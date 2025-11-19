@@ -1862,9 +1862,17 @@ def train_network(model, regions_dict, region_cells, num_epochs, lr, A=None, R=N
                         print(f"{'='*80}\n")
 
                     # Adaptive refinement: refine ALL failing cells periodically
-                    REFINE_INTERVAL = 10  # Refine every 50 epochs
+                    # REFINE_INTERVAL = 10  # Refine every 50 epochs
+                    # # REFINE_INTERVAL = 100 if epoch > 99 else 50
+                    # REFINE_FACTOR = 5  # Split into 2x2 subcells
+
+                    REFINE_INTERVAL = 500  # Refine every 50 epochs
                     # REFINE_INTERVAL = 100 if epoch > 99 else 50
-                    REFINE_FACTOR = 5  # Split into 2x2 subcells
+                    REFINE_FACTOR = 2  # Split into 2x2 subcells
+
+                    if(epoch > 2500):
+                        REFINE_INTERVAL = 100
+
 
                     if (epoch + 1) % REFINE_INTERVAL == 0 and num_total_failing > 0 and len(region_cells['generator']) < 3100:
                         print(f"\n[Adaptive Refinement] Refining failing cells at epoch {epoch+1}")
@@ -2297,8 +2305,8 @@ if __name__ == "__main__":
     ], dtype=np.float32)
 
     R_matrix = np.array([
-        [0.0, 0.0],
-        [0.0, 0.0]
+        [0.2, 0.0],
+        [0.0, 0.2]
     ], dtype=np.float32)
 
     # Generator loss weight (0.0 = disabled, 1.0 = same weight as other losses)
