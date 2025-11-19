@@ -14,6 +14,7 @@ from torch.func import jacrev, hessian, vmap
 # ============================================================================
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # device = torch.device('gpu')
+torch.manual_seed(0)
 
 # Network architecture (3 hidden layers for deeper composition)
 N_INPUTS = 2
@@ -37,11 +38,11 @@ NUM_EPOCHS = 200000
 # NOTE: With state-dependent diffusion (σ²x²), we need finer discretization
 # to catch extreme corners where Φ can explode!
 N_DISCRETIZE_GOAL = 1
-N_DISCRETIZE_OUTSIDE_GOAL = 4  # For V constraint: X \ Goal
+N_DISCRETIZE_OUTSIDE_GOAL = 3  # For V constraint: X \ Goal
 N_DISCRETIZE_GENERATOR = 1  # For Φ constraint: X \ (Goal ∪ Unsafe)
 # N_DISCRETIZE_ALL = 1
-N_DISCRETIZE_UNSAFE = 7
-N_DISCRETIZE_INIT = 7
+N_DISCRETIZE_UNSAFE = 3
+N_DISCRETIZE_INIT = 3
 
 # Constraints
 use_tan = False
@@ -50,10 +51,10 @@ use_arctan = False
 use_gelu = False
 use_relu = False
 # use_relu = True
-BETA_S = 0.3
+BETA_S = 0.6
 BETA_S_GOAL = BETA_S/2.0
 BETA_RA = 20.0
-SCALE_FACTOR = 10.0
+SCALE_FACTOR = 20.0
 ALL_V_LOWER_TARGET = 0.0
 
 # Input normalization scale (maps [-INPUT_SCALE, INPUT_SCALE] -> [-1, 1])
@@ -813,16 +814,19 @@ def loss_goal_sampled(model, goal_region, v_lowers, show, n_samples=10):
     v_samples = model(samples).squeeze()
 
     # Minimize V at these points (push toward 0, but penalize going below 0)
-    # Want: some V < beta_s, and all V >= 0
-    
-    
+    # Want: at least one V < BETA_S (strictly less than)
+
+
     # loss_soft = torch.relu(v_samples - BETA_S_GOAL).mean()  # Push below beta_s
-    loss_soft = torch.mean(v_samples)
+    # loss_soft = torch.mean(v_samples)
     # loss_soft = torch.sum(v_samples)
 
 
     # loss_nonneg = torch.relu(-v_samples).mean()  # Keep >= 0
-    # loss_nonneg = torch.relu(-v_lowers).sum()
+    loss_nonneg = torch.relu(-v_lowers).sum()
+
+    v_min = v_samples.min()
+    loss_soft = 1.0 * (v_min - BETA_S + 0.1)
 
     if (v_samples.min() < BETA_S).item() and (v_lowers.min() >= 0).item():
         passed = True
@@ -831,8 +835,8 @@ def loss_goal_sampled(model, goal_region, v_lowers, show, n_samples=10):
             print(f"  ✗ Goal sample failed: min V = {v_samples.min().item():.4f}, min V_lower = {v_lowers.min().item():.4f}")
         passed = False
 
-    # return loss_soft + loss_nonneg, passed
-    return loss_soft, passed
+    return loss_soft + loss_nonneg, passed
+    # return loss_soft, passed
 
 def loss_outside_goal_bounds(v_lowers, v_uppers):
     """
@@ -1439,16 +1443,16 @@ def pretrain_structure_aware(model, x_goal_range, x_unsafe_range, x_init_range, 
 
             if in_goal:
                 # Goal: want V small (< BETA_S = 0.9)
-                target_v[i] = 0.3 + 0.2 * torch.rand(1).item()  # Random in [0.3, 0.5]
+                target_v[i] = 0.3 +  0.001 * torch.rand(1).item()  # Random in [0.3, 0.5]
             elif in_unsafe:
                 # Unsafe: want V large (> BETA_RA = 10)
-                target_v[i] = 12.0 + 3.0 * torch.rand(1).item()  # Random in [12, 15]
+                target_v[i] = 20.0 + 3.0 * torch.rand(1).item()  # Random in [12, 15]
             elif in_init:
                 # Init: want BETA_S < V < 1.0
                 target_v[i] = 0.92 + 0.05 * torch.rand(1).item()  # Random in [0.92, 0.97]
             else:
                 # Outside goal: want V > BETA_S
-                target_v[i] = 1.1 + 0.3 * torch.rand(1).item()  # Random in [1.1, 1.4]
+                target_v[i] = 0.3 + 0.3 * torch.rand(1).item()  # Random in [1.1, 1.4]
 
         # Forward pass for V
         v_output = model(x).squeeze()
@@ -1478,7 +1482,7 @@ def pretrain_structure_aware(model, x_goal_range, x_unsafe_range, x_init_range, 
                 phi_output = phi_module(x_gen_filtered).squeeze()
 
                 # Loss: penalize positive Φ (want Φ ≤ 0 in generator region)
-                loss_phi = torch.nn.functional.relu(phi_output + 0.0).mean()
+                loss_phi = torch.nn.functional.relu(phi_output + 1.0).sum()
 
         # Combined loss (weight V more heavily initially)
         total_loss = loss_v + 1.0 * loss_phi  # Start with low GV weight
@@ -1501,7 +1505,7 @@ def pretrain_structure_aware(model, x_goal_range, x_unsafe_range, x_init_range, 
     print("="*80 + "\n")
 
 def train_network(model, regions_dict, region_cells, num_epochs, lr, A=None, R=None, generator_weight=1.0, generator_start_epoch=1000,
-                  crown_bounds_start_epoch=180000, enable_crown_verification=False, crown_verify_epoch_interval=500, crown_refine_N=2, crown_max_depth=2, scale_factor=1.0):
+                  crown_bounds_start_epoch=180000, lbfgs_start_epoch=190000, enable_crown_verification=False, crown_verify_epoch_interval=500, crown_refine_N=2, crown_max_depth=2, scale_factor=1.0):
     """
     Train the network using regions_dict approach
 
@@ -1519,13 +1523,16 @@ def train_network(model, regions_dict, region_cells, num_epochs, lr, A=None, R=N
         generator_weight: weight for generator loss (0 = disabled)
         generator_start_epoch: epoch to start applying generator loss (curriculum learning)
         crown_bounds_start_epoch: epoch to switch from sampling to CROWN bounds for GV (default: 180000, ~90% of 200k)
+        lbfgs_start_epoch: epoch to switch from Adam to L-BFGS optimizer (default: 190000, final 5% for fine-tuning)
         enable_crown_verification: if True, run CROWN verification when all constraints satisfied
         crown_verify_epoch_interval: run CROWN verification every N epochs (when constraints satisfied)
         crown_refine_N: refinement factor for CROWN verification (2 = 2x2 split)
         crown_max_depth: maximum CROWN refinement iterations (early stop for training feedback)
         scale_factor: SCALE_FACTOR from network architecture
     """
+    # Start with Adam optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    current_optimizer_name = "Adam"
 
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer,
@@ -1536,6 +1543,9 @@ def train_network(model, regions_dict, region_cells, num_epochs, lr, A=None, R=N
         min_lr=1e-6,          # minimum learning rate
         threshold=1e-3        # minimum change to qualify as improvement
     )
+
+    # Track if we've switched to L-BFGS
+    switched_to_lbfgs = False
 
     # Detect activation type
     use_manual_softplus = isinstance(model.activation_fn, nn.Softplus)
@@ -1660,12 +1670,41 @@ def train_network(model, regions_dict, region_cells, num_epochs, lr, A=None, R=N
     for epoch in range(num_epochs):
         # if epoch > 10000:
         #     break
+
+        # Switch to L-BFGS optimizer if we've reached the threshold
+        if epoch == lbfgs_start_epoch and not switched_to_lbfgs:
+            print(f"\n{'='*80}")
+            print(f"SWITCHING TO L-BFGS OPTIMIZER at epoch {epoch}")
+            print(f"L-BFGS uses second-order information for faster convergence near optimum")
+            print(f"{'='*80}\n")
+
+            # Create L-BFGS optimizer
+            # NOTE: Using very conservative settings to minimize closure calls (expensive with CROWN)
+            optimizer = torch.optim.LBFGS(
+                model.parameters(),
+                lr=1.0,  # L-BFGS learning rate
+                max_iter=1,  # Only 1 iteration per step (to minimize closure calls)
+                max_eval=3,  # Only 3 function evaluations (to minimize CROWN recomputation)
+                tolerance_grad=1e-5,  # Looser tolerance
+                tolerance_change=1e-7,
+                history_size=10,  # Smaller history (less memory)
+                line_search_fn=None  # Disable line search to avoid multiple closure calls
+            )
+            current_optimizer_name = "L-BFGS"
+            switched_to_lbfgs = True
+
+            # L-BFGS doesn't work well with scheduler, so disable it
+            scheduler = None
+
         # Step 1: Compute differentiable bounds for training
         # import time
         epoch_start_time = time.time()
 
         model.train()
-        optimizer.zero_grad()
+
+        # L-BFGS requires closure function, Adam doesn't
+        if not switched_to_lbfgs:
+            optimizer.zero_grad()
 
         # Flag for adaptive refinement cache rebuild
         needs_cache_rebuild = False
@@ -1823,11 +1862,11 @@ def train_network(model, regions_dict, region_cells, num_epochs, lr, A=None, R=N
                         print(f"{'='*80}\n")
 
                     # Adaptive refinement: refine ALL failing cells periodically
-                    REFINE_INTERVAL = 500  # Refine every 50 epochs
+                    REFINE_INTERVAL = 10  # Refine every 50 epochs
                     # REFINE_INTERVAL = 100 if epoch > 99 else 50
-                    REFINE_FACTOR = 2  # Split into 2x2 subcells
+                    REFINE_FACTOR = 5  # Split into 2x2 subcells
 
-                    if (epoch + 1) % REFINE_INTERVAL == 0 and num_total_failing > 0 and len(region_cells['generator']) < 1500:
+                    if (epoch + 1) % REFINE_INTERVAL == 0 and num_total_failing > 0 and len(region_cells['generator']) < 3100:
                         print(f"\n[Adaptive Refinement] Refining failing cells at epoch {epoch+1}")
                         print(f"  Before: {len(region_cells['generator'])} cells")
                         region_cells['generator'] = refine_cells_by_mask(
@@ -1946,7 +1985,20 @@ def train_network(model, regions_dict, region_cells, num_epochs, lr, A=None, R=N
         # Only step optimizer if we computed gradients
         if has_gradients:
             t0 = time.time()
-            optimizer.step()
+
+            if switched_to_lbfgs:
+                # L-BFGS requires a closure function
+                # Since we use max_iter=1 and line_search_fn=None, this should only be called once
+                def closure():
+                    # Return the already-computed loss (gradients already computed via backward())
+                    # This avoids expensive recomputation of CROWN bounds
+                    return total_loss
+
+                optimizer.step(closure)
+            else:
+                # Adam optimizer - simple step
+                optimizer.step()
+
             t_optimizer = time.time() - t0
         else:
             t_optimizer = 0.0
@@ -2005,7 +2057,8 @@ def train_network(model, regions_dict, region_cells, num_epochs, lr, A=None, R=N
             region_bounds = split_bounds_by_region(v_lowers, v_uppers)
 
         # Update scheduler less frequently (every 10 epochs is enough)
-        if (epoch + 1) % 10 == 0 and has_gradients:
+        # Only use scheduler if we're still using Adam (not L-BFGS)
+        if scheduler is not None and (epoch + 1) % 10 == 0 and has_gradients:
             scheduler.step(total_loss.item())
 
         # Print progress and check constraints periodically (not every epoch!)
@@ -2201,6 +2254,7 @@ if __name__ == "__main__":
             # Clip cells to remove overlaps with goal and unsafe regions
             print(f'  Clipping {len(all_cells)} generator cells against goal and unsafe regions...')
             exclusion_regions = [x_goal_range, x_unsafe_range]
+            # exclusion_regions = []
             clipped_cells = []
             for cell_lower, cell_upper in all_cells:
                 # Convert from torch tensors to numpy for clipping
@@ -2298,7 +2352,7 @@ if __name__ == "__main__":
 
     # Pre-train the network to have a good initial structure
     ENABLE_PRETRAINING = True  # Set to False to skip pre-training
-    PRETRAIN_EPOCHS = 500
+    PRETRAIN_EPOCHS = 1500
     PRETRAIN_LR = 0.01
 
     if ENABLE_PRETRAINING:
@@ -2318,12 +2372,16 @@ if __name__ == "__main__":
     # GV Training Strategy: Use sampling (fast) first, then CROWN (rigorous) to polish
     CROWN_BOUNDS_START_EPOCH = 0  # Switch to CROWN at 90% of training (polish final 10%)
 
+    # Optimizer Strategy: Use Adam first, then L-BFGS for final fine-tuning
+    LBFGS_START_EPOCH = 10000000000  # Switch to L-BFGS at 95% (last 5% for precision)
+
     verified_boxes, verified_bounds = train_network(
         model, regions_dict, region_cells, NUM_EPOCHS, LEARNING_RATE,
         A=A_matrix, R=R_matrix,
         generator_weight=GENERATOR_WEIGHT,
         generator_start_epoch=GENERATOR_START_EPOCH,
         crown_bounds_start_epoch=CROWN_BOUNDS_START_EPOCH,
+        lbfgs_start_epoch=LBFGS_START_EPOCH,
         enable_crown_verification=ENABLE_CROWN_VERIFICATION,
         crown_verify_epoch_interval=CROWN_VERIFY_INTERVAL,
         crown_refine_N=CROWN_REFINE_N,
