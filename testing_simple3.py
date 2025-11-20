@@ -18,8 +18,8 @@ torch.manual_seed(0)
 
 # Network architecture (3 hidden layers for deeper composition)
 N_INPUTS = 2
-N_HIDDEN_1 = 128
-N_HIDDEN_2 = 128
+N_HIDDEN_1 = 512
+N_HIDDEN_2 = 32
 # N_HIDDEN_3 = 64
 N_OUTPUTS = 1
 
@@ -37,7 +37,7 @@ NUM_EPOCHS = 200000
 # Discretization
 # NOTE: With state-dependent diffusion (σ²x²), we need finer discretization
 # to catch extreme corners where Φ can explode!
-N_DISCRETIZE_GOAL = 1
+N_DISCRETIZE_GOAL = 3
 N_DISCRETIZE_OUTSIDE_GOAL = 3  # For V constraint: X \ Goal
 N_DISCRETIZE_GENERATOR = 1  # For Φ constraint: X \ (Goal ∪ Unsafe)
 # N_DISCRETIZE_ALL = 1
@@ -812,6 +812,19 @@ def loss_goal_sampled(model, goal_region, v_lowers, show, n_samples=10):
 
     # Evaluate V at samples
     v_samples = model(samples).squeeze()
+    
+    # --- MODIFICATION START ---
+    # Instead of mean(), take the 'k' lowest values (Existential relaxation)
+    # If we satisfy the condition for the bottom 10% of points, we satisfy the existential query.
+    k = 100
+    
+    # Get the k smallest V values
+    smallest_v, _ = torch.topk(v_samples, k=k, largest=False)
+    
+    # Only minimize these "winners". 
+    # This stops the "losers" (points near the boundary) from polluting the gradient.
+    loss_soft = torch.relu(smallest_v - (BETA_S - 0.1)).mean()
+    # --- MODIFICATION END ---
 
     # Minimize V at these points (push toward 0, but penalize going below 0)
     # Want: at least one V < BETA_S (strictly less than)
@@ -825,8 +838,8 @@ def loss_goal_sampled(model, goal_region, v_lowers, show, n_samples=10):
     # loss_nonneg = torch.relu(-v_samples).mean()  # Keep >= 0
     loss_nonneg = torch.relu(-v_lowers).sum()
 
-    v_min = v_samples.min()
-    loss_soft = 1.0 * (v_min - BETA_S + 0.1)
+    # v_min = v_samples.min()
+    # loss_soft = 1.0 * (v_min - BETA_S + 1.0)
 
     if (v_samples.min() < BETA_S).item() and (v_lowers.min() >= 0).item():
         passed = True
@@ -1803,6 +1816,13 @@ def train_network(model, regions_dict, region_cells, num_epochs, lr, A=None, R=N
                     # Strategy: Minimize upper bounds directly (always provides gradient signal)
                     # phi_upper_violation = phi_uppers_gen  # No relu! Minimize even when negative
                     phi_upper_violation = torch.nn.functional.relu(phi_uppers_gen + 0.0)
+                    # def soft_indicator_pos(x, k=10.0):
+                    #     """
+                    #     Smooth approximation of 1_{x > 0}.
+                    #     k controls how sharp the transition is.
+                    #     """
+                    #     return torch.sigmoid(k * (x+0.1))
+                    # phi_upper_violation = soft_indicator_pos(phi_uppers_gen)
                     # phi_lower_violation = torch.nn.functional.relu(phi_lowers_gen + 10000.0)
                     # phi_violation = phi_upper_violation + phi_lower_violation
                     phi_violation = phi_upper_violation
@@ -2075,16 +2095,16 @@ def train_network(model, regions_dict, region_cells, num_epochs, lr, A=None, R=N
                 loss_str = ", ".join([f"{name}={loss.item():.4f}" for name, loss in region_losses.items()])
                 epoch_time = time.time() - epoch_start_time
                 print(f"Epoch [{epoch}/{num_epochs}], Loss: {total_loss.item():.4f} ({loss_str})")
-                if epoch % 1000000 == 0:  # Print detailed timing every 10 epochs
-                    print(f"  [TIMING] Total: {epoch_time:.3f}s | V_CROWN: {t_v_crown:.3f}s | V_loss: {t_v_loss:.3f}s | GV_CROWN: {t_gv_crown:.3f}s | GV_Sample: {t_gv_sample:.3f}s | GV_loss: {t_gv_loss:.3f}s | Backward: {t_backward:.3f}s | Optimizer: {t_optimizer:.3f}s | Split: {t_split:.3f}s")
-                    print(f"  [TIMING] Longest: {max(t_v_crown, t_v_loss, t_gv_crown, t_gv_loss, t_backward, t_optimizer):.3f}s")
+                # if epoch % 1000000 == 0:  # Print detailed timing every 10 epochs
+                #     print(f"  [TIMING] Total: {epoch_time:.3f}s | V_CROWN: {t_v_crown:.3f}s | V_loss: {t_v_loss:.3f}s | GV_CROWN: {t_gv_crown:.3f}s | GV_Sample: {t_gv_sample:.3f}s | GV_loss: {t_gv_loss:.3f}s | Backward: {t_backward:.3f}s | Optimizer: {t_optimizer:.3f}s | Split: {t_split:.3f}s")
+                #     print(f"  [TIMING] Longest: {max(t_v_crown, t_v_loss, t_gv_crown, t_gv_loss, t_backward, t_optimizer):.3f}s")
 
             if compute_V:
                 # Check constraints
                 with torch.no_grad():
                     # Goal: sample
                     # goal_satisfied = (goal_v_samples.min() < BETA_S).item() and (goal_v_samples.min() >= 0).item()
-                    goal_satisfied = passed
+                    _, goal_satisfied = loss_goal_sampled(model, region, v_lowers_region, show=show, n_samples=1000)
 
                     # Others: bounds
                     outside_satisfied = (region_bounds['outside'][0] >= BETA_S).all().item()
@@ -2174,6 +2194,8 @@ def train_network(model, regions_dict, region_cells, num_epochs, lr, A=None, R=N
                 )
                 # exit()
                 break
+        if has_gradients:
+            optimizer.step()
 
     end_time = time.time() - start_time
     print(f"Training completed in {end_time:.2f} seconds")
@@ -2360,7 +2382,7 @@ if __name__ == "__main__":
 
     # Pre-train the network to have a good initial structure
     ENABLE_PRETRAINING = True  # Set to False to skip pre-training
-    PRETRAIN_EPOCHS = 1500
+    PRETRAIN_EPOCHS = 2000
     PRETRAIN_LR = 0.01
 
     if ENABLE_PRETRAINING:
