@@ -18,7 +18,7 @@ torch.manual_seed(0)
 
 # Network architecture (3 hidden layers for deeper composition)
 N_INPUTS = 2
-N_HIDDEN_1 = 512
+N_HIDDEN_1 = 256
 N_HIDDEN_2 = 32
 # N_HIDDEN_3 = 64
 N_OUTPUTS = 1
