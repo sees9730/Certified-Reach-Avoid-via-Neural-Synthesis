@@ -36,6 +36,7 @@ from visualization import (
     visualize_training_progress,
     create_summary_plots
 )
+from controls import apply_control, diagonal_control
 
 
 class LearnableBetaS(nn.Module):
@@ -322,6 +323,7 @@ def train_network_bounds(
 
     # Training loop
     loss_history = []
+    refinement_epochs = {'outside': [], 'generator': []}
     start_time = time.time()
 
     for epoch in range(params.training.num_epochs):
@@ -471,6 +473,55 @@ def train_network_bounds(
         # Update scheduler AFTER bounds recomputation (matching testing_simple3.py's order!)
         scheduler.step(total_loss.item())
 
+        # Get current beta_s value for constraint checks
+        beta_s_check = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
+
+        # Adaptive refinement for outside region cells
+        needs_cache_rebuild = False
+        if compute_V and len(bounds_updated['outside'][0]) > 0:
+            # Track failing cells in outside region
+            outside_failing_mask = bounds_updated['outside'][0] < beta_s_check
+            num_outside_failing = outside_failing_mask.sum().item()
+
+            # Ensure bounds match current cell count
+            if len(outside_failing_mask) == len(region_cells['outside']) and num_outside_failing > 0:
+                REFINE_INTERVAL = 500
+                REFINE_FACTOR = 2
+                MAX_CELLS = 2000
+
+                if epoch > 2500:
+                    REFINE_INTERVAL = 100
+
+                if ((epoch + 1) % REFINE_INTERVAL == 0 and
+                    len(region_cells['outside']) < MAX_CELLS):
+                    print(f"\n[Adaptive Refinement - Outside] Refining failing cells at epoch {epoch+1}")
+                    print(f"  Before: {len(region_cells['outside'])} cells")
+                    print(f"  Failing cells: {num_outside_failing}/{len(region_cells['outside'])}")
+
+                    from discretization import discretize_region
+                    from regions import Region
+                    new_cells = []
+                    num_refined = 0
+
+                    for i, (cell_lower, cell_upper) in enumerate(region_cells['outside']):
+                        if i < len(outside_failing_mask) and outside_failing_mask[i]:
+                            cell_bounds = np.array([
+                                [cell_lower[0].item(), cell_upper[0].item()],
+                                [cell_lower[1].item(), cell_upper[1].item()]
+                            ], dtype=np.float32)
+                            cell_region = Region(cell_bounds)
+                            refined = discretize_region(cell_region, REFINE_FACTOR)
+                            new_cells.extend(refined)
+                            num_refined += 1
+                        else:
+                            new_cells.append((cell_lower, cell_upper))
+
+                    region_cells['outside'] = new_cells
+                    print(f"  After: {len(region_cells['outside'])} cells")
+                    print(f"  Refined {num_refined} failing cells into {num_refined * REFINE_FACTOR**2} subcells")
+                    needs_cache_rebuild = True
+                    refinement_epochs['outside'].append(epoch + 1)
+
         # Adaptive refinement for generator cells (before optimizer step)
         if compute_GV:
             if (epoch >= params.training.generator_start_epoch and
@@ -519,9 +570,8 @@ def train_network_bounds(
                     region_cells['generator'] = new_cells
                     print(f"  After: {len(region_cells['generator'])} cells")
                     print(f"  Refined {num_refined} failing cells into {num_refined * REFINE_FACTOR**2} subcells")
-
-                    # Flag to rebuild caches after optimizer step
                     needs_cache_rebuild = True
+                    refinement_epochs['generator'].append(epoch + 1)
 
         # Logging
         if epoch % 10 == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
@@ -539,14 +589,12 @@ def train_network_bounds(
         # Moved here to match testing_simple3.py's order (after logging, before detailed evaluation)
         # Use bounds_updated (computed AFTER optimizer step) to match testing_simple3.py!
         with torch.no_grad():
-            # Use detached beta_s for comparison
-            beta_s_check = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
             if compute_V:
                 if epoch % 10 == 0:
                     show = True
                 else:
                     show = False
-                _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, device=device, show=show, check=True, n_samples=1000)
+                _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, device=device, show=show, check=True, n_samples=10000)
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
                 init_satisfied = (bounds_updated['init'][0].min() >= beta_s_check and bounds_updated['init'][1].max() <= 1.0)
                 outside_satisfied = (bounds_updated['outside'][0].min() >= beta_s_check)
@@ -669,7 +717,7 @@ def train_network_bounds(
     if learnable_beta_s is not None:
         print(f"\nFinal learned β_s = {final_beta_s:.4f}")
 
-    return loss_history, final_beta_s
+    return loss_history, final_beta_s, refinement_epochs
 
 
 def main():
@@ -704,7 +752,7 @@ def main():
     params.training.generator_start_epoch = 0
 
     params.discretization.n_goal = 7
-    params.discretization.n_outside_goal = 3
+    params.discretization.n_outside_goal = 5
     params.discretization.n_generator = 1  # Will be overridden by radial discretization
     params.discretization.n_unsafe = 3
     params.discretization.n_init = 2
@@ -734,18 +782,29 @@ def main():
     print("SYSTEM DYNAMICS")
     print("="*80)
 
-    F_matrix = np.array([
-        [-1.5, 1.0],
-        [-1.0, -1.5]
+    # Open-loop dynamics
+    F_matrix_OL = np.array([
+        [-0.5, 1.0],
+        [-1.0, -0.5]
     ], dtype=np.float32)
+
+    # Control law: u = [-x1, -x2]
+    K_matrix = diagonal_control([-1.0, -1.0])
+
+    # Closed-loop dynamics: F_cl = F + K
+    F_matrix = apply_control(F_matrix_OL, K_matrix)
 
     G_matrix = np.array([
         [0.2, 0.0],
         [0.0, 0.2]
     ], dtype=np.float32)
 
+    print(f"Open-loop F:\n{F_matrix_OL}")
+    print(f"\nControl gain K (u = K @ x):\n{K_matrix}")
+    print(f"\nClosed-loop F:\n{F_matrix}")
+
     dynamics = Dynamics.from_matrices(F=F_matrix, G=G_matrix)
-    print(dynamics)
+    print(f"\n{dynamics}")
 
     # ========================================================================
     # 3. SPATIAL REGIONS
@@ -837,7 +896,7 @@ def main():
     device = params.training.device
     print(f"\nUsing device: {device}")
 
-    loss_history, final_beta_s = train_network_bounds(
+    loss_history, final_beta_s, refinement_epochs = train_network_bounds(
         V_net=V_net,
         GV_net=GV_net,
         region_cells=region_cells,
@@ -878,6 +937,7 @@ def main():
         beta_s=final_beta_s,
         beta_ra=params.constraints.beta_ra,
         loss_history=loss_history,
+        refinement_epochs=refinement_epochs,
         output_dir="results"
     )
 

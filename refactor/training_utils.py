@@ -94,64 +94,9 @@ def compute_loss_goal_bounds(
     check: bool = False,
     show: bool = False
 ) -> torch.Tensor:
-    """
-    Compute goal constraint loss from bounds and samples.
-
-    Goal: ∃x ∈ goal s.t. V(x) < beta_s (existential constraint)
-    Uses SAMPLED points to minimize V + bounds for non-negativity check
-
-    Args:
-        model: V network
-        goal_region: Goal region (Region or numpy array)
-        V_lower: Lower bounds on V (N,)
-        V_upper: Upper bounds on V (N,)
-        beta_s: Separation threshold (float or torch.Tensor)
-        n_samples: Number of samples to draw
-        device: Device
-
-    Returns:
-        Loss (scalar)
-    """
-    # import numpy as np
-
-    # # Get goal bounds
-    # if hasattr(goal_region, 'bounds'):
-    #     bounds = goal_region.bounds
-    # else:
-    #     bounds = goal_region  # numpy array
-
-    # # Create cache key
-    # cache_key = (bounds[0, 0].item() if hasattr(bounds[0, 0], 'item') else bounds[0, 0],
-    #              bounds[0, 1].item() if hasattr(bounds[0, 1], 'item') else bounds[0, 1],
-    #              bounds[1, 0].item() if hasattr(bounds[1, 0], 'item') else bounds[1, 0],
-    #              bounds[1, 1].item() if hasattr(bounds[1, 1], 'item') else bounds[1, 1],
-    #              n_samples)
-
-    # # Generate fixed samples once and cache them
-    # if cache_key not in _goal_samples_cache:
-    #     x1_samples = torch.rand(n_samples, device=device) * (bounds[0, 1] - bounds[0, 0]) + bounds[0, 0]
-    #     x2_samples = torch.rand(n_samples, device=device) * (bounds[1, 1] - bounds[1, 0]) + bounds[1, 0]
-    #     samples = torch.stack([x1_samples, x2_samples], dim=1)
-    #     _goal_samples_cache[cache_key] = samples
-    # else:
-    #     samples = _goal_samples_cache[cache_key].to(device)
-
-    # # Evaluate V at samples
-    # v_samples = model(samples).squeeze()
-
-    # # Take the k smallest V values (existential relaxation)
-    # k = 1000
-    # smallest_v, _ = torch.topk(v_samples, k=k, largest=False)
-
-    # # Minimize these "winners" - push toward values < beta_s
-    # loss_soft = torch.relu(smallest_v - (beta_s - 0.1)).min()
-
-    # # Non-negativity penalty (from bounds)
-    # loss_nonneg = torch.relu(-V_lower).sum()
-
+    
     bounds = goal_region.bounds
 
-    # ===== OPTION 2: Target the exact center point =====
     # Compute center of goal region
     center_x1 = (bounds[0, 0] + bounds[0, 1]) / 2.0
     center_x2 = (bounds[1, 0] + bounds[1, 1]) / 2.0
@@ -160,35 +105,45 @@ def compute_loss_goal_bounds(
     # Evaluate V at center point
     v_center = model(center).squeeze()
 
-    # Strong loss on center point - push it well below beta_s
-    margin = 0.2
-    loss_center = F.relu(v_center - (beta_s - margin)) * 2.0  # 20x weight on center!
+    # Strong loss on center point
+    margin = 0.3
+    loss_center = F.relu(v_center - (beta_s - margin)) * 10.0 
 
-    # Also sample from full goal region for verification and softer guidance
-    x1_samples = torch.rand(n_samples, device=device) * (bounds[0, 1] - bounds[0, 0]) + bounds[0, 0]
-    x2_samples = torch.rand(n_samples, device=device) * (bounds[1, 1] - bounds[1, 0]) + bounds[1, 0]
+    # Shrink the sampling bounds by a factor
+    # This creates a "safe buffer" where V is allowed to transition from >= beta_s to < beta_s
+    shrink_factor = 0.3 
+    
+    span_x1 = bounds[0, 1] - bounds[0, 0]
+    span_x2 = bounds[1, 1] - bounds[1, 0]
+    
+    inner_lower_x1 = bounds[0, 0] + span_x1 * (1 - shrink_factor) / 2
+    inner_upper_x1 = bounds[0, 1] - span_x1 * (1 - shrink_factor) / 2
+    inner_lower_x2 = bounds[1, 0] + span_x2 * (1 - shrink_factor) / 2
+    inner_upper_x2 = bounds[1, 1] - span_x2 * (1 - shrink_factor) / 2
+
+    x1_samples = torch.rand(n_samples, device=device) * (inner_upper_x1 - inner_lower_x1) + inner_lower_x1
+    x2_samples = torch.rand(n_samples, device=device) * (inner_upper_x2 - inner_lower_x2) + inner_lower_x2
     samples = torch.stack([x1_samples, x2_samples], dim=1)
     v_samples = model(samples).squeeze()
 
     # Softer loss on minimum of sampled points
-    loss_rest = F.relu(v_samples.min() - (beta_s - 0.1))
+    loss_rest = F.relu(v_samples.min() - (beta_s - 0.05))
 
     # Combined soft loss
     loss_soft = loss_center + loss_rest
 
-    # Non-negativity penalty from bounds
     loss_nonneg = torch.relu(-V_lower).min()
-
-    # Check if constraints are satisfied (using all samples for verification)
+    
+    # When checking for success (passed), still check the logic based on the CENTER or MIN sample, not the edges.
     if ((v_samples.min() < beta_s).item() or v_center < beta_s) and (V_lower.min() >= 0).item():
         passed = True
         if show:
             print(f"  ✓ Goal sample passed: min V = {min(v_samples.min().item(), v_center.item()):.4f}, min V_lower = {V_lower.min().item():.4f}")
     else:
+        passed = False
         if show:
             print(f"  ✗ Goal sample failed: min V = {min(v_samples.min().item(), v_center.item()):.4f}, min V_lower = {V_lower.min().item():.4f}")
-        passed = False
-
+        
     return loss_soft + loss_nonneg, passed
 
 def compute_loss_unsafe_bounds(

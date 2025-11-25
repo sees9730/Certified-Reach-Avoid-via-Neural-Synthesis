@@ -331,6 +331,7 @@ def plot_constraint_regions(
 
 def plot_loss_history(
     loss_history: List[dict],
+    refinement_epochs: Optional[dict] = None,
     filename: Optional[str] = None,
     figsize: Tuple[int, int] = (12, 8)
 ):
@@ -339,6 +340,7 @@ def plot_loss_history(
 
     Args:
         loss_history: List of loss dictionaries from training
+        refinement_epochs: Dict with 'outside' and 'generator' keys containing lists of refinement epochs (optional)
         filename: Output filename
         figsize: Figure size
     """
@@ -393,6 +395,36 @@ def plot_loss_history(
     axes[1, 2].set_ylabel('Loss')
     axes[1, 2].grid(True, alpha=0.3)
 
+    # Add vertical lines for adaptive refinement events
+    legend_added = False
+    if refinement_epochs is not None:
+        # Outside refinements
+        outside_refs = refinement_epochs.get('outside', [])
+        if len(outside_refs) > 0:
+            for ax in axes.flat:
+                for ref_epoch in outside_refs:
+                    ax.axvline(x=ref_epoch, color='black', linestyle='--',
+                              linewidth=1.5, alpha=0.7)
+            # Add to legend
+            axes[0, 0].axvline(x=outside_refs[0], color='black', linestyle='--',
+                              linewidth=1.5, alpha=0.7, label='Outside Refine')
+            legend_added = True
+
+        # Generator refinements
+        generator_refs = refinement_epochs.get('generator', [])
+        if len(generator_refs) > 0:
+            for ax in axes.flat:
+                for ref_epoch in generator_refs:
+                    ax.axvline(x=ref_epoch, color='steelblue', linestyle='--',
+                              linewidth=1.5, alpha=0.7)
+            # Add to legend
+            axes[0, 0].axvline(x=generator_refs[0], color='steelblue', linestyle='--',
+                              linewidth=1.5, alpha=0.7, label='Generator Refine')
+            legend_added = True
+
+        if legend_added:
+            axes[0, 0].legend(loc='best', fontsize=8)
+
     plt.tight_layout()
 
     # Save
@@ -423,6 +455,7 @@ def create_summary_plots(
     beta_s: float,
     beta_ra: float,
     loss_history: Optional[List[dict]] = None,
+    refinement_epochs: Optional[dict] = None,
     output_dir: str = "results"
 ):
     """
@@ -436,6 +469,7 @@ def create_summary_plots(
         beta_s: Separation threshold
         beta_ra: Unsafe threshold
         loss_history: Training loss history (optional)
+        refinement_epochs: Dict with 'outside' and 'generator' refinement epochs (optional)
         output_dir: Output directory for plots
     """
     import os
@@ -488,6 +522,7 @@ def create_summary_plots(
         print("\n4. Loss history...")
         plot_loss_history(
             loss_history,
+            refinement_epochs=refinement_epochs,
             filename=f"{output_dir}/loss_history.png"
         )
 
