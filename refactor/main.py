@@ -110,7 +110,10 @@ def pretrain_structure_aware(model, x_goal_range, x_unsafe_range, x_init_range, 
         else:
             G_matrix = R.cpu().numpy() if isinstance(R, torch.Tensor) else R
 
-        dynamics = Dynamics.from_matrices(F=A_np, G=G_matrix)
+        from dynamics import diagonal_state_diffusion_general
+        sigma_diag = np.diag(G_matrix)  # [0.2, 0.2]
+        diffusion_fn = diagonal_state_diffusion_general(sigma_diag)
+        dynamics = Dynamics.nonlinear(A, G=diffusion_fn, state_dim=2)
         phi_module = create_GV(model, dynamics, network_config, training_config).to(device)
         # print(phi_module)
         print(f"  GV (Φ) pre-training ENABLED with dynamics")
@@ -794,6 +797,22 @@ def main():
     # Closed-loop dynamics: F_cl = F + K
     F_matrix = apply_control(F_matrix_OL, K_matrix)
 
+    # Convert F_matrix to torch tensor for use in callable (ensures numerical equivalence)
+    F_matrix_torch = torch.from_numpy(F_matrix).float()
+
+    def sys_dynamics(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
+        # Batch: x @ F^T
+        return x @ F_matrix_torch.T
+
+    # def sys_dynamics(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
+    #     # Batch
+    #     x1 = x[:, 0]
+    #     x2 = x[:, 1]
+    #     # F_cl @ x
+    #     f1 = -1.5 * x1 + 1.0 * x2
+    #     f2 = -1.0 * x1 + -1.5 * x2
+    #     return torch.stack([f1, f2], dim=1)
+
     G_matrix = np.array([
         [0.2, 0.0],
         [0.0, 0.2]
@@ -803,7 +822,12 @@ def main():
     print(f"\nControl gain K (u = K @ x):\n{K_matrix}")
     print(f"\nClosed-loop F:\n{F_matrix}")
 
-    dynamics = Dynamics.from_matrices(F=F_matrix, G=G_matrix)
+    # Create state-dependent diffusion like from_matrices does
+    from dynamics import diagonal_state_diffusion_general
+    sigma_diag = np.diag(G_matrix)  # [0.2, 0.2]
+    diffusion_fn = diagonal_state_diffusion_general(sigma_diag)
+
+    dynamics = Dynamics.nonlinear(sys_dynamics, G=diffusion_fn, state_dim=2)
     print(f"\n{dynamics}")
 
     # ========================================================================
@@ -867,7 +891,7 @@ def main():
             x_unsafe_range=unsafe_range,
             x_init_range=init_range,
             x_range=full_range,
-            A=F_matrix,
+            A=sys_dynamics,
             R=G_matrix,
             scale_factor=params.network.scale_factor,
             num_epochs=PRETRAIN_EPOCHS,

@@ -106,7 +106,10 @@ class GV(nn.Module):
         print(f"[PhiModule] Initialized with:")
         print(f"  scale_factor: {self.scale_factor.item() if hasattr(self.scale_factor, 'item') else self.scale_factor}")
         print(f"  input_scale: {self.input_scale.item() if hasattr(self.input_scale, 'item') else self.input_scale}")
-        print(f"  Drift F:\n{self.F.numpy()}")
+        if self.F is not None:
+            print(f"  Drift F:\n{self.F.numpy()}")
+        else:
+            print(f" Drift: {self.dynamics.drift_fn}")
         if self.G is not None:
             raise ValueError('ggggggg')
             # print(f"  Diffusion G:\n{self.G.numpy()}")
