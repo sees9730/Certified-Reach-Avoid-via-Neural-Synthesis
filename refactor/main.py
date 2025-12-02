@@ -822,10 +822,23 @@ def main():
     print(f"\nControl gain K (u = K @ x):\n{K_matrix}")
     print(f"\nClosed-loop F:\n{F_matrix}")
 
-    # Create state-dependent diffusion like from_matrices does
-    from dynamics import diagonal_state_diffusion_general
+    # Create custom callable diffusion function: g(x) = diag(sigma * x)
     sigma_diag = np.diag(G_matrix)  # [0.2, 0.2]
-    diffusion_fn = diagonal_state_diffusion_general(sigma_diag)
+    sigma_torch = torch.from_numpy(sigma_diag).float()
+
+    def diffusion_fn(x: torch.Tensor) -> torch.Tensor:
+        if x.dim() == 1:
+            return torch.diag(sigma_torch * x)
+        else:
+            batch_size, state_dim = x.shape
+            G = torch.zeros(batch_size, state_dim, state_dim, device=x.device, dtype=x.dtype)
+            for i in range(state_dim):
+                G[:, i, i] = sigma_torch[i] * x[:, i]
+            return G
+
+    diffusion_fn.get_diagonal_squared = lambda x: (sigma_torch * x) ** 2
+    diffusion_fn._is_diagonal = True
+    diffusion_fn._sigma_diag = sigma_torch
 
     dynamics = Dynamics.nonlinear(sys_dynamics, G=diffusion_fn, state_dim=2)
     print(f"\n{dynamics}")
