@@ -1,73 +1,55 @@
 """
-Controls module for applying feedback control to system dynamics.
+Controls module for generic feedback control.
 
-This module provides utilities for transforming the drift matrix F using
-state feedback control laws of the form u = K @ x.
-
-For a system dx = F @ x dt + G(x) dW with control u, the closed-loop dynamics are:
-    dx = (F + K) @ x dt + G(x) dW
-
-where K is the control gain matrix.
+This module provides a generic control function that can be:
+- Linear feedback: u = K @ x
+- Neural network: u = NN(x)
+- Any callable: u = u_control(x)
 """
 
 import torch
 import numpy as np
-from typing import Union
+from typing import Union, Callable
 
 
-def apply_control(
-    F: Union[np.ndarray, torch.Tensor],
-    K: Union[np.ndarray, torch.Tensor]
-) -> Union[np.ndarray, torch.Tensor]:
+def u_control(K: Union[np.ndarray, torch.Tensor, Callable]) -> Callable:
     """
-    Apply state feedback control u = K @ x to drift matrix F.
-
-    Returns the closed-loop drift matrix: F_cl = F + K
+    Create a generic control function u(x).
 
     Args:
-        F: Open-loop drift matrix (state_dim x state_dim)
-        K: Control gain matrix (state_dim x state_dim)
-            For controller u = [k1*x1, k2*x2], use K = diag(k1, k2)
+        K: Can be:
+            - np.ndarray or torch.Tensor: Linear control u = K @ x
+            - Callable (e.g., neural network): u = K(x)
 
     Returns:
-        F_cl: Closed-loop drift matrix (same type as F)
+        Control function u(x) that takes state x and returns control input
 
     Example:
-        >>> F = np.array([[-0.5, 1.0], [-1.0, -0.5]])
-        >>> K = np.array([[-1.0, 0.0], [0.0, -1.0]])  # u = [-x1, -x2]
-        >>> F_cl = apply_control(F, K)
-        >>> # F_cl = [[-1.5, 1.0], [-1.0, -1.5]]
+        >>> # Linear control
+        >>> K = np.array([[-1.0, 0.0], [0.0, -1.0]])
+        >>> u = u_control(K)
+        >>> u(x)  # Returns K @ x
+
+        >>> # Neural network control
+        >>> u_nn = SomeNeuralNetwork()
+        >>> u = u_control(u_nn)
+        >>> u(x)  # Returns u_nn(x)
     """
-    # Ensure same type
-    if isinstance(F, np.ndarray):
-        if isinstance(K, torch.Tensor):
-            K = K.cpu().numpy()
-        return F + K
+    if callable(K):
+        # K is already a callable (neural network, custom function, etc.)
+        return K
     else:
+        # K is a matrix, create linear control function
         if isinstance(K, np.ndarray):
-            K = torch.from_numpy(K).to(F.device).to(F.dtype)
-        return F + K
+            K_torch = torch.from_numpy(K).float()
+        else:
+            K_torch = K.float()
 
+        def linear_control(x: torch.Tensor) -> torch.Tensor:
+            """Linear control: u = K @ x"""
+            if x.dim() == 1:
+                return K_torch @ x
+            else:
+                return x @ K_torch.T
 
-def diagonal_control(coefficients: Union[list, np.ndarray, torch.Tensor]) -> np.ndarray:
-    """
-    Create a diagonal control gain matrix.
-
-    For u = [k1*x1, k2*x2, ...], returns K = diag(k1, k2, ...)
-
-    Args:
-        coefficients: List or array of control gains [k1, k2, ...]
-
-    Returns:
-        K: Diagonal control gain matrix
-
-    Example:
-        >>> K = diagonal_control([-1.0, -1.0])  # u = [-x1, -x2]
-        >>> # K = [[-1.0, 0.0], [0.0, -1.0]]
-    """
-    if isinstance(coefficients, (list, tuple)):
-        coefficients = np.array(coefficients, dtype=np.float32)
-    elif isinstance(coefficients, torch.Tensor):
-        coefficients = coefficients.cpu().numpy()
-
-    return np.diag(coefficients).astype(np.float32)
+        return linear_control

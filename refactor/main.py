@@ -36,7 +36,7 @@ from visualization import (
     visualize_training_progress,
     create_summary_plots
 )
-from controls import apply_control, diagonal_control
+from controls import u_control
 
 
 class LearnableBetaS(nn.Module):
@@ -110,10 +110,7 @@ def pretrain_structure_aware(model, x_goal_range, x_unsafe_range, x_init_range, 
         else:
             G_matrix = R.cpu().numpy() if isinstance(R, torch.Tensor) else R
 
-        from dynamics import diagonal_state_diffusion_general
-        sigma_diag = np.diag(G_matrix)  # [0.2, 0.2]
-        diffusion_fn = diagonal_state_diffusion_general(sigma_diag)
-        dynamics = Dynamics.nonlinear(A, G=diffusion_fn, state_dim=2)
+        dynamics = Dynamics.dynamics(f=A, g=R)
         phi_module = create_GV(model, dynamics, network_config, training_config).to(device)
         # print(phi_module)
         print(f"  GV (Φ) pre-training ENABLED with dynamics")
@@ -785,62 +782,54 @@ def main():
     print("SYSTEM DYNAMICS")
     print("="*80)
 
-    # Open-loop dynamics
-    F_matrix_OL = np.array([
-        [-0.5, 1.0],
-        [-1.0, -0.5]
-    ], dtype=np.float32)
+    # Option 2: Neural network control (implements same K @ x)
+    class LinearControlNN(nn.Module):
+        def __init__(self):
+            super().__init__()
+            # Use nn.Linear but convert weight to buffer (non-trainable)
+            linear = nn.Linear(2, 2, bias=False)
+            with torch.no_grad():
+                linear.weight.copy_(torch.diag(torch.tensor([-1.0, -1.0])))
+            # Register weight as buffer instead of parameter
+            self.register_buffer('weight', linear.weight.data)
 
-    # Control law: u = [-x1, -x2]
-    K_matrix = diagonal_control([-1.0, -1.0])
+        def forward(self, x):
+            # Manually compute linear transformation
+            return torch.nn.functional.linear(x, self.weight, bias=None)
 
-    # Closed-loop dynamics: F_cl = F + K
-    F_matrix = apply_control(F_matrix_OL, K_matrix)
+    u_nn = LinearControlNN()
+    u_fn = u_control(u_nn)
 
-    # Convert F_matrix to torch tensor for use in callable (ensures numerical equivalence)
-    F_matrix_torch = torch.from_numpy(F_matrix).float()
+    def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
+        # Batch
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        f1 = -0.5 * x1 + 1.0 * x2
+        f2 = -0.0 * x1 + -0.5 * x2
+        return torch.stack([f1, f2], dim=1)
 
-    def sys_dynamics(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
-        # Batch: x @ F^T
-        return x @ F_matrix_torch.T
-
-    # def sys_dynamics(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
-    #     # Batch
-    #     x1 = x[:, 0]
-    #     x2 = x[:, 1]
-    #     # F_cl @ x
-    #     f1 = -1.5 * x1 + 1.0 * x2
-    #     f2 = -1.0 * x1 + -1.5 * x2
-    #     return torch.stack([f1, f2], dim=1)
+    def F_CL(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
+        """Closed-loop drift: f_cl(x) = f(x) + u(x)"""
+        return f_ol(x) + u_fn(x) 
 
     G_matrix = np.array([
         [0.2, 0.0],
         [0.0, 0.2]
     ], dtype=np.float32)
 
-    print(f"Open-loop F:\n{F_matrix_OL}")
-    print(f"\nControl gain K (u = K @ x):\n{K_matrix}")
-    print(f"\nClosed-loop F:\n{F_matrix}")
-
     # Create custom callable diffusion function: g(x) = diag(sigma * x)
     sigma_diag = np.diag(G_matrix)  # [0.2, 0.2]
     sigma_torch = torch.from_numpy(sigma_diag).float()
 
-    def diffusion_fn(x: torch.Tensor) -> torch.Tensor:
-        if x.dim() == 1:
-            return torch.diag(sigma_torch * x)
-        else:
-            batch_size, state_dim = x.shape
-            G = torch.zeros(batch_size, state_dim, state_dim, device=x.device, dtype=x.dtype)
-            for i in range(state_dim):
-                G[:, i, i] = sigma_torch[i] * x[:, i]
-            return G
+    def g(x: torch.Tensor) -> torch.Tensor:
+        return np.array([
+                [0.2, 0.0],
+                [0.0, 0.2]
+                ], dtype=np.float32)
 
-    diffusion_fn.get_diagonal_squared = lambda x: (sigma_torch * x) ** 2
-    diffusion_fn._is_diagonal = True
-    diffusion_fn._sigma_diag = sigma_torch
+    g.get_diagonal_squared = lambda x: (sigma_torch * x) ** 2
 
-    dynamics = Dynamics.nonlinear(sys_dynamics, G=diffusion_fn, state_dim=2)
+    dynamics = Dynamics.dynamics(f=F_CL, g=g)
     print(f"\n{dynamics}")
 
     # ========================================================================
@@ -904,7 +893,7 @@ def main():
             x_unsafe_range=unsafe_range,
             x_init_range=init_range,
             x_range=full_range,
-            A=sys_dynamics,
+            A=F_CL,
             R=G_matrix,
             scale_factor=params.network.scale_factor,
             num_epochs=PRETRAIN_EPOCHS,
@@ -989,7 +978,7 @@ def main():
     torch.save({
         'model_state_dict': V_net.state_dict(),
         'hyperparameters': params.to_dict(),
-        'dynamics': {'F': F_matrix, 'G': G_matrix},
+        # 'dynamics': {'F': F_CL, 'G': g},
         'regions': regions.to_dict(),
         'final_results': results,
         'loss_history': loss_history,

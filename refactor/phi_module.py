@@ -1,14 +1,14 @@
 """
 Phi module for computing the infinitesimal generator of the value function.
 
-The infinitesimal generator for a stochastic system dx = f(x)dt + g(x)dW is:
-    Φ(x) = f(x) · ∇V + 0.5 * Tr(g(x)g(x)^T @ H_V)
+The infinitesimal generator for a stochastic system dx = f(x,u)dt + g(x,u)dW is:
+    Φ(x) = f(x,u) · ∇V + 0.5 * Tr(g(x,u)g(x,u)^T @ H_V)
 
-This module properly handles:
-- General drift matrices F (not just hardcoded A)
-- General diffusion matrices G (not just R[0,0])
-- Diagonal and non-diagonal diffusion
-- State-dependent diffusion
+This module handles ANY form of drift f and diffusion g:
+- f: constant matrix, f(x), or f(x, u)
+- g: scalar, vector, constant matrix, g(x), or g(x, u)
+- g can return diagonal vector (N, 2) or full matrix (N, 2, 2)
+- Automatically computes diagonal of g@g^T for diffusion term
 """
 
 import torch
@@ -21,17 +21,17 @@ from dynamics import Dynamics
 
 class GV(nn.Module):
     """
-    Computes Φ(x) = f(x)·∇V + 0.5·Tr(g(x)g(x)^T @ H_V) using closed-form derivatives.
+    Computes Φ(x) = f(x,u)·∇V + 0.5·Tr(g(x,u)g(x,u)^T @ H_V) using closed-form derivatives.
 
-    Supports:
-    - General linear drift f(x) = F @ x
-    - General constant diffusion g(x) = G (constant matrix)
-    - Diagonal diffusion (optimized path using only diagonal Hessian)
-    - Non-diagonal diffusion (requires full Hessian computation)
+    Supports ANY form of drift and diffusion (2D systems):
+    - f: constant matrix F, f(x), or f(x, u)
+    - g: scalar σ, vector [σ₁, σ₂], constant matrix G, g(x), or g(x, u)
+    - g(x) or g(x,u) can return diagonal (N,2) or full matrix (N,2,2)
 
     Key features:
     - Uses REFERENCES to V_net's layers (not detached copies)
     - Gradients flow back to V_net's parameters during training
+    - Automatically handles diagonal extraction from g@g^T
     - Compatible with auto_LiRPA's BoundedModule
     """
 
@@ -76,50 +76,15 @@ class GV(nn.Module):
             self.register_buffer('input_scale', torch.tensor(input_scale_init, dtype=torch.float32))
             self.register_buffer('input_scale_sq', torch.tensor(input_scale_init ** 2, dtype=torch.float32))
 
-        # Register drift and diffusion matrices
-        self.register_buffer('F', dynamics.get_drift_matrix())
-
-        G_constant = dynamics.get_diffusion_matrix()
-        if G_constant is not None:
-            print('FFFFFFFFFFFFFFFFFFFFFFFF')
-            raise ValueError('FFFFFFFFFFFFFFFFFFFFFFFF')
-            # self.register_buffer('G', G_constant)
-            # # Compute G @ G^T for constant diffusion
-            # self.register_buffer('GGT', G_constant @ G_constant.T)
-            # self.sigma_diag = None
-        else:
-            # State-dependent diffusion - extract sigma values as Python floats (like original)
-            self.G = None
-            self.GGT = None
-            # Extract sigma diagonal as Python list/floats for CROWN compatibility
-            if dynamics.sigma_diag is not None:
-                # Convert to Python floats (not tensors) - matches original pattern
-                self.sigma_diag = [float(s) for s in dynamics.sigma_diag]
-                # raise ValueError('aaaaaa')
-            else:
-                self.sigma_diag = None
-                # raise ValueError('vvvvvvv')
-
-        # Check if diffusion is diagonal (works for both constant and state-dependent)
-        self.is_diagonal_diffusion = dynamics.is_diffusion_diagonal()
+        # Get drift and diffusion from dynamics
+        self.f = dynamics.get_f()
+        self.g = dynamics.get_g()
 
         print(f"[PhiModule] Initialized with:")
         print(f"  scale_factor: {self.scale_factor.item() if hasattr(self.scale_factor, 'item') else self.scale_factor}")
         print(f"  input_scale: {self.input_scale.item() if hasattr(self.input_scale, 'item') else self.input_scale}")
-        if self.F is not None:
-            print(f"  Drift F:\n{self.F.numpy()}")
-        else:
-            print(f" Drift: {self.dynamics.drift_fn}")
-        if self.G is not None:
-            raise ValueError('ggggggg')
-            # print(f"  Diffusion G:\n{self.G.numpy()}")
-            # print(f"  G@G^T:\n{self.GGT.numpy()}")
-            # print(f"  Diagonal diffusion: {self.is_diagonal_diffusion}")
-        else:
-            print(f"  Diffusion: state-dependent")
-            print(f"  Diagonal diffusion: {self.is_diagonal_diffusion}")
-            if self.sigma_diag is not None:
-                print(f"  Sigma diagonal: {self.sigma_diag}")
+        print(f"  f type: {type(self.f)}")
+        print(f"  g type: {type(self.g)}")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -212,24 +177,22 @@ class GV(nn.Module):
         H11 = H11_norm / input_scale_sq  # (N, 1)
         H22 = H22_norm / input_scale_sq  # (N, 1)
 
-        # Compute f(x) = F·x using ORIGINAL UNNORMALIZED coordinates
-        # (Dynamics operate on the physical state space, not the normalized NN input)
-        fx = self.dynamics.drift(x_orig)  # (N, 2)
-        f1 = fx[:, 0:1]    # (N, 1)
-        f2 = fx[:, 1:2]    # (N, 1)
+        # Compute f(x) or f(x, u) using ORIGINAL UNNORMALIZED coordinates
+        fx = self._evaluate_f(x_orig)  # (N, 2)
+        # Use static masks to avoid ScatterND
+        mask1 = torch.tensor([[1.0, 0.0]], device=x.device, dtype=x.dtype)  # (1, 2)
+        mask2 = torch.tensor([[0.0, 1.0]], device=x.device, dtype=x.dtype)  # (1, 2)
 
-        # State-dependent diffusion: g(x) = σ·x using ORIGINAL UNNORMALIZED coordinates
-        x1 = x_orig[:, 0:1]  # (N, 1)
-        x2 = x_orig[:, 1:2]  # (N, 1)
+        f1 = (fx * mask1).sum(dim=1, keepdim=True)  # (N, 1)
+        f2 = (fx * mask2).sum(dim=1, keepdim=True)  # (N, 1)
 
-        if self.sigma_diag is not None:
-            g11_sq = (self.sigma_diag[0] * x1) ** 2  # (N, 1)
-            g22_sq = (self.sigma_diag[1] * x2) ** 2  # (N, 1)
-        else:
-            raise ValueError('hhhhhh')
-            # Constant diffusion
-            g11_sq = self.GGT[0, 0]
-            g22_sq = self.GGT[1, 1]
+        # Compute diagonal of g(x) @ g(x)^T for any form of g
+        g_diag_sq = self._compute_gg_diag(x_orig)  # (N, 2)
+        # print(f"DEBUG: g_diag_sq.shape = {g_diag_sq.shape}, x_orig.shape = {x_orig.shape}")
+        # print(f"DEBUG: mask1.shape = {mask1.shape}, mask2.shape = {mask2.shape}")
+        g11_sq = (g_diag_sq * mask1).sum(dim=1, keepdim=True)  # (N, 1)
+        g22_sq = (g_diag_sq * mask2).sum(dim=1, keepdim=True)  # (N, 1)
+        # print(f"DEBUG: g11_sq.shape = {g11_sq.shape}, g22_sq.shape = {g22_sq.shape}")
 
         # Φ(x) = f·∇V + 0.5·(g²·H_diag)
         drift = f1 * dVdx1 + f2 * dVdx2
@@ -241,148 +204,156 @@ class GV(nn.Module):
 
         return drift + diff  # (N, 1)
 
-    def _compute_diffusion_diagonal(
-        self,
-        x: torch.Tensor,
-        W0, W1, W2,
-        d0, d1, q0, q1,
-        W1_scaled,
-        state_dim: int
-    ) -> torch.Tensor:
+    def _evaluate_f(self, x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
         """
-        Compute diffusion term for diagonal diffusion: 0.5 * Σ_i [GG^T]_{ii} * H_{ii}.
+        Evaluate drift f for any form: constant, f(x), or f(x, u).
 
         Args:
-            x: Original state (N, state_dim)
-            W0, W1, W2: Network weights
-            d0, d1: First derivatives of activation
-            q0, q1: Second derivatives of activation
-            W1_scaled: Pre-computed W1 * d0
-            state_dim: State dimension
+            x: State tensor (N, 2)
+            u: Control tensor (optional)
 
         Returns:
-            Diffusion term (N, 1)
+            Drift tensor (N, 2)
         """
-        # Compute input_scale_sq
-        if self.learnable_input_scale:
-            input_scale_sq = self.input_scale ** 2
-        else:
-            input_scale_sq = self.input_scale_sq
+        if callable(self.f):
+            # Check if f accepts u parameter
+            import inspect
+            sig = inspect.signature(self.f)
+            num_params = len([p for p in sig.parameters.values()
+                            if p.kind in (p.POSITIONAL_OR_KEYWORD, p.POSITIONAL_ONLY)])
 
-        # Compute Hessian diagonal elements
-        W1_q0 = W1.unsqueeze(0) * q0.unsqueeze(1)  # (N, m1, m0)
-
-        # Compute diffusion term using CROWN-compatible operations
-        diffusion_sum = 0.0
-        for i in range(state_dim):
-            # Compute H_{ii} (Hessian diagonal element)
-            sum_over_k = (W1_scaled * W0[:, i].view(1, 1, -1)).sum(dim=2)  # (N, m1)
-
-            # Cross term: σ''(z1) * (Σ_k W1·σ'(z0)·W0)^2
-            cross_term = q1 * (sum_over_k ** 2)  # (N, m1)
-
-            # Direct term: σ'(z1) * Σ_k W1·σ''(z0)·W0^2
-            W0_i_sq = W0[:, i] ** 2
-            direct_term = d1 * (W1_q0 * W0_i_sq.view(1, 1, -1)).sum(dim=2)  # (N, m1)
-
-            H_ii_norm = self.scale_factor * (W2 * (cross_term + direct_term)).sum(dim=1, keepdim=True)  # (N, 1)
-            H_ii = H_ii_norm / input_scale_sq  # (N, 1)
-
-            # Compute g_ii(x)^2 for this dimension (matching original's pattern)
-            if self.sigma_diag is not None:
-                # State-dependent: g_ii(x) = sigma_i * x_i (sigma_i is Python float)
-                x_i = x[:, i:i+1]  # (N, 1)
-                g_ii_sq = (self.sigma_diag[i] * x_i) ** 2  # (N, 1), CROWN-compatible
-
-                # Debug on first call
-                if not hasattr(self, '_debug_printed'):
-                    if i == 0:
-                        print(f"DEBUG diffusion: sigma_diag[{i}]={self.sigma_diag[i]}, x_i sample={x_i[0].item():.3f}, g_ii_sq sample={g_ii_sq[0].item():.6f}")
+            if num_params >= 2 and u is not None:
+                f_result = self.f(x, u)  # f(x, u)
             else:
-                # Constant diffusion: use pre-computed GGT diagonal
-                g_ii_sq = self.GGT[i, i]  # scalar
+                f_result = self.f(x)  # f(x)
 
-            # Add contribution: g_{ii}^2 * H_{ii}
-            diffusion_sum = diffusion_sum + g_ii_sq * H_ii
+            # Convert numpy to torch if needed
+            if isinstance(f_result, np.ndarray):
+                f_result = torch.from_numpy(f_result).float().to(x.device)
 
-        if not hasattr(self, '_debug_printed'):
-            self._debug_printed = True
+            return f_result
+        elif isinstance(self.f, (torch.Tensor, np.ndarray)):
+            # Convert numpy to torch if needed
+            if isinstance(self.f, np.ndarray):
+                f_tensor = torch.from_numpy(self.f).float().to(x.device)
+            else:
+                f_tensor = self.f
+            # Constant matrix: f = F @ x
+            return x @ f_tensor.T  # (N, 2)
+        else:
+            raise ValueError(f"Unsupported f type: {type(self.f)}")
 
-        return 0.5 * diffusion_sum  # (N, 1)
-
-    def _compute_diffusion_full(
-        self,
-        x: torch.Tensor,
-        W0, W1, W2,
-        d0, d1, q0, q1,
-        W1_scaled,
-        state_dim: int
-    ) -> torch.Tensor:
+    def _compute_gg_diag(self, x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
         """
-        Compute diffusion term for non-diagonal diffusion: 0.5 * Tr(GG^T @ H_V).
+        Compute diagonal of g(x) @ g(x)^T for any form of g.
 
-        This requires computing the full Hessian matrix, not just the diagonal.
+        Handles:
+        - Constant g (scalar, vector, or matrix)
+        - g(x) returning vector (diagonal)
+        - g(x) returning matrix (full 2x2, can have cross terms)
+        - g(x, u) returning vector or matrix
 
         Args:
-            x: Original state (N, state_dim)
-            W0, W1, W2: Network weights
-            d0, d1: First derivatives of activation
-            q0, q1: Second derivatives of activation
-            W1_scaled: Pre-computed W1 * d0
-            state_dim: State dimension
+            x: State tensor (N, 2)
+            u: Control tensor (optional)
 
         Returns:
-            Diffusion term (N, 1)
+            Diagonal of G @ G^T: (N, 2)
         """
-        # Compute input_scale_sq
-        if self.learnable_input_scale:
-            input_scale_sq = self.input_scale ** 2
+        # print(f"DEBUG _compute_gg_diag: x.shape = {x.shape}, type(self.g) = {type(self.g)}")
+        if self.g is None:
+            # No diffusion
+            return torch.zeros_like(x)
+
+        if callable(self.g):
+            # Check if g has a CROWN-compatible get_diagonal_squared method
+            if hasattr(self.g, 'get_diagonal_squared'):
+                # Use the optimized CROWN-compatible method directly
+                g_diag_sq = self.g.get_diagonal_squared(x)  # (N, 2)
+                # Convert numpy to torch if needed
+                if isinstance(g_diag_sq, np.ndarray):
+                    g_diag_sq = torch.from_numpy(g_diag_sq).float().to(x.device)
+                return g_diag_sq
+
+            # Fallback: call g and extract diagonal
+            # Check if g accepts u parameter
+            import inspect
+            sig = inspect.signature(self.g)
+            num_params = len([p for p in sig.parameters.values()
+                            if p.kind in (p.POSITIONAL_OR_KEYWORD, p.POSITIONAL_ONLY)])
+
+            if num_params >= 2 and u is not None:
+                g_result = self.g(x, u)  # g(x, u)
+            else:
+                g_result = self.g(x)  # g(x)
+
+            # Convert numpy to torch if needed
+            if isinstance(g_result, np.ndarray):
+                g_result = torch.from_numpy(g_result).float().to(x.device)
+
+            # Determine what g returned
+            if g_result.dim() == 2 and g_result.shape[1] == 2:
+                # Returns diagonal vector (N, 2): treat as diag(g)
+                # (G @ G^T)_ii = g_i^2
+                return g_result ** 2
+            elif g_result.dim() == 3:
+                # Returns full matrix (N, 2, 2)
+                # Compute G @ G^T and extract diagonal (CROWN-compatible)
+                GGT = torch.bmm(g_result, g_result.transpose(1, 2))  # (N, 2, 2)
+                # Extract diagonal using sum trick (avoid ScatterND from indexing)
+                # Create mask for diagonal elements
+                diag_mask = torch.eye(2, device=x.device, dtype=x.dtype).unsqueeze(0)  # (1, 2, 2)
+                g_diag_sq = (GGT * diag_mask).sum(dim=2)  # (N, 2)
+                return g_diag_sq
+            else:
+                raise ValueError(f"Unexpected g output shape: {g_result.shape}")
+
+        elif isinstance(self.g, (torch.Tensor, np.ndarray)):
+            # Convert numpy to torch if needed
+            if isinstance(self.g, np.ndarray):
+                g_tensor = torch.from_numpy(self.g).float().to(x.device)
+            else:
+                g_tensor = self.g
+
+            # print(f"DEBUG: g_tensor.shape = {g_tensor.shape}, g_tensor.dim() = {g_tensor.dim()}")
+
+            # Constant g - use broadcasting with x to get batch size
+            if g_tensor.dim() == 0:
+                # Scalar: g = σ * I
+                g_sq = g_tensor ** 2
+                # Broadcast to (N, 2) using x as template
+                return g_sq * torch.ones_like(x)
+            elif g_tensor.dim() == 1:
+                # Vector (2,): diagonal diffusion g = diag(g)
+                g_sq = g_tensor ** 2  # (2,)
+                # Broadcast: (2,) -> (N, 2) by adding zeros_like
+                # This ensures proper batch dimension
+                result = g_sq.view(1, 2) + torch.zeros_like(x)
+                # print(f"DEBUG: dim==1, g_sq.shape = {g_sq.shape}, result.shape = {result.shape}")
+                return result
+            elif g_tensor.dim() == 2:
+                # Matrix (2, 2): compute diagonal of G @ G^T (CROWN-compatible)
+                GGT = g_tensor @ g_tensor.T  # (2, 2)
+                # print(f"DEBUG: dim==2, GGT.shape = {GGT.shape}")
+                # Extract diagonal using sum trick (avoid ScatterND)
+                diag_mask = torch.eye(2, device=x.device, dtype=x.dtype)  # (2, 2)
+                g_diag = (GGT * diag_mask).sum(dim=1)  # (2,)
+                # print(f"DEBUG: g_diag.shape = {g_diag.shape}, x.shape = {x.shape}")
+                # Broadcast: (2,) -> (N, 2)
+                result = g_diag.view(1, 2) + torch.zeros_like(x)
+                # print(f"DEBUG: result.shape = {result.shape}")
+                return result
+            else:
+                raise ValueError(f"Unexpected g shape: {g_tensor.shape}")
+
+        elif isinstance(self.g, (int, float)):
+            # Scalar constant: g = σ
+            g_sq = self.g ** 2
+            # Broadcast to (N, 2)
+            return g_sq * torch.ones_like(x)
+
         else:
-            input_scale_sq = self.input_scale_sq
-
-        batch_size = x.shape[0]
-
-        # Compute full Hessian: H_V[i,j] = ∂²V / ∂x_i ∂x_j
-        # This is more expensive but necessary for non-diagonal diffusion
-
-        # Pre-compute terms for efficiency
-        W1_q0 = W1.unsqueeze(0) * q0.unsqueeze(1)  # (N, m1, m0)
-
-        # Compute Hessian matrix for each batch element
-        # For efficiency, we'll compute it in a vectorized way
-        H_full = torch.zeros(batch_size, state_dim, state_dim, device=x.device, dtype=x.dtype)
-
-        for i in range(state_dim):
-            for j in range(state_dim):
-                # Compute H_{ij}
-                if i == j:
-                    # Diagonal: use same formula as before
-                    sum_over_k_i = (W1_scaled * W0[:, i].view(1, 1, -1)).sum(dim=2)
-                    cross_term = q1 * (sum_over_k_i ** 2)
-                    W0_i_sq = W0[:, i] ** 2
-                    direct_term = d1 * (W1_q0 * W0_i_sq.view(1, 1, -1)).sum(dim=2)
-                    H_ij_norm = self.scale_factor * (W2 * (cross_term + direct_term)).sum(dim=1)
-                else:
-                    # Off-diagonal: only cross term (no direct term for i≠j)
-                    sum_over_k_i = (W1_scaled * W0[:, i].view(1, 1, -1)).sum(dim=2)
-                    sum_over_k_j = (W1_scaled * W0[:, j].view(1, 1, -1)).sum(dim=2)
-                    cross_term = q1 * sum_over_k_i * sum_over_k_j
-                    H_ij_norm = self.scale_factor * (W2 * cross_term).sum(dim=1)
-
-                H_full[:, i, j] = H_ij_norm / input_scale_sq
-
-        # Compute Tr(GG^T @ H_V) for each batch element
-        if self.GGT is not None:
-            # Constant diffusion: GG^T is the same for all batch elements
-            # Tr(GG^T @ H) = Σ_i Σ_j [GG^T]_{ij} * H_{ji}
-            diffusion_term = torch.einsum('ij,bij->b', self.GGT, H_full).unsqueeze(1)  # (N, 1)
-        else:
-            # State-dependent diffusion: compute GG^T for each state
-            GGT_batch = self.dynamics.diffusion_squared(x)  # (N, state_dim, state_dim)
-            # Tr(GG^T @ H) = Σ_i Σ_j [GG^T]_{ij} * H_{ji}
-            diffusion_term = torch.einsum('bij,bij->b', GGT_batch, H_full).unsqueeze(1)  # (N, 1)
-
-        return 0.5 * diffusion_term  # (N, 1)
+            raise ValueError(f"Unsupported g type: {type(self.g)}")
 
 
 def create_GV(

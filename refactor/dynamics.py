@@ -33,12 +33,9 @@ class Dynamics:
 
     def __init__(
         self,
-        F: Union[np.ndarray, torch.Tensor, Callable, None] = None,
-        G: Optional[Union[np.ndarray, torch.Tensor, Callable]] = None,
-        state_dim: int = 2,
-        drift_fn: Optional[Callable] = None,
-        B: Optional[Union[np.ndarray, torch.Tensor]] = None,
-        controller: Optional[Callable] = None
+        f: Union[np.ndarray, torch.Tensor, Callable, None] = None,
+        g: Union[np.ndarray, torch.Tensor, Callable, None] = None,
+        state_dim: int = 2
     ):
         """
         Initialize system dynamics.
@@ -61,51 +58,8 @@ class Dynamics:
         """
         self.state_dim = state_dim
 
-        # Setup drift (linear or nonlinear)
-        if drift_fn is not None:
-            # Explicit nonlinear drift function provided
-            self.drift_fn = drift_fn
-            self.F = None
-            self.is_linear_drift = False
-            print("[Dynamics] Using provided nonlinear drift function.")
-        elif callable(F):
-            # F is a function (nonlinear drift)
-            self.drift_fn = F
-            self.F = None
-            self.is_linear_drift = False
-            print("[Dynamics] Using provided nonlinear drift function.")
-        elif F is not None:
-            # F is a matrix (linear drift)
-            if isinstance(F, np.ndarray):
-                F = torch.from_numpy(F).float()
-            self.F = F.float() if F.dtype != torch.float32 else F
-
-            assert self.F.shape == (state_dim, state_dim), \
-                f"F must be {state_dim}x{state_dim}, got {self.F.shape}"
-
-            self.drift_fn = None
-            self.is_linear_drift = True
-            print("[Dynamics] Using provided linear drift matrix.")
-        else:
-            raise ValueError("Must provide either F (matrix or function) or drift_fn")
-
-        # Setup control input matrix and controller
-        if B is not None:
-            if isinstance(B, np.ndarray):
-                B = torch.from_numpy(B).float()
-            self.B = B.float() if B.dtype != torch.float32 else B
-            assert self.B.shape[0] == state_dim, \
-                f"B must have {state_dim} rows, got {self.B.shape[0]}"
-            print("[Dynamics] Using provided control input matrix.")
-        else:
-            self.B = None
-
-        self.controller = controller
-        if controller is not None:
-            print("[Dynamics] Using provided controller function.")
-
-        # Handle diffusion matrix/function
-        self._setup_diffusion(G)
+        self.f = f
+        self.g = g
 
     def _setup_diffusion(self, G):
         """Setup diffusion term (constant matrix or state-dependent function)."""
@@ -222,32 +176,11 @@ class Dynamics:
             # Batch: use bmm (batch matrix multiply)
             return torch.bmm(G, G.transpose(1, 2))
 
-    def get_drift_matrix(self) -> Optional[torch.Tensor]:
-        """
-        Get the drift matrix F (if linear).
+    def get_f(self) -> Optional[torch.Tensor]:
+        return self.f
 
-        Returns:
-            F if drift is linear, None if nonlinear
-        """
-        return self.F
-
-    def get_drift_function(self) -> Optional[Callable]:
-        """
-        Get the drift function (if nonlinear).
-
-        Returns:
-            drift_fn if drift is nonlinear, None if linear
-        """
-        return self.drift_fn if not self.is_linear_drift else None
-
-    def get_diffusion_matrix(self) -> Optional[torch.Tensor]:
-        """
-        Get the diffusion matrix G (if constant).
-
-        Returns:
-            G if diffusion is constant, None if state-dependent
-        """
-        return self.G_constant
+    def get_g(self) -> Optional[torch.Tensor]:
+        return self.g
 
     def is_diffusion_diagonal(self) -> bool:
         """
@@ -378,37 +311,38 @@ class Dynamics:
 
     def __repr__(self):
         """String representation."""
-        if self.is_linear_drift:
-            F_str = f"F=\n{self.F.numpy()}"
-        else:
-            F_str = "f(x)=<nonlinear>"
+        # if self.is_linear_drift:
+        #     F_str = f"F=\n{self.F.numpy()}"
+        # else:
+        #     F_str = "f(x)=<nonlinear>"
 
-        if self.is_constant_diffusion:
-            G_str = f"G=\n{self.G_constant.numpy()}"
-        else:
-            G_str = "G=<state-dependent>"
-        return f"Dynamics(state_dim={self.state_dim},\n{F_str},\n{G_str})"
+        # if self.is_constant_diffusion:
+        #     G_str = f"G=\n{self.G_constant.numpy()}"
+        # else:
+        #     G_str = "G=<state-dependent>"
+        # return f"Dynamics(state_dim={self.state_dim},\n{F_str},\n{G_str})"
+        return "FIX ME"
 
     @classmethod
-    def nonlinear(
+    def dynamics(
         cls,
-        drift_fn: Callable,
-        G: Union[np.ndarray, torch.Tensor, Callable, None] = None,
-        state_dim: int = 2
+        f: Union[np.ndarray, torch.tensor, Callable, None] = None,
+        g: Union[np.ndarray, torch.Tensor, Callable, None] = None
     ):
-        """
-        Create dynamics with nonlinear drift.
-
-        Args:
-            drift_fn: Function f(x) that computes drift. Should handle both single states
-                     and batches: x of shape (state_dim,) or (batch_size, state_dim)
-            G: Diffusion (same options as __init__)
-            state_dim: State dimension
-
-        Returns:
-            Dynamics instance with nonlinear drift
-        """
-        return cls(F=None, G=G, state_dim=state_dim, drift_fn=drift_fn)
+        if isinstance(f, np.ndarray) and isinstance(g, np.ndarray):
+            if g.shape[0] == f.shape[0]:
+                state_dim = g.shape[0]
+            else:
+                raise ValueError("State dimension mismatch between f and g")
+        elif isinstance(f, torch.Tensor) and isinstance(g, torch.Tensor):
+            if g.shape[0] == f.shape[0]:
+                state_dim = g.shape[0]
+            else:
+                raise ValueError("State dimension mismatch between f and g")
+        else:
+            # Default state dimension
+            state_dim = 2
+        return cls(f=f, g=g, state_dim=state_dim)
 
 
 # Example helper functions for common diffusion patterns
