@@ -24,7 +24,7 @@ from .dynamics import Dynamics, diagonal_state_diffusion
 
 from .regions import Region, Regions
 
-from .network import V, VDeep, create_value_network
+from .network import V, create_V
 
 from .phi_module import GV, create_GV
 
@@ -55,8 +55,7 @@ __all__ = [
 
     # Network
     'V',
-    'VDeep',
-    'create_value_network',
+    'create_V',
     'LinearControlNN',
 
     # Phi module

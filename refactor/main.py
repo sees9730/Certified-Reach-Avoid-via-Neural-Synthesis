@@ -1,8 +1,5 @@
 """
-Bound-based training script using CROWN for RL verification.
-
-This script uses CROWN bounds for training (like the original testing_simple3.py),
-rather than sampling points. This provides rigorous guarantees during training.
+Bound-based training script using CROWN for NN verification.
 """
 
 import torch
@@ -19,8 +16,6 @@ OUTPUT_DIR = ROOT / "refactor"/ "outputs"
 
 # Set random seed immediately after imports (matching testing_simple3.py)
 torch.manual_seed(0)
-compute_V = True
-compute_GV = False
 
 from hyperparameters import Hyperparameters
 from dynamics import Dynamics
@@ -160,8 +155,6 @@ def pretrain_structure_aware(model, x_goal_range, x_unsafe_range, x_init_range, 
 
         # Forward pass for V
         v_output = model(x).squeeze()
-
-        # print(f"v_output: min={v_output.min().item():.3f}, max={v_output.max().item():.3f}")
 
         # V MSE Loss
         loss_v = F.mse_loss(v_output, target_v)
@@ -343,15 +336,10 @@ def train_network_bounds(
 
     for epoch in range(params.training.num_epochs):
         V_net.train()
-        compute_V = True
-        compute_GV = True
-        if epoch > 250:
-            compute_GV = True
-            compute_V = True
 
         optimizer.zero_grad()
 
-        if compute_V:
+        if params.compute_V:
             # Compute bounds for ALL V cells at once (matching original!)
             if total_cells_V > 0:
                 v_lowers_all, v_uppers_all = crown_cache_all.compute_bounds(input_lowers_all, input_uppers_all)
@@ -373,7 +361,7 @@ def train_network_bounds(
                 else:
                     bounds[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
 
-        if compute_GV: 
+        if params.compute_GV: 
             # Compute generator bounds if enabled
             needs_cache_rebuild = False
             if (epoch >= params.training.generator_start_epoch and
@@ -399,7 +387,7 @@ def train_network_bounds(
             current_beta_s = beta_s_value
 
         # Compute total loss from bounds
-        if compute_V and not compute_GV: 
+        if params.compute_V and not params.compute_GV: 
             total_loss, loss_dict = compute_total_loss_bounds(
                 model=V_net,
                 goal_region=regions.goal,
@@ -414,10 +402,10 @@ def train_network_bounds(
                 beta_s=current_beta_s,
                 beta_ra=params.constraints.beta_ra,
                 device=device,
-                compute_V=compute_V,
-                compute_GV=compute_GV
+                compute_V=params.compute_V,
+                compute_GV=params.compute_GV
             )
-        elif not compute_V and compute_GV:
+        elif not params.compute_V and params.compute_GV:
             total_loss, loss_dict = compute_total_loss_bounds(
             model=V_net,
             goal_region=regions.goal,
@@ -427,8 +415,8 @@ def train_network_bounds(
             beta_ra=params.constraints.beta_ra,
             generator_weight=current_gen_weight,
             device=device,
-            compute_V=compute_V,
-            compute_GV=compute_GV
+            compute_V=params.compute_V,
+            compute_GV=params.compute_GV
             )
         else:
             total_loss, loss_dict = compute_total_loss_bounds(
@@ -448,21 +436,15 @@ def train_network_bounds(
             beta_ra=params.constraints.beta_ra,
             generator_weight=current_gen_weight,
             device=device,
-            compute_V=compute_V,
-            compute_GV=compute_GV,
+            compute_V=params.compute_V,
+            compute_GV=params.compute_GV,
             epoch=epoch
             )
-        # if epoch == 20:
-        #     exit(0)
 
         # Backward pass
         total_loss.backward()
 
-        # for i in range(100):
-        # optimizer.step()
-
-        # Recompute bounds AFTER optimizer step for verification (matching testing_simple3.py!)
-        # This ensures early stopping check uses updated network weights, not stale pre-update weights
+        # Recompute bounds after optimizer step for verification
         V_net.eval()
         with torch.no_grad():
             if total_cells_V > 0:
@@ -471,7 +453,7 @@ def train_network_bounds(
                 v_lowers_all_updated = torch.tensor([], device=device)
                 v_uppers_all_updated = torch.tensor([], device=device)
 
-            # Split updated bounds by region (for early stopping check)
+            # Split updated bounds by region
             bounds_updated = {}
             cell_idx = 0
             for name in region_order_V:
@@ -485,15 +467,15 @@ def train_network_bounds(
                 else:
                     bounds_updated[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
 
-        # Update scheduler AFTER bounds recomputation (matching testing_simple3.py's order!)
+        # Update scheduler after bounds recomputation
         scheduler.step(total_loss.item())
 
         # Get current beta_s value for constraint checks
         beta_s_check = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
 
-        # Adaptive refinement for outside region cells
+        # Adaptive refinement for V outside region cells
         needs_cache_rebuild = False
-        if compute_V and len(bounds_updated['outside'][0]) > 0:
+        if params.compute_V and len(bounds_updated['outside'][0]) > 0:
             # Track failing cells in outside region
             outside_failing_mask = bounds_updated['outside'][0] < beta_s_check
             num_outside_failing = outside_failing_mask.sum().item()
@@ -538,7 +520,7 @@ def train_network_bounds(
                     refinement_epochs['outside'].append(epoch + 1)
 
         # Adaptive refinement for generator cells (before optimizer step)
-        if compute_GV:
+        if params.compute_GV:
             if (epoch >= params.training.generator_start_epoch and
                 params.training.generator_weight > 0 and
                 crown_cache_phi is not None and
@@ -594,7 +576,7 @@ def train_network_bounds(
             if learnable_beta_s is not None:
                 beta_s_log = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
                 print(f"Epoch [{epoch}/{params.training.num_epochs}]: Loss={total_loss.item():.4f}, β_s={beta_s_log:.4f}")
-            print_loss_summary(epoch, loss_dict, compute_V=compute_V, compute_GV=compute_GV)
+            print_loss_summary(epoch, loss_dict, compute_V=params.compute_V, compute_GV=params.compute_GV)
             if control_net is not None:
                 print("control_net parameters:")
                 for name, param in control_net.named_parameters():
@@ -609,7 +591,7 @@ def train_network_bounds(
         # Moved here to match testing_simple3.py's order (after logging, before detailed evaluation)
         # Use bounds_updated (computed AFTER optimizer step) to match testing_simple3.py!
         with torch.no_grad():
-            if compute_V:
+            if params.compute_V:
                 if epoch % 10 == 0:
                     show = True
                 else:
@@ -618,10 +600,10 @@ def train_network_bounds(
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
                 init_satisfied = (bounds_updated['init'][0].min() >= beta_s_check and bounds_updated['init'][1].max() <= 1.0)
                 outside_satisfied = (bounds_updated['outside'][0].min() >= beta_s_check)
-            if compute_GV:
+            if params.compute_GV:
                 generator_satisfied = (phi_uppers.max() <= 0.0)
 
-            if compute_V and not compute_GV:
+            if params.compute_V and not params.compute_GV:
                 if goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied:
                     print("\n" + "="*80)
                     print("🎉 ALL CONSTRAINTS SATISFIED - EARLY STOPPING!")
@@ -629,7 +611,7 @@ def train_network_bounds(
                     print(f"Training converged at epoch {epoch}")
                     print(f"Final losses: Goal={loss_dict['goal']:.4f}, Unsafe={loss_dict['unsafe']:.4f}, Init={loss_dict['init']:.4f}, Outside={loss_dict['outside']:.4f}, Gen={loss_dict['generator']:.4f}")
                     break
-            elif not compute_V and compute_GV:
+            elif not params.compute_V and params.compute_GV:
                 if generator_satisfied:
                     print("\n" + "="*80)
                     print("🎉 ALL CONSTRAINTS SATISFIED - EARLY STOPPING!")
@@ -637,7 +619,7 @@ def train_network_bounds(
                     print(f"Training converged at epoch {epoch}")
                     print(f"Final losses: Gen={loss_dict['generator']:.4f}")
                     break
-            elif compute_V and compute_GV:
+            elif params.compute_V and params.compute_GV:
                 if goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied and generator_satisfied:
                     print("\n" + "="*80)
                     print("🎉 ALL CONSTRAINTS SATISFIED - EARLY STOPPING!")
@@ -671,12 +653,12 @@ def train_network_bounds(
             print_constraint_summary(results, prefix="  ")
 
             # Print bound statistics
-            if compute_V:
+            if params.compute_V:
                 if len(bounds['goal'][0]) > 0:
                     print(f"  Goal bounds: V ∈ [{bounds['goal'][0].min().item():.3f}, {bounds['goal'][1].max().item():.3f}]")
                 if len(bounds['unsafe'][0]) > 0:
                     print(f"  Unsafe bounds: V ∈ [{bounds['unsafe'][0].min().item():.3f}, {bounds['unsafe'][1].max().item():.3f}]")
-            if compute_GV:
+            if params.compute_GV:
                 if len(phi_uppers) > 0:
                     print(f"  Generator bounds: Φ ∈ [{phi_lowers.min().item():.3f}, {phi_uppers.max().item():.3f}]")
                     failing_cells = (phi_uppers > 0).sum().item()
@@ -696,7 +678,7 @@ def train_network_bounds(
         optimizer.step()
 
         # Rebuild CROWN caches after optimizer step if needed (after adaptive refinement)
-        if compute_GV:
+        if params.compute_GV:
             if needs_cache_rebuild:
                 # with torch.no_grad():
                 print(f"  Rebuilding CROWN caches with new generator cells...")
@@ -782,7 +764,6 @@ def main():
     params.training.num_epochs = 200000  # Adjust as needed
     params.training.learnable_scale = False
     params.training.learnable_input_scale = False
-    params.training.learnable_beta_s = False  # Set to True to make beta_s learnable
     params.training.generator_weight = 1.0  # Enable generator constraint
     params.training.generator_start_epoch = 0
 
@@ -794,8 +775,13 @@ def main():
 
     # Set beta_s to a value (constant), or set to None to make it learnable
     # If learnable_beta_s is True, this value will be used as initialization
+    params.training.learnable_beta_s = False  # Set to True to make beta_s learnable
     params.constraints.beta_s = 0.6
     params.constraints.beta_ra = 20.0
+
+    # Control what to compute during training
+    params.compute_V = True
+    params.compute_GV = True
 
     # params.training.random_seed = 0
 
@@ -883,12 +869,7 @@ def main():
     sigma_torch = torch.from_numpy(sigma_diag).float()
 
     def g(x: torch.Tensor) -> torch.Tensor:
-        return np.array([
-                [0.2, 0.0],
-                [0.0, 0.2]
-                ], dtype=np.float32)
-
-    g.get_diagonal_squared = lambda x: (sigma_torch * x) ** 2
+        return torch.tensor([0.2, 0.2], device=x.device, dtype=x.dtype) * x
 
     # dynamics = Dynamics.dynamics(f=F_CL, g=g)
     # new f_cl wrapper for [control synthesis]
