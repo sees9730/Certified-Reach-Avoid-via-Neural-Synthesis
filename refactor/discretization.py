@@ -413,7 +413,6 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
         # Clip cells to remove overlaps with goal and unsafe regions
         print(f'  Clipping {len(all_cells)} generator cells against goal and unsafe regions...')
         exclusion_regions = [regions.goal.bounds, regions.unsafe.bounds]
-        # exclusion_regions = []
 
         clipped_cells = []
         for cell_lower, cell_upper in all_cells:

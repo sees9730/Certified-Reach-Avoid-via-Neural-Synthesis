@@ -59,115 +59,74 @@ class LearnableBetaS(nn.Module):
         return torch.sigmoid(self.beta_s_logit)
     
 
-def pretrain_structure_aware(model, x_goal_range, x_unsafe_range, x_init_range, x_range,
-                              A=None, R=None, scale_factor=1.0, num_epochs=1000, lr=0.01, device='cpu'):
-    """
-    Pre-train V and GV (Φ) jointly to match constraint structure:
-
-    V constraints:
-    - Goal: V ≈ 0.4 (below BETA_S = 0.9)
-    - Unsafe: V ≈ 12 (above BETA_RA = 10)
-    - Init: V ≈ 0.95 (between BETA_S and 1.0)
-    - Outside: V ≈ 1.2 (above BETA_S)
-
-    GV (Φ) constraint (if A and R provided):
-    - Generator region (X \ (Goal ∪ Unsafe)): Φ ≤ 0
-
-    This gives the network a good starting point that respects both constraint structures.
-    """
+def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, x_range,
+                             A=None, R=None, scale_factor=1.0, num_epochs=1000, lr=0.01, device='cpu'):
+    """Pre-train V and GV networks using sampled points to match constraint structure."""
     print("\n" + "="*80)
     print("PRE-TRAINING: Structure-Aware Initialization (V + GV)")
     print("="*80)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
-    # Create Phi module if dynamics are provided
+    # Create GV (Φ) module if dynamics provided
     phi_module = None
     if A is not None and R is not None:
-        from phi_module import create_GV
-        # Create a simple network config for the phi module
         class NetworkConfig:
             def __init__(self):
                 self.input_scale = [100.0, 100.0]
                 self.scale_factor = scale_factor
-        network_config = NetworkConfig()
 
         class TrainingConfig:
             def __init__(self):
                 self.learnable_scale = False
                 self.learnable_input_scale = False
-        training_config = TrainingConfig()
-
-        # Create dynamics object
-        from dynamics import Dynamics
-        if isinstance(A, np.ndarray):
-            A_np = A
-        else:
-            A_np = A.cpu().numpy() if isinstance(A, torch.Tensor) else A
-
-        if isinstance(R, np.ndarray):
-            G_matrix = R
-        else:
-            G_matrix = R.cpu().numpy() if isinstance(R, torch.Tensor) else R
 
         dynamics = Dynamics.dynamics(f=A, g=R)
-        phi_module = create_GV(model, dynamics, network_config, training_config).to(device)
-        # print(phi_module)
+        phi_module = create_GV(model, dynamics, NetworkConfig(), TrainingConfig()).to(device)
         print(f"  GV (Φ) pre-training ENABLED with dynamics")
     else:
         print(f"  GV (Φ) pre-training DISABLED (no dynamics provided)")
 
     for epoch in range(num_epochs):
-        # Sample points uniformly across state space
+        # Sample points uniformly from state space
         x = torch.rand(1000, 2, device=device)
         x[:, 0] = x[:, 0] * (x_range[0, 1] - x_range[0, 0]) + x_range[0, 0]
         x[:, 1] = x[:, 1] * (x_range[1, 1] - x_range[1, 0]) + x_range[1, 0]
 
-        # ===== V LOSS =====
-        # Define target V based on region
+        # Assign target V values based on region
         target_v = torch.zeros(1000, device=device)
-
         for i in range(1000):
             x1, x2 = x[i, 0].item(), x[i, 1].item()
 
-            # Check which region this point is in
             in_goal = (x_goal_range[0, 0] <= x1 <= x_goal_range[0, 1] and
                       x_goal_range[1, 0] <= x2 <= x_goal_range[1, 1])
-
             in_unsafe = (x_unsafe_range[0, 0] <= x1 <= x_unsafe_range[0, 1] and
                         x_unsafe_range[1, 0] <= x2 <= x_unsafe_range[1, 1])
-
             in_init = (x_init_range[0, 0] <= x1 <= x_init_range[0, 1] and
                       x_init_range[1, 0] <= x2 <= x_init_range[1, 1])
 
             if in_goal:
-                # Goal: want V small (< BETA_S = 0.9)
-                target_v[i] = 0.3 +  0.001 * torch.rand(1, device=device).item()  # Random in [0.3, 0.5]
+                target_v[i] = 0.3 + 0.001 * torch.rand(1, device=device).item()
             elif in_unsafe:
-                # Unsafe: want V large (> BETA_RA = 10)
-                target_v[i] = 20.0 + 3.0 * torch.rand(1, device=device).item()  # Random in [12, 15]
+                target_v[i] = 20.0 + 3.0 * torch.rand(1, device=device).item()
             elif in_init:
-                # Init: want BETA_S < V < 1.0
-                target_v[i] = 0.92 + 0.05 * torch.rand(1, device=device).item()  # Random in [0.92, 0.97]
+                target_v[i] = 0.92 + 0.05 * torch.rand(1, device=device).item()
             else:
-                # Outside goal: want V > BETA_S
-                target_v[i] = 0.3 + 0.3 * torch.rand(1, device=device).item()  # Random in [1.1, 1.4]
+                target_v[i] = 0.3 + 0.3 * torch.rand(1, device=device).item()
 
-        # Forward pass for V
+        # V network loss
         v_output = model(x).squeeze()
-
-        # V MSE Loss
         loss_v = F.mse_loss(v_output, target_v)
 
-        # ===== GV (Φ) LOSS =====
+        # GV (Φ) network loss
         loss_phi = torch.tensor(0.0, device=device)
         if phi_module is not None:
-            # Sample points from generator region (X \ (Goal ∪ Unsafe))
+            # Sample from generator region: X \ (Goal ∪ Unsafe)
             x_gen = torch.rand(100, 2, device=device)
             x_gen[:, 0] = x_gen[:, 0] * (x_range[0, 1] - x_range[0, 0]) + x_range[0, 0]
             x_gen[:, 1] = x_gen[:, 1] * (x_range[1, 1] - x_range[1, 0]) + x_range[1, 0]
 
-            # Filter out points in goal or unsafe
+            # Filter to generator region only
             in_goal_mask = ((x_gen[:, 0] >= x_goal_range[0, 0]) & (x_gen[:, 0] <= x_goal_range[0, 1]) &
                            (x_gen[:, 1] >= x_goal_range[1, 0]) & (x_gen[:, 1] <= x_goal_range[1, 1]))
             in_unsafe_mask = ((x_gen[:, 0] >= x_unsafe_range[0, 0]) & (x_gen[:, 0] <= x_unsafe_range[0, 1]) &
@@ -177,15 +136,11 @@ def pretrain_structure_aware(model, x_goal_range, x_unsafe_range, x_init_range, 
             x_gen_filtered = x_gen[in_generator]
 
             if len(x_gen_filtered) > 0:
-                # Compute Φ
                 phi_output = phi_module(x_gen_filtered).squeeze()
-
-                # Loss: penalize positive Φ (want Φ ≤ 0 in generator region)
                 loss_phi = torch.nn.functional.relu(phi_output + 1.0).sum()
 
-        # print(f"loss_phi = {loss_phi.item()}")
-        # Combined loss (weight V more heavily initially)
-        total_loss = loss_v + 1.0 * loss_phi  # Start with low GV weight
+        # Combined loss and optimization step
+        total_loss = loss_v + 1.0 * loss_phi
 
         optimizer.zero_grad()
         total_loss.backward()
@@ -193,15 +148,12 @@ def pretrain_structure_aware(model, x_goal_range, x_unsafe_range, x_init_range, 
 
         if epoch % 100 == 0:
             if phi_module is not None:
-                print(f"  Pre-train Epoch [{epoch}/{num_epochs}]: V_loss = {loss_v.item():.6f}, Φ_loss = {loss_phi.item():.6f}, Total = {total_loss.item():.6f}")
+                print(f"  Epoch [{epoch}/{num_epochs}]: V_loss={loss_v.item():.6f}, Φ_loss={loss_phi.item():.6f}, Total={total_loss.item():.6f}")
             else:
-                print(f"  Pre-train Epoch [{epoch}/{num_epochs}]: V_loss = {loss_v.item():.6f}")
+                print(f"  Epoch [{epoch}/{num_epochs}]: V_loss={loss_v.item():.6f}")
 
     print("="*80)
-    if phi_module is not None:
-        print("Pre-training complete. V and GV (Φ) now have structure matching constraints.")
-    else:
-        print("Pre-training complete. V now has structure matching constraints.")
+    print(f"Pre-training complete. {'V and GV (Φ)' if phi_module else 'V'} initialized.")
     print("="*80 + "\n")
 
 
@@ -933,7 +885,7 @@ def main():
         for name, param in V_net.named_parameters():
             print(f"  {name}: mean={param.data.mean().item():.6f}")
 
-        pretrain_structure_aware(
+        pretrain_network_samples(
             model=V_net,
             x_goal_range=goal_range,
             x_unsafe_range=unsafe_range,
