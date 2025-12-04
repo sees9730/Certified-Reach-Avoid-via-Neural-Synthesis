@@ -6,7 +6,7 @@ discretization, constraints, and verification.
 """
 
 import torch
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 
@@ -19,7 +19,7 @@ class NetworkConfig:
     n_outputs: int = 1
 
     # Scaling parameters
-    input_scale: float = 100.0  # Maps [-input_scale, input_scale] -> [-1, 1]
+    input_scale: list = field(default_factory=lambda: [100.0, 100.0])  # Input normalization each index corresponds to a dimension
     scale_factor: float = 20.0  # Output layer scaling
 
 

@@ -67,14 +67,15 @@ class GV(nn.Module):
 
         # Input normalization scale
         if input_scale_init is None:
-            input_scale_init = V_net.input_scale.item()
+            input_scale_init = V_net.input_scale
 
         self.learnable_input_scale = learnable_input_scale
         if learnable_input_scale:
             self.input_scale = nn.Parameter(torch.tensor(input_scale_init, dtype=torch.float32))
         else:
             self.register_buffer('input_scale', torch.tensor(input_scale_init, dtype=torch.float32))
-            self.register_buffer('input_scale_sq', torch.tensor(input_scale_init ** 2, dtype=torch.float32))
+            input_scale_tensor = torch.tensor(input_scale_init, dtype=torch.float32)
+            self.register_buffer('input_scale_sq', input_scale_tensor ** 2)
 
         # Get drift and diffusion from dynamics
         self.f = dynamics.get_f()
@@ -82,7 +83,7 @@ class GV(nn.Module):
 
         print(f"[PhiModule] Initialized with:")
         print(f"  scale_factor: {self.scale_factor.item() if hasattr(self.scale_factor, 'item') else self.scale_factor}")
-        print(f"  input_scale: {self.input_scale.item() if hasattr(self.input_scale, 'item') else self.input_scale}")
+        print(f"  input_scale: {self.input_scale.tolist() if hasattr(self.input_scale, 'tolist') else self.input_scale}")
         print(f"  f type: {type(self.f)}")
         print(f"  g type: {type(self.g)}")
 
@@ -143,8 +144,8 @@ class GV(nn.Module):
         dVdx2_norm = self.scale_factor * (W2 * d1 * sum_over_k2).sum(dim=1, keepdim=True)  # (N, 1)
 
         # Apply chain rule: ∇V w.r.t x = (1/input_scale) · ∇V w.r.t x_norm
-        dVdx1 = dVdx1_norm / self.input_scale  # (N, 1)
-        dVdx2 = dVdx2_norm / self.input_scale  # (N, 1)
+        dVdx1 = dVdx1_norm / self.input_scale[0]  # (N, 1)
+        dVdx2 = dVdx2_norm / self.input_scale[1]  # (N, 1)
 
         # Compute Hessian diagonal w.r.t normalized coordinates
         # Pre-compute common term for Hessian: W1[j,k] · σ''(z0[k])
@@ -174,8 +175,8 @@ class GV(nn.Module):
             input_scale_sq = self.input_scale_sq
 
         # Apply chain rule: H_ii w.r.t x = (1/input_scale²) · H_ii w.r.t x_norm
-        H11 = H11_norm / input_scale_sq  # (N, 1)
-        H22 = H22_norm / input_scale_sq  # (N, 1)
+        H11 = H11_norm / input_scale_sq[0]  # (N, 1)
+        H22 = H22_norm / input_scale_sq[1]  # (N, 1)
 
         # Compute f(x) or f(x, u) using ORIGINAL UNNORMALIZED coordinates
         fx = self._evaluate_f(x_orig)  # (N, 2)

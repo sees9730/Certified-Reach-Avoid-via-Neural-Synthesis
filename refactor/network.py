@@ -40,8 +40,8 @@ class V(nn.Module):
 
         self.config = config
 
-        # Input normalization: maps [-input_scale, input_scale] -> [-1, 1]
-        self.register_buffer('input_scale', torch.tensor(config.input_scale))
+        # Input normalization for each dimension [input_scale_i, input_scale_j] -> [x_orig_i/input_scale_i, x_orig_j/input_scale_j]
+        self.register_buffer('input_scale', torch.tensor(config.input_scale, dtype=torch.float32))
 
         # Network layers
         self.layer1 = nn.Linear(config.n_inputs, config.n_hidden_1)
@@ -156,7 +156,7 @@ class VDeep(nn.Module):
         super(VDeep, self).__init__()
 
         # Input normalization
-        self.register_buffer('input_scale', torch.tensor(input_scale))
+        self.register_buffer('input_scale', torch.tensor(input_scale, dtype=torch.float32))
 
         # Network layers
         self.layer1 = nn.Linear(n_inputs, n_hidden_1)

@@ -93,7 +93,7 @@ def pretrain_structure_aware(model, x_goal_range, x_unsafe_range, x_init_range, 
         # Create a simple network config for the phi module
         class NetworkConfig:
             def __init__(self):
-                self.input_scale = 100.0
+                self.input_scale = [100.0, 100.0]
                 self.scale_factor = scale_factor
         network_config = NetworkConfig()
 
@@ -775,7 +775,7 @@ def main():
     # Customize configuration
     params.network.n_hidden_1 = 256
     params.network.n_hidden_2 = 32
-    params.network.input_scale = 100.0
+    params.network.input_scale = [100.0, 100.0]
     params.network.scale_factor = 20.0
 
     params.training.learning_rate = 0.005
