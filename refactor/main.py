@@ -18,7 +18,7 @@ OUTPUT_DIR = ROOT / "refactor"/ "outputs"
 torch.manual_seed(0)
 
 from hyperparameters import Hyperparameters
-from dynamics import Dynamics
+from dynamics import Dynamics, ClosedLoopDrift
 from regions import Regions
 from network import create_V
 from control_network import LinearControlNN # [control synthesis]
@@ -32,6 +32,7 @@ from training_utils import (
     print_loss_summary,
     print_constraint_summary
 )
+from utils import cleanup_and_setup_directories, print_training_config
 from visualization import (
     visualize_training_progress,
     create_summary_plots
@@ -60,13 +61,17 @@ class LearnableBetaS(nn.Module):
     
 
 def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, x_range,
-                             A=None, R=None, scale_factor=1.0, num_epochs=1000, lr=0.01, device='cpu'):
+                             A=None, R=None, scale_factor=1.0, num_epochs=1000, lr=0.01, device='cpu', control_net=None):
     """Pre-train V and GV networks using sampled points to match constraint structure."""
     print("\n" + "="*80)
     print("PRE-TRAINING: Structure-Aware Initialization (V + GV)")
     print("="*80)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    # Include control network parameters if provided
+    opt_params = list(model.parameters())
+    if control_net is not None:
+        opt_params += list(control_net.parameters())
+    optimizer = torch.optim.Adam(opt_params, lr=lr)
 
     # Create GV (Φ) module if dynamics provided
     phi_module = None
@@ -152,8 +157,22 @@ def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, 
             else:
                 print(f"  Epoch [{epoch}/{num_epochs}]: V_loss={loss_v.item():.6f}")
 
+            if control_net is not None and epoch % 500 == 0:
+                print("  Control Network Parameters:")
+                for name, param in control_net.named_parameters():
+                    if param.requires_grad:
+                        param_str = str(param.data.numpy()).replace('\n', '\n    ')
+                        print(f"    {name}:\n    {param_str}")
+
     print("="*80)
-    print(f"Pre-training complete. {'V and GV (Φ)' if phi_module else 'V'} initialized.")
+    networks_trained = []
+    if phi_module is not None:
+        networks_trained.append("V and GV (Φ)")
+    else:
+        networks_trained.append("V")
+    if control_net is not None:
+        networks_trained.append("Controller")
+    print(f"Pre-training complete. {' + '.join(networks_trained)} initialized.")
     print("="*80 + "\n")
 
 
@@ -740,32 +759,8 @@ def main():
     # ========================================================================
     # CLEANUP: Remove old results and training progress
     # ========================================================================
-    import shutil
-    results_dir = Path("results")
-    training_progress_dir = Path("training_progress")
-
-    if results_dir.exists():
-        shutil.rmtree(results_dir)
-        print(f"Cleaned up old results directory")
-
-    if training_progress_dir.exists():
-        shutil.rmtree(training_progress_dir)
-        print(f"Cleaned up old training_progress directory")
-
-    # Recreate directories
-    results_dir.mkdir(exist_ok=True)
-    training_progress_dir.mkdir(exist_ok=True)
-
-    print(f"Network: {params.network.n_inputs} -> {params.network.n_hidden_1} -> "
-          f"{params.network.n_hidden_2} -> {params.network.n_outputs}")
-    print(f"Training: {params.training.num_epochs} epochs, LR={params.training.learning_rate}")
-    if params.training.learnable_beta_s or params.constraints.beta_s is None:
-        init_beta_s = params.constraints.beta_s if params.constraints.beta_s is not None else 0.6
-        print(f"Constraints: beta_s=LEARNABLE (init={init_beta_s}), beta_ra={params.constraints.beta_ra}")
-    else:
-        print(f"Constraints: beta_s={params.constraints.beta_s}, beta_ra={params.constraints.beta_ra}")
-    print(f"Generator: weight={params.training.generator_weight}, start_epoch={params.training.generator_start_epoch}")
-    print(f"Training method: CROWN bounds (rigorous)")
+    cleanup_and_setup_directories(["results", "training_progress"])
+    print_training_config(params)
 
     # ========================================================================
     # 2. SYSTEM DYNAMICS
@@ -784,48 +779,19 @@ def main():
         f1 = -0.5 * x1 + 1.0 * x2
         f2 = -1.0 * x1 + -0.5 * x2
         return torch.stack([f1, f2], dim=1)
-    
-    # [control synthesis] F_CL needs to be an nn Module if u_control is being trained as well
-    class ClosedLoopDrift(nn.Module):
-        """
-        the open-loop dynamics f_ol is specified in forward()
-        """
-        def __init__(self, controller: nn.Module):
-            super().__init__()
-            self.controller = controller   # <- registered as submodule
-
-        def forward(self, x: torch.Tensor) -> torch.Tensor:
-            x1 = x[:, 0]
-            x2 = x[:, 1]
-            f1 = -0.5 * x1 + 1.0 * x2
-            f2 = -1.0 * x1 + -0.5 * x2
-            f_ol = torch.stack([f1, f2], dim=1)
-            return f_ol + self.controller(x)
-
-    # if we do [control synthesis], then
-    #   u_fn and F_CL are necessary only for the current pre_training
-    #   in other words, the controller is kept fixed during pre_training
-    #   future work will remove this dependence such that we can use pre_training to train or not train controller.
-    u_fn = u_control(u_nn)
-    def F_CL(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
-        """Closed-loop drift: f_cl(x) = f(x) + u(x)"""
-        return f_ol(x) + u_fn(x) 
-
-    G_matrix = np.array([
-        [0.2, 0.0],
-        [0.0, 0.2]
-    ], dtype=np.float32)
-
-    # Create custom callable diffusion function: g(x) = diag(sigma * x)
-    sigma_diag = np.diag(G_matrix)  # [0.2, 0.2]
-    sigma_torch = torch.from_numpy(sigma_diag).float()
 
     def g(x: torch.Tensor) -> torch.Tensor:
         return torch.tensor([0.2, 0.2], device=x.device, dtype=x.dtype) * x
 
-    # dynamics = Dynamics.dynamics(f=F_CL, g=g)
-    # new f_cl wrapper for [control synthesis]
-    f_cl_module = ClosedLoopDrift(u_nn).to(params.training.device)
+    # Create closed-loop drift for control synthesis
+    f_cl_module = ClosedLoopDrift(f_ol, u_nn).to(params.training.device)
+
+    # For pretraining compatibility
+    u_fn = u_control(u_nn)
+    def F_CL(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
+        """Closed-loop drift: f_cl(x) = f(x) + u(x)"""
+        return f_ol(x) + u_fn(x)
+
     dynamics = Dynamics.dynamics(f=f_cl_module, g=g)
 
     print(f"\n{dynamics}")
@@ -859,11 +825,6 @@ def main():
     V_net = create_V(params.network)
     print(f"V network: {V_net}")
 
-    # Debug: Print initial weight statistics
-    print(f"\nDEBUG - Initial V_net weights:")
-    for name, param in V_net.named_parameters():
-        print(f"  {name}: mean={param.data.mean().item():.6f}, std={param.data.std().item():.6f}")
-
     GV_net = create_GV(
         V_net=V_net,
         dynamics=dynamics,
@@ -880,11 +841,6 @@ def main():
     PRETRAIN_LR = 0.01
 
     if ENABLE_PRETRAINING:
-        # Check weights BEFORE pretraining
-        print(f"\nDEBUG - V_net weights BEFORE pretraining:")
-        for name, param in V_net.named_parameters():
-            print(f"  {name}: mean={param.data.mean().item():.6f}")
-
         pretrain_network_samples(
             model=V_net,
             x_goal_range=goal_range,
@@ -892,18 +848,15 @@ def main():
             x_init_range=init_range,
             x_range=full_range,
             A=F_CL,
-            R=G_matrix,
+            R=g,
             scale_factor=params.network.scale_factor,
             num_epochs=PRETRAIN_EPOCHS,
             lr=PRETRAIN_LR,
-            device=params.training.device
+            device=params.training.device,
+            control_net=u_nn
         )
 
-        # Check weights AFTER pretraining
-        print(f"\nDEBUG - V_net weights AFTER pretraining:")
-        for name, param in V_net.named_parameters():
-            print(f"  {name}: mean={param.data.mean().item():.6f}")
-        print(f"Pretraining completed - weights have been updated!\n")
+        print(f"Pretraining completed!\n")
 
     # ========================================================================
     # 5. DISCRETIZE REGIONS

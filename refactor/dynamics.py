@@ -16,6 +16,7 @@ where H_V is the Hessian of V.
 """
 
 import torch
+import torch.nn as nn
 import numpy as np
 from typing import Union, Callable, Optional
 
@@ -429,3 +430,25 @@ def diagonal_state_diffusion(sigma: float):
     G_fn._is_diagonal = True
     G_fn.get_diagonal_squared = get_diagonal_squared
     return G_fn
+
+
+class ClosedLoopDrift(nn.Module):
+    """
+    Closed-loop drift dynamics: f_cl(x) = f_ol(x) + u(x).
+
+    Combines open-loop drift with a controller. The controller is registered
+    as a submodule, allowing its parameters to be trained.
+    """
+    def __init__(self, f_ol: Callable, controller: nn.Module):
+        """
+        Args:
+            f_ol: Open-loop drift function f_ol(x) -> torch.Tensor
+            controller: Controller network u(x) -> torch.Tensor
+        """
+        super().__init__()
+        self.f_ol = f_ol
+        self.controller = controller
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Compute closed-loop drift: f_cl(x) = f_ol(x) + u(x)."""
+        return self.f_ol(x) + self.controller(x)
