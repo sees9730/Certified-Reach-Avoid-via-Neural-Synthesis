@@ -11,7 +11,11 @@ import torch.nn.functional as F
 import numpy as np
 import math
 import time
+
+# Set up directories
 from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]   # repo_root
+OUTPUT_DIR = ROOT / "refactor"/ "outputs"
 
 # Set random seed immediately after imports (matching testing_simple3.py)
 torch.manual_seed(0)
@@ -22,6 +26,7 @@ from hyperparameters import Hyperparameters
 from dynamics import Dynamics
 from regions import Regions
 from network import create_V
+from control_network import LinearControlNN # [control synthesis]
 from phi_module import create_GV
 from discretization import discretize_regions
 from crown_bounds import SymbolicCROWNCache, SymbolicCROWNCache_Phi, prepare_cell_bounds
@@ -57,7 +62,7 @@ class LearnableBetaS(nn.Module):
     def value(self):
         """Get the current value of beta_s."""
         return torch.sigmoid(self.beta_s_logit)
-
+    
 
 def pretrain_structure_aware(model, x_goal_range, x_unsafe_range, x_init_range, x_range,
                               A=None, R=None, scale_factor=1.0, num_epochs=1000, lr=0.01, device='cpu'):
@@ -214,7 +219,8 @@ def train_network_bounds(
     regions: Regions,
     params: Hyperparameters,
     device: str = 'cpu',
-    visualize_interval: int = 5000
+    visualize_interval: int = 5000,
+    control_net: nn.Module = None
 ):
     """
     Train the value network using CROWN bounds.
@@ -227,6 +233,7 @@ def train_network_bounds(
         params: Hyperparameters
         device: Device for training
         visualize_interval: Interval for visualization (0 to disable)
+        control_net: if this is provided, then we do [control synthesis]
     """
     print("\n" + "="*80)
     print("BOUND-BASED TRAINING (using CROWN)")
@@ -294,21 +301,29 @@ def train_network_bounds(
         learnable_beta_s = LearnableBetaS(initial_value=initial_beta_s).to(device)
         print(f"\nUsing LEARNABLE beta_s (initialized to {initial_beta_s})")
 
-        # Optimizer includes both V_net and learnable beta_s
-        optimizer = torch.optim.Adam(
-            list(V_net.parameters()) + list(learnable_beta_s.parameters()),
-            lr=params.training.learning_rate
-        )
+        # # Optimizer includes both V_net and learnable beta_s
+        # optimizer = torch.optim.Adam(
+        #     list(V_net.parameters()) + list(learnable_beta_s.parameters()),
+        #     lr=params.training.learning_rate
+        # )
+        opt_params = list(V_net.parameters()) + list(learnable_beta_s.parameters())
     else:
         # Use constant beta_s
         beta_s_value = params.constraints.beta_s
         print(f"\nUsing CONSTANT beta_s = {beta_s_value}")
 
-        # Optimizer only for V_net
-        optimizer = torch.optim.Adam(
-            V_net.parameters(),
-            lr=params.training.learning_rate
-        )
+        # # Optimizer only for V_net
+        # optimizer = torch.optim.Adam(
+        #     V_net.parameters(),
+        #     lr=params.training.learning_rate
+        # )
+        opt_params = list(V_net.parameters())
+
+    # [control synthesis]
+    if control_net is not None:
+        opt_params += list(control_net.parameters())
+
+    optimizer = torch.optim.Adam(opt_params, lr=params.training.learning_rate)
 
     # Scheduler (matching testing_simple3.py)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
@@ -580,6 +595,11 @@ def train_network_bounds(
                 beta_s_log = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
                 print(f"Epoch [{epoch}/{params.training.num_epochs}]: Loss={total_loss.item():.4f}, β_s={beta_s_log:.4f}")
             print_loss_summary(epoch, loss_dict, compute_V=compute_V, compute_GV=compute_GV)
+            if control_net is not None:
+                print("control_net parameters:")
+                for name, param in control_net.named_parameters():
+                    if param.requires_grad:
+                        print(f"  {name} =\n{param.data}")
             loss_dict['epoch'] = epoch
             if learnable_beta_s is not None:
                 loss_dict['beta_s'] = beta_s_log
@@ -624,6 +644,11 @@ def train_network_bounds(
                     print("="*80)
                     print(f"Training converged at epoch {epoch}")
                     print(f"Final losses: Goal={loss_dict['goal']:.4f}, Unsafe={loss_dict['unsafe']:.4f}, Init={loss_dict['init']:.4f}, Outside={loss_dict['outside']:.4f}, Gen={loss_dict['generator']:.4f}")
+                    if control_net is not None:
+                        print("control_net parameters:")
+                        for name, param in control_net.named_parameters():
+                            if param.requires_grad:
+                                print(f"  {name} =\n{param.data}")
                     break
 
         # Detailed evaluation and visualization
@@ -812,22 +837,7 @@ def main():
     print("="*80)
 
     # Option 2: Neural network control (implements same K @ x)
-    class LinearControlNN(nn.Module):
-        def __init__(self):
-            super().__init__()
-            # Use nn.Linear but convert weight to buffer (non-trainable)
-            linear = nn.Linear(2, 2, bias=False)
-            with torch.no_grad():
-                linear.weight.copy_(torch.diag(torch.tensor([-1.0, -1.0])))
-            # Register weight as buffer instead of parameter
-            self.register_buffer('weight', linear.weight.data)
-
-        def forward(self, x):
-            # Manually compute linear transformation
-            return torch.nn.functional.linear(x, self.weight, bias=None)
-
     u_nn = LinearControlNN()
-    u_fn = u_control(u_nn)
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
         # Batch
@@ -836,7 +846,29 @@ def main():
         f1 = -0.5 * x1 + 1.0 * x2
         f2 = -1.0 * x1 + -0.5 * x2
         return torch.stack([f1, f2], dim=1)
+    
+    # [control synthesis] F_CL needs to be an nn Module if u_control is being trained as well
+    class ClosedLoopDrift(nn.Module):
+        """
+        the open-loop dynamics f_ol is specified in forward()
+        """
+        def __init__(self, controller: nn.Module):
+            super().__init__()
+            self.controller = controller   # <- registered as submodule
 
+        def forward(self, x: torch.Tensor) -> torch.Tensor:
+            x1 = x[:, 0]
+            x2 = x[:, 1]
+            f1 = -0.5 * x1 + 1.0 * x2
+            f2 = -1.0 * x1 + -0.5 * x2
+            f_ol = torch.stack([f1, f2], dim=1)
+            return f_ol + self.controller(x)
+
+    # if we do [control synthesis], then
+    #   u_fn and F_CL are necessary only for the current pre_training
+    #   in other words, the controller is kept fixed during pre_training
+    #   future work will remove this dependence such that we can use pre_training to train or not train controller.
+    u_fn = u_control(u_nn)
     def F_CL(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
         """Closed-loop drift: f_cl(x) = f(x) + u(x)"""
         return f_ol(x) + u_fn(x) 
@@ -858,7 +890,11 @@ def main():
 
     g.get_diagonal_squared = lambda x: (sigma_torch * x) ** 2
 
-    dynamics = Dynamics.dynamics(f=F_CL, g=g)
+    # dynamics = Dynamics.dynamics(f=F_CL, g=g)
+    # new f_cl wrapper for [control synthesis]
+    f_cl_module = ClosedLoopDrift(u_nn).to(params.training.device)
+    dynamics = Dynamics.dynamics(f=f_cl_module, g=g)
+
     print(f"\n{dynamics}")
 
     # ========================================================================
@@ -958,7 +994,8 @@ def main():
         regions=regions,
         params=params,
         device=device,
-        visualize_interval=1000
+        visualize_interval=1000,
+        control_net=u_nn,   # [control synthesis]
     )
 
     # ========================================================================
@@ -993,6 +1030,7 @@ def main():
         beta_ra=params.constraints.beta_ra,
         loss_history=loss_history,
         refinement_epochs=refinement_epochs,
+        results=results,
         output_dir="results"
     )
 
@@ -1003,7 +1041,8 @@ def main():
     print("SAVING MODEL")
     print("="*80)
 
-    save_path = Path("trained_model_bounds.pth")
+    # save the certificate
+    save_path = OUTPUT_DIR / "trained_model_bounds.pth"
     torch.save({
         'model_state_dict': V_net.state_dict(),
         'hyperparameters': params.to_dict(),
@@ -1014,14 +1053,21 @@ def main():
         'training_method': 'bounds',
         'final_beta_s': final_beta_s  # Save the final beta_s value (learned or constant)
     }, save_path)
+    print(f"Certificate Network saved to: {save_path}")
 
-    print(f"Model saved to: {save_path}")
+    control_save_path = OUTPUT_DIR / "control_net.pth"
+    torch.save({
+        'model_state_dict': u_nn.state_dict(),
+    }, control_save_path)
+    print(f"Control Network saved to: {control_save_path}")
 
     print("\n" + "="*80)
     print("TRAINING COMPLETE")
     print("="*80)
     print(f"\nResults saved to:")
-    print(f"  - Model: {save_path}")
+    print(f"  - Certificate Network: {save_path}")
+    print(f"  - Control Network: {control_save_path}")
+
     print(f"  - Plots: results/")
     if loss_history:
         print(f"  - Training progress: training_progress/")

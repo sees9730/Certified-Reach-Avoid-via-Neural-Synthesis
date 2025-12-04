@@ -111,6 +111,7 @@ def visualize_generator(
     show_regions: bool = True,
     show_discretization: bool = False,
     training_cells: Optional[List] = None,
+    results=None,
     filename: Optional[str] = None,
     resolution: int = 100,
     figsize: Tuple[int, int] = (10, 8)
@@ -167,6 +168,9 @@ def visualize_generator(
 
     plt.xlabel('x₁', fontsize=12)
     plt.ylabel('x₂', fontsize=12)
+    if(results is not None):
+        phi_min = results['Phi_min']
+        phi_max = results['Phi_max']
     plt.title(f"{title}\nRange: [{phi_min:.4f}, {phi_max:.4f}]", fontsize=14, fontweight='bold')
 
     # Overlay regions
@@ -456,6 +460,7 @@ def create_summary_plots(
     beta_ra: float,
     loss_history: Optional[List[dict]] = None,
     refinement_epochs: Optional[dict] = None,
+    results=None,
     output_dir: str = "results"
 ):
     """
@@ -503,10 +508,11 @@ def create_summary_plots(
     print("\n2. Generator with discretization...")
     visualize_generator(
         V_net, GV_net, regions,
-        title="Generator Φ(x)",
+        title="Generator Φ(x) outside goal and outside unsafe",
         show_regions=True,
         show_discretization=True,
         training_cells=gv_cells,
+        results=results,
         filename=f"{output_dir}/generator.png"
     )
 

@@ -32,6 +32,7 @@ from . import discretization
 from . import training_utils
 from . import visualization
 from . import crown_bounds
+from .control_network import LinearControlNN
 
 
 __version__ = '1.0.0'
@@ -56,6 +57,7 @@ __all__ = [
     'V',
     'VDeep',
     'create_value_network',
+    'LinearControlNN',
 
     # Phi module
     'GV',
