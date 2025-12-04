@@ -993,6 +993,7 @@ def main():
         beta_ra=params.constraints.beta_ra,
         loss_history=loss_history,
         refinement_epochs=refinement_epochs,
+        results=results,
         output_dir="results"
     )
 
