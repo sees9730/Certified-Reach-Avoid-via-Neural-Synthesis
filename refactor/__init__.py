@@ -20,7 +20,7 @@ from .hyperparameters import (
     TrainingConfig
 )
 
-from .dynamics import Dynamics, diagonal_state_diffusion
+from .dynamics import Dynamics, diagonal_state_diffusion, ClosedLoopDrift
 
 from .regions import Region, Regions
 
@@ -32,6 +32,7 @@ from . import discretization
 from . import training_utils
 from . import visualization
 from . import crown_bounds
+from . import utils
 from .control_network import LinearControlNN
 
 
@@ -48,6 +49,7 @@ __all__ = [
     # Dynamics
     'Dynamics',
     'diagonal_state_diffusion',
+    'ClosedLoopDrift',
 
     # Regions
     'Region',
@@ -67,4 +69,5 @@ __all__ = [
     'training_utils',
     'visualization',
     'crown_bounds',
+    'utils',
 ]

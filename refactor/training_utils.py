@@ -608,3 +608,43 @@ def print_constraint_summary(results: dict, prefix: str = ""):
           f"(V_min={results['V_outside_min']:.3f}, V_max={results['V_outside_max']:.3f})")
     print(f"{prefix}  Generator: {status_str(results['generator_satisfied'])} "
           f"(Phi_min={results['Phi_min']:.3f}, Phi_max={results['Phi_max']:.3f}, failing={results['num_failing_cells']})")
+
+
+def refine_failing_cells(
+    region_cells: List[Tuple[torch.Tensor, torch.Tensor]],
+    failing_mask: torch.Tensor,
+    refine_factor: int = 2
+) -> Tuple[List[Tuple[torch.Tensor, torch.Tensor]], int]:
+    """
+    Refine cells that fail constraints by subdividing them.
+
+    Args:
+        region_cells: List of (lower, upper) cell bounds
+        failing_mask: Boolean mask indicating which cells failed
+        refine_factor: Factor to subdivide cells (2 = split into 2x2 subcells)
+
+    Returns:
+        Tuple of (new_cells, num_refined)
+    """
+    from discretization import discretize_region
+    from regions import Region
+
+    new_cells = []
+    num_refined = 0
+
+    for i, (cell_lower, cell_upper) in enumerate(region_cells):
+        if i < len(failing_mask) and failing_mask[i]:
+            # Refine this failing cell into subcells
+            cell_bounds = np.array([
+                [cell_lower[0].item(), cell_upper[0].item()],
+                [cell_lower[1].item(), cell_upper[1].item()]
+            ], dtype=np.float32)
+            cell_region = Region(cell_bounds)
+            refined = discretize_region(cell_region, refine_factor)
+            new_cells.extend(refined)
+            num_refined += 1
+        else:
+            # Keep original cell
+            new_cells.append((cell_lower, cell_upper))
+
+    return new_cells, num_refined

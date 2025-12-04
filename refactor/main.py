@@ -30,7 +30,8 @@ from training_utils import (
     compute_loss_goal_bounds,
     evaluate_constraints,
     print_loss_summary,
-    print_constraint_summary
+    print_constraint_summary,
+    refine_failing_cells
 )
 from utils import cleanup_and_setup_directories, print_training_config
 from visualization import (
@@ -466,23 +467,11 @@ def train_network_bounds(
                     print(f"  Before: {len(region_cells['outside'])} cells")
                     print(f"  Failing cells: {num_outside_failing}/{len(region_cells['outside'])}")
 
-                    from discretization import discretize_region
-                    from regions import Region
-                    new_cells = []
-                    num_refined = 0
-
-                    for i, (cell_lower, cell_upper) in enumerate(region_cells['outside']):
-                        if i < len(outside_failing_mask) and outside_failing_mask[i]:
-                            cell_bounds = np.array([
-                                [cell_lower[0].item(), cell_upper[0].item()],
-                                [cell_lower[1].item(), cell_upper[1].item()]
-                            ], dtype=np.float32)
-                            cell_region = Region(cell_bounds)
-                            refined = discretize_region(cell_region, REFINE_FACTOR)
-                            new_cells.extend(refined)
-                            num_refined += 1
-                        else:
-                            new_cells.append((cell_lower, cell_upper))
+                    new_cells, num_refined = refine_failing_cells(
+                        region_cells['outside'],
+                        outside_failing_mask,
+                        REFINE_FACTOR
+                    )
 
                     region_cells['outside'] = new_cells
                     print(f"  After: {len(region_cells['outside'])} cells")
@@ -509,31 +498,15 @@ def train_network_bounds(
                 # Check if it's time to refine
                 if ((epoch + 1) % REFINE_INTERVAL == 0 and
                     len(region_cells['generator']) < MAX_CELLS):
-                    print(f"\n[Adaptive Refinement] Refining failing cells at epoch {epoch+1}")
+                    print(f"\n[Adaptive Refinement - Generator] Refining failing cells at epoch {epoch+1}")
                     print(f"  Before: {len(region_cells['generator'])} cells")
                     print(f"  Failing cells: {num_total_failing}/{len(region_cells['generator'])}")
 
-                    # Refine failing cells
-                    from discretization import discretize_region
-                    from regions import Region
-                    new_cells = []
-                    num_refined = 0
-
-                    for i, (cell_lower, cell_upper) in enumerate(region_cells['generator']):
-                        if phi_upper_failing_mask[i]:
-                            # Refine this failing cell into subcells
-                            # Create Region object from cell bounds
-                            cell_bounds = np.array([
-                                [cell_lower[0].item(), cell_upper[0].item()],
-                                [cell_lower[1].item(), cell_upper[1].item()]
-                            ], dtype=np.float32)
-                            cell_region = Region(cell_bounds)
-                            refined = discretize_region(cell_region, REFINE_FACTOR)
-                            new_cells.extend(refined)
-                            num_refined += 1
-                        else:
-                            # Keep original cell
-                            new_cells.append((cell_lower, cell_upper))
+                    new_cells, num_refined = refine_failing_cells(
+                        region_cells['generator'],
+                        phi_upper_failing_mask,
+                        REFINE_FACTOR
+                    )
 
                     region_cells['generator'] = new_cells
                     print(f"  After: {len(region_cells['generator'])} cells")
