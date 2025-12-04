@@ -111,7 +111,7 @@ def compute_loss_goal_bounds(
 
     # Shrink the sampling bounds by a factor
     # This creates a "safe buffer" where V is allowed to transition from >= beta_s to < beta_s
-    shrink_factor = 0.3 
+    shrink_factor = 0.3
     
     span_x1 = bounds[0, 1] - bounds[0, 0]
     span_x2 = bounds[1, 1] - bounds[1, 0]

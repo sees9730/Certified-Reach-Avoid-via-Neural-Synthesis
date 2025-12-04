@@ -707,6 +707,16 @@ def train_network_bounds(
                 # Rebuild generator input bounds
                 input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], device)
 
+                # Update cell counts after refinement
+                for name in region_order_V:
+                    cell_counts_V[name] = len(region_cells[name])
+                
+                # Rebuild concatenated input bounds for V
+                all_cells_V = []
+                for name in region_order_V:
+                    all_cells_V.extend(region_cells[name])
+                    input_lowers_all, input_uppers_all =  prepare_cell_bounds(all_cells_V, device)
+
                 print(f"  Caches rebuilt successfully!")
 
     elapsed_time = time.time() - start_time
@@ -764,6 +774,25 @@ def main():
 
     # params.training.random_seed = 0
 
+    # ========================================================================
+    # CLEANUP: Remove old results and training progress
+    # ========================================================================
+    import shutil
+    results_dir = Path("results")
+    training_progress_dir = Path("training_progress")
+
+    if results_dir.exists():
+        shutil.rmtree(results_dir)
+        print(f"Cleaned up old results directory")
+
+    if training_progress_dir.exists():
+        shutil.rmtree(training_progress_dir)
+        print(f"Cleaned up old training_progress directory")
+
+    # Recreate directories
+    results_dir.mkdir(exist_ok=True)
+    training_progress_dir.mkdir(exist_ok=True)
+
     print(f"Network: {params.network.n_inputs} -> {params.network.n_hidden_1} -> "
           f"{params.network.n_hidden_2} -> {params.network.n_outputs}")
     print(f"Training: {params.training.num_epochs} epochs, LR={params.training.learning_rate}")
@@ -805,7 +834,7 @@ def main():
         x1 = x[:, 0]
         x2 = x[:, 1]
         f1 = -0.5 * x1 + 1.0 * x2
-        f2 = -0.0 * x1 + -0.5 * x2
+        f2 = -1.0 * x1 + -0.5 * x2
         return torch.stack([f1, f2], dim=1)
 
     def F_CL(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
