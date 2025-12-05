@@ -353,59 +353,39 @@ def train_network_bounds(
             current_beta_s = beta_s_value
 
         # Compute total loss from bounds
-        if params.compute_V and not params.compute_GV: 
-            total_loss, loss_dict = compute_total_loss_bounds(
-                model=V_net,
-                goal_region=regions.goal,
-                V_goal_lower=bounds['goal'][0],
-                V_goal_upper=bounds['goal'][1],
-                V_unsafe_lower=bounds['unsafe'][0],
-                V_unsafe_upper=bounds['unsafe'][1],
-                V_init_lower=bounds['init'][0],
-                V_init_upper=bounds['init'][1],
-                V_outside_lower=bounds['outside'][0],
-                V_outside_upper=bounds['outside'][1],
-                beta_s=current_beta_s,
-                beta_ra=params.constraints.beta_ra,
-                device=device,
-                compute_V=params.compute_V,
-                compute_GV=params.compute_GV
-            )
-        elif not params.compute_V and params.compute_GV:
-            total_loss, loss_dict = compute_total_loss_bounds(
-            model=V_net,
-            goal_region=regions.goal,
-            Phi_lower=phi_lowers,
-            Phi_upper=phi_uppers,
-            beta_s=current_beta_s,
-            beta_ra=params.constraints.beta_ra,
-            generator_weight=current_gen_weight,
-            device=device,
-            compute_V=params.compute_V,
-            compute_GV=params.compute_GV
-            )
-        else:
-            total_loss, loss_dict = compute_total_loss_bounds(
-            model=V_net,
-            goal_region=regions.goal,
-            V_goal_lower=bounds['goal'][0],
-            V_goal_upper=bounds['goal'][1],
-            V_unsafe_lower=bounds['unsafe'][0],
-            V_unsafe_upper=bounds['unsafe'][1],
-            V_init_lower=bounds['init'][0],
-            V_init_upper=bounds['init'][1],
-            V_outside_lower=bounds['outside'][0],
-            V_outside_upper=bounds['outside'][1],
-            Phi_lower=phi_lowers,
-            Phi_upper=phi_uppers,
-            beta_s=current_beta_s,
-            beta_ra=params.constraints.beta_ra,
-            generator_weight=current_gen_weight,
-            device=device,
-            compute_V=params.compute_V,
-            compute_GV=params.compute_GV,
-            epoch=epoch
-            )
+        loss_kwargs = {
+            'model': V_net,
+            'goal_region': regions.goal,
+            'beta_s': current_beta_s,
+            'beta_ra': params.constraints.beta_ra,
+            'device': device,
+            'compute_V': params.compute_V,
+            'compute_GV': params.compute_GV,
+            'epoch': epoch
+        }
+
+        # Add V bounds if computing V
+        if params.compute_V:
+            loss_kwargs.update({
+                'V_goal_lower': bounds['goal'][0],
+                'V_goal_upper': bounds['goal'][1],
+                'V_unsafe_lower': bounds['unsafe'][0],
+                'V_unsafe_upper': bounds['unsafe'][1],
+                'V_init_lower': bounds['init'][0],
+                'V_init_upper': bounds['init'][1],
+                'V_outside_lower': bounds['outside'][0],
+                'V_outside_upper': bounds['outside'][1]
+            })
+
+        # Add GV bounds if computing GV
+        if params.compute_GV:
+            loss_kwargs.update({
+                'Phi_lower': phi_lowers,
+                'Phi_upper': phi_uppers,
+                'generator_weight': current_gen_weight
+            })
+
+        total_loss, loss_dict = compute_total_loss_bounds(**loss_kwargs)
 
         # Backward pass
         total_loss.backward()
@@ -525,9 +505,7 @@ def train_network_bounds(
                 loss_dict['beta_s'] = beta_s_log
             loss_history.append(loss_dict.copy())
 
-        # Early stopping check (every epoch) - check if all constraints are satisfied
-        # Moved here to match testing_simple3.py's order (after logging, before detailed evaluation)
-        # Use bounds_updated (computed AFTER optimizer step) to match testing_simple3.py!
+        # Early stopping check
         with torch.no_grad():
             # Check V constraints
             all_satisfied = True
@@ -567,7 +545,6 @@ def train_network_bounds(
                 break
 
         # Detailed evaluation and visualization
-        # Skip epoch 0 to avoid affecting random state and maintain exact reproducibility with testing_simple3.py
         if (epoch % 1000 == 0) or epoch == params.training.num_epochs - 1:
             print(f"\nEpoch {epoch} - Detailed Evaluation:")
             # For evaluation, we can just create temporary caches (not in the hot path)
@@ -742,8 +719,11 @@ def main():
         f2 = -1.0 * x1 + -0.5 * x2
         return torch.stack([f1, f2], dim=1)
 
+
+    # Create diffusion coefficients as a persistent tensor to avoid TracerWarnings
+    g_coeffs = torch.tensor([0.2, 0.2], dtype=torch.float32)
     def g(x: torch.Tensor) -> torch.Tensor:
-        return torch.tensor([0.2, 0.2], device=x.device, dtype=x.dtype) * x
+        return g_coeffs.to(device=x.device, dtype=x.dtype) * x
 
     # Create closed-loop drift for control synthesis
     f_cl_module = ClosedLoopDrift(f_ol, u_nn).to(params.training.device)

@@ -77,6 +77,10 @@ class GV(nn.Module):
             input_scale_tensor = torch.tensor(input_scale_init, dtype=torch.float32)
             self.register_buffer('input_scale_sq', input_scale_tensor ** 2)
 
+        # Register masks as buffers to avoid TracerWarnings
+        self.register_buffer('mask1', torch.tensor([[1.0, 0.0]], dtype=torch.float32))
+        self.register_buffer('mask2', torch.tensor([[0.0, 1.0]], dtype=torch.float32))
+
         # Get drift and diffusion from dynamics
         self.f = dynamics.get_f()
         self.g = dynamics.get_g()
@@ -180,19 +184,15 @@ class GV(nn.Module):
 
         # Compute f(x) or f(x, u) using ORIGINAL UNNORMALIZED coordinates
         fx = self._evaluate_f(x_orig)  # (N, 2)
-        # Use static masks to avoid ScatterND
-        mask1 = torch.tensor([[1.0, 0.0]], device=x.device, dtype=x.dtype)  # (1, 2)
-        mask2 = torch.tensor([[0.0, 1.0]], device=x.device, dtype=x.dtype)  # (1, 2)
-
-        f1 = (fx * mask1).sum(dim=1, keepdim=True)  # (N, 1)
-        f2 = (fx * mask2).sum(dim=1, keepdim=True)  # (N, 1)
+        # Use registered buffer masks to avoid TracerWarnings
+        f1 = (fx * self.mask1.to(x.dtype)).sum(dim=1, keepdim=True)  # (N, 1)
+        f2 = (fx * self.mask2.to(x.dtype)).sum(dim=1, keepdim=True)  # (N, 1)
 
         # Compute diagonal of g(x) @ g(x)^T for any form of g
         g_diag_sq = self._compute_gg_diag(x_orig)  # (N, 2)
-        # print(f"DEBUG: g_diag_sq.shape = {g_diag_sq.shape}, x_orig.shape = {x_orig.shape}")
-        # print(f"DEBUG: mask1.shape = {mask1.shape}, mask2.shape = {mask2.shape}")
-        g11_sq = (g_diag_sq * mask1).sum(dim=1, keepdim=True)  # (N, 1)
-        g22_sq = (g_diag_sq * mask2).sum(dim=1, keepdim=True)  # (N, 1)
+        # Use registered buffer masks
+        g11_sq = (g_diag_sq * self.mask1.to(x.dtype)).sum(dim=1, keepdim=True)  # (N, 1)
+        g22_sq = (g_diag_sq * self.mask2.to(x.dtype)).sum(dim=1, keepdim=True)  # (N, 1)
         # print(f"DEBUG: g11_sq.shape = {g11_sq.shape}, g22_sq.shape = {g22_sq.shape}")
 
         # Φ(x) = f·∇V + 0.5·(g²·H_diag)
@@ -292,12 +292,13 @@ class GV(nn.Module):
             if isinstance(g_result, np.ndarray):
                 g_result = torch.from_numpy(g_result).float().to(x.device)
 
-            # Determine what g returned
-            if g_result.dim() == 2 and g_result.shape[1] == 2:
+            # Determine what g returned based on shape
+            ndim = len(g_result.shape)
+            if ndim == 2:
                 # Returns diagonal vector (N, 2): treat as diag(g)
                 # (G @ G^T)_ii = g_i^2
                 return g_result ** 2
-            elif g_result.dim() == 3:
+            elif ndim == 3:
                 # Returns full matrix (N, 2, 2)
                 # Compute G @ G^T and extract diagonal (CROWN-compatible)
                 GGT = torch.bmm(g_result, g_result.transpose(1, 2))  # (N, 2, 2)
