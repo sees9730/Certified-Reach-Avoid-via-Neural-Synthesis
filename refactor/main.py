@@ -547,7 +547,7 @@ def train_network_bounds(
             # Early stop if all active constraints are satisfied
             if all_satisfied:
                 print("\n" + "="*80)
-                print("🎉 ALL CONSTRAINTS SATISFIED - EARLY STOPPING!")
+                print("ALL CONSTRAINTS SATISFIED - EARLY STOPPING!")
                 print("="*80)
                 print(f"Training converged at epoch {epoch}")
 
