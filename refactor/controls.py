@@ -11,7 +11,6 @@ import torch
 import numpy as np
 from typing import Union, Callable
 
-
 def u_control(K: Union[np.ndarray, torch.Tensor, Callable]) -> Callable:
     """
     Create a generic control function u(x).

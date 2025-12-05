@@ -19,6 +19,8 @@ def discretize_region(region: Region, n_squares: int) -> List[Tuple[torch.Tensor
     """
     Discretize a region into n_squares x n_squares grid cells.
 
+    For union regions, discretizes each component separately and combines.
+
     Args:
         region: Region to discretize
         n_squares: Number of subdivisions per dimension
@@ -26,20 +28,29 @@ def discretize_region(region: Region, n_squares: int) -> List[Tuple[torch.Tensor
     Returns:
         List of (lower, upper) tuples representing cells
     """
-    bounds = region.bounds
-    x1_edges = np.linspace(bounds[0, 0], bounds[0, 1], n_squares + 1)
-    x2_edges = np.linspace(bounds[1, 0], bounds[1, 1], n_squares + 1)
+    if region.is_union:
+        # Discretize each component and combine
+        all_cells = []
+        for comp in region.components:
+            comp_cells = discretize_region(comp, n_squares)
+            all_cells.extend(comp_cells)
+        return all_cells
+    else:
+        # Single rectangle - standard grid discretization
+        bounds = region.bounds
+        x1_edges = np.linspace(bounds[0, 0], bounds[0, 1], n_squares + 1)
+        x2_edges = np.linspace(bounds[1, 0], bounds[1, 1], n_squares + 1)
 
-    cells = []
-    for i in range(n_squares):
-        for j in range(n_squares):
-            cell_lower = np.array([x1_edges[i], x2_edges[j]], dtype=np.float32)
-            cell_upper = np.array([x1_edges[i+1], x2_edges[j+1]], dtype=np.float32)
-            cells.append((
-                torch.tensor(cell_lower, dtype=torch.float32),
-                torch.tensor(cell_upper, dtype=torch.float32)
-            ))
-    return cells
+        cells = []
+        for i in range(n_squares):
+            for j in range(n_squares):
+                cell_lower = np.array([x1_edges[i], x2_edges[j]], dtype=np.float32)
+                cell_upper = np.array([x1_edges[i+1], x2_edges[j+1]], dtype=np.float32)
+                cells.append((
+                    torch.tensor(cell_lower, dtype=torch.float32),
+                    torch.tensor(cell_upper, dtype=torch.float32)
+                ))
+        return cells
 
 
 def subtract_rectangle(
@@ -307,29 +318,47 @@ def compute_rectangular_partition_outside_goal_and_unsafe(
     """
     Compute rectangles covering full_region \ (goal_region ∪ unsafe_region).
 
+    Handles union unsafe regions properly.
+
     Args:
         full_region: Full region
         goal_region: Goal region to exclude
-        unsafe_region: Unsafe region to exclude
+        unsafe_region: Unsafe region to exclude (can be a union)
 
     Returns:
         List of Region objects covering the complement
     """
     full_bounds = full_region.bounds
     goal_bounds = goal_region.bounds
-    unsafe_bounds = unsafe_region.bounds
 
-    # Collect all boundaries
-    x_boundaries = sorted(set([
+    # Collect boundaries from full and goal
+    x_boundaries = set([
         full_bounds[0, 0], full_bounds[0, 1],
-        goal_bounds[0, 0], goal_bounds[0, 1],
-        unsafe_bounds[0, 0], unsafe_bounds[0, 1]
-    ]))
-    y_boundaries = sorted(set([
+        goal_bounds[0, 0], goal_bounds[0, 1]
+    ])
+    y_boundaries = set([
         full_bounds[1, 0], full_bounds[1, 1],
-        goal_bounds[1, 0], goal_bounds[1, 1],
-        unsafe_bounds[1, 0], unsafe_bounds[1, 1]
-    ]))
+        goal_bounds[1, 0], goal_bounds[1, 1]
+    ])
+
+    # Add boundaries from unsafe region (handle union case)
+    if unsafe_region.is_union:
+        # Add boundaries from each component
+        for comp in unsafe_region.components:
+            x_boundaries.add(comp.bounds[0, 0])
+            x_boundaries.add(comp.bounds[0, 1])
+            y_boundaries.add(comp.bounds[1, 0])
+            y_boundaries.add(comp.bounds[1, 1])
+    else:
+        # Single rectangle
+        unsafe_bounds = unsafe_region.bounds
+        x_boundaries.add(unsafe_bounds[0, 0])
+        x_boundaries.add(unsafe_bounds[0, 1])
+        y_boundaries.add(unsafe_bounds[1, 0])
+        y_boundaries.add(unsafe_bounds[1, 1])
+
+    x_boundaries = sorted(x_boundaries)
+    y_boundaries = sorted(y_boundaries)
 
     rectangles = []
     for i in range(len(x_boundaries) - 1):
@@ -344,6 +373,7 @@ def compute_rectangular_partition_outside_goal_and_unsafe(
             center_y = (rect_bounds[1, 0] + rect_bounds[1, 1]) / 2
 
             center = np.array([center_x, center_y])
+            # unsafe_region.contains() handles union regions automatically
             if not goal_region.contains(center) and not unsafe_region.contains(center):
                 rectangles.append(Region(rect_bounds))
 
@@ -412,7 +442,18 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
 
         # Clip cells to remove overlaps with goal and unsafe regions
         print(f'  Clipping {len(all_cells)} generator cells against goal and unsafe regions...')
-        exclusion_regions = [regions.goal.bounds, regions.unsafe.bounds]
+
+        # Build exclusion list: goal + all unsafe components (for union regions)
+        exclusion_regions = [regions.goal.bounds]
+        if regions.unsafe.is_union:
+            # Add each component of the union separately
+            for comp in regions.unsafe.components:
+                exclusion_regions.append(comp.bounds)
+            print(f'  Excluding goal + {len(regions.unsafe.components)} unsafe components')
+        else:
+            # Single unsafe region
+            exclusion_regions.append(regions.unsafe.bounds)
+            print(f'  Excluding goal + 1 unsafe region')
 
         clipped_cells = []
         for cell_lower, cell_upper in all_cells:
@@ -420,7 +461,7 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
             lower_np = cell_lower.numpy() if isinstance(cell_lower, torch.Tensor) else cell_lower
             upper_np = cell_upper.numpy() if isinstance(cell_upper, torch.Tensor) else cell_upper
 
-            # Clip this cell against both exclusion regions
+            # Clip this cell against all exclusion regions
             result_cells = clip_cell_against_exclusions(lower_np, upper_np, exclusion_regions)
 
             # Convert back to torch tensors

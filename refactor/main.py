@@ -19,7 +19,7 @@ torch.manual_seed(0)
 
 from hyperparameters import Hyperparameters
 from dynamics import Dynamics, ClosedLoopDrift
-from regions import Regions
+from regions import Regions, Region
 from network import create_V
 from control_network import LinearControlNN # [control synthesis]
 from phi_module import create_GV
@@ -87,6 +87,11 @@ def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, 
     else:
         print(f"  GV (Φ) pre-training DISABLED (no GV_net provided)")
 
+    # Track best model
+    best_loss = float('inf')
+    best_model_state = None
+    best_control_state = None
+
     for epoch in range(num_epochs):
         # Sample points uniformly from state space
         x = torch.rand(1000, 2, device=device)
@@ -146,6 +151,13 @@ def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, 
         total_loss.backward()
         optimizer.step()
 
+        # Track best model
+        if total_loss.item() < best_loss:
+            best_loss = total_loss.item()
+            best_model_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
+            if control_net is not None:
+                best_control_state = {k: v.cpu().clone() for k, v in control_net.state_dict().items()}
+
         if epoch % 100 == 0:
             if GV_net is not None:
                 print(f"  Epoch [{epoch}/{num_epochs}]: V_loss={loss_v.item():.6f}, Φ_loss={loss_phi.item():.6f}, Total={total_loss.item():.6f}")
@@ -158,6 +170,13 @@ def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, 
                     if param.requires_grad:
                         param_str = str(param.data.numpy()).replace('\n', '\n    ')
                         print(f"    {name}:\n    {param_str}")
+
+    # Restore best model
+    if best_model_state is not None:
+        model.load_state_dict(best_model_state)
+        if control_net is not None and best_control_state is not None:
+            control_net.load_state_dict(best_control_state)
+        print(f"\n  Best loss: {best_loss:.6f}")
 
     print("="*80)
     networks_trained = []
@@ -437,19 +456,13 @@ def train_network_bounds(
 
                 if ((epoch + 1) % REFINE_INTERVAL == 0 and
                     len(region_cells['outside']) < MAX_CELLS):
-                    print(f"\n[Adaptive Refinement - Outside] Refining failing cells at epoch {epoch+1}")
-                    print(f"  Before: {len(region_cells['outside'])} cells")
-                    print(f"  Failing cells: {num_outside_failing}/{len(region_cells['outside'])}")
-
                     new_cells, num_refined = refine_failing_cells(
                         region_cells['outside'],
                         outside_failing_mask,
                         REFINE_FACTOR
                     )
-
                     region_cells['outside'] = new_cells
-                    print(f"  After: {len(region_cells['outside'])} cells")
-                    print(f"  Refined {num_refined} failing cells into {num_refined * REFINE_FACTOR**2} subcells")
+                    print(f"[Refine-Outside] Epoch {epoch+1}: {num_outside_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['outside'].append(epoch + 1)
 
@@ -472,19 +485,13 @@ def train_network_bounds(
                 # Check if it's time to refine
                 if ((epoch + 1) % REFINE_INTERVAL == 0 and
                     len(region_cells['generator']) < MAX_CELLS):
-                    print(f"\n[Adaptive Refinement - Generator] Refining failing cells at epoch {epoch+1}")
-                    print(f"  Before: {len(region_cells['generator'])} cells")
-                    print(f"  Failing cells: {num_total_failing}/{len(region_cells['generator'])}")
-
                     new_cells, num_refined = refine_failing_cells(
                         region_cells['generator'],
                         phi_upper_failing_mask,
                         REFINE_FACTOR
                     )
-
                     region_cells['generator'] = new_cells
-                    print(f"  After: {len(region_cells['generator'])} cells")
-                    print(f"  Refined {num_refined} failing cells into {num_refined * REFINE_FACTOR**2} subcells")
+                    print(f"[Refine-Generator] Epoch {epoch+1}: {num_total_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['generator'].append(epoch + 1)
 
@@ -748,14 +755,30 @@ def main():
     init_range = np.array([[45.0, 55.0], [-55.0, -45.0]], dtype=np.float32)
     goal_range = np.array([[-25.0, 25.0], [-25.0, 25.0]], dtype=np.float32)
     unsafe_range = np.array([[-100.0, -80.0], [-100.0, 100.0]], dtype=np.float32)
+    # Create unsafe region as union of two rectangles (matching paper exactly)
+    unsafe_down1 = np.array([[-100.0, -80.0], [-100.0, -50.0]], dtype=np.float32)
+    unsafe_down2 = np.array([[-100.0, -80.0], [-50.0, 0.0]], dtype=np.float32)
+    unsafe_up = np.array([[-100.0, -80.0], [0.0, 100.0]], dtype=np.float32)
+
+    # unsafe_range = np.vstack((unsafe_up, unsafe_down))
     full_range = np.array([[-100.0, 100.0], [-100.0, 100.0]], dtype=np.float32)
 
-    regions = Regions.from_numpy_ranges(
-        init_range=init_range,
-        goal_range=goal_range,
-        unsafe_range=unsafe_range,
-        full_range=full_range
-    )
+    # regions = Regions.from_numpy_ranges(
+    #     init_range=init_range,
+    #     goal_range=goal_range,
+    #     unsafe_range=unsafe_range,
+    #     full_range=full_range
+    # )
+
+    init = Region(init_range)
+    goal = Region(goal_range)
+    unsafe_down1 = Region(unsafe_down1)
+    unsafe_down2 = Region(unsafe_down2)
+    unsafe_up = Region(unsafe_up)
+    unsafe = Region.union(unsafe_down1, unsafe_down2, unsafe_up)
+    full = Region(full_range)
+
+    regions = Regions(init=init, goal=goal, unsafe=unsafe, full=full)
 
     # ========================================================================
     # 4. CREATE NETWORKS

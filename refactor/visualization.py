@@ -440,15 +440,37 @@ def plot_loss_history(
 
 
 def _draw_region(region, color: str, label: str):
-    """Helper to draw a region rectangle."""
-    bounds = region.bounds
-    rect = Rectangle(
-        (bounds[0, 0], bounds[1, 0]),
-        bounds[0, 1] - bounds[0, 0],
-        bounds[1, 1] - bounds[1, 0],
-        linewidth=3, edgecolor=color, facecolor='none', label=label
-    )
-    plt.gca().add_patch(rect)
+    """
+    Helper to draw a region rectangle or union of rectangles.
+
+    Args:
+        region: Region object (single or union)
+        color: Edge color
+        label: Label for legend
+    """
+    if region.is_union:
+        # Draw each component of the union
+        for i, comp in enumerate(region.components):
+            bounds = comp.bounds
+            # Only add label to the first component
+            comp_label = label if i == 0 else None
+            rect = Rectangle(
+                (bounds[0, 0], bounds[1, 0]),
+                bounds[0, 1] - bounds[0, 0],
+                bounds[1, 1] - bounds[1, 0],
+                linewidth=3, edgecolor=color, facecolor='none', label=comp_label
+            )
+            plt.gca().add_patch(rect)
+    else:
+        # Single rectangle
+        bounds = region.bounds
+        rect = Rectangle(
+            (bounds[0, 0], bounds[1, 0]),
+            bounds[0, 1] - bounds[0, 0],
+            bounds[1, 1] - bounds[1, 0],
+            linewidth=3, edgecolor=color, facecolor='none', label=label
+        )
+        plt.gca().add_patch(rect)
 
 
 def create_summary_plots(

@@ -20,10 +20,14 @@ class Region:
     Rectangular region in 2D state space.
 
     Defined by bounds: [x1_min, x1_max] × [x2_min, x2_max]
+
+    Can represent either:
+    - A single rectangle (when bounds is a 2D array)
+    - A union of rectangles (when is_union=True and components is a list)
     """
     bounds: np.ndarray  # Shape: (state_dim, 2) where (:, 0) is lower, (:, 1) is upper
 
-    def __init__(self, bounds: np.ndarray):
+    def __init__(self, bounds: np.ndarray, is_union: bool = False, components: Optional[list] = None):
         """
         Initialize region.
 
@@ -31,14 +35,25 @@ class Region:
             bounds: Array of shape (state_dim, 2) where:
                     bounds[i, 0] = lower bound for dimension i
                     bounds[i, 1] = upper bound for dimension i
+                    For union regions, this is the bounding box of all components
+            is_union: Whether this region is a union of multiple rectangles
+            components: List of Region objects if is_union=True
         """
         self.bounds = np.array(bounds, dtype=np.float32)
         self.state_dim = self.bounds.shape[0]
+        self.is_union = is_union
+        self.components = components if components is not None else []
 
         # Validate
         assert self.bounds.shape[1] == 2, "bounds must have shape (state_dim, 2)"
         assert np.all(self.bounds[:, 0] <= self.bounds[:, 1]), \
             "Lower bounds must be <= upper bounds"
+
+        if is_union:
+            assert len(self.components) > 0, "Union region must have at least one component"
+            # Verify bounding box encompasses all components
+            for comp in self.components:
+                assert comp.state_dim == self.state_dim, "All components must have same state_dim"
 
     @property
     def lower(self) -> np.ndarray:
@@ -64,27 +79,42 @@ class Region:
         """
         Check if point(s) are inside region.
 
+        For union regions, returns True if point is in ANY component.
+
         Args:
             x: Point or batch of points. Shape: (state_dim,) or (batch_size, state_dim)
 
         Returns:
             Boolean or boolean array indicating membership
         """
-        if isinstance(x, torch.Tensor):
-            lower = torch.from_numpy(self.lower).to(x.device)
-            upper = torch.from_numpy(self.upper).to(x.device)
+        if self.is_union:
+            # Check membership in any component
+            if x.ndim == 1:
+                # Single point
+                return any(comp.contains(x) for comp in self.components)
+            else:
+                # Batch of points - use OR across all components
+                result = self.components[0].contains(x)
+                for comp in self.components[1:]:
+                    result = result | comp.contains(x)
+                return result
         else:
-            lower = self.lower
-            upper = self.upper
+            # Single rectangle - use standard bounds check
+            if isinstance(x, torch.Tensor):
+                lower = torch.from_numpy(self.lower).to(x.device)
+                upper = torch.from_numpy(self.upper).to(x.device)
+            else:
+                lower = self.lower
+                upper = self.upper
 
-        if x.ndim == 1:
-            # Single point
-            return np.all((x >= lower) & (x <= upper)) if isinstance(x, np.ndarray) \
-                   else torch.all((x >= lower) & (x <= upper))
-        else:
-            # Batch of points
-            return np.all((x >= lower) & (x <= upper), axis=1) if isinstance(x, np.ndarray) \
-                   else torch.all((x >= lower) & (x <= upper), dim=1)
+            if x.ndim == 1:
+                # Single point
+                return np.all((x >= lower) & (x <= upper)) if isinstance(x, np.ndarray) \
+                       else torch.all((x >= lower) & (x <= upper))
+            else:
+                # Batch of points
+                return np.all((x >= lower) & (x <= upper), axis=1) if isinstance(x, np.ndarray) \
+                       else torch.all((x >= lower) & (x <= upper), dim=1)
 
     def to_torch(self) -> Tuple[torch.Tensor, torch.Tensor]:
         """
@@ -100,9 +130,13 @@ class Region:
 
     def __repr__(self):
         """String representation."""
-        ranges = [f"[{self.bounds[i, 0]:.2f}, {self.bounds[i, 1]:.2f}]"
-                  for i in range(self.state_dim)]
-        return f"Region({' × '.join(ranges)})"
+        if self.is_union:
+            comp_strs = [str(comp) for comp in self.components]
+            return f"UnionRegion({' ∪ '.join(comp_strs)})"
+        else:
+            ranges = [f"[{self.bounds[i, 0]:.2f}, {self.bounds[i, 1]:.2f}]"
+                      for i in range(self.state_dim)]
+            return f"Region({' × '.join(ranges)})"
 
     @classmethod
     def from_corners(cls, lower: np.ndarray, upper: np.ndarray):
@@ -120,6 +154,40 @@ class Region:
         upper = np.array(upper, dtype=np.float32)
         bounds = np.stack([lower, upper], axis=1)
         return cls(bounds)
+
+    @classmethod
+    def union(cls, *regions):
+        """
+        Create a union of multiple rectangular regions.
+
+        Args:
+            *regions: Variable number of Region objects to union together
+
+        Returns:
+            Region instance representing the union
+
+        Example:
+            region1 = Region(bounds1)
+            region2 = Region(bounds2)
+            union_region = Region.union(region1, region2)
+        """
+        if len(regions) == 0:
+            raise ValueError("Must provide at least one region")
+
+        if len(regions) == 1:
+            # Single region - no union needed
+            return regions[0]
+
+        # Compute bounding box of all regions
+        all_lowers = np.stack([r.lower for r in regions])
+        all_uppers = np.stack([r.upper for r in regions])
+
+        bounding_lower = all_lowers.min(axis=0)
+        bounding_upper = all_uppers.max(axis=0)
+        bounding_bounds = np.stack([bounding_lower, bounding_upper], axis=1)
+
+        # Create union region
+        return cls(bounds=bounding_bounds, is_union=True, components=list(regions))
 
 
 class Regions:
