@@ -40,6 +40,12 @@ class ConstraintConfig:
     beta_ra: float = 20.0  # Reachability-avoid threshold
     all_v_lower_target: float = 0.0
 
+    # Pre-training target values
+    pretrain_goal_target: float = 0.3
+    pretrain_unsafe_target: float = 20.0
+    pretrain_init_target: float = 0.92
+    pretain_phi_target: float = 1.0
+
 
 @dataclass
 class TrainingConfig:
@@ -128,7 +134,11 @@ class Hyperparameters:
             'constraints': {
                 'beta_s': self.constraints.beta_s,
                 'beta_ra': self.constraints.beta_ra,
-                'all_v_lower_target': self.constraints.all_v_lower_target
+                'all_v_lower_target': self.constraints.all_v_lower_target,
+                'pretrain_goal_target': self.constraints.pretrain_goal_target,
+                'pretrain_unsafe_target': self.constraints.pretrain_unsafe_target,
+                'pretrain_init_target': self.constraints.pretrain_init_target,
+                'pretrain_phi_target': self.constraints.pretain_phi_target
             },
             'training': {
                 'learning_rate': self.training.learning_rate,

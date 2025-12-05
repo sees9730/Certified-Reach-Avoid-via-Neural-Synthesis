@@ -62,10 +62,17 @@ class LearnableBetaS(nn.Module):
     
 
 def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, x_range,
-                             A=None, R=None, scale_factor=1.0, num_epochs=1000, lr=0.01, device='cpu', control_net=None):
-    """Pre-train V and GV networks using sampled points to match constraint structure."""
+                             params, GV_net=None, num_epochs=1000, lr=0.01, device='cpu', control_net=None):
+    """Pre-train V network using sampled points to match constraint structure.
+
+    Args:
+        model: V network to train
+        params: Hyperparameters object (for target values)
+        GV_net: Optional GV network for additional loss (if None, only V is trained)
+        control_net: Optional control network
+    """
     print("\n" + "="*80)
-    print("PRE-TRAINING: Structure-Aware Initialization (V + GV)")
+    print("PRE-TRAINING: Structure-Aware Initialization (Sample-Based)")
     print("="*80)
 
     # Include control network parameters if provided
@@ -74,24 +81,11 @@ def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, 
         opt_params += list(control_net.parameters())
     optimizer = torch.optim.Adam(opt_params, lr=lr)
 
-    # Create GV (Φ) module if dynamics provided
-    phi_module = None
-    if A is not None and R is not None:
-        class NetworkConfig:
-            def __init__(self):
-                self.input_scale = [100.0, 100.0]
-                self.scale_factor = scale_factor
-
-        class TrainingConfig:
-            def __init__(self):
-                self.learnable_scale = False
-                self.learnable_input_scale = False
-
-        dynamics = Dynamics.dynamics(f=A, g=R)
-        phi_module = create_GV(model, dynamics, NetworkConfig(), TrainingConfig()).to(device)
-        print(f"  GV (Φ) pre-training ENABLED with dynamics")
+    # Use provided GV module if available
+    if GV_net is not None:
+        print(f"  GV (Φ) pre-training ENABLED (using provided GV_net)")
     else:
-        print(f"  GV (Φ) pre-training DISABLED (no dynamics provided)")
+        print(f"  GV (Φ) pre-training DISABLED (no GV_net provided)")
 
     for epoch in range(num_epochs):
         # Sample points uniformly from state space
@@ -112,13 +106,13 @@ def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, 
                       x_init_range[1, 0] <= x2 <= x_init_range[1, 1])
 
             if in_goal:
-                target_v[i] = 0.3 + 0.001 * torch.rand(1, device=device).item()
+                target_v[i] = params.constraints.pretrain_goal_target + 0.001 * torch.rand(1, device=device).item()
             elif in_unsafe:
-                target_v[i] = 20.0 + 3.0 * torch.rand(1, device=device).item()
+                target_v[i] = params.constraints.pretrain_unsafe_target + 3.0 * torch.rand(1, device=device).item()
             elif in_init:
-                target_v[i] = 0.92 + 0.05 * torch.rand(1, device=device).item()
+                target_v[i] = params.constraints.pretrain_init_target + 0.05 * torch.rand(1, device=device).item()
             else:
-                target_v[i] = 0.3 + 0.3 * torch.rand(1, device=device).item()
+                target_v[i] = params.constraints.pretrain_goal_target + 0.3 * torch.rand(1, device=device).item()
 
         # V network loss
         v_output = model(x).squeeze()
@@ -126,7 +120,7 @@ def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, 
 
         # GV (Φ) network loss
         loss_phi = torch.tensor(0.0, device=device)
-        if phi_module is not None:
+        if GV_net is not None:
             # Sample from generator region: X \ (Goal ∪ Unsafe)
             x_gen = torch.rand(100, 2, device=device)
             x_gen[:, 0] = x_gen[:, 0] * (x_range[0, 1] - x_range[0, 0]) + x_range[0, 0]
@@ -142,8 +136,8 @@ def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, 
             x_gen_filtered = x_gen[in_generator]
 
             if len(x_gen_filtered) > 0:
-                phi_output = phi_module(x_gen_filtered).squeeze()
-                loss_phi = torch.nn.functional.relu(phi_output + 1.0).sum()
+                phi_output = GV_net(x_gen_filtered).squeeze()
+                loss_phi = torch.nn.functional.relu(phi_output + params.constraints.pretrain_phi_target).sum()
 
         # Combined loss and optimization step
         total_loss = loss_v + 1.0 * loss_phi
@@ -153,7 +147,7 @@ def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, 
         optimizer.step()
 
         if epoch % 100 == 0:
-            if phi_module is not None:
+            if GV_net is not None:
                 print(f"  Epoch [{epoch}/{num_epochs}]: V_loss={loss_v.item():.6f}, Φ_loss={loss_phi.item():.6f}, Total={total_loss.item():.6f}")
             else:
                 print(f"  Epoch [{epoch}/{num_epochs}]: V_loss={loss_v.item():.6f}")
@@ -167,7 +161,7 @@ def pretrain_network_samples(model, x_goal_range, x_unsafe_range, x_init_range, 
 
     print("="*80)
     networks_trained = []
-    if phi_module is not None:
+    if GV_net is not None:
         networks_trained.append("V and GV (Φ)")
     else:
         networks_trained.append("V")
@@ -535,47 +529,42 @@ def train_network_bounds(
         # Moved here to match testing_simple3.py's order (after logging, before detailed evaluation)
         # Use bounds_updated (computed AFTER optimizer step) to match testing_simple3.py!
         with torch.no_grad():
+            # Check V constraints
+            all_satisfied = True
             if params.compute_V:
-                if epoch % 10 == 0:
-                    show = True
-                else:
-                    show = False
+                show = (epoch % 10 == 0)
                 _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, device=device, show=show, check=True, n_samples=10000)
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
                 init_satisfied = (bounds_updated['init'][0].min() >= beta_s_check and bounds_updated['init'][1].max() <= 1.0)
                 outside_satisfied = (bounds_updated['outside'][0].min() >= beta_s_check)
+                all_satisfied = all_satisfied and goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied
+
+            # Check GV constraints
             if params.compute_GV:
                 generator_satisfied = (phi_uppers.max() <= 0.0)
+                all_satisfied = all_satisfied and generator_satisfied
 
-            if params.compute_V and not params.compute_GV:
-                if goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied:
-                    print("\n" + "="*80)
-                    print("🎉 ALL CONSTRAINTS SATISFIED - EARLY STOPPING!")
-                    print("="*80)
-                    print(f"Training converged at epoch {epoch}")
-                    print(f"Final losses: Goal={loss_dict['goal']:.4f}, Unsafe={loss_dict['unsafe']:.4f}, Init={loss_dict['init']:.4f}, Outside={loss_dict['outside']:.4f}, Gen={loss_dict['generator']:.4f}")
-                    break
-            elif not params.compute_V and params.compute_GV:
-                if generator_satisfied:
-                    print("\n" + "="*80)
-                    print("🎉 ALL CONSTRAINTS SATISFIED - EARLY STOPPING!")
-                    print("="*80)
-                    print(f"Training converged at epoch {epoch}")
-                    print(f"Final losses: Gen={loss_dict['generator']:.4f}")
-                    break
-            elif params.compute_V and params.compute_GV:
-                if goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied and generator_satisfied:
-                    print("\n" + "="*80)
-                    print("🎉 ALL CONSTRAINTS SATISFIED - EARLY STOPPING!")
-                    print("="*80)
-                    print(f"Training converged at epoch {epoch}")
-                    print(f"Final losses: Goal={loss_dict['goal']:.4f}, Unsafe={loss_dict['unsafe']:.4f}, Init={loss_dict['init']:.4f}, Outside={loss_dict['outside']:.4f}, Gen={loss_dict['generator']:.4f}")
-                    if control_net is not None:
-                        print("control_net parameters:")
-                        for name, param in control_net.named_parameters():
-                            if param.requires_grad:
-                                print(f"  {name} =\n{param.data}")
-                    break
+            # Early stop if all active constraints are satisfied
+            if all_satisfied:
+                print("\n" + "="*80)
+                print("🎉 ALL CONSTRAINTS SATISFIED - EARLY STOPPING!")
+                print("="*80)
+                print(f"Training converged at epoch {epoch}")
+
+                # Print relevant losses
+                loss_parts = []
+                if params.compute_V:
+                    loss_parts.append(f"Goal={loss_dict['goal']:.4f}, Unsafe={loss_dict['unsafe']:.4f}, Init={loss_dict['init']:.4f}, Outside={loss_dict['outside']:.4f}")
+                if params.compute_GV:
+                    loss_parts.append(f"Gen={loss_dict['generator']:.4f}")
+                print(f"Final losses: {', '.join(loss_parts)}")
+
+                if control_net is not None:
+                    print("control_net parameters:")
+                    for name, param in control_net.named_parameters():
+                        if param.requires_grad:
+                            print(f"  {name} =\n{param.data}")
+                break
 
         # Detailed evaluation and visualization
         # Skip epoch 0 to avoid affecting random state and maintain exact reproducibility with testing_simple3.py
@@ -687,7 +676,7 @@ def main():
     print("MODULAR RL VERIFICATION - BOUND-BASED TRAINING")
     print("="*80)
 
-    # Random seed is set at module level (line 17) to match testing_simple3.py
+    # 
 
     # ========================================================================
     # 1. HYPERPARAMETERS
@@ -810,19 +799,25 @@ def main():
     # 4.5. PRE-TRAINING (Optional)
     # ========================================================================
     ENABLE_PRETRAINING = True  # Set to True to enable
-    PRETRAIN_EPOCHS = 2000
+    PRETRAIN_EPOCHS = 2500
     PRETRAIN_LR = 0.01
 
     if ENABLE_PRETRAINING:
+
+        delta = 0.1
+        params.constraints.pretrain_goal_target = params.constraints.beta_s - delta
+        params.constraints.pretrain_unsafe_target = params.constraints.beta_ra
+        params.constraints.pretrain_init_target = params.constraints.beta_s + delta
+        params.constraints.pretrain_phi_target = 1.0
+
         pretrain_network_samples(
             model=V_net,
             x_goal_range=goal_range,
             x_unsafe_range=unsafe_range,
             x_init_range=init_range,
             x_range=full_range,
-            A=F_CL,
-            R=g,
-            scale_factor=params.network.scale_factor,
+            params=params,
+            GV_net=GV_net,  # Pass GV_net if you want GV loss, None otherwise
             num_epochs=PRETRAIN_EPOCHS,
             lr=PRETRAIN_LR,
             device=params.training.device,
