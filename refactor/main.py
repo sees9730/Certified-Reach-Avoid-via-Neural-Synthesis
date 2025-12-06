@@ -716,7 +716,7 @@ def main():
     print("="*80)
 
     # Option 2: Neural network control (implements same K @ x)
-    u_nn = LinearControlNN()
+    u_nn = LinearControlNN(prior_knowledge=False)
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
         # Batch
