@@ -135,14 +135,16 @@ def compute_loss_goal_bounds(
     loss_nonneg = torch.relu(-V_lower).min()
     
     # When checking for success (passed), still check the logic based on the CENTER or MIN sample, not the edges.
+    min_v_sample = min(v_samples.min().item(), v_center.item())
+    min_v_lower = V_lower.min().item()
     if ((v_samples.min() < beta_s).item() or v_center < beta_s) and (V_lower.min() >= 0).item():
         passed = True
         if show:
-            print(f"  ✓ Goal sample passed: min V = {min(v_samples.min().item(), v_center.item()):.4f}, min V_lower = {V_lower.min().item():.4f}")
+            print(f" [Goal Loss]: V_sample={min_v_sample:.4f}, V_lower={min_v_lower:.4f}")
     else:
         passed = False
         if show:
-            print(f"  ✗ Goal sample failed: min V = {min(v_samples.min().item(), v_center.item()):.4f}, min V_lower = {V_lower.min().item():.4f}")
+            print(f" [Goal Loss]: V_sample={min_v_sample:.4f}, V_lower={min_v_lower:.4f}")
         
     return loss_soft + loss_nonneg, passed
 

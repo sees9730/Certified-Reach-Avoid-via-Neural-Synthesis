@@ -31,7 +31,8 @@ from training_utils import (
     evaluate_constraints,
     print_loss_summary,
     print_constraint_summary,
-    refine_failing_cells
+    refine_failing_cells,
+    clear_goal_samples_cache
 )
 from utils import cleanup_and_setup_directories, print_training_config
 from visualization import (
@@ -219,7 +220,6 @@ def train_network_bounds(
 
     # Move models to device
     V_net = V_net.to(device)
-    # GV_net = GV_net.to(device)
 
     # Collect ALL cells in the same order as original (init, goal, unsafe, outside, generator)
     print("\nCollecting all cells for V network...")
@@ -503,10 +503,9 @@ def train_network_bounds(
                 print(f"Epoch [{epoch}/{params.training.num_epochs}]: Loss={total_loss.item():.4f}, β_s={beta_s_log:.4f}")
             print_loss_summary(epoch, loss_dict, compute_V=params.compute_V, compute_GV=params.compute_GV)
             if control_net is not None:
-                print("control_net parameters:")
                 for name, param in control_net.named_parameters():
                     if param.requires_grad:
-                        print(f"  {name} =\n{param.data}")
+                        print(f" [Controller Params] {name} = {param.data}")
             loss_dict['epoch'] = epoch
             if learnable_beta_s is not None:
                 loss_dict['beta_s'] = beta_s_log
@@ -545,10 +544,9 @@ def train_network_bounds(
                 print(f"Final losses: {', '.join(loss_parts)}")
 
                 if control_net is not None:
-                    print("control_net parameters:")
                     for name, param in control_net.named_parameters():
                         if param.requires_grad:
-                            print(f"  {name} =\n{param.data}")
+                            print(f" [Controller Params] {name} = {param.data}")
                 break
 
         # Detailed evaluation and visualization
@@ -756,8 +754,8 @@ def main():
     goal_range = np.array([[-25.0, 25.0], [-25.0, 25.0]], dtype=np.float32)
     unsafe_range = np.array([[-100.0, -80.0], [-100.0, 100.0]], dtype=np.float32)
     # Create unsafe region as union of two rectangles (matching paper exactly)
-    unsafe_down1 = np.array([[-100.0, -80.0], [-100.0, -50.0]], dtype=np.float32)
-    unsafe_down2 = np.array([[-100.0, -80.0], [-50.0, 0.0]], dtype=np.float32)
+    # unsafe_down1 = np.array([[-100.0, -80.0], [-100.0, -50.0]], dtype=np.float32)
+    # unsafe_down2 = np.array([[-100.0, -80.0], [-50.0, 0.0]], dtype=np.float32)
     unsafe_up = np.array([[-100.0, -80.0], [0.0, 100.0]], dtype=np.float32)
 
     # unsafe_range = np.vstack((unsafe_up, unsafe_down))
@@ -772,10 +770,11 @@ def main():
 
     init = Region(init_range)
     goal = Region(goal_range)
-    unsafe_down1 = Region(unsafe_down1)
-    unsafe_down2 = Region(unsafe_down2)
-    unsafe_up = Region(unsafe_up)
-    unsafe = Region.union(unsafe_down1, unsafe_down2, unsafe_up)
+    # unsafe_down1 = Region(unsafe_down1)
+    # unsafe_down2 = Region(unsafe_down2)
+    # unsafe_up = Region(unsafe_up)
+    # unsafe = Region.union(unsafe_down1, unsafe_down2, unsafe_up)
+    unsafe = Region(unsafe_range)
     full = Region(full_range)
 
     regions = Regions(init=init, goal=goal, unsafe=unsafe, full=full)
@@ -824,7 +823,7 @@ def main():
             num_epochs=PRETRAIN_EPOCHS,
             lr=PRETRAIN_LR,
             device=params.training.device,
-            control_net=u_nn
+            # control_net=u_nn
         )
 
         print(f"Pretraining completed!\n")
@@ -852,7 +851,7 @@ def main():
         params=params,
         device=device,
         visualize_interval=1000,
-        control_net=u_nn,   # [control synthesis]
+        # control_net=u_nn,   # [control synthesis]
     )
 
     # ========================================================================
