@@ -133,17 +133,26 @@ def compute_loss_goal_bounds(
     loss_soft = loss_center + loss_rest
 
     loss_nonneg = torch.relu(-V_lower).min()
+
+    # Obtain minimum V inside goal region: from samples and lowest upper bound
+    v_min = min(v_samples.min().item(), v_center.item(), V_upper.min().item())
     
-    # When checking for success (passed), still check the logic based on the CENTER or MIN sample, not the edges.
-    if ((v_samples.min() < beta_s).item() or v_center < beta_s) and (V_lower.min() >= 0).item():
+    # When checking for success (passed), check the logic based on v_min
+    if (v_min < beta_s) and (V_lower.min() >= 0).item():
         passed = True
         if show:
-            print(f"  ✓ Goal sample passed: min V = {min(v_samples.min().item(), v_center.item()):.4f}, min V_lower = {V_lower.min().item():.4f}")
+            # print(f"  ✓ Goal sample passed: min V = {min(v_samples.min().item(), v_center.item()):.4f}, min V_lower = {V_lower.min().item():.4f}")
+            print(" ✓ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
+                v_min, V_lower.min()
+            ))
     else:
         passed = False
         if show:
-            print(f"  ✗ Goal sample failed: min V = {min(v_samples.min().item(), v_center.item()):.4f}, min V_lower = {V_lower.min().item():.4f}")
-        
+            # print(f"  ✗ Goal sample failed: min V = {min(v_samples.min().item(), v_center.item()):.4f}, min V_lower = {V_lower.min().item():.4f}")
+            print(" ✗ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
+                v_min, V_lower.min()
+            ))
+
     return loss_soft + loss_nonneg, passed
 
 def compute_loss_unsafe_bounds(
