@@ -1,5 +1,6 @@
 from pathlib import Path
 import torch
+import sys
 
 def _cells_to_cpu(region_cells: dict):
     out = {}
@@ -81,3 +82,24 @@ def load_eval_bundle(bundle_path: Path, map_location="cpu"):
     if not bundle_path.exists():
         raise FileNotFoundError(f"Could not find eval bundle: {bundle_path}")
     return torch.load(bundle_path, map_location=map_location)
+
+
+class Tee:
+    def __init__(self, *streams):
+        self.streams = streams
+
+    def write(self, data):
+        for s in self.streams:
+            s.write(data)
+            s.flush()
+
+    def flush(self):
+        for s in self.streams:
+            s.flush()
+
+def enable_terminal_logging(log_path: Path):
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    log_f = open(log_path, "w", buffering=1)  # line-buffered
+    sys.stdout = Tee(sys.__stdout__, log_f)
+    sys.stderr = Tee(sys.__stderr__, log_f)
+    return log_f  # keep a reference so it doesn't get GC'd

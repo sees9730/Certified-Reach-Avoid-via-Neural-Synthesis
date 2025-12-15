@@ -1,13 +1,15 @@
-"""
-Bound-based training script using CROWN for NN verification.
-"""
 
+"""
+2D Geometric Brownian Motion Control Synthesis, 
+Goal is centered at origin (the equilibrium points)
+"""
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import math
 import time
+import argparse
 
 # Set up directories
 from pathlib import Path
@@ -35,6 +37,7 @@ from src.training_utils import (
     merge_passing_neighbor_cells,
     clear_goal_samples_cache
 )
+from src.save_load_utils import save_eval_bundle, load_eval_bundle, log_loaded_training_epochs, enable_terminal_logging
 from src.utils import cleanup_and_setup_directories, print_training_config
 from src.visualization import (
     visualize_training_progress,
@@ -758,12 +761,15 @@ def train_network_bounds(
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--train", type=int, default=1, choices=[0, 1],
+                        help="1: train + save bundle, 0: load bundle + eval/plot")
+    args = parser.parse_args()
+
     """Main training function."""
     print("="*80)
     print("MODULAR RL VERIFICATION - BOUND-BASED TRAINING")
     print("="*80)
-
-    # 
 
     # ========================================================================
     # 1. HYPERPARAMETERS
@@ -803,14 +809,6 @@ def main():
     params.compute_V = True
     params.compute_GV = True
 
-    # params.training.random_seed = 0
-
-    # ========================================================================
-    # CLEANUP: Remove old results and training progress
-    # ========================================================================
-    cleanup_and_setup_directories(["results", "training_progress"])
-    print_training_config(params)
-
     # ========================================================================
     # 2. SYSTEM DYNAMICS
     # ========================================================================
@@ -838,15 +836,7 @@ def main():
     # Create closed-loop drift for control synthesis
     f_cl_module = ClosedLoopDrift(f_ol, u_nn).to(params.training.device)
 
-    # # For pretraining compatibility
-    # u_fn = u_control(u_nn)
-    # def F_CL(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
-    #     """Closed-loop drift: f_cl(x) = f(x) + u(x)"""
-    #     return f_ol(x) + u_fn(x)
-
     dynamics = Dynamics.dynamics(f=f_cl_module, g=g)
-
-    print(f"\n{dynamics}")
 
     # ========================================================================
     # 3. SPATIAL REGIONS
@@ -892,46 +882,12 @@ def main():
     print("="*80)
 
     V_net = create_V(params.network)
-    print(f"V network: {V_net}")
-
     GV_net = create_GV(
         V_net=V_net,
         dynamics=dynamics,
         network_config=params.network,
         training_config=params.training
     )
-    print(f"GV network created")
-
-    # ========================================================================
-    # 4.5. PRE-TRAINING (Optional)
-    # ========================================================================
-    ENABLE_PRETRAINING = True  # Set to True to enable
-    PRETRAIN_EPOCHS = 1000
-    PRETRAIN_LR = 0.01
-
-    if ENABLE_PRETRAINING:
-
-        delta = 0.1
-        params.constraints.pretrain_goal_target = params.constraints.beta_s - delta
-        params.constraints.pretrain_unsafe_target = params.constraints.beta_ra
-        params.constraints.pretrain_init_target = params.constraints.beta_s + delta
-        params.constraints.pretrain_phi_target = 1.0
-
-        pretrain_network_samples(
-            model=V_net,
-            x_goal_range=goal_range,
-            x_unsafe_range=unsafe_range,
-            x_init_range=init_range,
-            x_range=full_range,
-            params=params,
-            GV_net=GV_net,  # Pass GV_net if you want GV loss, None otherwise
-            num_epochs=PRETRAIN_EPOCHS,
-            lr=PRETRAIN_LR,
-            device=params.training.device,
-            control_net=u_nn
-        )
-
-        print(f"Pretraining completed!\n")
 
     # ========================================================================
     # 5. DISCRETIZE REGIONS
@@ -943,95 +899,203 @@ def main():
     )
 
     # ========================================================================
-    # 6. TRAIN WITH BOUNDS
+    # 6.0 Setup saving
     # ========================================================================
     device = params.training.device
-    print(f"\nUsing device: {device}")
+    delta = 0.1
+    params.constraints.pretrain_goal_target = params.constraints.beta_s - delta
+    params.constraints.pretrain_unsafe_target = params.constraints.beta_ra
+    params.constraints.pretrain_init_target = params.constraints.beta_s + delta
+    params.constraints.pretrain_phi_target = 1.0
+    # Path to bundle we will save/load
+    bundle_path = OUTPUT_DIR / "eval_bundle.pth"
 
-    loss_history, final_beta_s, refinement_epochs = train_network_bounds(
-        V_net=V_net,
-        GV_net=GV_net,
-        region_cells=region_cells,
-        regions=regions,
-        params=params,
-        device=device,
-        visualize_interval=1000,
-        control_net=u_nn,   # [control synthesis]
-    )
+    if args.train == 1:
+        # ========================================================================
+        # 6.1. PRE-TRAINING (Optional)
+        # ========================================================================
+        cleanup_and_setup_directories(["results", "training_progress"]) # CLEANUP: Remove old results and training progress
+        enable_terminal_logging(OUTPUT_DIR / "terminal_log.txt")
+        print_training_config(params)
+        print(f"\n{dynamics}")
+        print(f"V network: {V_net}")
+        print(f"\nUsing device: {device}")
+    
+        ENABLE_PRETRAINING = True  # Set to True to enable
+        PRETRAIN_EPOCHS = 1000
+        PRETRAIN_LR = 0.01
 
-    # ========================================================================
-    # 7. FINAL EVALUATION
-    # ========================================================================
-    print("\n" + "="*80)
-    print("FINAL EVALUATION")
-    print("="*80)
+        if ENABLE_PRETRAINING:
+            pretrain_network_samples(
+                model=V_net,
+                x_goal_range=goal_range,
+                x_unsafe_range=unsafe_range,
+                x_init_range=init_range,
+                x_range=full_range,
+                params=params,
+                GV_net=GV_net,  # Pass GV_net if you want GV loss, None otherwise
+                num_epochs=PRETRAIN_EPOCHS,
+                lr=PRETRAIN_LR,
+                device=params.training.device,
+                control_net=u_nn
+            )
 
-    results = evaluate_constraints(
-        V_net, GV_net, region_cells,
-        beta_s=final_beta_s,
-        beta_ra=params.constraints.beta_ra,
-        device=device,
-        n_samples=5000
-    )
-    print_constraint_summary(results)
+            print(f"Pretraining completed!\n")
 
-    # ========================================================================
-    # 8. FINAL VISUALIZATIONS
-    # ========================================================================
-    print("\n" + "="*80)
-    print("CREATING FINAL VISUALIZATIONS")
-    print("="*80)
+        # ========================================================================
+        # 6. TRAIN WITH BOUNDS
+        # ========================================================================
+        device = params.training.device
+        print(f"\nUsing device: {device}")
 
-    create_summary_plots(
-        V_net=V_net,
-        GV_net=GV_net,
-        regions=regions,
-        region_cells=region_cells,
-        beta_s=final_beta_s,
-        beta_ra=params.constraints.beta_ra,
-        loss_history=loss_history,
-        refinement_epochs=refinement_epochs,
-        results=results,
-        output_dir="results"
-    )
+        loss_history, final_beta_s, refinement_epochs = train_network_bounds(
+            V_net=V_net,
+            GV_net=GV_net,
+            region_cells=region_cells,
+            regions=regions,
+            params=params,
+            device=device,
+            visualize_interval=1000,
+            control_net=u_nn,   # [control synthesis]
+        )
 
-    # ========================================================================
-    # 9. SAVE MODEL
-    # ========================================================================
-    print("\n" + "="*80)
-    print("SAVING MODEL")
-    print("="*80)
+        # ========================================================================
+        # 7. FINAL EVALUATION
+        # ========================================================================
+        print("\n" + "="*80)
+        print("FINAL EVALUATION")
+        print("="*80)
 
-    # save the certificate
-    save_path = OUTPUT_DIR / "trained_model_bounds.pth"
-    torch.save({
-        'model_state_dict': V_net.state_dict(),
-        'hyperparameters': params.to_dict(),
-        # 'dynamics': {'F': F_CL, 'G': g},
-        'regions': regions.to_dict(),
-        'final_results': results,
-        'loss_history': loss_history,
-        'training_method': 'bounds',
-        'final_beta_s': final_beta_s  # Save the final beta_s value (learned or constant)
-    }, save_path)
-    print(f"Certificate Network saved to: {save_path}")
+        results = evaluate_constraints(
+            V_net, GV_net, region_cells,
+            beta_s=final_beta_s,
+            beta_ra=params.constraints.beta_ra,
+            device=device,
+            n_samples=5000
+        )
+        print_constraint_summary(results)
 
-    control_save_path = OUTPUT_DIR / "control_net.pth"
-    torch.save({
-        'model_state_dict': u_nn.state_dict(),
-    }, control_save_path)
-    print(f"Control Network saved to: {control_save_path}")
+        # ========================================================================
+        # 8. FINAL VISUALIZATIONS
+        # ========================================================================
+        print("\n" + "="*80)
+        print("CREATING FINAL VISUALIZATIONS")
+        print("="*80)
 
-    print("\n" + "="*80)
-    print("TRAINING COMPLETE")
-    print("="*80)
-    print(f"\nResults saved to:")
-    print(f"  - Certificate Network: {save_path}")
-    print(f"  - Control Network: {control_save_path}")
+        create_summary_plots(
+            V_net=V_net,
+            GV_net=GV_net,
+            regions=regions,
+            region_cells=region_cells,
+            beta_s=final_beta_s,
+            beta_ra=params.constraints.beta_ra,
+            loss_history=loss_history,
+            refinement_epochs=refinement_epochs,
+            results=results,
+            output_dir="results"
+        )
 
-    print(f"  - Plots: results/")
-    if loss_history:
-        print(f"  - Training progress: training_progress/")
+        # ====================================================================
+        # 9. SAVE BUNDLE (for future eval/plots)
+        # ====================================================================
+        print("\n" + "="*80)
+        print("SAVING EVAL BUNDLE")
+        print("="*80)
+
+        save_eval_bundle(
+            OUTPUT_DIR,
+            V_net=V_net,
+            GV_net=GV_net,
+            control_net=u_nn,
+            params=params,
+            regions=regions,
+            region_cells=region_cells,
+            final_beta_s=final_beta_s,
+            loss_history=loss_history,
+            refinement_epochs=refinement_epochs,
+            results=results,
+        )
+
+    else:
+        # ====================================================================
+        # LOAD + EVAL + PLOT
+        # ====================================================================
+        print("\n" + "="*80)
+        print("LOADING SAVED BUNDLE (skip training)")
+        print("="*80)
+
+        bundle = load_eval_bundle(bundle_path, map_location="cpu")
+
+        # Rebuild params/regions from dicts
+        params = Hyperparameters.from_dict(bundle["hyperparameters"])
+
+        # Rebuild discretization cells
+        region_cells = bundle["region_cells"]  # already list of (cpu tensors)
+
+        # Rebuild networks (same as before) and load weights
+        V_net = create_V(params.network).to(device)
+        V_net.load_state_dict(bundle["V_state_dict"])
+
+        # Recreate dynamics + GV_net (same construction as training path)
+        # NOTE: uses your existing dynamics creation earlier in main()
+        GV_net = create_GV(
+            V_net=V_net,
+            dynamics=dynamics,
+            network_config=params.network,
+            training_config=params.training
+        ).to(device)
+        if bundle["GV_state_dict"] is not None:
+            GV_net.load_state_dict(bundle["GV_state_dict"])
+
+        # Control net (only needed if your plots depend on it)
+        u_nn = LinearControlNN(prior_knowledge=True).to(device)
+        if bundle["control_state_dict"] is not None:
+            u_nn.load_state_dict(bundle["control_state_dict"])
+
+        # Move cells to device for evaluation/plots
+        region_cells = {
+            k: [(lo.to(device), hi.to(device)) for (lo, hi) in v]
+            for k, v in region_cells.items()
+        }
+
+        final_beta_s = bundle["final_beta_s"]
+        loss_history = bundle["loss_history"]
+        refinement_epochs = bundle["refinement_epochs"]
+
+        # You can reuse saved results, or recompute
+        results = bundle.get("final_results", None)
+        if results is None:
+            print("No saved results found in bundle, recomputing evaluation...")
+            results = evaluate_constraints(
+                V_net, GV_net, region_cells,
+                beta_s=final_beta_s,
+                beta_ra=params.constraints.beta_ra,
+                device=device,
+                n_samples=5000
+            )
+
+        print("\n" + "="*80)
+        print("FINAL EVALUATION (LOADED)")
+        print("="*80)
+        print_constraint_summary(results)
+
+        print("\n" + "="*80)
+        print("CREATING FINAL VISUALIZATIONS (LOADED)")
+        print("="*80)
+        log_loaded_training_epochs(loss_history)
+
+        create_summary_plots(
+            V_net=V_net,
+            GV_net=GV_net,
+            regions=regions,
+            region_cells=region_cells,
+            beta_s=final_beta_s,
+            beta_ra=params.constraints.beta_ra,
+            loss_history=loss_history,
+            refinement_epochs=refinement_epochs,
+            results=results,
+            output_dir="results"
+        )
 
 
 if __name__ == '__main__':

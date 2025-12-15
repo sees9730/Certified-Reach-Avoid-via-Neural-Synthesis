@@ -21,6 +21,7 @@ import sys
 sys.path.insert(0, str(ROOT))
 
 from src.control_network import LinearControlNN
+from src.save_load_utils import load_eval_bundle
 
 
 # ----------------------------
@@ -104,16 +105,22 @@ def g_diag_np(x: np.ndarray) -> np.ndarray:
     return 0.2 * x
 
 
-# ----------------------------
-# Optional: load a 3D control net
-# (Your net must be R^3 -> R^3)
-# ----------------------------
-def load_control_net(control_save_path, device="cpu"):
-    control_net = LinearControlNN(input_dim=3)
-    ckpt = torch.load(control_save_path, map_location=device)
-    control_net.load_state_dict(ckpt["model_state_dict"])
+# Control Network
+def load_control_net(bundle_path, device="cpu"):
+    
+    bundle = load_eval_bundle(bundle_path, map_location="cpu")
+    
+    # 1) create a fresh network with SAME architecture as when saved
+    control_net = LinearControlNN(input_dim=3).to(device)
+
+    if bundle["control_state_dict"] is not None:
+        control_net.load_state_dict(bundle["control_state_dict"])
+
+    # 4) eval mode for rollout
     control_net.eval()
     return control_net
+
+control_net = load_control_net(OUTPUT_DIR / "eval_bundle.pth")
 
 
 def test_single_traj_run(controller=None, T=10.0, seed=None):
@@ -393,12 +400,11 @@ def test_mc(controller=None):
 
 
 def main():
-    # test_single_traj_run(controller=None)
+    test_single_traj_run(controller=None)
     # test_mc(controller=None)
 
     # If you have a trained 3D controller:
     # from control_network import LinearControlNN3D
-    control_net = load_control_net(OUTPUT_DIR / "control_net.pth")
     test_single_traj_run(controller=control_net)
     test_mc(controller=control_net)
 

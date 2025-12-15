@@ -674,13 +674,13 @@ def create_summary_plots(
         filename=f"{output_dir}/constraint_regions.png"
     )
 
-    # # Loss history
-    # if loss_history is not None and len(loss_history) > 0:
-    #     print("\n4. Loss history...")
-    #     plot_loss_history(
-    #         loss_history,
-    #         refinement_epochs=refinement_epochs,
-    #         filename=f"{output_dir}/loss_history.png"
-    #     )
+    # Loss history
+    if loss_history is not None and len(loss_history) > 0:
+        print("\n4. Loss history...")
+        plot_loss_history(
+            loss_history,
+            refinement_epochs=refinement_epochs,
+            filename=f"{output_dir}/loss_history.png"
+        )
 
-    # print(f"\nAll plots saved to '{output_dir}/'")
+    print(f"\nAll plots saved to '{output_dir}/'")

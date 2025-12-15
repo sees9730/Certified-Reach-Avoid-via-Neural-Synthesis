@@ -18,6 +18,7 @@ import sys
 sys.path.insert(0, str(ROOT))
 
 from src.control_network import GBMControlNN
+from src.save_load_utils import load_eval_bundle
 
 X_bounds = {
     "x1_min": -100.0, "x1_max": 100.0,
@@ -46,21 +47,21 @@ def in_box(x1, x2, box):
 
 
 # Control Network
-def load_control_net(control_save_path, device="cpu"):
+def load_control_net(bundle_path, device="cpu"):
+    
+    bundle = load_eval_bundle(bundle_path, map_location="cpu")
+    
     # 1) create a fresh network with SAME architecture as when saved
-    control_net = GBMControlNN().to(device)
+    control_net = GBMControlNN(input_dim=2).to(device)
 
-    # 2) load checkpoint
-    ckpt = torch.load(control_save_path, map_location=device)
-
-    # 3) restore weights
-    control_net.load_state_dict(ckpt["model_state_dict"])
+    if bundle["control_state_dict"] is not None:
+        control_net.load_state_dict(bundle["control_state_dict"])
 
     # 4) eval mode for rollout
     control_net.eval()
     return control_net
 
-control_net = load_control_net(OUTPUT_DIR / "control_net.pth")
+control_net = load_control_net(OUTPUT_DIR / "eval_bundle.pth")
 
 
 """Stochastic Inverted Pendulum Dynamics"""

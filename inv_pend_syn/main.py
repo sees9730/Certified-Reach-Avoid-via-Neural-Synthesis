@@ -1,5 +1,5 @@
 """
-Bound-based training script using CROWN for NN verification.
+2D Inverted Pendulum Control Synthesis
 """
 import torch
 import torch.nn as nn
@@ -33,7 +33,7 @@ from src.training_utils import (
     print_constraint_summary,
     refine_failing_cells
 )
-from src.save_load_utils import save_eval_bundle, load_eval_bundle, log_loaded_training_epochs
+from src.save_load_utils import save_eval_bundle, load_eval_bundle, log_loaded_training_epochs, enable_terminal_logging
 from src.utils import cleanup_and_setup_directories, print_training_config
 from src.visualization import (
     visualize_training_progress,
@@ -837,14 +837,6 @@ def main():
     params.compute_V = True
     params.compute_GV = True
 
-    # params.training.random_seed = 0
-
-    # ========================================================================
-    # CLEANUP: Remove old results and training progress
-    # ========================================================================
-    cleanup_and_setup_directories(["results", "training_progress"])
-    print_training_config(params)
-
     # ========================================================================
     # 2. SYSTEM DYNAMICS
     # ========================================================================
@@ -907,8 +899,6 @@ def main():
 
     dynamics = Dynamics.dynamics(f=f_cl_module, g=g)
 
-    print(f"\n{dynamics}")
-
     # ========================================================================
     # 3. SPATIAL REGIONS
     # ========================================================================
@@ -942,15 +932,12 @@ def main():
     print("="*80)
 
     V_net = create_V(params.network)
-    print(f"V network: {V_net}")
-
     GV_net = create_GV(
         V_net=V_net,
         dynamics=dynamics,
         network_config=params.network,
         training_config=params.training
     )
-    print(f"GV network created")
 
     # ========================================================================
     # 5. DISCRETIZE REGIONS
@@ -965,14 +952,11 @@ def main():
     # 6.0 Setup saving
     # ========================================================================
     device = params.training.device
-    print(f"\nUsing device: {device}")
-
     delta = 0.1
     params.constraints.pretrain_goal_target = params.constraints.beta_s - delta
     params.constraints.pretrain_unsafe_target = params.constraints.beta_ra
     params.constraints.pretrain_init_target = params.constraints.beta_s + delta
     params.constraints.pretrain_phi_target = 1.0
-
     # Path to bundle we will save/load
     bundle_path = OUTPUT_DIR / "eval_bundle.pth"
 
@@ -980,6 +964,13 @@ def main():
         # ========================================================================
         # 6.1. PRE-TRAINING (Optional)
         # ========================================================================
+        cleanup_and_setup_directories(["results", "training_progress"]) # CLEANUP: Remove old results and training progress
+        enable_terminal_logging(OUTPUT_DIR / "terminal_log.txt")
+        print_training_config(params)
+        print(f"\n{dynamics}")
+        print(f"V network: {V_net}")
+        print(f"\nUsing device: {device}")
+        
         ENABLE_PRETRAINING = True  # Set to True to enable
         PRETRAIN_EPOCHS = 20000
         PRETRAIN_LR = 1e-3
