@@ -24,12 +24,6 @@ from typing import Union, Callable, Optional
 class Dynamics:
     """
     System dynamics for stochastic differential equations.
-
-    Supports:
-    - Linear drift: f(x) = F @ x
-    - Nonlinear drift: f(x) = f_fn(x) (via custom function)
-    - Constant diffusion: g(x) = G (constant matrix)
-    - State-dependent diffusion: g(x) = G(x) (via custom function)
     """
 
     def __init__(
@@ -38,27 +32,7 @@ class Dynamics:
         g: Union[np.ndarray, torch.Tensor, Callable, None] = None,
         state_dim: int = 2
     ):
-        """
-        Initialize system dynamics.
-
-        Args:
-            F: Drift matrix or function. Can be:
-                - np.ndarray or torch.Tensor: linear drift f(x) = F @ x
-                - Callable: nonlinear drift f(x) = f_fn(x)
-                - None: must provide drift_fn instead
-            G: Diffusion matrix or function. Can be:
-                - np.ndarray or torch.Tensor: constant diffusion g(x) = G
-                - Callable: function g(x) = G(x) that takes state and returns diffusion
-                - None: no diffusion (deterministic system)
-            state_dim: State space dimension (default: 2)
-            drift_fn: Alternative way to specify nonlinear drift (overrides F if both provided)
-            B: Control input matrix (state_dim, control_dim) for controlled systems.
-               If provided, closed-loop drift becomes: f(x) + B @ u(x)
-            controller: Controller function u(x) (e.g., TrainableFeedbackControl instance).
-                       If both B and controller are provided, they're applied to drift.
-        """
         self.state_dim = state_dim
-
         self.f = f
         self.g = g
 
@@ -69,8 +43,6 @@ class Dynamics:
         return self.g
 
     def __repr__(self):
-        """String representation."""
-        # Drift type
         if callable(self.f):
             f_str = "f(x)=<callable>"
         elif isinstance(self.f, (torch.Tensor, np.ndarray)):
@@ -78,7 +50,6 @@ class Dynamics:
         else:
             f_str = "f=None"
 
-        # Diffusion type
         if callable(self.g):
             g_str = "g(x)=<callable>"
         elif isinstance(self.g, (torch.Tensor, np.ndarray)):
@@ -91,23 +62,31 @@ class Dynamics:
     @classmethod
     def dynamics(
         cls,
-        f: Union[np.ndarray, torch.tensor, Callable, None] = None,
+        f: Union[np.ndarray, torch.Tensor, Callable, None] = None,
         g: Union[np.ndarray, torch.Tensor, Callable, None] = None
     ):
-        if isinstance(f, np.ndarray) and isinstance(g, np.ndarray):
-            if g.shape[0] == f.shape[0]:
-                state_dim = g.shape[0]
-            else:
-                raise ValueError("State dimension mismatch between f and g")
-        elif isinstance(f, torch.Tensor) and isinstance(g, torch.Tensor):
-            if g.shape[0] == f.shape[0]:
-                state_dim = g.shape[0]
-            else:
-                raise ValueError("State dimension mismatch between f and g")
+        def infer_dim(obj) -> Optional[int]:
+            if isinstance(obj, (np.ndarray, torch.Tensor)):
+                # Works for (N,N), (N,m), (N,), etc.
+                return int(obj.shape[0])
+            return None
+
+        f_dim = infer_dim(f)
+        g_dim = infer_dim(g)
+
+        if f_dim is not None and g_dim is not None:
+            if f_dim != g_dim:
+                raise ValueError(f"State dimension mismatch between f ({f_dim}) and g ({g_dim})")
+            state_dim = f_dim
+        elif f_dim is not None:
+            state_dim = f_dim
+        elif g_dim is not None:
+            state_dim = g_dim
         else:
-            # Default state dimension
-            state_dim = 2
+            state_dim = 2  # fallback when both are callables/None
+
         return cls(f=f, g=g, state_dim=state_dim)
+
 
 class ClosedLoopDrift(nn.Module):
     """

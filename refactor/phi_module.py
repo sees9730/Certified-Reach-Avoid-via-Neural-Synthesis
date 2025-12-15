@@ -1,38 +1,17 @@
-"""
-Phi module for computing the infinitesimal generator of the value function.
-
-The infinitesimal generator for a stochastic system dx = f(x,u)dt + g(x,u)dW is:
-    Φ(x) = f(x,u) · ∇V + 0.5 * Tr(g(x,u)g(x,u)^T @ H_V)
-
-This module handles ANY form of drift f and diffusion g:
-- f: constant matrix, f(x), or f(x, u)
-- g: scalar, vector, constant matrix, g(x), or g(x, u)
-- g can return diagonal vector (N, 2) or full matrix (N, 2, 2)
-- Automatically computes diagonal of g@g^T for diffusion term
-"""
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-
 from dynamics import Dynamics
 
 
 class GV(nn.Module):
     """
-    Computes Φ(x) = f(x,u)·∇V + 0.5·Tr(g(x,u)g(x,u)^T @ H_V) using closed-form derivatives.
-
-    Supports ANY form of drift and diffusion (2D systems):
-    - f: constant matrix F, f(x), or f(x, u)
-    - g: scalar σ, vector [σ₁, σ₂], constant matrix G, g(x), or g(x, u)
-    - g(x) or g(x,u) can return diagonal (N,2) or full matrix (N,2,2)
-
-    Key features:
-    - Uses REFERENCES to V_net's layers (not detached copies)
-    - Gradients flow back to V_net's parameters during training
-    - Automatically handles diagonal extraction from g@g^T
-    - Compatible with auto_LiRPA's BoundedModule
+    Optimized GV:
+      - caches callable signatures once
+      - computes diag(GG^T) via sum of squares (no bmm, no eye mask)
+      - avoids per-forward expand() + bmm(...) patterns by using matmul broadcasting
+      - caches expanded input scales when not learnable
     """
 
     def __init__(
@@ -44,338 +23,319 @@ class GV(nn.Module):
         learnable_input_scale: bool = False,
         input_scale_init: float = None
     ):
-        """
-        Initialize Phi module.
-
-        Args:
-            V_net: Value function network
-            dynamics: System dynamics (drift F and diffusion G)
-            scale_factor: Output scaling factor
-            learnable_scale: Whether scale_factor is learnable
-            learnable_input_scale: Whether input_scale is learnable
-            input_scale_init: Initial input scale (default: use V_net's input_scale)
-        """
         super().__init__()
         self.V_net = V_net
         self.dynamics = dynamics
 
-        # Make scale_factor learnable or constant based on flag
+        # -------------------------
+        # scale factor
+        # -------------------------
         if learnable_scale:
             self.scale_factor = nn.Parameter(torch.tensor(scale_factor, dtype=torch.float32))
         else:
-            self.register_buffer('scale_factor', torch.tensor(scale_factor, dtype=torch.float32))
+            self.register_buffer("scale_factor", torch.tensor(scale_factor, dtype=torch.float32))
 
-        # Input normalization scale
+        # -------------------------
+        # input scale
+        # -------------------------
         if input_scale_init is None:
             input_scale_init = V_net.input_scale
 
         self.learnable_input_scale = learnable_input_scale
         if learnable_input_scale:
             self.input_scale = nn.Parameter(torch.tensor(input_scale_init, dtype=torch.float32))
+            # no caching when learnable
+            self._cached_scale_D = None
+            self._cached_inv_scale = None
+            self._cached_inv_scale_sq = None
         else:
-            self.register_buffer('input_scale', torch.tensor(input_scale_init, dtype=torch.float32))
-            input_scale_tensor = torch.tensor(input_scale_init, dtype=torch.float32)
-            self.register_buffer('input_scale_sq', input_scale_tensor ** 2)
+            s = torch.tensor(input_scale_init, dtype=torch.float32)
+            self.register_buffer("input_scale", s)
+            self.register_buffer("input_scale_sq", s ** 2)
 
-        # Register masks as buffers to avoid TracerWarnings
-        self.register_buffer('mask1', torch.tensor([[1.0, 0.0]], dtype=torch.float32))
-        self.register_buffer('mask2', torch.tensor([[0.0, 1.0]], dtype=torch.float32))
+            # cache expanded (D,) inverse scales for speed
+            self._cached_scale_D = None
+            self._cached_inv_scale = None
+            self._cached_inv_scale_sq = None
 
-        # Get drift and diffusion from dynamics
+        # -------------------------
+        # dynamics (cache dispatch decisions once)
+        # -------------------------
         self.f = dynamics.get_f()
         self.g = dynamics.get_g()
 
-        print(f"[PhiModule] Initialized with:")
-        print(f"  scale_factor: {self.scale_factor.item() if hasattr(self.scale_factor, 'item') else self.scale_factor}")
-        print(f"  input_scale: {self.input_scale.tolist() if hasattr(self.input_scale, 'tolist') else self.input_scale}")
+        self._init_f_dispatch()
+        self._init_g_dispatch()
+
+        print("[PhiModule] Initialized with:")
+        print(f"  scale_factor: {float(self.scale_factor.detach().cpu())}")
+        print(f"  input_scale: {self.input_scale.detach().cpu().tolist() if self.input_scale.numel() > 1 else float(self.input_scale.detach().cpu())}")
         print(f"  f type: {type(self.f)}")
         print(f"  g type: {type(self.g)}")
 
+    # -------------------------
+    # forward
+    # -------------------------
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Compute Φ(x) using closed-form derivatives.
-
-        For network: h0 = σ(W0·x_norm + b0), h1 = σ(W1·h0 + b1), V = W2·(SCALE·h1) + b2
-        where x_norm = x / input_scale
-
         Args:
-            x: State tensor (batch_size, state_dim) or (state_dim,)
-
+            x: (D,) or (N,D)
         Returns:
-            Φ(x) of shape (batch_size, 1) or (1,)
+            (1,) if input was (D,), else (N,1)
         """
-        # Store original x for dynamics computation (f(x) = F·x uses unnormalized coords)
-        x_orig = x.clone()
+        x, was_1d = self._as_batch(x)
+        N, D = x.shape
 
-        # Normalize input
-        x_norm = x / self.input_scale
+        W0, b0, W1, b1, W2 = self._get_V_params()  # W2: (1,m1)
+        W2v = W2.view(-1)  # (m1,)
 
-        # Get weights from V_net (trainable - not detached!)
-        W0 = self.V_net.layer1.weight  # (m0, state_dim)
-        b0 = self.V_net.layer1.bias    # (m0,)
-        W1 = self.V_net.layer2.weight  # (m1, m0)
-        b1 = self.V_net.layer2.bias    # (m1,)
-        W2 = self.V_net.output.weight  # (1, m1)
-        b2 = self.V_net.output.bias    # (1,)
+        inv_scale, inv_scale_sq = self._get_inv_scales(D, x.device, x.dtype)  # (D,), (D,)
 
-        state_dim = W0.shape[1]
+        # normalize (multiplication is a bit cheaper than division)
+        x_norm = x * inv_scale
 
-        # Forward pass through first hidden layer
-        z0 = F.linear(x_norm, W0, b0)     # (N, m0)
-        h0 = torch.sigmoid(z0)             # (N, m0)
-        d0 = h0 * (1.0 - h0)              # σ'(z0): (N, m0)
-        q0 = (1.0 - 2.0 * h0) * d0        # σ''(z0): (N, m0)
+        # layer 1
+        z0 = F.linear(x_norm, W0, b0)     # (N,m0)
+        h0, d0, q0 = self._sigmoid_derivs(z0)
 
-        # Forward pass through second hidden layer
-        z1 = F.linear(h0, W1, b1)         # (N, m1)
-        h1 = torch.sigmoid(z1)             # (N, m1)
-        d1 = h1 * (1.0 - h1)              # σ'(z1): (N, m1)
-        q1 = (1.0 - 2.0 * h1) * d1        # σ''(z1): (N, m1)
+        # layer 2
+        z1 = F.linear(h0, W1, b1)         # (N,m1)
+        h1, d1, q1 = self._sigmoid_derivs(z1)
 
-        # Compute ∇V w.r.t normalized coordinates
-        # ∂V/∂x_norm_i = SCALE · Σ_j W2[j]·σ'(z1[j])·(Σ_k W1[j,k]·σ'(z0[k])·W0[k,i])
+        # S = W1[j,k] * d0[n,k] -> (N,m1,m0)
+        S = W1.unsqueeze(0) * d0.unsqueeze(1)
 
-        # Pre-compute common terms to avoid redundant operations
-        # W1_scaled[j,k] = W1[j,k] · σ'(z0[k])  (shared for both x1 and x2)
-        W1_scaled = W1.unsqueeze(0) * d0.unsqueeze(1)  # (N, m1, m0)
+        # sum_over_k_all = S @ W0  -> (N,m1,D)   (broadcasted matmul; avoids expand + bmm)
+        sum_over_k_all = torch.matmul(S, W0)  # (N,m1,D)
 
-        # For x1 (i=0):
-        sum_over_k1 = (W1_scaled * W0[:, 0].view(1, 1, -1)).sum(dim=2)  # (N, m1)
-        dVdx1_norm = self.scale_factor * (W2 * d1 * sum_over_k1).sum(dim=1, keepdim=True)  # (N, 1)
+        # gradient wrt normalized coords:
+        # dVdx_norm[n,d] = scale * sum_j W2[j] * d1[n,j] * sum_over_k_all[n,j,d]
+        tmp = d1.unsqueeze(2) * sum_over_k_all                      # (N,m1,D)
+        dVdx_norm = self.scale_factor * (tmp * W2v.view(1, -1, 1)).sum(dim=1)  # (N,D)
 
-        # For x2 (i=1):
-        sum_over_k2 = (W1_scaled * W0[:, 1].view(1, 1, -1)).sum(dim=2)  # (N, m1)
-        dVdx2_norm = self.scale_factor * (W2 * d1 * sum_over_k2).sum(dim=1, keepdim=True)  # (N, 1)
+        # chain rule back to x: dVdx = dVdx_norm / input_scale = dVdx_norm * inv_scale
+        dVdx = dVdx_norm * inv_scale
 
-        # Apply chain rule: ∇V w.r.t x = (1/input_scale) · ∇V w.r.t x_norm
-        dVdx1 = dVdx1_norm / self.input_scale[0]  # (N, 1)
-        dVdx2 = dVdx2_norm / self.input_scale[1]  # (N, 1)
+        # Hessian diagonal wrt normalized coords:
+        cross = q1.unsqueeze(2) * sum_over_k_all.square()            # (N,m1,D)
 
-        # Compute Hessian diagonal w.r.t normalized coordinates
-        # Pre-compute common term for Hessian: W1[j,k] · σ''(z0[k])
-        W1_q0 = W1.unsqueeze(0) * q0.unsqueeze(1)  # (N, m1, m0)
+        # direct term: d1 * ( (W1 * q0) @ (W0^2) )
+        W1_q0 = W1.unsqueeze(0) * q0.unsqueeze(1)                    # (N,m1,m0)
+        W0_sq = W0.square()                                          # (m0,D)
+        direct = d1.unsqueeze(2) * torch.matmul(W1_q0, W0_sq)        # (N,m1,D)
 
-        # For x1 (i=0):
-        # Cross-term: σ''(z1[j]) · (Σ_k W1[j,k]·σ'(z0[k])·W0[k,0])²
-        cross_term1 = q1 * (sum_over_k1 ** 2)  # (N, m1)
+        Hdiag_norm = self.scale_factor * ((cross + direct) * W2v.view(1, -1, 1)).sum(dim=1)  # (N,D)
 
-        # Direct term: σ'(z1[j]) · Σ_k W1[j,k]·σ''(z0[k])·W0[k,0]²
-        W0_0_sq = W0[:, 0] ** 2  # Pre-compute squared weights
-        direct_term1 = d1 * (W1_q0 * W0_0_sq.view(1, 1, -1)).sum(dim=2)  # (N, m1)
+        # chain rule: / input_scale^2  => * inv_scale_sq
+        Hdiag = Hdiag_norm * inv_scale_sq
 
-        H11_norm = self.scale_factor * (W2 * (cross_term1 + direct_term1)).sum(dim=1, keepdim=True)  # (N, 1)
+        # drift term
+        fx = self._evaluate_f_fast(x)  # (N,D)
+        drift = (fx * dVdx).sum(dim=1, keepdim=True)  # (N,1)
 
-        # For x2 (i=1):
-        cross_term2 = q1 * (sum_over_k2 ** 2)  # (N, m1)
-        W0_1_sq = W0[:, 1] ** 2  # Pre-compute squared weights
-        direct_term2 = d1 * (W1_q0 * W0_1_sq.view(1, 1, -1)).sum(dim=2)  # (N, m1)
+        # diffusion term (diag(GG^T))
+        g_diag_sq = self._compute_gg_diag_fast(x)     # (N,D)
+        diff = 0.5 * (g_diag_sq * Hdiag).sum(dim=1, keepdim=True)  # (N,1)
 
-        H22_norm = self.scale_factor * (W2 * (cross_term2 + direct_term2)).sum(dim=1, keepdim=True)  # (N, 1)
+        out = drift + diff
+        return out.squeeze(0) if was_1d else out
 
-        # Compute input_scale_sq
+    # -------------------------
+    # cached-scale helpers
+    # -------------------------
+    def _get_inv_scales(self, D: int, device, dtype):
+        """
+        Returns:
+            inv_scale: (D,)
+            inv_scale_sq: (D,)
+        """
+        # learnable => recompute each call (cheap compared to rest, but avoids stale cache)
         if self.learnable_input_scale:
-            input_scale_sq = self.input_scale ** 2
-        else:
-            input_scale_sq = self.input_scale_sq
+            s = self._expand_scale(self.input_scale.to(device=device, dtype=dtype), D)
+            inv = s.reciprocal()
+            inv_sq = (s * s).reciprocal()
+            return inv, inv_sq
 
-        # Apply chain rule: H_ii w.r.t x = (1/input_scale²) · H_ii w.r.t x_norm
-        H11 = H11_norm / input_scale_sq[0]  # (N, 1)
-        H22 = H22_norm / input_scale_sq[1]  # (N, 1)
+        # non-learnable => cache expanded vectors on the right device/dtype
+        cache_ok = (
+            self._cached_scale_D == D
+            and self._cached_inv_scale is not None
+            and self._cached_inv_scale.device == device
+            and self._cached_inv_scale.dtype == dtype
+        )
+        if cache_ok:
+            return self._cached_inv_scale, self._cached_inv_scale_sq
 
-        # Compute f(x) or f(x, u) using ORIGINAL UNNORMALIZED coordinates
-        fx = self._evaluate_f(x_orig)  # (N, 2)
-        # Use registered buffer masks to avoid TracerWarnings
-        f1 = (fx * self.mask1.to(x.dtype)).sum(dim=1, keepdim=True)  # (N, 1)
-        f2 = (fx * self.mask2.to(x.dtype)).sum(dim=1, keepdim=True)  # (N, 1)
+        s = self._expand_scale(self.input_scale, D).to(device=device, dtype=dtype)
+        s2 = self._expand_scale(self.input_scale_sq, D).to(device=device, dtype=dtype)
 
-        # Compute diagonal of g(x) @ g(x)^T for any form of g
-        g_diag_sq = self._compute_gg_diag(x_orig)  # (N, 2)
-        # Use registered buffer masks
-        g11_sq = (g_diag_sq * self.mask1.to(x.dtype)).sum(dim=1, keepdim=True)  # (N, 1)
-        g22_sq = (g_diag_sq * self.mask2.to(x.dtype)).sum(dim=1, keepdim=True)  # (N, 1)
-        # print(f"DEBUG: g11_sq.shape = {g11_sq.shape}, g22_sq.shape = {g22_sq.shape}")
+        inv = s.reciprocal()
+        inv_sq = s2.reciprocal()
 
-        # Φ(x) = f·∇V + 0.5·(g²·H_diag)
-        drift = f1 * dVdx1 + f2 * dVdx2
-        diff = 0.5 * (g11_sq * H11 + g22_sq * H22)
+        self._cached_scale_D = D
+        self._cached_inv_scale = inv
+        self._cached_inv_scale_sq = inv_sq
+        return inv, inv_sq
 
-        # print(f" Drift: {drift}")
-        # print(f" Diffusion: {diff}")
-        # exit(0)
+    # -------------------------
+    # small internal helpers
+    # -------------------------
+    @staticmethod
+    def _as_batch(x: torch.Tensor):
+        was_1d = (x.dim() == 1)
+        return (x.unsqueeze(0) if was_1d else x), was_1d
 
-        return drift + diff  # (N, 1)
+    @staticmethod
+    def _expand_scale(scale: torch.Tensor, D: int) -> torch.Tensor:
+        return scale.expand(D) if scale.numel() == 1 else scale.view(-1)
 
-    def _evaluate_f(self, x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
-        """
-        Evaluate drift f for any form: constant, f(x), or f(x, u).
+    @staticmethod
+    def _sigmoid_derivs(z: torch.Tensor):
+        h = torch.sigmoid(z)
+        d = h * (1.0 - h)           # σ'
+        q = (1.0 - 2.0 * h) * d     # σ''
+        return h, d, q
 
-        Args:
-            x: State tensor (N, 2)
-            u: Control tensor (optional)
+    def _get_V_params(self):
+        return (
+            self.V_net.layer1.weight,
+            self.V_net.layer1.bias,
+            self.V_net.layer2.weight,
+            self.V_net.layer2.bias,
+            self.V_net.output.weight,  # (1,m1)
+        )
 
-        Returns:
-            Drift tensor (N, 2)
-        """
-        if callable(self.f):
-            # Check if f accepts u parameter
+    # -------------------------
+    # drift / diffusion dispatch init (done once)
+    # -------------------------
+    def _init_f_dispatch(self):
+        self._f_callable = callable(self.f)
+        self._f_expects_u = False
+
+        # convert constant arrays to buffers once (so .to(device) works)
+        if isinstance(self.f, np.ndarray):
+            f_t = torch.tensor(self.f, dtype=torch.float32)
+            self.register_buffer("_f_const", f_t)
+            self.f = self._f_const
+            self._f_callable = False
+
+        if self._f_callable:
             import inspect
             sig = inspect.signature(self.f)
-            num_params = len([p for p in sig.parameters.values()
-                            if p.kind in (p.POSITIONAL_OR_KEYWORD, p.POSITIONAL_ONLY)])
+            self._f_expects_u = (len(sig.parameters) >= 2)
 
-            if num_params >= 2 and u is not None:
-                f_result = self.f(x, u)  # f(x, u)
-            else:
-                f_result = self.f(x)  # f(x)
+        self._f_is_tensor = isinstance(self.f, torch.Tensor)
+        self._f_is_numpy = isinstance(self.f, np.ndarray)
 
-            # Convert numpy to torch if needed
-            if isinstance(f_result, np.ndarray):
-                f_result = torch.from_numpy(f_result).float().to(x.device)
+    def _init_g_dispatch(self):
+        self._g_is_none = (self.g is None)
+        self._g_callable = callable(self.g)
+        self._g_has_diag_sq = (self._g_callable and hasattr(self.g, "get_diagonal_squared"))
 
-            return f_result
-        elif isinstance(self.f, (torch.Tensor, np.ndarray)):
-            # Convert numpy to torch if needed
-            if isinstance(self.f, np.ndarray):
-                f_tensor = torch.from_numpy(self.f).float().to(x.device)
-            else:
-                f_tensor = self.f
-            # Constant matrix: f = F @ x
-            return x @ f_tensor.T  # (N, 2)
-        else:
-            raise ValueError(f"Unsupported f type: {type(self.f)}")
+        # convert constant arrays to buffers once
+        if isinstance(self.g, np.ndarray):
+            g_t = torch.tensor(self.g, dtype=torch.float32)
+            self.register_buffer("_g_const", g_t)
+            self.g = self._g_const
+            self._g_callable = False
+            self._g_has_diag_sq = False
 
-    def _compute_gg_diag(self, x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
-        """
-        Compute diagonal of g(x) @ g(x)^T for any form of g.
-
-        Handles:
-        - Constant g (scalar, vector, or matrix)
-        - g(x) returning vector (diagonal)
-        - g(x) returning matrix (full 2x2, can have cross terms)
-        - g(x, u) returning vector or matrix
-
-        Args:
-            x: State tensor (N, 2)
-            u: Control tensor (optional)
-
-        Returns:
-            Diagonal of G @ G^T: (N, 2)
-        """
-        # print(f"DEBUG _compute_gg_diag: x.shape = {x.shape}, type(self.g) = {type(self.g)}")
-        if self.g is None:
-            # No diffusion
-            return torch.zeros_like(x)
-
-        if callable(self.g):
-            # Check if g has a CROWN-compatible get_diagonal_squared method
-            if hasattr(self.g, 'get_diagonal_squared'):
-                # Use the optimized CROWN-compatible method directly
-                g_diag_sq = self.g.get_diagonal_squared(x)  # (N, 2)
-                # Convert numpy to torch if needed
-                if isinstance(g_diag_sq, np.ndarray):
-                    g_diag_sq = torch.from_numpy(g_diag_sq).float().to(x.device)
-                return g_diag_sq
-
-            # Fallback: call g and extract diagonal
-            # Check if g accepts u parameter
+        self._g_is_tensor = isinstance(self.g, torch.Tensor)
+        self._g_is_float = isinstance(self.g, (int, float))
+        self._g_expects_u = False
+        if self._g_callable and (not self._g_has_diag_sq):
             import inspect
             sig = inspect.signature(self.g)
-            num_params = len([p for p in sig.parameters.values()
-                            if p.kind in (p.POSITIONAL_OR_KEYWORD, p.POSITIONAL_ONLY)])
+            self._g_expects_u = (len(sig.parameters) >= 2)
 
-            if num_params >= 2 and u is not None:
-                g_result = self.g(x, u)  # g(x, u)
-            else:
-                g_result = self.g(x)  # g(x)
+    # -------------------------
+    # drift / diffusion (fast paths)
+    # -------------------------
+    def _evaluate_f_fast(self, x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
+        """
+        Returns f(x) in shape (N,D). Fast dispatch with cached info.
+        """
+        if self._f_callable:
+            f_result = self.f(x, u) if (self._f_expects_u and u is not None) else self.f(x)
+            if isinstance(f_result, np.ndarray):
+                # still supported, but slower than returning torch directly
+                f_result = torch.from_numpy(f_result).to(device=x.device, dtype=x.dtype)
+            return f_result
 
-            # Convert numpy to torch if needed
-            if isinstance(g_result, np.ndarray):
-                g_result = torch.from_numpy(g_result).float().to(x.device)
+        # linear drift matrix form: x @ A^T
+        if isinstance(self.f, torch.Tensor):
+            f_tensor = self.f.to(device=x.device, dtype=x.dtype)
+            return x @ f_tensor.T
 
-            # Determine what g returned based on shape
-            ndim = len(g_result.shape)
-            if ndim == 2:
-                # Returns diagonal vector (N, 2): treat as diag(g)
-                # (G @ G^T)_ii = g_i^2
-                return g_result ** 2
-            elif ndim == 3:
-                # Returns full matrix (N, 2, 2)
-                # Compute G @ G^T and extract diagonal (CROWN-compatible)
-                GGT = torch.bmm(g_result, g_result.transpose(1, 2))  # (N, 2, 2)
-                # Extract diagonal using sum trick (avoid ScatterND from indexing)
-                # Create mask for diagonal elements
-                diag_mask = torch.eye(2, device=x.device, dtype=x.dtype).unsqueeze(0)  # (1, 2, 2)
-                g_diag_sq = (GGT * diag_mask).sum(dim=2)  # (N, 2)
+        raise ValueError(f"Unsupported f type: {type(self.f)}")
+
+    def _compute_gg_diag_fast(self, x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
+        """
+        Returns diag(GG^T)(x) in shape (N,D). Fast paths:
+          - If G is (N,D,m) or (N,D,D): diag(GG^T) = sum_k G^2 along last dim
+          - If G is constant (D,D): diag(GG^T) = row-wise sum of squares of G
+        """
+        if self._g_is_none:
+            return torch.zeros_like(x)
+
+        N, D = x.shape
+
+        if self._g_callable:
+            if self._g_has_diag_sq:
+                g_diag_sq = self.g.get_diagonal_squared(x)
+                if isinstance(g_diag_sq, np.ndarray):
+                    g_diag_sq = torch.from_numpy(g_diag_sq).to(device=x.device, dtype=x.dtype)
                 return g_diag_sq
-            else:
-                raise ValueError(f"Unexpected g output shape: {g_result.shape}")
 
-        elif isinstance(self.g, (torch.Tensor, np.ndarray)):
-            # Convert numpy to torch if needed
-            if isinstance(self.g, np.ndarray):
-                g_tensor = torch.from_numpy(self.g).float().to(x.device)
-            else:
-                g_tensor = self.g
+            g_out = self.g(x, u) if (self._g_expects_u and u is not None) else self.g(x)
+            if isinstance(g_out, np.ndarray):
+                g_out = torch.from_numpy(g_out).to(device=x.device, dtype=x.dtype)
 
-            # print(f"DEBUG: g_tensor.shape = {g_tensor.shape}, g_tensor.dim() = {g_tensor.dim()}")
+            if g_out.dim() == 2:
+                # (N,D) diagonal diffusion vector
+                return g_out.square()
 
-            # Constant g - use broadcasting with x to get batch size
-            if g_tensor.dim() == 0:
-                # Scalar: g = σ * I
-                g_sq = g_tensor ** 2
-                # Broadcast to (N, 2) using x as template
-                return g_sq * torch.ones_like(x)
-            elif g_tensor.dim() == 1:
-                # Vector (2,): diagonal diffusion g = diag(g)
-                g_sq = g_tensor ** 2  # (2,)
-                # Broadcast: (2,) -> (N, 2) by adding zeros_like
-                # This ensures proper batch dimension
-                result = g_sq.view(1, 2) + torch.zeros_like(x)
-                # print(f"DEBUG: dim==1, g_sq.shape = {g_sq.shape}, result.shape = {result.shape}")
-                return result
-            elif g_tensor.dim() == 2:
-                # Matrix (2, 2): compute diagonal of G @ G^T (CROWN-compatible)
-                GGT = g_tensor @ g_tensor.T  # (2, 2)
-                # print(f"DEBUG: dim==2, GGT.shape = {GGT.shape}")
-                # Extract diagonal using sum trick (avoid ScatterND)
-                diag_mask = torch.eye(2, device=x.device, dtype=x.dtype)  # (2, 2)
-                g_diag = (GGT * diag_mask).sum(dim=1)  # (2,)
-                # print(f"DEBUG: g_diag.shape = {g_diag.shape}, x.shape = {x.shape}")
-                # Broadcast: (2,) -> (N, 2)
-                result = g_diag.view(1, 2) + torch.zeros_like(x)
-                # print(f"DEBUG: result.shape = {result.shape}")
-                return result
-            else:
-                raise ValueError(f"Unexpected g shape: {g_tensor.shape}")
+            if g_out.dim() == 3:
+                # (N,D,m) or (N,D,D): diag(GG^T) = sum_k G_{i,k}^2
+                if g_out.shape[1] != D:
+                    raise ValueError(f"Expected g_out shape (N,D,*) but got {tuple(g_out.shape)} with D={D}")
+                return g_out.square().sum(dim=2)
 
-        elif isinstance(self.g, (int, float)):
-            # Scalar constant: g = σ
-            g_sq = self.g ** 2
-            # Broadcast to (N, 2)
-            return g_sq * torch.ones_like(x)
+            raise ValueError(f"Unexpected g output shape: {tuple(g_out.shape)}")
 
-        else:
-            raise ValueError(f"Unsupported g type: {type(self.g)}")
+        # constant tensor / scalar g
+        if self._g_is_float:
+            return (float(self.g) ** 2) * torch.ones_like(x)
+
+        if isinstance(self.g, torch.Tensor):
+            g_t = self.g.to(device=x.device, dtype=x.dtype)
+
+            if g_t.dim() == 0:
+                return g_t.square() * torch.ones_like(x)
+
+            if g_t.dim() == 1:
+                if g_t.numel() != D:
+                    raise ValueError(f"g vector dim {g_t.numel()} != state dim {D}")
+                return g_t.view(1, D).square().expand_as(x)
+
+            if g_t.dim() == 2:
+                if g_t.shape != (D, D):
+                    raise ValueError(f"g matrix shape {tuple(g_t.shape)} not (D,D) with D={D}")
+                # diag(GG^T) = row-wise sum of squares
+                diag = g_t.square().sum(dim=1)  # (D,)
+                return diag.view(1, D).expand_as(x)
+
+            raise ValueError(f"Unexpected g shape: {tuple(g_t.shape)}")
+
+        raise ValueError(f"Unsupported g type: {type(self.g)}")
 
 
 def create_GV(
     V_net: nn.Module,
     dynamics: Dynamics,
-    network_config,  # NetworkConfig
-    training_config  # TrainingConfig
+    network_config,
+    training_config
 ) -> GV:
-    """
-    Factory function to create GV (Phi) module.
-
-    Args:
-        V_net: Value function network (GV-specific)
-        dynamics: System dynamics (GV-specific)
-        network_config: NetworkConfig with scale_factor and input_scale (shared with V)
-        training_config: TrainingConfig with learnable flags (shared with V)
-
-    Returns:
-        GV instance
-    """
     return GV(
         V_net=V_net,
         dynamics=dynamics,

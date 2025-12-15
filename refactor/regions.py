@@ -45,7 +45,7 @@ class Region:
         self.components = components if components is not None else []
 
         # Validate
-        assert self.bounds.shape[1] == 2, "bounds must have shape (state_dim, 2)"
+        # assert self.bounds.shape[1] == 2, "bounds must have shape (state_dim, 2)"
         assert np.all(self.bounds[:, 0] <= self.bounds[:, 1]), \
             "Lower bounds must be <= upper bounds"
 

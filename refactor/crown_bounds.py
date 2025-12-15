@@ -47,7 +47,7 @@ class SymbolicCROWNCache:
 
         # Create BoundedModule ONCE - this builds the symbolic computation graph
         print(f"[SymbolicCROWNCache] Creating BoundedModule for {num_cells} cells...")
-        self.lirpa_model = BoundedModule(model, dummy_batch[:1], device=device)
+        self.lirpa_model = BoundedModule(model, dummy_batch, device=device)
 
         # Initialize with dummy bounds
         dummy_lower = torch.zeros(num_cells, input_dim, device=device)
@@ -230,7 +230,7 @@ class SymbolicCROWNCache_Phi:
             self.phi_module.V_net.train()
 
 
-def prepare_cell_bounds(cells, device='cpu'):
+def prepare_cell_bounds(cells, device='cpu', input_dim=2):
     """
     Prepare input bounds tensors from list of cells.
 
@@ -242,7 +242,7 @@ def prepare_cell_bounds(cells, device='cpu'):
         (input_lowers, input_uppers) tensors of shape (N, input_dim)
     """
     if len(cells) == 0:
-        return torch.empty(0, 2, device=device), torch.empty(0, 2, device=device)
+        return torch.empty(0, input_dim, device=device), torch.empty(0, input_dim, device=device)
 
     input_lowers = torch.stack([cell[0] for cell in cells]).to(device)
     input_uppers = torch.stack([cell[1] for cell in cells]).to(device)

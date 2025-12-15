@@ -2,15 +2,20 @@ import torch.nn as nn
 import torch
 
 class LinearControlNN(nn.Module):
-    def __init__(self, prior_knowledge=True):
+    def __init__(self, prior_knowledge=True, input_dim=2):
         super().__init__()
         # Standard fully-connected layer: 2 inputs -> 2 outputs, no bias
-        self.fc = nn.Linear(2, 2, bias=False)
+        self.fc = nn.Linear(input_dim, input_dim, bias=False)
 
         if(prior_knowledge):
-            #Initialize as diag(-1, -1)
-            with torch.no_grad():
-                self.fc.weight.copy_(torch.diag(torch.tensor([-1.0, -1.0])))
-
+            if(input_dim == 2):
+                #Initialize as diag(-1, -1)
+                with torch.no_grad():
+                    self.fc.weight.copy_(torch.diag(torch.tensor([-1.0, -1.0])))
+            if(input_dim == 3):
+                #Initialize as diag(0, 0)
+                with torch.no_grad():
+                    self.fc.weight.copy_(torch.diag(torch.tensor([0.0, 0.0, 0.0])))
+                
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.fc(x)

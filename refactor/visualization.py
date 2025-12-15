@@ -17,6 +17,151 @@ from typing import Optional, List, Tuple
 from regions import Regions
 
 
+def _get_plot_pairs(D: int):
+    """
+    Return list of (x_dim, y_dim) index pairs (0-based) following your rule:
+      D=2: (1 vs 2)
+      D=3: (1 vs 2), (3 vs 2)
+      D=4: (1 vs 2), (3 vs 4)
+      D=5: (1 vs 2), (3 vs 4), (5 vs 4)
+    General rule:
+      - Consecutive pairs: (1 vs 2), (3 vs 4), (5 vs 6), ...
+      - If D is odd and > 2: add last dim vs previous dim: (D vs D-1)
+    """
+    if D <= 1:
+        raise ValueError(f"D must be > 1, got D={D}")
+
+    pairs = []
+    # consecutive pairs: (0,1), (2,3), (4,5), ...
+    for i in range(0, D - 1, 2):
+        pairs.append((i, i + 1))
+
+    # odd leftover: add (D-1) vs (D-2) => x_D vs x_{D-1}
+    if (D % 2 == 1) and (D > 2):
+        pairs.append((D - 1, D - 2))  # x-axis: last dim, y-axis: previous dim
+
+    return pairs
+
+
+def _format_dim_label(k_0based: int) -> str:
+    """Pretty label like x₁, x₂, ... for small indices; falls back to x{n}."""
+    n = k_0based + 1
+    subs = str(n).translate(str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉"))
+    return f"x{subs}"
+
+
+def _make_slice_grid(full_bounds: np.ndarray, x_dim: int, y_dim: int, resolution: int, slice_point: np.ndarray = None):
+    """
+    Build a (resolution^2, D) grid where only x_dim and y_dim vary over their bounds.
+    All other dims are fixed at `slice_point` (if provided) or the center of full_bounds.
+    Returns:
+        X (mesh), Y (mesh), grid_np (N, D)
+    """
+    D = full_bounds.shape[0]
+
+    x_vals = np.linspace(full_bounds[x_dim, 0], full_bounds[x_dim, 1], resolution)
+    y_vals = np.linspace(full_bounds[y_dim, 0], full_bounds[y_dim, 1], resolution)
+    X, Y = np.meshgrid(x_vals, y_vals)
+
+    if slice_point is None:
+        slice_point = 0.5 * (full_bounds[:, 0] + full_bounds[:, 1])  # (D,)
+    else:
+        slice_point = np.asarray(slice_point, dtype=np.float32)
+        assert slice_point.shape == (D,), f"slice_point must be shape ({D},), got {slice_point.shape}"
+
+    N = X.size
+    grid = np.tile(slice_point[None, :], (N, 1))     # (N,D)
+    grid[:, x_dim] = X.reshape(-1)
+    grid[:, y_dim] = Y.reshape(-1)
+    return X, Y, grid
+
+
+def make_slice_point_for_region(
+    region,
+    full_bounds: np.ndarray,
+    x_dim: int,
+    y_dim: int,
+    *,
+    fallback: str = "center_full",   # or "center_region"
+) -> np.ndarray:
+    """
+    Create a (D,) slice_point that passes through the middle of `region`
+    for all dimensions except x_dim and y_dim.
+
+    - For dims not in {x_dim, y_dim}: use center of the region bounds.
+    - For x_dim and y_dim: keep fallback center (doesn't matter; those dims vary).
+    - Clips result to full_bounds.
+
+    Handles union regions by using the center of the union bounding box.
+    """
+    D = full_bounds.shape[0]
+
+    # Base point (fallback for plotted dims)
+    if fallback == "center_region":
+        # If you want even plotted dims to start from region center (not necessary)
+        base = 0.5 * (_region_bbox(region, D)[:, 0] + _region_bbox(region, D)[:, 1])
+    else:
+        base = 0.5 * (full_bounds[:, 0] + full_bounds[:, 1])
+
+    region_bounds = _region_bbox(region, D)  # (D,2)
+    region_center = 0.5 * (region_bounds[:, 0] + region_bounds[:, 1])
+
+    slice_point = base.copy()
+    for d in range(D):
+        if d != x_dim and d != y_dim:
+            slice_point[d] = region_center[d]
+
+    # Safety: clip to full bounds
+    slice_point = np.clip(slice_point, full_bounds[:, 0], full_bounds[:, 1]).astype(np.float32)
+    return slice_point
+
+
+def _region_bbox(region, D: int) -> np.ndarray:
+    """
+    Return a (D,2) bounding box for Region or union Region.
+    Assumes `region.bounds` exists for non-union, and `region.components` for union.
+    """
+    if getattr(region, "is_union", False):
+        lows = []
+        highs = []
+        for comp in region.components:
+            b = np.asarray(comp.bounds, dtype=np.float32)
+            lows.append(b[:, 0])
+            highs.append(b[:, 1])
+        low = np.min(np.stack(lows, axis=0), axis=0)
+        high = np.max(np.stack(highs, axis=0), axis=0)
+        return np.stack([low, high], axis=1)
+    else:
+        b = np.asarray(region.bounds, dtype=np.float32)
+        if b.shape != (D, 2):
+            raise ValueError(f"Region bounds shape {b.shape} != ({D},2)")
+        return b
+
+
+def _draw_region_proj(ax, region, color: str, label: str, x_dim: int, y_dim: int):
+    """Draw region projected to (x_dim, y_dim) on the given axis."""
+    if region.is_union:
+        for i, comp in enumerate(region.components):
+            bounds = comp.bounds
+            comp_label = label if i == 0 else None
+            rect = Rectangle(
+                (bounds[x_dim, 0], bounds[y_dim, 0]),
+                bounds[x_dim, 1] - bounds[x_dim, 0],
+                bounds[y_dim, 1] - bounds[y_dim, 0],
+                linewidth=3, edgecolor=color, facecolor='none', label=comp_label
+            )
+            ax.add_patch(rect)
+    else:
+        bounds = region.bounds
+        rect = Rectangle(
+            (bounds[x_dim, 0], bounds[y_dim, 0]),
+            bounds[x_dim, 1] - bounds[x_dim, 0],
+            bounds[y_dim, 1] - bounds[y_dim, 0],
+            linewidth=3, edgecolor=color, facecolor='none', label=label
+        )
+        ax.add_patch(rect)
+
+
 def visualize_value_function(
     V_net,
     regions: Regions,
@@ -28,77 +173,79 @@ def visualize_value_function(
     resolution: int = 100,
     figsize: Tuple[int, int] = (10, 8)
 ):
-    """
-    Visualize the value function V(x) as a contour plot.
-
-    Args:
-        V_net: Value function network
-        regions: Regions object with init, goal, unsafe, full
-        title: Plot title
-        show_regions: Whether to overlay region boundaries
-        show_discretization: Whether to show discretization cells
-        training_cells: List of (lower, upper) cell tuples (optional)
-        filename: Output filename (default: "value_function.png")
-        resolution: Grid resolution for plotting
-        figsize: Figure size
-    """
     V_net.eval()
 
-    # Create grid over full region
     full_bounds = regions.full.bounds
-    x1_vals = np.linspace(full_bounds[0, 0], full_bounds[0, 1], resolution)
-    x2_vals = np.linspace(full_bounds[1, 0], full_bounds[1, 1], resolution)
-    X1, X2 = np.meshgrid(x1_vals, x2_vals)
+    D = full_bounds.shape[0]
+    pairs = _get_plot_pairs(D)
 
-    # Flatten and evaluate
-    x1_flat = X1.flatten()
-    x2_flat = X2.flatten()
-    x_grid = torch.tensor(np.stack([x1_flat, x2_flat], axis=1), dtype=torch.float32)
+    # device for eval
+    try:
+        net_device = next(V_net.parameters()).device
+    except StopIteration:
+        net_device = torch.device("cpu")
 
-    with torch.no_grad():
-        V_output = V_net(x_grid).numpy().flatten()
+    n_plots = len(pairs)
+    fig, axes = plt.subplots(
+        1, n_plots,
+        figsize=(figsize[0] * n_plots, figsize[1]),
+        squeeze=False
+    )
+    axes = axes.ravel()
 
-    # Reshape for contour plot
-    V_grid = V_output.reshape(X1.shape)
+    for p, (x_dim, y_dim) in enumerate(pairs):
+        ax = axes[p]
 
-    # Get output range
-    vmin, vmax = V_grid.min(), V_grid.max()
+        X, Y, grid_np = _make_slice_grid(full_bounds, x_dim, y_dim, resolution)
+        x_grid = torch.tensor(grid_np, dtype=torch.float32, device=net_device)
 
-    # Create plot
-    plt.figure(figsize=figsize)
-    contour = plt.contourf(X1, X2, V_grid, levels=20, cmap='viridis')
-    plt.colorbar(contour, label='V(x₁, x₂)')
+        with torch.no_grad():
+            V_output = V_net(x_grid).detach().cpu().numpy().reshape(X.shape)
 
-    plt.xlabel('x₁', fontsize=12)
-    plt.ylabel('x₂', fontsize=12)
-    plt.title(f"{title}\nRange: [{vmin:.4f}, {vmax:.4f}]", fontsize=14, fontweight='bold')
+        vmin, vmax = float(np.min(V_output)), float(np.max(V_output))
 
-    # Overlay regions
-    if show_regions:
-        _draw_region(regions.init, 'green', 'Init')
-        _draw_region(regions.unsafe, 'red', 'Unsafe')
-        _draw_region(regions.goal, 'blue', 'Goal')
-        plt.legend(loc='upper right', fontsize=10)
+        contour = ax.contourf(X, Y, V_output, levels=20, cmap='viridis')
+        fig.colorbar(contour, ax=ax, label=f"V({_format_dim_label(x_dim)}, {_format_dim_label(y_dim)})")
 
-    # Draw discretization cells
-    if show_discretization and training_cells is not None:
-        for cell_lower, cell_upper in training_cells:
-            cell_rect = Rectangle(
-                (cell_lower[0].item(), cell_lower[1].item()),
-                cell_upper[0].item() - cell_lower[0].item(),
-                cell_upper[1].item() - cell_lower[1].item(),
-                linewidth=0.5, edgecolor='black', facecolor='none', alpha=0.5
-            )
-            plt.gca().add_patch(cell_rect)
+        ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
+        ax.set_ylabel(_format_dim_label(y_dim), fontsize=12)
+        ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
+                     f"Range: [{vmin:.4f}, {vmax:.4f}]",
+                     fontsize=12, fontweight='bold')
 
-    plt.tight_layout()
+        # Regions (projected)
+        if show_regions:
+            # only label on first subplot to avoid legend spam
+            lab_init  = "Init" if p == 0 else None
+            lab_unsafe = "Unsafe" if p == 0 else None
+            lab_goal  = "Goal" if p == 0 else None
 
-    # Save
+            _draw_region_proj(ax, regions.init,   'green', lab_init,  x_dim, y_dim)
+            _draw_region_proj(ax, regions.unsafe, 'red',   lab_unsafe, x_dim, y_dim)
+            _draw_region_proj(ax, regions.goal,   'blue',  lab_goal,  x_dim, y_dim)
+
+            if p == 0:
+                ax.legend(loc='upper right', fontsize=10)
+
+        # Discretization cells (projected)
+        if show_discretization and training_cells is not None:
+            for cell_lower, cell_upper in training_cells:
+                rect = Rectangle(
+                    (cell_lower[x_dim].item(), cell_lower[y_dim].item()),
+                    cell_upper[x_dim].item() - cell_lower[x_dim].item(),
+                    cell_upper[y_dim].item() - cell_lower[y_dim].item(),
+                    linewidth=0.5, edgecolor='black', facecolor='none', alpha=0.5
+                )
+                ax.add_patch(rect)
+
+    fig.suptitle(title, fontsize=14, fontweight='bold')
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+
     if filename is None:
         filename = "value_function.png"
-    plt.savefig(filename, dpi=150)
+    fig.savefig(filename, dpi=150)
     print(f"  → Saved to '{filename}'")
-    plt.close()
+    plt.close(fig)
 
     V_net.train()
 
@@ -116,89 +263,93 @@ def visualize_generator(
     resolution: int = 100,
     figsize: Tuple[int, int] = (10, 8)
 ):
-    """
-    Visualize the generator Φ(x) = f·∇V + 0.5·Tr(g·g^T·H_V) as a contour plot.
-
-    Args:
-        V_net: Value function network
-        GV_net: Generator network
-        regions: Regions object with init, goal, unsafe, full
-        title: Plot title
-        show_regions: Whether to overlay region boundaries
-        show_discretization: Whether to show discretization cells
-        training_cells: List of (lower, upper) cell tuples (optional)
-        filename: Output filename (default: "generator.png")
-        resolution: Grid resolution for plotting
-        figsize: Figure size
-    """
     V_net.eval()
     GV_net.eval()
 
-    # Create grid over full region
     full_bounds = regions.full.bounds
-    x1_vals = np.linspace(full_bounds[0, 0], full_bounds[0, 1], resolution)
-    x2_vals = np.linspace(full_bounds[1, 0], full_bounds[1, 1], resolution)
-    X1, X2 = np.meshgrid(x1_vals, x2_vals)
+    D = full_bounds.shape[0]
+    pairs = _get_plot_pairs(D)
 
-    # Flatten and evaluate
-    x1_flat = X1.flatten()
-    x2_flat = X2.flatten()
-    x_grid = torch.tensor(np.stack([x1_flat, x2_flat], axis=1), dtype=torch.float32)
+    try:
+        net_device = next(GV_net.parameters()).device
+    except StopIteration:
+        net_device = torch.device("cpu")
 
-    with torch.no_grad():
-        Phi_output = GV_net(x_grid).numpy().flatten()
+    n_plots = len(pairs)
+    fig, axes = plt.subplots(
+        1, n_plots,
+        figsize=(figsize[0] * n_plots, figsize[1]),
+        squeeze=False
+    )
+    axes = axes.ravel()
 
-    # Reshape for contour plot
-    Phi_grid = Phi_output.reshape(X1.shape)
+    for p, (x_dim, y_dim) in enumerate(pairs):
+        ax = axes[p]
 
-    # Get output range
-    phi_min, phi_max = Phi_grid.min(), Phi_grid.max()
+        slice_point = make_slice_point_for_region(
+            regions.goal,   # or regions.goal / regions.init / regions.full
+            full_bounds,
+            x_dim=x_dim,
+            y_dim=y_dim,
+        )
 
-    # Create plot - use diverging colormap centered at 0
-    plt.figure(figsize=figsize)
+        X, Y, grid_np = _make_slice_grid(full_bounds, x_dim, y_dim, resolution, slice_point=slice_point)
+        x_grid = torch.tensor(grid_np, dtype=torch.float32, device=net_device)
 
-    # Symmetric colormap around 0
-    abs_max = max(abs(phi_min), abs(phi_max))
-    contour = plt.contourf(X1, X2, Phi_grid, levels=20, cmap='RdBu_r',
-                           vmin=-abs_max, vmax=abs_max)
-    plt.colorbar(contour, label='Φ(x₁, x₂)')
+        with torch.no_grad():
+            Phi_output = GV_net(x_grid).detach().cpu().numpy().reshape(X.shape)
 
-    # Add contour line at Φ=0
-    plt.contour(X1, X2, Phi_grid, levels=[0], colors='black', linewidths=2)
+        phi_min = float(np.min(Phi_output))
+        phi_max = float(np.max(Phi_output))
+        if results is not None:
+            # keep your old behavior: show global min/max if provided
+            phi_min = float(results.get('Phi_min', phi_min))
+            phi_max = float(results.get('Phi_max', phi_max))
 
-    plt.xlabel('x₁', fontsize=12)
-    plt.ylabel('x₂', fontsize=12)
-    if(results is not None):
-        phi_min = results['Phi_min']
-        phi_max = results['Phi_max']
-    plt.title(f"{title}\nRange: [{phi_min:.4f}, {phi_max:.4f}]", fontsize=14, fontweight='bold')
+        abs_max = max(abs(phi_min), abs(phi_max))
+        contour = ax.contourf(X, Y, Phi_output, levels=20, cmap='RdBu_r',
+                              vmin=-abs_max, vmax=abs_max)
+        fig.colorbar(contour, ax=ax, label=f"Φ({_format_dim_label(x_dim)}, {_format_dim_label(y_dim)})")
 
-    # Overlay regions
-    if show_regions:
-        _draw_region(regions.init, 'green', 'Init')
-        _draw_region(regions.unsafe, 'red', 'Unsafe')
-        _draw_region(regions.goal, 'blue', 'Goal')
-        plt.legend(loc='upper right', fontsize=10)
+        # Φ=0 contour
+        ax.contour(X, Y, Phi_output, levels=[0], colors='black', linewidths=2)
 
-    # Draw discretization cells
-    if show_discretization and training_cells is not None:
-        for cell_lower, cell_upper in training_cells:
-            cell_rect = Rectangle(
-                (cell_lower[0].item(), cell_lower[1].item()),
-                cell_upper[0].item() - cell_lower[0].item(),
-                cell_upper[1].item() - cell_lower[1].item(),
-                linewidth=0.5, edgecolor='black', facecolor='none', alpha=0.5
-            )
-            plt.gca().add_patch(cell_rect)
+        ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
+        ax.set_ylabel(_format_dim_label(y_dim), fontsize=12)
+        ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
+                     f"Range: [{phi_min:.4f}, {phi_max:.4f}]",
+                     fontsize=12, fontweight='bold')
 
-    plt.tight_layout()
+        if show_regions:
+            lab_init  = "Init" if p == 0 else None
+            lab_unsafe = "Unsafe" if p == 0 else None
+            lab_goal  = "Goal" if p == 0 else None
 
-    # Save
+            _draw_region_proj(ax, regions.init,   'green', lab_init,  x_dim, y_dim)
+            _draw_region_proj(ax, regions.unsafe, 'red',   lab_unsafe, x_dim, y_dim)
+            _draw_region_proj(ax, regions.goal,   'blue',  lab_goal,  x_dim, y_dim)
+
+            if p == 0:
+                ax.legend(loc='upper right', fontsize=10)
+
+        if show_discretization and training_cells is not None:
+            for cell_lower, cell_upper in training_cells:
+                rect = Rectangle(
+                    (cell_lower[x_dim].item(), cell_lower[y_dim].item()),
+                    cell_upper[x_dim].item() - cell_lower[x_dim].item(),
+                    cell_upper[y_dim].item() - cell_lower[y_dim].item(),
+                    linewidth=0.5, edgecolor='black', facecolor='none', alpha=0.5
+                )
+                ax.add_patch(rect)
+
+    fig.suptitle(title, fontsize=14, fontweight='bold')
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+
     if filename is None:
         filename = "generator.png"
-    plt.savefig(filename, dpi=150)
+    fig.savefig(filename, dpi=150)
     print(f"  → Saved to '{filename}'")
-    plt.close()
+    plt.close(fig)
 
     V_net.train()
     GV_net.train()
@@ -268,67 +419,73 @@ def plot_constraint_regions(
     resolution: int = 100,
     figsize: Tuple[int, int] = (10, 8)
 ):
-    """
-    Plot value function with constraint boundaries marked.
-
-    Args:
-        V_net: Value function network
-        regions: Regions object
-        beta_s: Separation threshold
-        beta_ra: Unsafe threshold
-        filename: Output filename
-        resolution: Grid resolution
-        figsize: Figure size
-    """
     V_net.eval()
 
-    # Create grid
     full_bounds = regions.full.bounds
-    x1_vals = np.linspace(full_bounds[0, 0], full_bounds[0, 1], resolution)
-    x2_vals = np.linspace(full_bounds[1, 0], full_bounds[1, 1], resolution)
-    X1, X2 = np.meshgrid(x1_vals, x2_vals)
+    D = full_bounds.shape[0]
+    pairs = _get_plot_pairs(D)
 
-    # Evaluate
-    x1_flat = X1.flatten()
-    x2_flat = X2.flatten()
-    x_grid = torch.tensor(np.stack([x1_flat, x2_flat], axis=1), dtype=torch.float32)
+    try:
+        net_device = next(V_net.parameters()).device
+    except StopIteration:
+        net_device = torch.device("cpu")
 
-    with torch.no_grad():
-        V_output = V_net(x_grid).numpy().flatten()
+    n_plots = len(pairs)
+    fig, axes = plt.subplots(
+        1, n_plots,
+        figsize=(figsize[0] * n_plots, figsize[1]),
+        squeeze=False
+    )
+    axes = axes.ravel()
 
-    V_grid = V_output.reshape(X1.shape)
+    for p, (x_dim, y_dim) in enumerate(pairs):
+        ax = axes[p]
 
-    # Create plot
-    plt.figure(figsize=figsize)
-    contour = plt.contourf(X1, X2, V_grid, levels=20, cmap='viridis')
-    plt.colorbar(contour, label='V(x₁, x₂)')
+        slice_point = make_slice_point_for_region(
+            regions.unsafe,   # or regions.goal / regions.init / regions.full
+            full_bounds,
+            x_dim=x_dim,
+            y_dim=y_dim,
+        )
 
-    # Add constraint boundaries
-    plt.contour(X1, X2, V_grid, levels=[beta_s/2.0], colors='cyan',
-               linewidths=2, linestyles='--', label=f'V={beta_s/2.0} (goal target)')
-    plt.contour(X1, X2, V_grid, levels=[beta_s], colors='yellow',
-               linewidths=2, linestyles='--', label=f'V={beta_s} (separation)')
-    plt.contour(X1, X2, V_grid, levels=[beta_ra], colors='orange',
-               linewidths=2, linestyles='--', label=f'V={beta_ra} (unsafe)')
+        X, Y, grid_np = _make_slice_grid(full_bounds, x_dim, y_dim, resolution, slice_point=slice_point)
+        x_grid = torch.tensor(grid_np, dtype=torch.float32, device=net_device)
 
-    plt.xlabel('x₁', fontsize=12)
-    plt.ylabel('x₂', fontsize=12)
-    plt.title("Value Function with Constraint Boundaries", fontsize=14, fontweight='bold')
+        with torch.no_grad():
+            V_grid = V_net(x_grid).detach().cpu().numpy().reshape(X.shape)
 
-    # Overlay regions
-    _draw_region(regions.init, 'green', 'Init')
-    _draw_region(regions.unsafe, 'red', 'Unsafe')
-    _draw_region(regions.goal, 'blue', 'Goal')
+        contour = ax.contourf(X, Y, V_grid, levels=20, cmap='viridis')
+        fig.colorbar(contour, ax=ax, label=f"V({_format_dim_label(x_dim)}, {_format_dim_label(y_dim)})")
 
-    plt.legend(loc='upper right', fontsize=9)
-    plt.tight_layout()
+        # constraint contours
+        ax.contour(X, Y, V_grid, levels=[beta_s / 2.0], colors='cyan', linewidths=2, linestyles='--')
+        ax.contour(X, Y, V_grid, levels=[beta_s],       colors='yellow', linewidths=2, linestyles='--')
+        ax.contour(X, Y, V_grid, levels=[beta_ra],      colors='orange', linewidths=2, linestyles='--')
 
-    # Save
+        ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
+        ax.set_ylabel(_format_dim_label(y_dim), fontsize=12)
+        ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}",
+                     fontsize=12, fontweight='bold')
+
+        # regions projected
+        lab_init  = "Init" if p == 0 else None
+        lab_unsafe = "Unsafe" if p == 0 else None
+        lab_goal  = "Goal" if p == 0 else None
+        _draw_region_proj(ax, regions.init,   'green', lab_init,  x_dim, y_dim)
+        _draw_region_proj(ax, regions.unsafe, 'red',   lab_unsafe, x_dim, y_dim)
+        _draw_region_proj(ax, regions.goal,   'blue',  lab_goal,  x_dim, y_dim)
+
+        if p == 0:
+            ax.legend(loc='upper right', fontsize=9)
+
+    fig.suptitle("Value Function with Constraint Boundaries", fontsize=14, fontweight='bold')
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+
     if filename is None:
         filename = "constraint_regions.png"
-    plt.savefig(filename, dpi=150)
+    fig.savefig(filename, dpi=150)
     print(f"  → Saved to '{filename}'")
-    plt.close()
+    plt.close(fig)
 
     V_net.train()
 
@@ -439,40 +596,6 @@ def plot_loss_history(
     plt.close()
 
 
-def _draw_region(region, color: str, label: str):
-    """
-    Helper to draw a region rectangle or union of rectangles.
-
-    Args:
-        region: Region object (single or union)
-        color: Edge color
-        label: Label for legend
-    """
-    if region.is_union:
-        # Draw each component of the union
-        for i, comp in enumerate(region.components):
-            bounds = comp.bounds
-            # Only add label to the first component
-            comp_label = label if i == 0 else None
-            rect = Rectangle(
-                (bounds[0, 0], bounds[1, 0]),
-                bounds[0, 1] - bounds[0, 0],
-                bounds[1, 1] - bounds[1, 0],
-                linewidth=3, edgecolor=color, facecolor='none', label=comp_label
-            )
-            plt.gca().add_patch(rect)
-    else:
-        # Single rectangle
-        bounds = region.bounds
-        rect = Rectangle(
-            (bounds[0, 0], bounds[1, 0]),
-            bounds[0, 1] - bounds[0, 0],
-            bounds[1, 1] - bounds[1, 0],
-            linewidth=3, edgecolor=color, facecolor='none', label=label
-        )
-        plt.gca().add_patch(rect)
-
-
 def create_summary_plots(
     V_net,
     GV_net,
@@ -545,13 +668,13 @@ def create_summary_plots(
         filename=f"{output_dir}/constraint_regions.png"
     )
 
-    # Loss history
-    if loss_history is not None and len(loss_history) > 0:
-        print("\n4. Loss history...")
-        plot_loss_history(
-            loss_history,
-            refinement_epochs=refinement_epochs,
-            filename=f"{output_dir}/loss_history.png"
-        )
+    # # Loss history
+    # if loss_history is not None and len(loss_history) > 0:
+    #     print("\n4. Loss history...")
+    #     plot_loss_history(
+    #         loss_history,
+    #         refinement_epochs=refinement_epochs,
+    #         filename=f"{output_dir}/loss_history.png"
+    #     )
 
-    print(f"\nAll plots saved to '{output_dir}/'")
+    # print(f"\nAll plots saved to '{output_dir}/'")

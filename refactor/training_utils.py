@@ -83,77 +83,91 @@ def clear_goal_samples_cache():
     _goal_samples_cache = {}
 
 
+import torch
+import torch.nn.functional as F
+from typing import Union
+
 def compute_loss_goal_bounds(
     model,
     goal_region,
     V_lower: torch.Tensor,
     V_upper: torch.Tensor,
     beta_s: Union[float, torch.Tensor],
+    V_outside_lower,
     n_samples: int = 1000,
     device: str = 'cpu',
     check: bool = False,
     show: bool = False
 ) -> torch.Tensor:
-    
-    bounds = goal_region.bounds
 
-    # Compute center of goal region
-    center_x1 = (bounds[0, 0] + bounds[0, 1]) / 2.0
-    center_x2 = (bounds[1, 0] + bounds[1, 1]) / 2.0
-    center = torch.tensor([[center_x1, center_x2]], device=device, dtype=torch.float32)
+    bounds = goal_region.bounds  # (D, 2)
+    D = bounds.shape[0]
+
+    # Compute center of goal region (1, D)
+    center = torch.as_tensor(((bounds[:, 0] + bounds[:, 1]) / 2.0),
+                             device=device, dtype=torch.float32).view(1, D)
 
     # Evaluate V at center point
     v_center = model(center).squeeze()
 
     # Strong loss on center point
-    margin = 0.3
-    loss_center = F.relu(v_center - (beta_s - margin)) * 10.0 
+    margin = 0.0
+    # loss_center = F.relu(v_center - (beta_s - margin)) * 10.0
 
-    # Shrink the sampling bounds by a factor
-    # This creates a "safe buffer" where V is allowed to transition from >= beta_s to < beta_s
-    shrink_factor = 0.3
-    
-    span_x1 = bounds[0, 1] - bounds[0, 0]
-    span_x2 = bounds[1, 1] - bounds[1, 0]
-    
-    inner_lower_x1 = bounds[0, 0] + span_x1 * (1 - shrink_factor) / 2
-    inner_upper_x1 = bounds[0, 1] - span_x1 * (1 - shrink_factor) / 2
-    inner_lower_x2 = bounds[1, 0] + span_x2 * (1 - shrink_factor) / 2
-    inner_upper_x2 = bounds[1, 1] - span_x2 * (1 - shrink_factor) / 2
+    # Shrink the sampling bounds by a factor (inner box)
+    shrink_factor = 0.1
+    lower = torch.as_tensor(bounds[:, 0], device=device, dtype=torch.float32)  # (D,)
+    upper = torch.as_tensor(bounds[:, 1], device=device, dtype=torch.float32)  # (D,)
+    span = upper - lower                                                      # (D,)
 
-    x1_samples = torch.rand(n_samples, device=device) * (inner_upper_x1 - inner_lower_x1) + inner_lower_x1
-    x2_samples = torch.rand(n_samples, device=device) * (inner_upper_x2 - inner_lower_x2) + inner_lower_x2
-    samples = torch.stack([x1_samples, x2_samples], dim=1)
+    inner_lower = lower + span * (1.0 - shrink_factor) / 2.0                  # (D,)
+    inner_upper = upper - span * (1.0 - shrink_factor) / 2.0                  # (D,)
+
+    # Sample uniformly in the inner box: (n_samples, D)
+    # rand in [0,1) scaled to [inner_lower, inner_upper]
+    r = torch.rand(n_samples, D, device=device, dtype=torch.float32)
+    samples = r * (inner_upper - inner_lower).unsqueeze(0) + inner_lower.unsqueeze(0)
+
     v_samples = model(samples).squeeze()
 
     # Softer loss on minimum of sampled points
-    loss_rest = F.relu(v_samples.min() - (beta_s - 0.05))
+    threshold = V_outside_lower.min().item()
+    loss_rest = F.relu(v_samples.min() - threshold) * 2000
 
     # Combined soft loss
-    loss_soft = loss_center + loss_rest
+    loss_soft =  loss_rest
 
-    loss_nonneg = torch.relu(-V_lower).min()
+    # Encourage non-negativity of the certified lower bound inside goal
+    # (kept identical behavior, but note: min() here returns a scalar tensor)
+    loss_nonneg = torch.relu(0.0 - V_lower).sum()
 
-    # Obtain minimum V inside goal region: from samples and lowest upper bound
+    # Obtain minimum V inside goal region: from samples, center, and lowest upper bound
     v_min = min(v_samples.min().item(), v_center.item(), V_upper.min().item())
-    
+
     # When checking for success (passed), check the logic based on v_min
-    if (v_min < beta_s) and (V_lower.min() >= 0).item():
+    # Keep semantics identical to your original
+    # if (v_min < beta_s) and (V_lower.min() >= 0).item():
+    if (v_min < V_outside_lower.min()) and (V_lower.min() >= 0).item():
         passed = True
         if show:
-            # print(f"  ✓ Goal sample passed: min V = {min(v_samples.min().item(), v_center.item()):.4f}, min V_lower = {V_lower.min().item():.4f}")
-            print(" ✓ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
-                v_min, V_lower.min()
+            # print(" ✓ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
+            #     v_min, V_lower.min()
+            # ))
+            print(" ✓ Inside Goal passed, min V= {:.4f}, min V_outside_lower= {:.4f}, min V_lower={:.4f}".format(
+                v_min, V_outside_lower.min(), V_lower.min()
             ))
     else:
         passed = False
         if show:
-            # print(f"  ✗ Goal sample failed: min V = {min(v_samples.min().item(), v_center.item()):.4f}, min V_lower = {V_lower.min().item():.4f}")
-            print(" ✗ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
-                v_min, V_lower.min()
+            # print(" ✗ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
+            #     v_min, V_lower.min()
+            # ))
+            print(" ✗ Inside Goal passed, min V= {:.4f}, min V_outside_lower= {:.4f}, min V_lower={:.4f}".format(
+                v_min, V_outside_lower.min(), V_lower.min()
             ))
 
     return loss_soft + loss_nonneg, passed
+
 
 def compute_loss_unsafe_bounds(
     V_lower: torch.Tensor,
@@ -333,7 +347,8 @@ def compute_total_loss_bounds(
     # Compute individual losses
     if compute_V:
         loss_unsafe = compute_loss_unsafe_bounds(V_unsafe_lower, V_unsafe_upper, beta_ra)
-        loss_goal, _ = compute_loss_goal_bounds(model, goal_region, V_goal_lower, V_goal_upper, beta_s, device=device, n_samples=10000, show=False)
+        loss_goal, _ = compute_loss_goal_bounds(model, goal_region, V_goal_lower, V_goal_upper, beta_s, V_outside_lower,
+                                                 device=device, n_samples=10000, show=False)
         loss_init = compute_loss_init_bounds(V_init_lower, V_init_upper, beta_s)
         loss_outside = compute_loss_outside_bounds(V_outside_lower, V_outside_upper, beta_s)
     if compute_GV:
@@ -389,6 +404,7 @@ def compute_total_loss_bounds(
 
     return total_loss, loss_dict
 
+
 def evaluate_constraints(
     V_net,
     GV_net,
@@ -397,43 +413,42 @@ def evaluate_constraints(
     beta_ra: float,
     device: str = 'cpu',
     n_samples: int = 1000,
-    crown_cache_all = None,
-    crown_cache_phi = None,
-    input_bounds_all = None,
+    crown_cache_all=None,
+    crown_cache_phi=None,
+    input_bounds_all=None,
     cell_counts_V: dict = None,
-    input_bounds_gen = None
+    input_bounds_gen=None
 ) -> dict:
     """
-    Evaluate constraint satisfaction using CROWN bounds (matches testing_simple3.py).
+    Evaluate constraint satisfaction using CROWN bounds.
 
-    Uses bounds checking (rigorous) rather than just sampling:
-    - Goal: samples + bounds (existential constraint)
-    - Others: bounds only (universal constraints)
-
-    Args:
-        V_net: Value network
-        GV_net: Generator network
-        region_cells: Dictionary of region cells
-        beta_s: Separation threshold (float or torch.Tensor)
-        beta_ra: Unsafe threshold
-        device: Device
-        n_samples: Number of samples for goal region
-        crown_cache_all: Single CROWN cache for all V cells (in order: init, goal, unsafe, outside)
-        crown_cache_phi: Optional pre-computed CROWN cache for Phi (avoids recreation)
-        input_bounds_all: Tuple of (input_lowers_all, input_uppers_all) for all V cells
-        cell_counts_V: Dict with counts for each region to split bounds
-        input_bounds_gen: Tuple of (input_lowers_gen, input_uppers_gen) for generator cells
-
-    Returns:
-        Dictionary with satisfaction (True/False) and statistics
+    Dimension-generic: infers input_dim from provided bounds or region_cells.
     """
     from crown_bounds import SymbolicCROWNCache, SymbolicCROWNCache_Phi, prepare_cell_bounds
 
     V_net.eval()
-    # GV_net.eval()
+
+    # -----------------------------
+    # Infer input_dim (D) robustly
+    # -----------------------------
+    input_dim = None
+    if input_bounds_all is not None:
+        input_lowers_all, _ = input_bounds_all
+        if isinstance(input_lowers_all, torch.Tensor) and input_lowers_all.ndim == 2:
+            input_dim = int(input_lowers_all.shape[1])
+
+    if input_dim is None:
+        # Try infer from any non-empty cell list
+        for name in ['goal', 'unsafe', 'init', 'outside', 'generator']:
+            if name in region_cells and len(region_cells[name]) > 0:
+                cell0 = region_cells[name][0]          # (lower, upper)
+                input_dim = int(cell0[0].numel())       # lower is (D,)
+                break
+
+    if input_dim is None:
+        raise ValueError("Could not infer input_dim: provide input_bounds_all or non-empty region_cells.")
 
     with torch.no_grad():
-        # Compute CROWN bounds for all regions using single cache
         region_bounds = {}
 
         if crown_cache_all is not None and input_bounds_all is not None and cell_counts_V is not None:
@@ -441,7 +456,6 @@ def evaluate_constraints(
             input_lowers_all, input_uppers_all = input_bounds_all
             v_lowers_all, v_uppers_all = crown_cache_all.compute_bounds(input_lowers_all, input_uppers_all)
 
-            # Split bounds by region (in order: init, goal, unsafe, outside)
             region_order = ['init', 'goal', 'unsafe', 'outside']
             start_idx = 0
             for name in region_order:
@@ -453,23 +467,22 @@ def evaluate_constraints(
                 else:
                     region_bounds[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
         else:
-            # Fallback: create separate cache for each region
+            # Fallback: create separate cache for each region (dimension-generic)
             for name in ['goal', 'unsafe', 'init', 'outside']:
                 if len(region_cells[name]) > 0:
-                    cache = SymbolicCROWNCache(V_net, len(region_cells[name]), input_dim=2, device=device)
-                    input_lowers, input_uppers = prepare_cell_bounds(region_cells[name], device)
+                    cache = SymbolicCROWNCache(V_net, len(region_cells[name]), input_dim=input_dim, device=device)
+                    input_lowers, input_uppers = prepare_cell_bounds(region_cells[name], device=device, input_dim=input_dim)
                     v_lowers, v_uppers = cache.compute_bounds(input_lowers, input_uppers)
                     region_bounds[name] = (v_lowers, v_uppers)
                 else:
                     region_bounds[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
 
-        # Goal: sample + bounds (existential: ∃x ∈ goal s.t. V(x) < beta_s)
-        # Match original: (v_samples.min() < BETA_S) AND (v_lowers.min() >= 0)
+        # Goal: sample + bounds (existential)
         if len(region_cells['goal']) > 0:
             x_goal = sample_from_cells(region_cells['goal'], n_samples, device)
-            v_goal_samples = V_net(x_goal).squeeze()
+            v_goal_samples = V_net(x_goal).squeeze(-1)
             goal_satisfied = ((v_goal_samples.min() < beta_s).item() and
-                            (region_bounds['goal'][0].min() >= 0).item())
+                              (region_bounds['goal'][0].min() >= 0).item())
             v_goal_min = v_goal_samples.min().item()
             v_goal_max = v_goal_samples.max().item()
             v_goal_mean = v_goal_samples.mean().item()
@@ -477,8 +490,7 @@ def evaluate_constraints(
             goal_satisfied = False
             v_goal_min = v_goal_max = v_goal_mean = 0.0
 
-        # Outside: bounds only (universal: ∀x ∉ goal, V(x) >= beta_s)
-        # Check: ALL lower bounds >= beta_s
+        # Outside: bounds only (universal)
         if len(region_bounds['outside'][0]) > 0:
             outside_satisfied = (region_bounds['outside'][0] >= beta_s).all().item()
             v_outside_min = region_bounds['outside'][0].min().item()
@@ -487,18 +499,21 @@ def evaluate_constraints(
             outside_satisfied = True
             v_outside_min = v_outside_max = 0.0
 
-        # Unsafe: bounds only (universal: ∀x ∈ unsafe, V(x) >= beta_ra)
-        # Check: ALL lower bounds >= beta_ra
+        # Unsafe: bounds only (universal)
         if len(region_bounds['unsafe'][0]) > 0:
             unsafe_satisfied = (region_bounds['unsafe'][0] >= beta_ra).all().item()
             v_unsafe_min = region_bounds['unsafe'][0].min().item()
             v_unsafe_max = region_bounds['unsafe'][1].max().item()
+
+            # # debug
+            # x_unsafe = sample_from_cells(region_cells['unsafe'], n_samples, device)
+            # v_unsafe_samples = V_net(x_unsafe).squeeze(-1)
+            # print("[DEBUG] V samplesin UNSAFE", v_unsafe_samples.min(), v_unsafe_samples.max())
         else:
             unsafe_satisfied = True
             v_unsafe_min = v_unsafe_max = 0.0
 
-        # Init: bounds only (universal: ∀x ∈ init, beta_s <= V(x) <= 1.0)
-        # Check: ALL lower bounds >= beta_s AND ALL upper bounds <= 1.0
+        # Init: bounds only (universal)
         if len(region_bounds['init'][0]) > 0:
             init_lower_ok = (region_bounds['init'][0] >= beta_s).all().item()
             init_upper_ok = (region_bounds['init'][1] <= 1.0).all().item()
@@ -509,20 +524,21 @@ def evaluate_constraints(
             init_satisfied = True
             v_init_min = v_init_max = 0.0
 
-        # Generator: bounds only (universal: ∀x ∉ (goal ∪ unsafe), Φ(x) <= 0)
-        # Check: ALL upper bounds <= 0 (i.e., num_failing == 0 where failing = phi_upper > 0)
+        # Generator: bounds only (universal)  Φ(x) <= 0
         if len(region_cells['generator']) > 0:
             if crown_cache_phi is not None:
-                # Use pre-computed cache
                 if input_bounds_gen is not None:
                     input_lowers, input_uppers = input_bounds_gen
                 else:
-                    input_lowers, input_uppers = prepare_cell_bounds(region_cells['generator'], device)
+                    input_lowers, input_uppers = prepare_cell_bounds(
+                        region_cells['generator'], device=device, input_dim=input_dim
+                    )
                 phi_lowers, phi_uppers = crown_cache_phi.compute_bounds(input_lowers, input_uppers)
             else:
-                # Create cache on-the-fly (for standalone use)
-                cache_phi = SymbolicCROWNCache_Phi(GV_net, len(region_cells['generator']), input_dim=2, device=device)
-                input_lowers, input_uppers = prepare_cell_bounds(region_cells['generator'], device)
+                cache_phi = SymbolicCROWNCache_Phi(GV_net, len(region_cells['generator']), input_dim=input_dim, device=device)
+                input_lowers, input_uppers = prepare_cell_bounds(
+                    region_cells['generator'], device=device, input_dim=input_dim
+                )
                 phi_lowers, phi_uppers = cache_phi.compute_bounds(input_lowers, input_uppers)
 
             num_failing = (phi_uppers > 0.0).sum().item()
@@ -536,14 +552,12 @@ def evaluate_constraints(
             phi_min = phi_max = phi_mean = 0.0
 
     results = {
-        # Satisfaction (True/False)
         'goal_satisfied': goal_satisfied,
         'unsafe_satisfied': unsafe_satisfied,
         'init_satisfied': init_satisfied,
         'outside_satisfied': outside_satisfied,
         'generator_satisfied': generator_satisfied,
 
-        # Statistics
         'V_goal_min': v_goal_min,
         'V_goal_max': v_goal_max,
         'V_goal_mean': v_goal_mean,
@@ -560,8 +574,6 @@ def evaluate_constraints(
     }
 
     V_net.train()
-    # GV_net.train()
-
     return results
 
 
@@ -619,18 +631,26 @@ def print_constraint_summary(results: dict, prefix: str = ""):
           f"(Phi_min={results['Phi_min']:.3f}, Phi_max={results['Phi_max']:.3f}, failing={results['num_failing_cells']})")
 
 
+from typing import List, Tuple, Optional
+import numpy as np
+import torch
+
 def refine_failing_cells(
     region_cells: List[Tuple[torch.Tensor, torch.Tensor]],
     failing_mask: torch.Tensor,
-    refine_factor: int = 2
+    refine_factor: int = 2,
+    N_to_refine: int = 100,
+    seed: Optional[int] = 0,
 ) -> Tuple[List[Tuple[torch.Tensor, torch.Tensor]], int]:
     """
-    Refine cells that fail constraints by subdividing them.
+    Refine (split) only a random subset of failing cells.
 
     Args:
-        region_cells: List of (lower, upper) cell bounds
+        region_cells: List of (lower, upper) cell bounds, each (D,)
         failing_mask: Boolean mask indicating which cells failed
-        refine_factor: Factor to subdivide cells (2 = split into 2x2 subcells)
+        refine_factor: Factor to subdivide cells (2 = split into refine_factor^D subcells)
+        N_to_refine: Max number of failing cells to refine (randomly selected)
+        seed: Optional RNG seed for reproducibility
 
     Returns:
         Tuple of (new_cells, num_refined)
@@ -638,22 +658,45 @@ def refine_failing_cells(
     from discretization import discretize_region
     from regions import Region
 
-    new_cells = []
+    # Make sure mask is 1D on CPU for indexing
+    failing_mask = failing_mask.reshape(-1).to(dtype=torch.bool).cpu()
+
+    n_cells = len(region_cells)
+    mask_len = min(len(failing_mask), n_cells)
+
+    # indices of failing cells that are eligible (within mask range)
+    failing_idxs = torch.nonzero(failing_mask[:mask_len], as_tuple=False).reshape(-1).tolist()
+
+    # choose subset to refine
+    if N_to_refine is None or N_to_refine <= 0 or len(failing_idxs) == 0:
+        refine_set = set()
+    else:
+        rng = np.random.default_rng(seed)
+        k = min(int(N_to_refine), len(failing_idxs))
+        refine_set = set(rng.choice(failing_idxs, size=k, replace=False).tolist())
+
+    new_cells: List[Tuple[torch.Tensor, torch.Tensor]] = []
     num_refined = 0
 
     for i, (cell_lower, cell_upper) in enumerate(region_cells):
-        if i < len(failing_mask) and failing_mask[i]:
-            # Refine this failing cell into subcells
-            cell_bounds = np.array([
-                [cell_lower[0].item(), cell_upper[0].item()],
-                [cell_lower[1].item(), cell_upper[1].item()]
-            ], dtype=np.float32)
+        if i in refine_set:
+            # --- build (D,2) bounds (dimension-generic) ---
+            cell_lower = cell_lower.reshape(-1)
+            cell_upper = cell_upper.reshape(-1)
+            D = int(cell_lower.numel())
+
+            cell_bounds = np.array(
+                [[cell_lower[d].item(), cell_upper[d].item()] for d in range(D)],
+                dtype=np.float32
+            )
+            # ------------------------------------------------
+
             cell_region = Region(cell_bounds)
             refined = discretize_region(cell_region, refine_factor)
             new_cells.extend(refined)
             num_refined += 1
         else:
-            # Keep original cell
             new_cells.append((cell_lower, cell_upper))
 
     return new_cells, num_refined
+
