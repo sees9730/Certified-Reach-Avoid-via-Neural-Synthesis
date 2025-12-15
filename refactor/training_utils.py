@@ -97,7 +97,8 @@ def compute_loss_goal_bounds(
     n_samples: int = 1000,
     device: str = 'cpu',
     check: bool = False,
-    show: bool = False
+    show: bool = False,
+    w_soft = 2000
 ) -> torch.Tensor:
 
     bounds = goal_region.bounds  # (D, 2)
@@ -132,7 +133,7 @@ def compute_loss_goal_bounds(
 
     # Softer loss on minimum of sampled points
     threshold = V_outside_lower.min().item()
-    loss_rest = F.relu(v_samples.min() - threshold) * 2000
+    loss_rest = F.relu(v_samples.min() - threshold) * w_soft
 
     # Combined soft loss
     loss_soft =  loss_rest
@@ -313,7 +314,8 @@ def compute_total_loss_bounds(
     device: str = 'cpu',
     compute_V: bool = True,
     compute_GV: bool = True,
-    epoch: int = 0
+    epoch: int = 0,
+    w_soft = 2000,
 ) -> Tuple[torch.Tensor, dict]:
     """
     Compute total training loss from CROWN bounds.
@@ -348,7 +350,7 @@ def compute_total_loss_bounds(
     if compute_V:
         loss_unsafe = compute_loss_unsafe_bounds(V_unsafe_lower, V_unsafe_upper, beta_ra)
         loss_goal, _ = compute_loss_goal_bounds(model, goal_region, V_goal_lower, V_goal_upper, beta_s, V_outside_lower,
-                                                 device=device, n_samples=10000, show=False)
+                                                 device=device, n_samples=10000, show=False, w_soft=w_soft)
         loss_init = compute_loss_init_bounds(V_init_lower, V_init_upper, beta_s)
         loss_outside = compute_loss_outside_bounds(V_outside_lower, V_outside_upper, beta_s)
     if compute_GV:

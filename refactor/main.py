@@ -380,7 +380,8 @@ def train_network_bounds(
             'device': device,
             'compute_V': params.compute_V,
             'compute_GV': params.compute_GV,
-            'epoch': epoch
+            'epoch': epoch,
+            'w_soft': 10.0,
         }
 
         # Add V bounds if computing V
@@ -517,7 +518,8 @@ def train_network_bounds(
             all_satisfied = True
             if params.compute_V:
                 show = (epoch % 10 == 0)
-                _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, device=device, show=show, check=True, n_samples=10000)
+                _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, bounds_updated['outside'][0], 
+                                                             device=device, show=show, check=True, n_samples=10000)
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
                 init_satisfied = (bounds_updated['init'][0].min() >= beta_s_check and bounds_updated['init'][1].max() <= 1.0)
                 outside_satisfied = (bounds_updated['outside'][0].min() >= beta_s_check)
@@ -691,7 +693,7 @@ def main():
     # Set beta_s to a value (constant), or set to None to make it learnable
     # If learnable_beta_s is True, this value will be used as initialization
     params.training.learnable_beta_s = False  # Set to True to make beta_s learnable
-    params.constraints.beta_s = 0.6
+    params.constraints.beta_s = 0.1
     params.constraints.beta_ra = 20.0
 
     # Control what to compute during training
@@ -733,11 +735,11 @@ def main():
     # Create closed-loop drift for control synthesis
     f_cl_module = ClosedLoopDrift(f_ol, u_nn).to(params.training.device)
 
-    # For pretraining compatibility
-    u_fn = u_control(u_nn)
-    def F_CL(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
-        """Closed-loop drift: f_cl(x) = f(x) + u(x)"""
-        return f_ol(x) + u_fn(x)
+    # # For pretraining compatibility
+    # u_fn = u_control(u_nn)
+    # def F_CL(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
+    #     """Closed-loop drift: f_cl(x) = f(x) + u(x)"""
+    #     return f_ol(x) + u_fn(x)
 
     dynamics = Dynamics.dynamics(f=f_cl_module, g=g)
 
@@ -756,7 +758,7 @@ def main():
     # Create unsafe region as union of two rectangles (matching paper exactly)
     # unsafe_down1 = np.array([[-100.0, -80.0], [-100.0, -50.0]], dtype=np.float32)
     # unsafe_down2 = np.array([[-100.0, -80.0], [-50.0, 0.0]], dtype=np.float32)
-    unsafe_up = np.array([[-100.0, -80.0], [0.0, 100.0]], dtype=np.float32)
+    # unsafe_up = np.array([[-100.0, -80.0], [0.0, 100.0]], dtype=np.float32)
 
     # unsafe_range = np.vstack((unsafe_up, unsafe_down))
     full_range = np.array([[-100.0, 100.0], [-100.0, 100.0]], dtype=np.float32)
@@ -801,7 +803,7 @@ def main():
     # 4.5. PRE-TRAINING (Optional)
     # ========================================================================
     ENABLE_PRETRAINING = True  # Set to True to enable
-    PRETRAIN_EPOCHS = 2500
+    PRETRAIN_EPOCHS = 1000
     PRETRAIN_LR = 0.01
 
     if ENABLE_PRETRAINING:
