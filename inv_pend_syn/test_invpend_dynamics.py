@@ -33,6 +33,7 @@ import sys
 sys.path.insert(0, str(ROOT))
 
 from src.control_network import InvertControlNN, WrapperConterlNN
+from src.save_load_utils import load_eval_bundle
 
 # ----------------------------
 # Parameters
@@ -78,33 +79,33 @@ def in_box(x1, x2, box):
     return (box["x1_min"] <= x1 <= box["x1_max"]) and (box["x2_min"] <= x2 <= box["x2_max"])
 
 
-# # Control Network
+# Control Network (from RL pretrained)
 # def load_control_net(control_save_path, device="cpu"):
 #     # 1) create a fresh network with SAME architecture as when saved
 #     rl_policy_net = InvertControlNN().to(device)
-
 #     # 2) load checkpoint
 #     ckpt = torch.load(control_save_path, map_location=device)
-
 #     # 3) restore weights
 #     rl_policy_net.load_state_dict(ckpt["model_state_dict"])
-
 #     # 4) eval mode for rollout
 #     rl_policy_net.eval()
 #     return rl_policy_net
-
 # control_net = load_control_net(OUTPUT_DIR / "control_net.pth")
 
-# 1) Rebuild the model with same architecture
-device = "cpu"
-rl_policy_net = InvertControlNN(input_dim=2, hidden_dim=8, output_dim=1)
-control_net = WrapperConterlNN(rl_policy_net).to(device)
 
-# 2) Load checkpoint
-ckpt = torch.load(OUTPUT_DIR / "control_net.pth", map_location=device)
+# Control Network
+def load_control_net(bundle_path, device="cpu"):
+    bundle = load_eval_bundle(bundle_path, map_location="cpu")
+    rl_policy_net = InvertControlNN(input_dim=2, hidden_dim=8, output_dim=1)
+    control_net = WrapperConterlNN(rl_policy_net).to(device)
+    if bundle["control_state_dict"] is not None:
+        control_net.load_state_dict(bundle["control_state_dict"])
 
-control_net.load_state_dict(ckpt["model_state_dict"])
-control_net.eval()  # optional but recommended for inference
+    # 4) eval mode for rollout
+    control_net.eval()
+    return control_net
+
+control_net = load_control_net(OUTPUT_DIR / "eval_bundle.pth")
 
 # ----------------------------
 # small helper to get u

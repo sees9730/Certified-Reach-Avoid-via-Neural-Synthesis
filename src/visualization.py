@@ -447,7 +447,7 @@ def plot_constraint_regions(
         ax = axes[p]
 
         slice_point = make_slice_point_for_region(
-            regions.unsafe,   # or regions.goal / regions.init / regions.full
+            regions.full,   # or regions.goal / regions.init / regions.full
             full_bounds,
             x_dim=x_dim,
             y_dim=y_dim,
@@ -465,6 +465,7 @@ def plot_constraint_regions(
         # constraint contours
         ax.contour(X, Y, V_grid, levels=[beta_s / 2.0], colors='cyan', linewidths=2, linestyles='--')
         ax.contour(X, Y, V_grid, levels=[beta_s],       colors='yellow', linewidths=2, linestyles='--')
+        ax.contour(X, Y, V_grid, levels=[1.0],       colors='green', linewidths=2, linestyles='--')
         ax.contour(X, Y, V_grid, levels=[beta_ra],      colors='orange', linewidths=2, linestyles='--')
 
         ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)

@@ -44,7 +44,7 @@ class ConstraintConfig:
     pretrain_goal_target: float = 0.3
     pretrain_unsafe_target: float = 20.0
     pretrain_init_target: float = 0.92
-    pretain_phi_target: float = 1.0
+    pretrain_phi_target: float = 1.0
 
 
 @dataclass
@@ -138,7 +138,7 @@ class Hyperparameters:
                 'pretrain_goal_target': self.constraints.pretrain_goal_target,
                 'pretrain_unsafe_target': self.constraints.pretrain_unsafe_target,
                 'pretrain_init_target': self.constraints.pretrain_init_target,
-                'pretrain_phi_target': self.constraints.pretain_phi_target
+                'pretrain_phi_target': self.constraints.pretrain_phi_target
             },
             'training': {
                 'learning_rate': self.training.learning_rate,
