@@ -163,7 +163,7 @@ def compute_loss_goal_bounds(
             # print(" ✗ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
             #     v_min, V_lower.min()
             # ))
-            print(" ✗ Inside Goal passed, min V= {:.4f}, min V_outside_lower= {:.4f}, min V_lower={:.4f}".format(
+            print(" ✗ Inside Goal failed, min V= {:.4f}, min V_outside_lower= {:.4f}, min V_lower={:.4f}".format(
                 v_min, V_outside_lower.min(), V_lower.min()
             ))
 
@@ -545,7 +545,7 @@ def evaluate_constraints(
 
             num_failing = (phi_uppers > 0.0).sum().item()
             generator_satisfied = (num_failing == 0)
-            phi_min = phi_lowers.min().item()
+            phi_min = phi_uppers.min().item()
             phi_max = phi_uppers.max().item()
             phi_mean = phi_uppers.mean().item()
         else:
@@ -630,7 +630,7 @@ def print_constraint_summary(results: dict, prefix: str = ""):
     print(f"{prefix}  Outside:   {status_str(results['outside_satisfied'])} "
           f"(V_min={results['V_outside_min']:.3f}, V_max={results['V_outside_max']:.3f})")
     print(f"{prefix}  Generator: {status_str(results['generator_satisfied'])} "
-          f"(Phi_min={results['Phi_min']:.3f}, Phi_max={results['Phi_max']:.3f}, failing={results['num_failing_cells']})")
+          f"(Phi_upper_min={results['Phi_min']:.3f}, Phi_upper_max={results['Phi_max']:.3f}, failing={results['num_failing_cells']})")
 
 
 from typing import List, Tuple, Optional
@@ -702,3 +702,126 @@ def refine_failing_cells(
 
     return new_cells, num_refined
 
+
+def merge_passing_neighbor_cells(
+    region_cells: List[Tuple[torch.Tensor, torch.Tensor]],
+    failing_mask: torch.Tensor,
+    max_passes: int = 1,
+    max_merges: Optional[int] = None,
+    seed: int = 0,
+    eps: float = 1e-6,
+) -> Tuple[List[Tuple[torch.Tensor, torch.Tensor]], int]:
+    """
+    Merge adjacent passing cells (hyper-rectangles) to reduce cell count.
+
+    Two cells can merge if:
+      - both are passing (not failing)
+      - same bounds in all dims except one dim d
+      - they touch along dim d (upper_d == other.lower_d)
+      - same size along dim d (to keep grid alignment)
+      - same size in all other dims implicitly enforced by identical bounds
+
+    Args:
+        region_cells: List of (lower, upper), each (D,)
+        failing_mask: Boolean mask (len == #cells) where True means failing
+        max_passes: How many coarsening sweeps to try (each pass attempts merges along all dims)
+        max_merges: Optional cap on how many pair-merges to do (for speed)
+        seed: RNG seed if max_merges is used (randomly subsamples merges)
+        eps: Quantization step for robust float comparisons (bounds -> ints via round(val/eps))
+
+    Returns:
+        (new_cells, num_pair_merges)
+    """
+    failing_mask = failing_mask.reshape(-1).to(dtype=torch.bool).cpu()
+    n = len(region_cells)
+    if len(failing_mask) != n:
+        # safer: only merge when mask matches cell count
+        return region_cells, 0
+
+    # passing indices are eligible to merge
+    passing = (~failing_mask).tolist()
+
+    def quantize(v: torch.Tensor) -> Tuple[int, ...]:
+        v = v.detach().cpu().reshape(-1).to(torch.float64)
+        q = torch.round(v / eps).to(torch.int64)
+        return tuple(q.tolist())
+
+    rng = np.random.default_rng(seed)
+    num_merges_total = 0
+    cells = region_cells
+
+    for _ in range(max_passes):
+        n = len(cells)
+        if n == 0:
+            break
+
+        # assume all cells have same D
+        D = int(cells[0][0].numel())
+
+        # precompute quantized bounds for robust hashing
+        lo_q = [quantize(lo) for (lo, _) in cells]
+        hi_q = [quantize(hi) for (_, hi) in cells]
+
+        merged_flag = [False] * n
+        new_cells: List[Tuple[torch.Tensor, torch.Tensor]] = []
+
+        merges_this_pass = 0
+
+        for d in range(D):
+            # build lookup: (signature_except_d, lower_d, size_d) -> index
+            lookup = {}
+            for i in range(n):
+                if merged_flag[i] or (not passing[i]):
+                    continue
+                size_d = hi_q[i][d] - lo_q[i][d]
+                sig = tuple((lo_q[i][k], hi_q[i][k]) for k in range(D) if k != d)
+                key = (sig, lo_q[i][d], size_d)
+                lookup[key] = i
+
+            # attempt merges i -> neighbor on +d side
+            # optionally cap merges for speed
+            indices = list(range(n))
+            if max_merges is not None:
+                rng.shuffle(indices)
+
+            for i in indices:
+                if merged_flag[i] or (not passing[i]):
+                    continue
+
+                size_d = hi_q[i][d] - lo_q[i][d]
+                sig = tuple((lo_q[i][k], hi_q[i][k]) for k in range(D) if k != d)
+                neighbor_key = (sig, hi_q[i][d], size_d)  # neighbor starts where i ends
+                j = lookup.get(neighbor_key, None)
+                if j is None or j == i or merged_flag[j] or (not passing[j]):
+                    continue
+
+                # merge i and j
+                lo_i, hi_i = cells[i]
+                lo_j, hi_j = cells[j]
+                merged_lo = torch.minimum(lo_i, lo_j)
+                merged_hi = torch.maximum(hi_i, hi_j)
+
+                merged_flag[i] = True
+                merged_flag[j] = True
+                new_cells.append((merged_lo, merged_hi))
+
+                merges_this_pass += 1
+                num_merges_total += 1
+
+                if max_merges is not None and num_merges_total >= int(max_merges):
+                    break
+
+            if max_merges is not None and num_merges_total >= int(max_merges):
+                break
+
+        # append anything not merged
+        for i in range(n):
+            if not merged_flag[i]:
+                new_cells.append(cells[i])
+
+        if len(new_cells) == len(cells):
+            # no progress
+            break
+        cells = new_cells
+
+    return cells, num_merges_total

@@ -32,6 +32,7 @@ from training_utils import (
     print_loss_summary,
     print_constraint_summary,
     refine_failing_cells,
+    merge_passing_neighbor_cells,
     clear_goal_samples_cache
 )
 from utils import cleanup_and_setup_directories, print_training_config
@@ -428,6 +429,7 @@ def train_network_bounds(
                 # Track failing cells for adaptive refinement
                 phi_upper_failing_mask = phi_uppers > 0.0
                 num_total_failing = phi_upper_failing_mask.sum().item()
+                phi_upper_failing_mask_relax = phi_uppers > -100.0
                 
             else:
                 phi_lowers = torch.tensor([], device=device)
@@ -450,7 +452,8 @@ def train_network_bounds(
             'device': device,
             'compute_V': params.compute_V,
             'compute_GV': params.compute_GV,
-            'epoch': epoch
+            'epoch': epoch,
+            'w_soft': 2000.0,
         }
 
         # Add V bounds if computing V
@@ -514,6 +517,7 @@ def train_network_bounds(
             # Track failing cells in outside region
             outside_failing_mask = bounds_updated['outside'][0] < beta_s_check
             num_outside_failing = outside_failing_mask.sum().item()
+            outside_failing_mask_relax = bounds_updated['outside'][0] < (beta_s_check + 0.3)
 
             # Ensure bounds match current cell count
             if len(outside_failing_mask) == len(region_cells['outside']) and num_outside_failing > 0:
@@ -535,6 +539,19 @@ def train_network_bounds(
                     print(f"[Refine-Outside] Epoch {epoch+1}: {num_outside_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['outside'].append(epoch + 1)
+
+            # if((epoch + 1) % 512 == 0):
+            #     merged_cells, num_merges = merge_passing_neighbor_cells(
+            #         region_cells['outside'],
+            #         outside_failing_mask_relax,
+            #         max_passes=8,
+            #         max_merges=None,   # cap work; set None for full greedy
+            #         seed=0,
+            #         eps=1e-6,
+            #     )
+            #     region_cells['outside'] = merged_cells
+            #     print(f"[Merge-Outside] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+            #     needs_cache_rebuild = True
 
         # Adaptive refinement for generator cells (before optimizer step)
         if params.compute_GV:
@@ -564,6 +581,19 @@ def train_network_bounds(
                     print(f"[Refine-Generator] Epoch {epoch+1}: {num_total_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['generator'].append(epoch + 1)
+            
+            if((epoch + 1) % 501 == 0):
+                merged_cells, num_merges = merge_passing_neighbor_cells(
+                    region_cells['generator'],
+                    phi_upper_failing_mask_relax,
+                    max_passes=8,
+                    max_merges=None,   # cap work; set None for full greedy
+                    seed=0,
+                    eps=1e-6,
+                )
+                region_cells['generator'] = merged_cells
+                print(f"[Merge-Generator] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+                needs_cache_rebuild = True
 
         # Logging
         if epoch % 10 == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
