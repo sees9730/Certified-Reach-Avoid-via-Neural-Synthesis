@@ -36,3 +36,59 @@ class GBMControlNN(nn.Module):
         # Output layer (no activation here; add if you need e.g. tanh/sigmoid/softmax)
         x = self.fc2(x)
         return x
+    
+
+class InvertControlNN(nn.Module):
+    def __init__(self, input_dim=2, hidden_dim=8, output_dim=1):
+        super().__init__()
+        # Fully connected layers
+        self.fc1 = nn.Linear(input_dim, hidden_dim, bias=True)   # input -> hidden
+        self.fc2 = nn.Linear(hidden_dim, output_dim, bias=False)  # hidden -> output
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        h1 = F.tanh(self.fc1(x))
+        out = F.tanh(self.fc2(h1))
+        return out
+
+
+class TanhPolicy(nn.Sequential):
+    """
+    A policy with three layers and tanh activations.
+    """
+
+    def __init__(
+        self,
+        n_in: int = 2,
+        n_out: int = 1,
+        n_hidden: int = 64,
+        device: torch.device | str = "cpu"
+    ):
+        super().__init__(
+            nn.Linear(n_in, n_hidden, dtype=torch.float32, device=device),
+            nn.Tanh(),
+            nn.Linear(n_hidden, n_hidden, dtype=torch.float32, device=device),
+            nn.Tanh(),
+            nn.Linear(n_hidden, n_out, dtype=torch.float32, device=device),
+        )
+
+
+class WrapperConterlNN(nn.Module):
+    """
+    Wraps a 1D policy network and returns a 2D control:
+        u(x) = [0, self.M_mLsquare * policy(x)]
+    """
+
+    def __init__(self, policy_net: nn.Module):
+        super().__init__()
+        self.policy_net = policy_net
+        self.M_mLsquare = 6/(0.15*0.5**2)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        x: (N, 2) or (batch, state_dim)
+        returns: (N, 2) where [:, 0] = policy(x), [:, 1] = 0
+        """
+        u2 = self.policy_net(x)          # shape (N, 1)
+        zeros = torch.zeros_like(u2)     # same shape as u1
+        u = torch.cat([zeros, self.M_mLsquare*u2], dim=-1)  # (N, 2)
+        return u
