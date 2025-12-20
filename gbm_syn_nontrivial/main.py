@@ -533,7 +533,7 @@ def train_network_bounds(
                 MAX_CELLS = 5000
 
                 if epoch > 2500:
-                    REFINE_INTERVAL = 50
+                    REFINE_INTERVAL = 100
 
                 if ((epoch + 1) % REFINE_INTERVAL == 0 and
                     len(region_cells['outside']) < MAX_CELLS):
@@ -547,18 +547,18 @@ def train_network_bounds(
                     needs_cache_rebuild = True
                     refinement_epochs['outside'].append(epoch + 1)
 
-            if((epoch + 1) % 512 == 0):
-                merged_cells, num_merges = merge_passing_neighbor_cells(
-                    region_cells['outside'],
-                    outside_failing_mask_relax,
-                    max_passes=8,
-                    max_merges=None,   # cap work; set None for full greedy
-                    seed=0,
-                    eps=1e-6,
-                )
-                region_cells['outside'] = merged_cells
-                print(f"[Merge-Outside] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
-                needs_cache_rebuild = True
+            # if((epoch + 1) % 512 == 0):
+            #     merged_cells, num_merges = merge_passing_neighbor_cells(
+            #         region_cells['outside'],
+            #         outside_failing_mask_relax,
+            #         max_passes=8,
+            #         max_merges=None,   # cap work; set None for full greedy
+            #         seed=0,
+            #         eps=1e-6,
+            #     )
+            #     region_cells['outside'] = merged_cells
+            #     print(f"[Merge-Outside] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+            #     needs_cache_rebuild = True
 
         # Adaptive refinement for generator cells (before optimizer step)
         if params.compute_GV:
@@ -570,11 +570,11 @@ def train_network_bounds(
                 # Refinement parameters (matching testing_simple3.py)
                 REFINE_INTERVAL = 500  # Refine every 100k epochs
                 REFINE_FACTOR = 2  # Split into 2x2 subcells
-                MAX_CELLS = 5000  # Don't refine if we already have too many cells
+                MAX_CELLS = 10000  # Don't refine if we already have too many cells
 
                 # Adjust interval for later epochs
                 if epoch > 2500:
-                    REFINE_INTERVAL = 100
+                    REFINE_INTERVAL = 250
 
                 # Check if it's time to refine
                 if ((epoch + 1) % REFINE_INTERVAL == 0 and
@@ -590,18 +590,18 @@ def train_network_bounds(
                     needs_cache_rebuild = True
                     refinement_epochs['generator'].append(epoch + 1)
 
-            if((epoch + 1) % 512 == 0):
-                merged_cells, num_merges = merge_passing_neighbor_cells(
-                    region_cells['generator'],
-                    phi_upper_failing_mask_relax,
-                    max_passes=8,
-                    max_merges=None,   # cap work; set None for full greedy
-                    seed=0,
-                    eps=1e-6,
-                )
-                region_cells['generator'] = merged_cells
-                print(f"[Merge-Generator] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
-                needs_cache_rebuild = True
+            # if((epoch + 1) % 512 == 0):
+            #     merged_cells, num_merges = merge_passing_neighbor_cells(
+            #         region_cells['generator'],
+            #         phi_upper_failing_mask_relax,
+            #         max_passes=8,
+            #         max_merges=None,   # cap work; set None for full greedy
+            #         seed=0,
+            #         eps=1e-6,
+            #     )
+            #     region_cells['generator'] = merged_cells
+            #     print(f"[Merge-Generator] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+            #     needs_cache_rebuild = True
 
         # Logging
         if epoch % 10 == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
@@ -780,8 +780,8 @@ def main():
     params = Hyperparameters.default()
 
     # Customize configuration
-    params.network.n_hidden_1 = 256
-    params.network.n_hidden_2 = 32
+    params.network.n_hidden_1 = 64
+    params.network.n_hidden_2 = 64
     params.network.input_scale = [100.0, 100.0]
     params.network.scale_factor = 20.0
 
@@ -921,7 +921,7 @@ def main():
         print(f"\nUsing device: {device}")
 
         ENABLE_PRETRAINING = True  # Set to True to enable
-        PRETRAIN_EPOCHS = 1000
+        PRETRAIN_EPOCHS = 5000
         PRETRAIN_LR = 0.01
 
         if ENABLE_PRETRAINING:
@@ -936,7 +936,8 @@ def main():
                 num_epochs=PRETRAIN_EPOCHS,
                 lr=PRETRAIN_LR,
                 device=params.training.device,
-                control_net=u_nn
+                control_net=u_nn,
+                n_each=1000
             )
 
             print(f"Pretraining completed!\n")

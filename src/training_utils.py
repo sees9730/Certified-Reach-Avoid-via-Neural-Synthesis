@@ -154,7 +154,8 @@ def compute_loss_goal_bounds(
     # When checking for success (passed), check the logic based on v_min
     # Keep semantics identical to your original
     # if (v_min < beta_s) and (V_lower.min() >= 0).item():
-    if (v_min < V_outside_lower.min()) and (V_lower.min() >= 0).item():
+    # if (v_min < V_outside_lower.min()) and (V_lower.min() >= 0).item():
+    if (V_lower.min() >= 0):
         passed = True
         if show:
             # print(" ✓ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
@@ -173,7 +174,7 @@ def compute_loss_goal_bounds(
                 v_min, V_outside_lower.min(), V_lower.min()
             ))
 
-    return loss_soft + loss_nonneg, passed
+    return loss_nonneg, passed
 
 
 def compute_loss_unsafe_bounds(
@@ -220,8 +221,8 @@ def compute_loss_init_bounds(
     """
     # Push V_upper <= 1.0 AND V_lower >= beta_s
     loss_upper = F.relu(V_upper - 1.0).sum()
-    loss_lower = F.relu(beta_s - V_lower).sum()
-    return loss_upper + loss_lower
+    # loss_lower = F.relu(beta_s - V_lower).sum()
+    return loss_upper
 
 
 def compute_loss_outside_bounds(
@@ -245,42 +246,6 @@ def compute_loss_outside_bounds(
 
 
 def compute_loss_generator_bounds(
-    Phi_lower: torch.Tensor,
-    Phi_upper: torch.Tensor
-) -> torch.Tensor:
-    """
-    Compute generator constraint loss from bounds: Φ(x) <= 0 for x outside (Goal ∪ Unsafe).
-
-    Args:
-        Phi_lower: Lower bounds on Φ (N,)
-        Phi_upper: Upper bounds on Φ (N,)
-
-    Returns:
-        Loss (scalar) - unweighted (weight applied by caller)
-    """
-    # Want Phi <= 0, so penalize Phi_upper > 0
-    return F.relu(Phi_upper).sum()
-
-
-def compute_loss_generator_bounds_unsafe(
-    Phi_lower: torch.Tensor,
-    Phi_upper: torch.Tensor
-) -> torch.Tensor:
-    """
-    Compute generator constraint loss from bounds: Φ(x) <= 0 for x outside (Goal ∪ Unsafe).
-
-    Args:
-        Phi_lower: Lower bounds on Φ (N,)
-        Phi_upper: Upper bounds on Φ (N,)
-
-    Returns:
-        Loss (scalar) - unweighted (weight applied by caller)
-    """
-    # Want Phi <= 0, so penalize Phi_upper > 0
-    return F.relu(Phi_upper + 1000).sum()
-
-
-def compute_loss_generator_bounds_goal(
     Phi_lower: torch.Tensor,
     Phi_upper: torch.Tensor
 ) -> torch.Tensor:
@@ -363,8 +328,6 @@ def compute_total_loss_bounds(
         loss_outside = compute_loss_outside_bounds(V_outside_lower, V_outside_upper, beta_s)
     if compute_GV:
         loss_generator = compute_loss_generator_bounds(Phi_lower, Phi_upper)
-        # loss_generator_unsafe = compute_loss_generator_bounds_unsafe(Phi_lower_unsafe, Phi_upper_unsafe)
-        # loss_generator_goal = compute_loss_generator_bounds_goal(Phi_lower_goal, Phi_upper_goal)
 
     # Combine losses
     # Note: generator_weight is applied directly (no additional loss_weights multiplier for generator)
