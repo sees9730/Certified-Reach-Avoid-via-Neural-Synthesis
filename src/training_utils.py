@@ -147,7 +147,6 @@ def compute_loss_goal_bounds(
     # Encourage non-negativity of the certified lower bound inside goal
     # (kept identical behavior, but note: min() here returns a scalar tensor)
     loss_nonneg = torch.relu(0.0 - V_lower).sum()
-    # loss_nonneg = torch.relu(0.0 - torch.min(V_lower))
 
     # Obtain minimum V inside goal region: from samples, center, and lowest upper bound
     v_min = min(v_samples.min().item(), v_center.item(), V_upper.min().item())
@@ -244,7 +243,6 @@ def compute_loss_outside_bounds(
     """
     # Want V >= beta_s, so penalize V_lower < beta_s
     return F.relu(beta_s - V_lower).sum()
-    # return F.relu(beta_s - torch.min(V_lower))
 
 
 def compute_loss_generator_bounds(
@@ -261,10 +259,8 @@ def compute_loss_generator_bounds(
     Returns:
         Loss (scalar) - unweighted (weight applied by caller)
     """
-    # Want Phi < 0, so penalize Phi_upper > 0
-    delta = 1e-4
-    return F.relu(Phi_upper + delta).sum()
-    # return torch.relu(torch.max(Phi_upper))
+    # Want Phi <= 0, so penalize Phi_upper > 0
+    return F.relu(Phi_upper).sum()
 
 
 def compute_loss_boundary_bounds(
@@ -300,8 +296,6 @@ def compute_total_loss_bounds(
     V_init_upper: torch.Tensor = None,
     V_outside_lower: torch.Tensor = None,
     V_outside_upper: torch.Tensor = None,
-    V_boundary_lower: torch.Tensor = None,
-    V_boundary_upper: torch.Tensor = None,
     Phi_lower: torch.Tensor = None,
     Phi_upper: torch.Tensor = None,
     Phi_lower_unsafe: torch.Tensor = None,
@@ -342,7 +336,6 @@ def compute_total_loss_bounds(
             'unsafe': 1.0,
             'init': 1.0,
             'outside': 1.0,
-            'boundary': 1.0,
             'generator': 1.0
         }
 
@@ -353,11 +346,6 @@ def compute_total_loss_bounds(
                                                  device=device, n_samples=10000, show=False, w_soft=w_soft)
         loss_init = compute_loss_init_bounds(V_init_lower, V_init_upper, beta_s)
         loss_outside = compute_loss_outside_bounds(V_outside_lower, V_outside_upper, beta_s)
-        # Boundary loss (only if boundary bounds provided)
-        if V_boundary_lower is not None and V_boundary_upper is not None:
-            loss_boundary = compute_loss_boundary_bounds(V_boundary_lower, V_boundary_upper)
-        else:
-            loss_boundary = torch.tensor(0.0, device=device)
     if compute_GV:
         loss_generator = compute_loss_generator_bounds(Phi_lower, Phi_upper)
 
@@ -370,7 +358,6 @@ def compute_total_loss_bounds(
             loss_weights['unsafe'] * loss_unsafe +
             loss_weights['init'] * loss_init +
             loss_weights['outside'] * loss_outside +
-            0.0 * loss_weights['boundary'] * loss_boundary +
             generator_weight * loss_generator #+ loss_generator_unsafe + loss_generator_goal
         )
 
@@ -380,7 +367,6 @@ def compute_total_loss_bounds(
             'unsafe': loss_unsafe.item(),
             'init': loss_init.item(),
             'outside': loss_outside.item(),
-            'boundary': loss_boundary.item(),
             'generator': loss_generator.item()
         }
 
@@ -389,8 +375,7 @@ def compute_total_loss_bounds(
             loss_weights['goal'] * loss_goal +
             loss_weights['unsafe'] * loss_unsafe +
             loss_weights['init'] * loss_init +
-            loss_weights['outside'] * loss_outside +
-            loss_weights['boundary'] * loss_boundary
+            loss_weights['outside'] * loss_outside
         )
 
         loss_dict = {
@@ -398,8 +383,7 @@ def compute_total_loss_bounds(
             'goal': loss_goal.item(),
             'unsafe': loss_unsafe.item(),
             'init': loss_init.item(),
-            'outside': loss_outside.item(),
-            'boundary': loss_boundary.item()
+            'outside': loss_outside.item()
         }
 
     elif not compute_V and compute_GV:
@@ -447,7 +431,7 @@ def evaluate_constraints(
 
     if input_dim is None:
         # Try infer from any non-empty cell list
-        for name in ['goal', 'unsafe', 'init', 'outside', 'boundary', 'generator']:
+        for name in ['goal', 'unsafe', 'init', 'outside', 'generator']:
             if name in region_cells and len(region_cells[name]) > 0:
                 cell0 = region_cells[name][0]          # (lower, upper)
                 input_dim = int(cell0[0].numel())       # lower is (D,)
@@ -464,7 +448,7 @@ def evaluate_constraints(
             input_lowers_all, input_uppers_all = input_bounds_all
             v_lowers_all, v_uppers_all = crown_cache_all.compute_bounds(input_lowers_all, input_uppers_all)
 
-            region_order = ['init', 'goal', 'unsafe', 'outside', 'boundary']
+            region_order = ['init', 'goal', 'unsafe', 'outside']
             start_idx = 0
             for name in region_order:
                 count = cell_counts_V[name]
@@ -476,7 +460,7 @@ def evaluate_constraints(
                     region_bounds[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
         else:
             # Fallback: create separate cache for each region (dimension-generic)
-            for name in ['goal', 'unsafe', 'init', 'outside', 'boundary']:
+            for name in ['goal', 'unsafe', 'init', 'outside']:
                 if len(region_cells[name]) > 0:
                     cache = SymbolicCROWNCache(V_net, len(region_cells[name]), input_dim=input_dim, device=device)
                     input_lowers, input_uppers = prepare_cell_bounds(region_cells[name], device=device, input_dim=input_dim)
@@ -532,27 +516,6 @@ def evaluate_constraints(
             init_satisfied = True
             v_init_min = v_init_max = 0.0
 
-        # Boundary: bounds only (universal) V(x) >= 1.0
-        if 'boundary' in region_cells and len(region_cells['boundary']) > 0:
-            # Check if boundary bounds are already in region_bounds
-            if 'boundary' in region_bounds and len(region_bounds['boundary'][0]) > 0:
-                boundary_satisfied = (region_bounds['boundary'][0] >= 1.0).all().item()
-                v_boundary_min = region_bounds['boundary'][0].min().item()
-                v_boundary_max = region_bounds['boundary'][1].max().item()
-            else:
-                # Fallback: compute boundary bounds separately
-                cache_boundary = SymbolicCROWNCache(V_net, len(region_cells['boundary']), input_dim=input_dim, device=device)
-                input_lowers_boundary, input_uppers_boundary = prepare_cell_bounds(
-                    region_cells['boundary'], device=device, input_dim=input_dim
-                )
-                v_lowers_boundary, v_uppers_boundary = cache_boundary.compute_bounds(input_lowers_boundary, input_uppers_boundary)
-                boundary_satisfied = (v_lowers_boundary >= 1.0).all().item()
-                v_boundary_min = v_lowers_boundary.min().item()
-                v_boundary_max = v_uppers_boundary.max().item()
-        else:
-            boundary_satisfied = True
-            v_boundary_min = v_boundary_max = 0.0
-
         # Generator: bounds only (universal)  Φ(x) <= 0
         if len(region_cells['generator']) > 0:
             if crown_cache_phi is not None:
@@ -585,7 +548,6 @@ def evaluate_constraints(
         'unsafe_satisfied': unsafe_satisfied,
         'init_satisfied': init_satisfied,
         'outside_satisfied': outside_satisfied,
-        'boundary_satisfied': boundary_satisfied,
         'generator_satisfied': generator_satisfied,
 
         'V_goal_min': v_goal_min,
@@ -597,8 +559,6 @@ def evaluate_constraints(
         'V_init_max': v_init_max,
         'V_outside_min': v_outside_min,
         'V_outside_max': v_outside_max,
-        'V_boundary_min': v_boundary_min,
-        'V_boundary_max': v_boundary_max,
         'Phi_min': phi_min,
         'Phi_max': phi_max,
         'Phi_mean': phi_mean,
@@ -625,16 +585,14 @@ def print_loss_summary(epoch: int, loss_dict: dict, prefix: str = "", compute_V:
             f"Unsafe: {loss_dict['unsafe']:.4f} | "
             f"Init: {loss_dict['init']:.4f} | "
             f"Outside: {loss_dict['outside']:.4f} | "
-            f"Boundary: {loss_dict['boundary']:.4f} | "
-            f"Gen: {loss_dict['generator']:.6e}")
+            f"Gen: {loss_dict['generator']:.4f}")
     elif compute_V and not compute_GV:
         print(f"{prefix}Epoch {epoch:5d} | "
             f"Total: {loss_dict['total']:.4f} | "
             f"Goal: {loss_dict['goal']:.4f} | "
             f"Unsafe: {loss_dict['unsafe']:.4f} | "
             f"Init: {loss_dict['init']:.4f} | "
-            f"Outside: {loss_dict['outside']:.4f} | "
-            f"Boundary: {loss_dict['boundary']:.4f}")
+            f"Outside: {loss_dict['outside']:.4f}")
     else:
         print(f"{prefix}Epoch {epoch:5d} | "
             f"Gen: {loss_dict['generator']:.4f}")
@@ -661,78 +619,9 @@ def print_constraint_summary(results: dict, prefix: str = ""):
           f"(V_min={results['V_init_min']:.3f}, V_max={results['V_init_max']:.3f})")
     print(f"{prefix}  Outside:   {status_str(results['outside_satisfied'])} "
           f"(V_min={results['V_outside_min']:.3f}, V_max={results['V_outside_max']:.3f})")
-    print(f"{prefix}  Boundary:  {status_str(results['boundary_satisfied'])} "
-          f"(V_min={results['V_boundary_min']:.3f}, V_max={results['V_boundary_max']:.3f})")
     print(f"{prefix}  Generator: {status_str(results['generator_satisfied'])} "
-          f"(Phi_upper_min={results['Phi_min']:.6e}, Phi_upper_max={results['Phi_max']:.6e}, failing={results['num_failing_cells']})")
+          f"(Phi_upper_min={results['Phi_min']:.3f}, Phi_upper_max={results['Phi_max']:.3f}, failing={results['num_failing_cells']})")
 
-
-# def refine_failing_cells(
-#     region_cells: List[Tuple[torch.Tensor, torch.Tensor]],
-#     failing_mask: torch.Tensor,
-#     refine_factor: int = 2,
-#     N_to_refine: int = 100,
-#     seed: Optional[int] = 0,
-# ) -> Tuple[List[Tuple[torch.Tensor, torch.Tensor]], int]:
-#     """
-#     Refine (split) only a random subset of failing cells.
-
-#     Args:
-#         region_cells: List of (lower, upper) cell bounds, each (D,)
-#         failing_mask: Boolean mask indicating which cells failed
-#         refine_factor: Factor to subdivide cells (2 = split into refine_factor^D subcells)
-#         N_to_refine: Max number of failing cells to refine (randomly selected)
-#         seed: Optional RNG seed for reproducibility
-
-#     Returns:
-#         Tuple of (new_cells, num_refined)
-#     """
-#     # Make sure mask is 1D on CPU for indexing
-#     failing_mask = failing_mask.reshape(-1).to(dtype=torch.bool).cpu()
-
-#     n_cells = len(region_cells)
-#     mask_len = min(len(failing_mask), n_cells)
-
-#     # indices of failing cells that are eligible (within mask range)
-#     failing_idxs = torch.nonzero(failing_mask[:mask_len], as_tuple=False).reshape(-1).tolist()
-
-#     # choose subset to refine
-#     if N_to_refine is None or N_to_refine <= 0 or len(failing_idxs) == 0:
-#         refine_set = set()
-#     else:
-#         rng = np.random.default_rng(seed)
-#         k = min(int(N_to_refine), len(failing_idxs))
-#         refine_set = set(rng.choice(failing_idxs, size=k, replace=False).tolist())
-
-#     new_cells: List[Tuple[torch.Tensor, torch.Tensor]] = []
-#     num_refined = 0
-
-#     for i, (cell_lower, cell_upper) in enumerate(region_cells):
-#         if i in refine_set:
-#             # --- build (D,2) bounds (dimension-generic) ---
-#             cell_lower = cell_lower.reshape(-1)
-#             cell_upper = cell_upper.reshape(-1)
-#             D = int(cell_lower.numel())
-
-#             cell_bounds = np.array(
-#                 [[cell_lower[d].item(), cell_upper[d].item()] for d in range(D)],
-#                 dtype=np.float32
-#             )
-#             # ------------------------------------------------
-
-#             cell_region = Region(cell_bounds)
-#             refined = discretize_region(cell_region, refine_factor)
-#             new_cells.extend(refined)
-#             num_refined += 1
-#         else:
-#             new_cells.append((cell_lower, cell_upper))
-
-#     return new_cells, num_refined
-
-
-from typing import List, Tuple, Optional
-import numpy as np
-import torch
 
 def refine_failing_cells(
     region_cells: List[Tuple[torch.Tensor, torch.Tensor]],
@@ -740,21 +629,16 @@ def refine_failing_cells(
     refine_factor: int = 2,
     N_to_refine: int = 100,
     seed: Optional[int] = 0,
-    scores: Optional[torch.Tensor] = None,   # <-- NEW (larger = refine first)
 ) -> Tuple[List[Tuple[torch.Tensor, torch.Tensor]], int]:
     """
-    Refine (split) only a subset of failing cells.
-
-    If scores is provided, refine the top-N_to_refine failing cells with the
-    largest scores (e.g., phi_uppers). Otherwise, refine a random subset.
+    Refine (split) only a random subset of failing cells.
 
     Args:
         region_cells: List of (lower, upper) cell bounds, each (D,)
         failing_mask: Boolean mask indicating which cells failed
         refine_factor: Factor to subdivide cells (2 = split into refine_factor^D subcells)
-        N_to_refine: Max number of failing cells to refine
-        seed: Optional RNG seed for reproducibility (only used when scores is None)
-        scores: Optional 1D tensor aligned with region_cells giving priority (higher = refine first)
+        N_to_refine: Max number of failing cells to refine (randomly selected)
+        seed: Optional RNG seed for reproducibility
 
     Returns:
         Tuple of (new_cells, num_refined)
@@ -766,32 +650,15 @@ def refine_failing_cells(
     mask_len = min(len(failing_mask), n_cells)
 
     # indices of failing cells that are eligible (within mask range)
-    failing_idxs_t = torch.nonzero(failing_mask[:mask_len], as_tuple=False).reshape(-1)
+    failing_idxs = torch.nonzero(failing_mask[:mask_len], as_tuple=False).reshape(-1).tolist()
 
     # choose subset to refine
-    if N_to_refine is None or N_to_refine <= 0 or failing_idxs_t.numel() == 0:
+    if N_to_refine is None or N_to_refine <= 0 or len(failing_idxs) == 0:
         refine_set = set()
     else:
-        k = min(int(N_to_refine), int(failing_idxs_t.numel()))
-
-        if scores is not None:
-            # Top-k selection by score among failing cells (largest first)
-            scores_cpu = scores.reshape(-1).detach().cpu()
-            scores_cpu = scores_cpu[:mask_len]
-            print("[debug] use score")
-
-            failing_scores = scores_cpu[failing_idxs_t]
-            # Be safe with NaNs/Infs
-            failing_scores = torch.nan_to_num(failing_scores, nan=-float("inf"))
-
-            topk = torch.topk(failing_scores, k=k, largest=True).indices
-            refine_idxs = failing_idxs_t[topk].tolist()
-            refine_set = set(refine_idxs)
-        else:
-            # Random subset (original behavior)
-            rng = np.random.default_rng(seed)
-            refine_idxs = rng.choice(failing_idxs_t.tolist(), size=k, replace=False).tolist()
-            refine_set = set(refine_idxs)
+        rng = np.random.default_rng(seed)
+        k = min(int(N_to_refine), len(failing_idxs))
+        refine_set = set(rng.choice(failing_idxs, size=k, replace=False).tolist())
 
     new_cells: List[Tuple[torch.Tensor, torch.Tensor]] = []
     num_refined = 0

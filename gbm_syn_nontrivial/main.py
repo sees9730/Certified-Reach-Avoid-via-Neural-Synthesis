@@ -550,6 +550,18 @@ def train_network_bounds(
                     needs_cache_rebuild = True
                     refinement_epochs['outside'].append(epoch + 1)
 
+            # if((epoch + 1) % 512 == 0):
+            #     merged_cells, num_merges = merge_passing_neighbor_cells(
+            #         region_cells['outside'],
+            #         outside_failing_mask_relax,
+            #         max_passes=8,
+            #         max_merges=None,   # cap work; set None for full greedy
+            #         seed=0,
+            #         eps=1e-6,
+            #     )
+            #     region_cells['outside'] = merged_cells
+            #     print(f"[Merge-Outside] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+            #     needs_cache_rebuild = True
             if((epoch + 1) % 502 == 0):
                 merged_cells, num_merges = merge_passing_neighbor_cells(
                     region_cells['outside'],
@@ -594,6 +606,18 @@ def train_network_bounds(
                     needs_cache_rebuild = True
                     refinement_epochs['generator'].append(epoch + 1)
 
+            # if((epoch + 1) % 512 == 0):
+            #     merged_cells, num_merges = merge_passing_neighbor_cells(
+            #         region_cells['generator'],
+            #         phi_upper_failing_mask_relax,
+            #         max_passes=8,
+            #         max_merges=None,   # cap work; set None for full greedy
+            #         seed=0,
+            #         eps=1e-6,
+            #     )
+            #     region_cells['generator'] = merged_cells
+            #     print(f"[Merge-Generator] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+            #     needs_cache_rebuild = True
             if((epoch + 1) % 502 == 0):
                 merged_cells, num_merges = merge_passing_neighbor_cells(
                     region_cells['generator'],
