@@ -821,11 +821,11 @@ def main():
     params.training.generator_weight = 1.0  # Enable generator constraint
     params.training.generator_start_epoch = 0
 
-    params.discretization.n_goal = 20
+    params.discretization.n_goal = 16
     params.discretization.n_outside_goal = 10
     params.discretization.n_generator = 1  # Will be overridden by radial discretization
-    params.discretization.n_unsafe = 12
-    params.discretization.n_init = 12
+    params.discretization.n_unsafe = 16
+    params.discretization.n_init = 16
 
     # Set beta_s to a value (constant), or set to None to make it learnable
     # If learnable_beta_s is True, this value will be used as initialization
