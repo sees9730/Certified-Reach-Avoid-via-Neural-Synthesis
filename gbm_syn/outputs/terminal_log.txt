@@ -1,6 +1,6 @@
 Network: 2 -> 256 -> 32 -> 1
 Training: 200000 epochs, LR=0.005
-Constraints: beta_s=0.1, beta_ra=20.0
+Constraints: beta_s=0.0, beta_ra=20.0
 Generator: weight=1.0, start_epoch=0
 Training method: CROWN bounds (rigorous)
 
@@ -20,18 +20,18 @@ Using device: cpu
 PRE-TRAINING: Constraint-Structured Initialization (Sample-Based)
 ================================================================================
   GV (Φ) pre-training ENABLED (using provided GV_net)
-  Epoch [0/1000]: V=11887.412109 (full=0.000, init=3861.903, unsafe=3796.416, goal=4229.093, others=0.000), Φ=21.692574, Total=11909.104492
-  Epoch [100/1000]: V=35.750984 (full=6.934, init=0.000, unsafe=0.000, goal=22.184, others=6.633), Φ=5.444308, Total=41.195293
-  Epoch [200/1000]: V=10.858682 (full=1.448, init=0.000, unsafe=0.000, goal=8.351, others=1.059), Φ=0.728637, Total=11.587318
-  Epoch [300/1000]: V=6.943943 (full=2.171, init=0.000, unsafe=0.147, goal=2.580, others=2.046), Φ=0.568381, Total=7.512324
-  Epoch [400/1000]: V=5.533503 (full=1.520, init=0.000, unsafe=0.062, goal=2.950, others=1.002), Φ=0.158816, Total=5.692319
-  Epoch [500/1000]: V=30.121532 (full=14.884, init=0.000, unsafe=0.349, goal=0.000, others=14.888), Φ=0.972410, Total=31.093943
-  Epoch [600/1000]: V=7.498027 (full=0.087, init=0.000, unsafe=0.000, goal=7.311, others=0.100), Φ=0.091705, Total=7.589732
-  Epoch [700/1000]: V=46.742683 (full=22.269, init=0.000, unsafe=0.000, goal=0.000, others=24.474), Φ=1.051374, Total=47.794056
-  Epoch [800/1000]: V=4.823425 (full=2.540, init=0.000, unsafe=0.000, goal=0.070, others=2.214), Φ=0.115948, Total=4.939373
-  Epoch [900/1000]: V=13.047573 (full=0.000, init=0.000, unsafe=0.000, goal=13.048, others=0.000), Φ=0.138916, Total=13.186489
+  Epoch [0/1000]: V=11927.412109 (full=0.000, init=3861.903, unsafe=3796.416, goal=4269.093, others=0.000), Φ=21.692574, Total=11949.104492
+  Epoch [100/1000]: V=41.922115 (full=12.035, init=0.000, unsafe=1.120, goal=24.200, others=4.567), Φ=5.182188, Total=47.104301
+  Epoch [200/1000]: V=23.336039 (full=11.231, init=0.000, unsafe=0.000, goal=10.965, others=1.140), Φ=0.880238, Total=24.216276
+  Epoch [300/1000]: V=26.845350 (full=4.793, init=0.000, unsafe=0.000, goal=22.028, others=0.024), Φ=0.885472, Total=27.730824
+  Epoch [400/1000]: V=22.117134 (full=6.128, init=0.000, unsafe=0.000, goal=15.941, others=0.048), Φ=0.540567, Total=22.657701
+  Epoch [500/1000]: V=35.794334 (full=2.361, init=0.000, unsafe=0.000, goal=33.433, others=0.000), Φ=0.106456, Total=35.900791
+  Epoch [600/1000]: V=16.034292 (full=7.840, init=0.000, unsafe=0.000, goal=8.034, others=0.159), Φ=0.073320, Total=16.107613
+  Epoch [700/1000]: V=16.435141 (full=13.021, init=0.000, unsafe=0.018, goal=0.566, others=2.829), Φ=0.094684, Total=16.529825
+  Epoch [800/1000]: V=23.212114 (full=5.089, init=0.000, unsafe=0.000, goal=18.123, others=0.000), Φ=0.102528, Total=23.314642
+  Epoch [900/1000]: V=17.543884 (full=7.095, init=0.000, unsafe=0.000, goal=10.448, others=0.000), Φ=0.018431, Total=17.562315
 
-  Best loss: 2.134177
+  Best loss: 12.104241
 ================================================================================
 Pre-training complete. V + GV (Φ) + Controller initialized.
 ================================================================================
@@ -65,225 +65,225 @@ Creating CROWN cache for 'generator' (Phi)...
   self._cached_scale_D == D
 [SymbolicCROWNCache_Phi] Initialized for 48 cells!
 
-Using CONSTANT beta_s = 0.1
+Using CONSTANT beta_s = 0.0
 /Users/chko1829/src/Projects/ML/Neural_Certificate/.venv/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:28: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.
   warnings.warn("The verbose parameter is deprecated. Please use get_last_lr() "
-Epoch     0 | Total: 373.4493 | Goal: 4.7516 | Unsafe: 18.8580 | Init: 0.0000 | Outside: 28.7613 | Gen: 321.0784
- [Controller Params] fc.weight = tensor([[-0.5679, -0.8365],
-        [-0.3143,  0.1479]])
- ✗ Inside Goal failed, min V= -0.0304, min V_outside_lower= -0.6357, min V_lower=-0.2225
+Epoch     0 | Total: 381.4023 | Goal: 9.8795 | Unsafe: 19.6160 | Init: 0.0000 | Outside: 26.1369 | Gen: 325.7699
+ [Controller Params] fc.weight = tensor([[-0.5824, -0.8407],
+        [-0.3219,  0.1508]])
+ ✗ Inside Goal failed, min V= -0.1245, min V_outside_lower= -0.7539, min V_lower=-0.3356
 
 Epoch 0 - Detailed Evaluation:
   Constraint Satisfaction:
-    Goal:      ✗ (V_min=-0.034, V_mean=-0.022, V_max=0.017)
-    Unsafe:    ✗ (V_min=13.948, V_max=37.362)
-    Init:      ✗ (V_min=0.072, V_max=0.178)
-    Outside:   ✗ (V_min=-0.636, V_max=34.853)
-    Generator: ✗ (Phi_upper_min=0.005, Phi_upper_max=40.545, failing=48)
-  Goal bounds: V ∈ [-0.223, 0.221]
-  Unsafe bounds: V ∈ [13.948, 37.362]
-  Generator bounds: Φ ∈ [-249.814, 40.545]
+    Goal:      ✗ (V_min=-0.127, V_mean=-0.108, V_max=-0.049)
+    Unsafe:    ✗ (V_min=14.037, V_max=37.420)
+    Init:      ✓ (V_min=0.100, V_max=0.290)
+    Outside:   ✗ (V_min=-0.754, V_max=34.917)
+    Generator: ✗ (Phi_upper_min=0.001, Phi_upper_max=37.959, failing=48)
+  Goal bounds: V ∈ [-0.336, 0.190]
+  Unsafe bounds: V ∈ [14.037, 37.420]
+  Generator bounds: Φ ∈ [-243.362, 37.959]
   Generator failing cells: 48/48 (100.0%)
 
   Creating visualization for epoch 0...
   → Saved to 'training_progress/value_function_epoch_0.png'
   → Saved to 'training_progress/generator_epoch_0.png'
-Epoch    10 | Total: 121.8889 | Goal: 0.0000 | Unsafe: 21.7462 | Init: 0.0000 | Outside: 0.0000 | Gen: 100.1426
- [Controller Params] fc.weight = tensor([[-0.6166, -0.8850],
-        [-0.2747,  0.1133]])
- ✓ Inside Goal passed, min V= 0.7868, min V_outside_lower= 0.6845, min V_lower=0.7334
-Epoch    20 | Total: 91.9802 | Goal: 0.0000 | Unsafe: 17.2313 | Init: 0.8232 | Outside: 0.0000 | Gen: 73.9257
- [Controller Params] fc.weight = tensor([[-0.6556, -0.9293],
-        [-0.2605,  0.1259]])
- ✓ Inside Goal passed, min V= 1.1863, min V_outside_lower= 1.0530, min V_lower=1.0775
-Epoch    30 | Total: 78.4747 | Goal: 0.0000 | Unsafe: 13.9575 | Init: 1.2077 | Outside: 0.0000 | Gen: 63.3094
- [Controller Params] fc.weight = tensor([[-0.6781, -0.9514],
-        [-0.2549,  0.1426]])
- ✓ Inside Goal passed, min V= 1.2171, min V_outside_lower= 1.1318, min V_lower=1.1545
-Epoch    40 | Total: 71.1497 | Goal: 0.0000 | Unsafe: 7.8686 | Init: 1.9423 | Outside: 0.0000 | Gen: 61.3389
- [Controller Params] fc.weight = tensor([[-0.6915, -0.9564],
-        [-0.2518,  0.1546]])
- ✓ Inside Goal passed, min V= 1.3800, min V_outside_lower= 1.2941, min V_lower=1.3130
-Epoch    50 | Total: 65.4645 | Goal: 0.0000 | Unsafe: 16.5175 | Init: 2.0475 | Outside: 0.0000 | Gen: 46.8994
- [Controller Params] fc.weight = tensor([[-0.7024, -0.9537],
-        [-0.2501,  0.1652]])
- ✓ Inside Goal passed, min V= 1.4285, min V_outside_lower= 1.3531, min V_lower=1.3721
-Epoch    60 | Total: 60.8803 | Goal: 0.0000 | Unsafe: 8.4311 | Init: 1.8235 | Outside: 0.0000 | Gen: 50.6257
- [Controller Params] fc.weight = tensor([[-0.7129, -0.9472],
-        [-0.2493,  0.1741]])
- ✓ Inside Goal passed, min V= 1.4240, min V_outside_lower= 1.3552, min V_lower=1.3762
-Epoch    70 | Total: 57.8303 | Goal: 0.0000 | Unsafe: 6.0805 | Init: 1.8047 | Outside: 0.0000 | Gen: 49.9452
- [Controller Params] fc.weight = tensor([[-0.7241, -0.9383],
-        [-0.2488,  0.1819]])
- ✓ Inside Goal passed, min V= 1.4177, min V_outside_lower= 1.3443, min V_lower=1.3665
-Epoch    80 | Total: 54.5655 | Goal: 0.0000 | Unsafe: 10.0503 | Init: 1.5292 | Outside: 0.0000 | Gen: 42.9860
- [Controller Params] fc.weight = tensor([[-0.7362, -0.9276],
-        [-0.2484,  0.1887]])
- ✓ Inside Goal passed, min V= 1.3387, min V_outside_lower= 1.2679, min V_lower=1.2894
-Epoch    90 | Total: 52.4210 | Goal: 0.0000 | Unsafe: 9.2031 | Init: 1.1466 | Outside: 0.0000 | Gen: 42.0712
- [Controller Params] fc.weight = tensor([[-0.7491, -0.9156],
-        [-0.2482,  0.1941]])
- ✓ Inside Goal passed, min V= 1.2337, min V_outside_lower= 1.1587, min V_lower=1.1810
-Epoch   100 | Total: 50.3946 | Goal: 0.0000 | Unsafe: 6.2027 | Init: 0.4147 | Outside: 0.0000 | Gen: 43.7773
- [Controller Params] fc.weight = tensor([[-0.7629, -0.9024],
-        [-0.2480,  0.1981]])
- ✓ Inside Goal passed, min V= 1.0600, min V_outside_lower= 0.9887, min V_lower=1.0089
-Epoch   110 | Total: 48.5071 | Goal: 0.0000 | Unsafe: 4.0006 | Init: 0.1711 | Outside: 0.0000 | Gen: 44.3354
- [Controller Params] fc.weight = tensor([[-0.7782, -0.8875],
-        [-0.2479,  0.2013]])
- ✓ Inside Goal passed, min V= 0.9820, min V_outside_lower= 0.9010, min V_lower=0.9234
-Epoch   120 | Total: 46.7442 | Goal: 0.0000 | Unsafe: 3.5246 | Init: 0.0162 | Outside: 0.0000 | Gen: 43.2034
- [Controller Params] fc.weight = tensor([[-0.7953, -0.8707],
-        [-0.2477,  0.2038]])
- ✓ Inside Goal passed, min V= 0.9456, min V_outside_lower= 0.8707, min V_lower=0.8900
-Epoch   130 | Total: 45.3567 | Goal: 0.0000 | Unsafe: 3.0785 | Init: 0.1161 | Outside: 0.0000 | Gen: 42.1621
- [Controller Params] fc.weight = tensor([[-0.8134, -0.8528],
-        [-0.2475,  0.2058]])
- ✓ Inside Goal passed, min V= 0.9692, min V_outside_lower= 0.8931, min V_lower=0.9110
-Epoch   140 | Total: 45.0337 | Goal: 0.0000 | Unsafe: 9.5864 | Init: 0.0000 | Outside: 0.0000 | Gen: 35.4473
- [Controller Params] fc.weight = tensor([[-0.8324, -0.8341],
-        [-0.2474,  0.2074]])
- ✓ Inside Goal passed, min V= 0.9049, min V_outside_lower= 0.8380, min V_lower=0.8510
-Epoch   150 | Total: 43.5597 | Goal: 0.0000 | Unsafe: 7.0787 | Init: 0.1977 | Outside: 0.0000 | Gen: 36.2834
- [Controller Params] fc.weight = tensor([[-0.8574, -0.8235],
-        [-0.2472,  0.2089]])
- ✓ Inside Goal passed, min V= 0.9647, min V_outside_lower= 0.8844, min V_lower=0.8969
-Epoch   160 | Total: 41.4756 | Goal: 0.0000 | Unsafe: 1.0264 | Init: 0.3026 | Outside: 0.0000 | Gen: 40.1466
- [Controller Params] fc.weight = tensor([[-0.8816, -0.8093],
-        [-0.2471,  0.2104]])
- ✓ Inside Goal passed, min V= 0.9870, min V_outside_lower= 0.8997, min V_lower=0.9118
-Epoch   170 | Total: 41.0523 | Goal: 0.0000 | Unsafe: 4.7942 | Init: 0.0000 | Outside: 0.0000 | Gen: 36.2581
- [Controller Params] fc.weight = tensor([[-0.9088, -0.7965],
-        [-0.2470,  0.2120]])
- ✓ Inside Goal passed, min V= 0.8915, min V_outside_lower= 0.8108, min V_lower=0.8218
-Epoch   180 | Total: 39.8956 | Goal: 0.0000 | Unsafe: 4.5188 | Init: 0.0317 | Outside: 0.0000 | Gen: 35.3452
- [Controller Params] fc.weight = tensor([[-0.9366, -0.7823],
-        [-0.2469,  0.2133]])
- ✓ Inside Goal passed, min V= 0.8973, min V_outside_lower= 0.8052, min V_lower=0.8183
-Epoch   190 | Total: 39.5868 | Goal: 0.0000 | Unsafe: 6.5361 | Init: 0.1712 | Outside: 0.0000 | Gen: 32.8795
- [Controller Params] fc.weight = tensor([[-0.9650, -0.7678],
-        [-0.2467,  0.2145]])
- ✓ Inside Goal passed, min V= 0.9008, min V_outside_lower= 0.8085, min V_lower=0.8260
-Epoch   200 | Total: 37.1515 | Goal: 0.0000 | Unsafe: 0.9321 | Init: 0.1714 | Outside: 0.0000 | Gen: 36.0481
- [Controller Params] fc.weight = tensor([[-0.9943, -0.7528],
-        [-0.2466,  0.2154]])
- ✓ Inside Goal passed, min V= 0.9074, min V_outside_lower= 0.7993, min V_lower=0.8163
-Epoch   210 | Total: 41.4822 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.2093 | Outside: 0.0000 | Gen: 41.2729
- [Controller Params] fc.weight = tensor([[-1.0240, -0.7385],
-        [-0.2465,  0.2163]])
- ✓ Inside Goal passed, min V= 0.9366, min V_outside_lower= 0.8248, min V_lower=0.8388
-Epoch   220 | Total: 37.1155 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.1015 | Outside: 0.0000 | Gen: 37.0141
- [Controller Params] fc.weight = tensor([[-1.0541, -0.7236],
-        [-0.2463,  0.2171]])
- ✓ Inside Goal passed, min V= 0.9020, min V_outside_lower= 0.7907, min V_lower=0.8046
-Epoch   230 | Total: 34.3433 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 34.3433
- [Controller Params] fc.weight = tensor([[-1.0851, -0.7073],
-        [-0.2462,  0.2179]])
- ✓ Inside Goal passed, min V= 0.8325, min V_outside_lower= 0.7176, min V_lower=0.7325
-Epoch   240 | Total: 35.9667 | Goal: 0.0000 | Unsafe: 8.0501 | Init: 0.0212 | Outside: 0.0000 | Gen: 27.8955
- [Controller Params] fc.weight = tensor([[-1.1164, -0.6919],
-        [-0.2460,  0.2187]])
- ✓ Inside Goal passed, min V= 0.7748, min V_outside_lower= 0.6740, min V_lower=0.6965
-Epoch   250 | Total: 34.4096 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0671 | Outside: 0.0000 | Gen: 34.3426
- [Controller Params] fc.weight = tensor([[-1.1445, -0.6809],
-        [-0.2459,  0.2195]])
- ✓ Inside Goal passed, min V= 0.8177, min V_outside_lower= 0.6940, min V_lower=0.7164
-Epoch   260 | Total: 31.9141 | Goal: 0.0000 | Unsafe: 0.1319 | Init: 0.0698 | Outside: 0.0000 | Gen: 31.7123
- [Controller Params] fc.weight = tensor([[-1.1689, -0.6690],
-        [-0.2457,  0.2204]])
- ✓ Inside Goal passed, min V= 0.7897, min V_outside_lower= 0.6804, min V_lower=0.7044
-Epoch   270 | Total: 33.4782 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0752 | Outside: 0.0000 | Gen: 33.4029
- [Controller Params] fc.weight = tensor([[-1.1925, -0.6620],
-        [-0.2455,  0.2211]])
- ✓ Inside Goal passed, min V= 0.8132, min V_outside_lower= 0.6992, min V_lower=0.7229
-Epoch   280 | Total: 33.6616 | Goal: 0.0000 | Unsafe: 6.7981 | Init: 0.0000 | Outside: 0.0000 | Gen: 26.8635
- [Controller Params] fc.weight = tensor([[-1.2157, -0.6645],
-        [-0.2454,  0.2217]])
- ✓ Inside Goal passed, min V= 0.7638, min V_outside_lower= 0.6754, min V_lower=0.6947
-Epoch   290 | Total: 35.5731 | Goal: 0.0000 | Unsafe: 12.3290 | Init: 0.0238 | Outside: 0.0000 | Gen: 23.2204
- [Controller Params] fc.weight = tensor([[-1.2387, -0.6671],
-        [-0.2452,  0.2223]])
- ✓ Inside Goal passed, min V= 0.7845, min V_outside_lower= 0.7084, min V_lower=0.7249
-Epoch   300 | Total: 35.0047 | Goal: 0.0000 | Unsafe: 11.4182 | Init: 0.1899 | Outside: 0.0000 | Gen: 23.3966
- [Controller Params] fc.weight = tensor([[-1.2612, -0.6668],
-        [-0.2451,  0.2230]])
- ✓ Inside Goal passed, min V= 0.8222, min V_outside_lower= 0.7455, min V_lower=0.7621
-Epoch   310 | Total: 30.6408 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.2155 | Outside: 0.0000 | Gen: 30.4253
- [Controller Params] fc.weight = tensor([[-1.2838, -0.6668],
-        [-0.2449,  0.2236]])
- ✓ Inside Goal passed, min V= 0.8699, min V_outside_lower= 0.7663, min V_lower=0.7882
-Epoch   320 | Total: 29.5229 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0233 | Outside: 0.0000 | Gen: 29.4996
- [Controller Params] fc.weight = tensor([[-1.3072, -0.6667],
-        [-0.2447,  0.2242]])
- ✓ Inside Goal passed, min V= 0.7943, min V_outside_lower= 0.6942, min V_lower=0.7162
-Epoch   330 | Total: 29.5700 | Goal: 0.0000 | Unsafe: 1.5302 | Init: 0.0081 | Outside: 0.0000 | Gen: 28.0317
- [Controller Params] fc.weight = tensor([[-1.3315, -0.6668],
-        [-0.2446,  0.2248]])
- ✓ Inside Goal passed, min V= 0.7486, min V_outside_lower= 0.6540, min V_lower=0.6741
-Epoch   340 | Total: 32.4221 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0274 | Outside: 0.0000 | Gen: 32.3947
- [Controller Params] fc.weight = tensor([[-1.3562, -0.6669],
-        [-0.2445,  0.2253]])
- ✓ Inside Goal passed, min V= 0.8055, min V_outside_lower= 0.6916, min V_lower=0.7134
-Epoch   350 | Total: 29.5505 | Goal: 0.0000 | Unsafe: 2.7289 | Init: 0.0000 | Outside: 0.0000 | Gen: 26.8217
- [Controller Params] fc.weight = tensor([[-1.3812, -0.6665],
-        [-0.2443,  0.2259]])
- ✓ Inside Goal passed, min V= 0.7371, min V_outside_lower= 0.6426, min V_lower=0.6631
-Epoch   360 | Total: 27.9816 | Goal: 0.0000 | Unsafe: 0.1738 | Init: 0.0000 | Outside: 0.0000 | Gen: 27.8078
- [Controller Params] fc.weight = tensor([[-1.4067, -0.6667],
-        [-0.2441,  0.2264]])
- ✓ Inside Goal passed, min V= 0.7141, min V_outside_lower= 0.6133, min V_lower=0.6354
-Epoch   370 | Total: 27.4898 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 27.4898
- [Controller Params] fc.weight = tensor([[-1.4326, -0.6663],
-        [-0.2439,  0.2268]])
- ✓ Inside Goal passed, min V= 0.7011, min V_outside_lower= 0.6008, min V_lower=0.6219
-Epoch   380 | Total: 27.4194 | Goal: 0.0000 | Unsafe: 0.9680 | Init: 0.1088 | Outside: 0.0000 | Gen: 26.3427
- [Controller Params] fc.weight = tensor([[-1.4589, -0.6666],
-        [-0.2438,  0.2271]])
- ✓ Inside Goal passed, min V= 0.7234, min V_outside_lower= 0.6259, min V_lower=0.6461
-Epoch   390 | Total: 27.5940 | Goal: 0.0000 | Unsafe: 2.2462 | Init: 0.0000 | Outside: 0.0000 | Gen: 25.3478
- [Controller Params] fc.weight = tensor([[-1.4844, -0.6669],
-        [-0.2436,  0.2275]])
- ✓ Inside Goal passed, min V= 0.6624, min V_outside_lower= 0.5685, min V_lower=0.5878
-Epoch   400 | Total: 26.5646 | Goal: 0.0000 | Unsafe: 0.1353 | Init: 0.3501 | Outside: 0.0000 | Gen: 26.0792
- [Controller Params] fc.weight = tensor([[-1.5088, -0.6666],
-        [-0.2435,  0.2279]])
- ✓ Inside Goal passed, min V= 0.7730, min V_outside_lower= 0.6780, min V_lower=0.6972
-Epoch   410 | Total: 27.5233 | Goal: 0.0000 | Unsafe: 3.2110 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3122
- [Controller Params] fc.weight = tensor([[-1.5330, -0.6665],
-        [-0.2433,  0.2285]])
- ✓ Inside Goal passed, min V= 0.6684, min V_outside_lower= 0.5807, min V_lower=0.5985
-Epoch   420 | Total: 29.1112 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 29.1112
- [Controller Params] fc.weight = tensor([[-1.5573, -0.6664],
-        [-0.2431,  0.2290]])
- ✓ Inside Goal passed, min V= 0.6122, min V_outside_lower= 0.5050, min V_lower=0.5281
-Epoch   430 | Total: 26.5504 | Goal: 0.0000 | Unsafe: 1.9375 | Init: 0.3761 | Outside: 0.0000 | Gen: 24.2367
- [Controller Params] fc.weight = tensor([[-1.5819, -0.6667],
-        [-0.2429,  0.2295]])
- ✓ Inside Goal passed, min V= 0.7346, min V_outside_lower= 0.6424, min V_lower=0.6671
-Epoch   440 | Total: 25.5272 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0036 | Outside: 0.0000 | Gen: 25.5235
- [Controller Params] fc.weight = tensor([[-1.6068, -0.6663],
-        [-0.2427,  0.2301]])
- ✓ Inside Goal passed, min V= 0.7072, min V_outside_lower= 0.6155, min V_lower=0.6345
-Epoch   450 | Total: 27.2019 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 27.2019
- [Controller Params] fc.weight = tensor([[-1.6309, -0.6673],
-        [-0.2426,  0.2307]])
- ✓ Inside Goal passed, min V= 0.5697, min V_outside_lower= 0.4701, min V_lower=0.4899
-Epoch   460 | Total: 25.9515 | Goal: 0.0000 | Unsafe: 2.6651 | Init: 0.4355 | Outside: 0.0000 | Gen: 22.8509
- [Controller Params] fc.weight = tensor([[-1.6546, -0.6668],
-        [-0.2424,  0.2312]])
- ✓ Inside Goal passed, min V= 0.7862, min V_outside_lower= 0.7018, min V_lower=0.7224
-Epoch   470 | Total: 25.0454 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 25.0454
- [Controller Params] fc.weight = tensor([[-1.6782, -0.6674],
-        [-0.2423,  0.2317]])
- ✓ Inside Goal passed, min V= 0.6631, min V_outside_lower= 0.5758, min V_lower=0.5935
-Epoch   480 | Total: 25.4040 | Goal: 0.0000 | Unsafe: 3.1234 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.2806
- [Controller Params] fc.weight = tensor([[-1.7019, -0.6674],
-        [-0.2422,  0.2322]])
- ✓ Inside Goal passed, min V= 0.6378, min V_outside_lower= 0.5555, min V_lower=0.5771
-Epoch   490 | Total: 25.3805 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 25.3805
- [Controller Params] fc.weight = tensor([[-1.7253, -0.6669],
-        [-0.2420,  0.2327]])
- ✓ Inside Goal passed, min V= 0.6535, min V_outside_lower= 0.5670, min V_lower=0.5841
+Epoch    10 | Total: 125.6921 | Goal: 0.0000 | Unsafe: 20.3957 | Init: 0.0000 | Outside: 0.0000 | Gen: 105.2965
+ [Controller Params] fc.weight = tensor([[-0.6298, -0.8892],
+        [-0.2815,  0.1137]])
+ ✓ Inside Goal passed, min V= 0.7207, min V_outside_lower= 0.5988, min V_lower=0.6362
+Epoch    20 | Total: 94.3251 | Goal: 0.0000 | Unsafe: 16.8984 | Init: 0.8673 | Outside: 0.0000 | Gen: 76.5595
+ [Controller Params] fc.weight = tensor([[-0.6663, -0.9336],
+        [-0.2665,  0.1149]])
+ ✓ Inside Goal passed, min V= 1.1149, min V_outside_lower= 0.9468, min V_lower=0.9785
+Epoch    30 | Total: 79.6411 | Goal: 0.0000 | Unsafe: 16.5238 | Init: 0.6518 | Outside: 0.0000 | Gen: 62.4655
+ [Controller Params] fc.weight = tensor([[-0.6875, -0.9550],
+        [-0.2620,  0.1346]])
+ ✓ Inside Goal passed, min V= 1.0891, min V_outside_lower= 0.9949, min V_lower=1.0222
+Epoch    40 | Total: 70.9039 | Goal: 0.0000 | Unsafe: 11.0952 | Init: 1.4268 | Outside: 0.0000 | Gen: 58.3819
+ [Controller Params] fc.weight = tensor([[-0.7009, -0.9598],
+        [-0.2595,  0.1456]])
+ ✓ Inside Goal passed, min V= 1.2581, min V_outside_lower= 1.1651, min V_lower=1.1886
+Epoch    50 | Total: 64.5568 | Goal: 0.0000 | Unsafe: 11.7267 | Init: 1.3119 | Outside: 0.0000 | Gen: 51.5182
+ [Controller Params] fc.weight = tensor([[-0.7123, -0.9569],
+        [-0.2581,  0.1531]])
+ ✓ Inside Goal passed, min V= 1.2807, min V_outside_lower= 1.2052, min V_lower=1.2281
+Epoch    60 | Total: 59.9712 | Goal: 0.0000 | Unsafe: 12.6774 | Init: 1.2710 | Outside: 0.0000 | Gen: 46.0228
+ [Controller Params] fc.weight = tensor([[-0.7238, -0.9500],
+        [-0.2573,  0.1589]])
+ ✓ Inside Goal passed, min V= 1.2821, min V_outside_lower= 1.2111, min V_lower=1.2341
+Epoch    70 | Total: 56.5341 | Goal: 0.0000 | Unsafe: 8.7624 | Init: 1.1750 | Outside: 0.0000 | Gen: 46.5966
+ [Controller Params] fc.weight = tensor([[-0.7359, -0.9406],
+        [-0.2569,  0.1634]])
+ ✓ Inside Goal passed, min V= 1.2576, min V_outside_lower= 1.1802, min V_lower=1.2059
+Epoch    80 | Total: 53.5224 | Goal: 0.0000 | Unsafe: 10.9507 | Init: 0.6845 | Outside: 0.0000 | Gen: 41.8871
+ [Controller Params] fc.weight = tensor([[-0.7491, -0.9294],
+        [-0.2566,  0.1665]])
+ ✓ Inside Goal passed, min V= 1.1394, min V_outside_lower= 1.0682, min V_lower=1.0921
+Epoch    90 | Total: 51.3546 | Goal: 0.0000 | Unsafe: 6.2237 | Init: 0.0315 | Outside: 0.0000 | Gen: 45.0994
+ [Controller Params] fc.weight = tensor([[-0.7633, -0.9168],
+        [-0.2564,  0.1684]])
+ ✓ Inside Goal passed, min V= 0.9868, min V_outside_lower= 0.9129, min V_lower=0.9389
+Epoch   100 | Total: 49.2447 | Goal: 0.0000 | Unsafe: 4.7510 | Init: 0.0702 | Outside: 0.0000 | Gen: 44.4235
+ [Controller Params] fc.weight = tensor([[-0.7790, -0.9023],
+        [-0.2562,  0.1690]])
+ ✓ Inside Goal passed, min V= 0.9563, min V_outside_lower= 0.8666, min V_lower=0.8954
+Epoch   110 | Total: 47.4582 | Goal: 0.0000 | Unsafe: 5.9207 | Init: 0.0285 | Outside: 0.0000 | Gen: 41.5091
+ [Controller Params] fc.weight = tensor([[-0.7968, -0.8858],
+        [-0.2558,  0.1681]])
+ ✓ Inside Goal passed, min V= 0.9500, min V_outside_lower= 0.8709, min V_lower=0.8945
+Epoch   120 | Total: 46.3883 | Goal: 0.0000 | Unsafe: 8.0933 | Init: 0.0107 | Outside: 0.0000 | Gen: 38.2843
+ [Controller Params] fc.weight = tensor([[-0.8156, -0.8681],
+        [-0.2555,  0.1668]])
+ ✓ Inside Goal passed, min V= 0.9428, min V_outside_lower= 0.8713, min V_lower=0.8911
+Epoch   130 | Total: 45.8414 | Goal: 0.0000 | Unsafe: 11.4435 | Init: 0.1928 | Outside: 0.0000 | Gen: 34.2051
+ [Controller Params] fc.weight = tensor([[-0.8349, -0.8500],
+        [-0.2552,  0.1657]])
+ ✓ Inside Goal passed, min V= 0.9674, min V_outside_lower= 0.8895, min V_lower=0.9058
+Epoch   140 | Total: 43.8062 | Goal: 0.0000 | Unsafe: 6.5031 | Init: 0.1860 | Outside: 0.0000 | Gen: 37.1171
+ [Controller Params] fc.weight = tensor([[-0.8548, -0.8316],
+        [-0.2550,  0.1648]])
+ ✓ Inside Goal passed, min V= 0.9709, min V_outside_lower= 0.8936, min V_lower=0.9100
+Epoch   150 | Total: 42.6552 | Goal: 0.0000 | Unsafe: 5.8683 | Init: 0.0000 | Outside: 0.0000 | Gen: 36.7869
+ [Controller Params] fc.weight = tensor([[-0.8759, -0.8120],
+        [-0.2548,  0.1640]])
+ ✓ Inside Goal passed, min V= 0.9044, min V_outside_lower= 0.8334, min V_lower=0.8493
+Epoch   160 | Total: 41.6487 | Goal: 0.0000 | Unsafe: 6.3547 | Init: 0.1287 | Outside: 0.0000 | Gen: 35.1653
+ [Controller Params] fc.weight = tensor([[-0.9034, -0.7986],
+        [-0.2545,  0.1633]])
+ ✓ Inside Goal passed, min V= 0.9386, min V_outside_lower= 0.8563, min V_lower=0.8690
+Epoch   170 | Total: 40.0198 | Goal: 0.0000 | Unsafe: 3.3544 | Init: 0.0304 | Outside: 0.0000 | Gen: 36.6350
+ [Controller Params] fc.weight = tensor([[-0.9319, -0.7841],
+        [-0.2544,  0.1631]])
+ ✓ Inside Goal passed, min V= 0.9066, min V_outside_lower= 0.8233, min V_lower=0.8342
+Epoch   180 | Total: 38.3880 | Goal: 0.0000 | Unsafe: 1.2646 | Init: 0.0834 | Outside: 0.0000 | Gen: 37.0400
+ [Controller Params] fc.weight = tensor([[-0.9627, -0.7698],
+        [-0.2542,  0.1633]])
+ ✓ Inside Goal passed, min V= 0.9094, min V_outside_lower= 0.8114, min V_lower=0.8250
+Epoch   190 | Total: 37.5106 | Goal: 0.0000 | Unsafe: 2.0664 | Init: 0.0554 | Outside: 0.0000 | Gen: 35.3889
+ [Controller Params] fc.weight = tensor([[-0.9937, -0.7530],
+        [-0.2541,  0.1636]])
+ ✓ Inside Goal passed, min V= 0.8722, min V_outside_lower= 0.7688, min V_lower=0.7859
+Epoch   200 | Total: 36.3455 | Goal: 0.0000 | Unsafe: 1.6200 | Init: 0.0458 | Outside: 0.0000 | Gen: 34.6798
+ [Controller Params] fc.weight = tensor([[-1.0263, -0.7369],
+        [-0.2540,  0.1640]])
+ ✓ Inside Goal passed, min V= 0.8463, min V_outside_lower= 0.7392, min V_lower=0.7580
+Epoch   210 | Total: 39.7735 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0392 | Outside: 0.0000 | Gen: 39.7343
+ [Controller Params] fc.weight = tensor([[-1.0594, -0.7210],
+        [-0.2538,  0.1643]])
+ ✓ Inside Goal passed, min V= 0.8707, min V_outside_lower= 0.7530, min V_lower=0.7678
+Epoch   220 | Total: 36.3569 | Goal: 0.0000 | Unsafe: 7.0525 | Init: 0.0000 | Outside: 0.0000 | Gen: 29.3044
+ [Controller Params] fc.weight = tensor([[-1.0927, -0.7042],
+        [-0.2537,  0.1648]])
+ ✓ Inside Goal passed, min V= 0.7911, min V_outside_lower= 0.6892, min V_lower=0.7078
+Epoch   230 | Total: 33.9569 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0432 | Outside: 0.0000 | Gen: 33.9137
+ [Controller Params] fc.weight = tensor([[-1.1251, -0.6884],
+        [-0.2536,  0.1653]])
+ ✓ Inside Goal passed, min V= 0.8527, min V_outside_lower= 0.7277, min V_lower=0.7452
+Epoch   240 | Total: 33.9279 | Goal: 0.0000 | Unsafe: 4.4693 | Init: 0.0082 | Outside: 0.0000 | Gen: 29.4504
+ [Controller Params] fc.weight = tensor([[-1.1526, -0.6740],
+        [-0.2534,  0.1659]])
+ ✓ Inside Goal passed, min V= 0.7657, min V_outside_lower= 0.6614, min V_lower=0.6847
+Epoch   250 | Total: 32.4254 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0328 | Outside: 0.0000 | Gen: 32.3926
+ [Controller Params] fc.weight = tensor([[-1.1796, -0.6651],
+        [-0.2533,  0.1665]])
+ ✓ Inside Goal passed, min V= 0.7946, min V_outside_lower= 0.6816, min V_lower=0.7046
+Epoch   260 | Total: 36.3240 | Goal: 0.0000 | Unsafe: 12.3665 | Init: 0.0442 | Outside: 0.0000 | Gen: 23.9133
+ [Controller Params] fc.weight = tensor([[-1.2055, -0.6661],
+        [-0.2532,  0.1670]])
+ ✓ Inside Goal passed, min V= 0.7414, min V_outside_lower= 0.6639, min V_lower=0.6799
+Epoch   270 | Total: 35.9375 | Goal: 0.0000 | Unsafe: 12.3357 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.6018
+ [Controller Params] fc.weight = tensor([[-1.2296, -0.6658],
+        [-0.2530,  0.1675]])
+ ✓ Inside Goal passed, min V= 0.7332, min V_outside_lower= 0.6543, min V_lower=0.6715
+Epoch   280 | Total: 34.4475 | Goal: 0.0000 | Unsafe: 9.6195 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.8279
+ [Controller Params] fc.weight = tensor([[-1.2533, -0.6672],
+        [-0.2529,  0.1681]])
+ ✓ Inside Goal passed, min V= 0.7656, min V_outside_lower= 0.6825, min V_lower=0.7006
+Epoch   290 | Total: 30.4944 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 30.4944
+ [Controller Params] fc.weight = tensor([[-1.2771, -0.6656],
+        [-0.2527,  0.1685]])
+ ✓ Inside Goal passed, min V= 0.8135, min V_outside_lower= 0.7094, min V_lower=0.7283
+Epoch   300 | Total: 33.5764 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0752 | Outside: 0.0000 | Gen: 33.5012
+ [Controller Params] fc.weight = tensor([[-1.3015, -0.6668],
+        [-0.2526,  0.1689]])
+ ✓ Inside Goal passed, min V= 0.8325, min V_outside_lower= 0.7165, min V_lower=0.7387
+Epoch   310 | Total: 29.6238 | Goal: 0.0000 | Unsafe: 0.0074 | Init: 0.0000 | Outside: 0.0000 | Gen: 29.6164
+ [Controller Params] fc.weight = tensor([[-1.3265, -0.6668],
+        [-0.2524,  0.1694]])
+ ✓ Inside Goal passed, min V= 0.7461, min V_outside_lower= 0.6438, min V_lower=0.6631
+Epoch   320 | Total: 30.0697 | Goal: 0.0000 | Unsafe: 2.7086 | Init: 0.3245 | Outside: 0.0000 | Gen: 27.0366
+ [Controller Params] fc.weight = tensor([[-1.3520, -0.6666],
+        [-0.2523,  0.1699]])
+ ✓ Inside Goal passed, min V= 0.8217, min V_outside_lower= 0.7299, min V_lower=0.7490
+Epoch   330 | Total: 28.4941 | Goal: 0.0000 | Unsafe: 0.1643 | Init: 0.0000 | Outside: 0.0000 | Gen: 28.3298
+ [Controller Params] fc.weight = tensor([[-1.3782, -0.6666],
+        [-0.2522,  0.1703]])
+ ✓ Inside Goal passed, min V= 0.7288, min V_outside_lower= 0.6296, min V_lower=0.6510
+Epoch   340 | Total: 29.2316 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.1462 | Outside: 0.0000 | Gen: 29.0854
+ [Controller Params] fc.weight = tensor([[-1.4051, -0.6668],
+        [-0.2521,  0.1706]])
+ ✓ Inside Goal passed, min V= 0.7474, min V_outside_lower= 0.6449, min V_lower=0.6664
+Epoch   350 | Total: 33.1179 | Goal: 0.0000 | Unsafe: 11.3222 | Init: 0.0249 | Outside: 0.0000 | Gen: 21.7708
+ [Controller Params] fc.weight = tensor([[-1.4326, -0.6669],
+        [-0.2519,  0.1710]])
+ ✓ Inside Goal passed, min V= 0.6433, min V_outside_lower= 0.5630, min V_lower=0.5837
+Epoch   360 | Total: 27.4140 | Goal: 0.0000 | Unsafe: 0.5574 | Init: 0.0278 | Outside: 0.0000 | Gen: 26.8289
+ [Controller Params] fc.weight = tensor([[-1.4600, -0.6666],
+        [-0.2518,  0.1713]])
+ ✓ Inside Goal passed, min V= 0.7235, min V_outside_lower= 0.6243, min V_lower=0.6452
+Epoch   370 | Total: 27.7645 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 27.7645
+ [Controller Params] fc.weight = tensor([[-1.4866, -0.6669],
+        [-0.2516,  0.1717]])
+ ✓ Inside Goal passed, min V= 0.6749, min V_outside_lower= 0.5723, min V_lower=0.5938
+Epoch   380 | Total: 28.2241 | Goal: 0.0000 | Unsafe: 3.8978 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3263
+ [Controller Params] fc.weight = tensor([[-1.5126, -0.6667],
+        [-0.2515,  0.1720]])
+ ✓ Inside Goal passed, min V= 0.6204, min V_outside_lower= 0.5314, min V_lower=0.5500
+Epoch   390 | Total: 28.9368 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 28.9368
+ [Controller Params] fc.weight = tensor([[-1.5384, -0.6666],
+        [-0.2513,  0.1724]])
+ ✓ Inside Goal passed, min V= 0.7045, min V_outside_lower= 0.5968, min V_lower=0.6205
+Epoch   400 | Total: 26.8332 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.4879 | Outside: 0.0000 | Gen: 26.3453
+ [Controller Params] fc.weight = tensor([[-1.5637, -0.6666],
+        [-0.2511,  0.1728]])
+ ✓ Inside Goal passed, min V= 0.7903, min V_outside_lower= 0.6969, min V_lower=0.7153
+Epoch   410 | Total: 27.0625 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 27.0625
+ [Controller Params] fc.weight = tensor([[-1.5888, -0.6666],
+        [-0.2510,  0.1731]])
+ ✓ Inside Goal passed, min V= 0.5491, min V_outside_lower= 0.4502, min V_lower=0.4718
+Epoch   420 | Total: 28.2190 | Goal: 0.0000 | Unsafe: 6.1114 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.1075
+ [Controller Params] fc.weight = tensor([[-1.6141, -0.6674],
+        [-0.2509,  0.1735]])
+ ✓ Inside Goal passed, min V= 0.5715, min V_outside_lower= 0.4936, min V_lower=0.5095
+Epoch   430 | Total: 28.7899 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0592 | Outside: 0.0000 | Gen: 28.7307
+ [Controller Params] fc.weight = tensor([[-1.6393, -0.6666],
+        [-0.2507,  0.1738]])
+ ✓ Inside Goal passed, min V= 0.7066, min V_outside_lower= 0.6050, min V_lower=0.6261
+Epoch   440 | Total: 24.9526 | Goal: 0.0000 | Unsafe: 0.0299 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.9227
+ [Controller Params] fc.weight = tensor([[-1.6647, -0.6669],
+        [-0.2506,  0.1741]])
+ ✓ Inside Goal passed, min V= 0.4925, min V_outside_lower= 0.4039, min V_lower=0.4227
+Epoch   450 | Total: 27.3269 | Goal: 0.0000 | Unsafe: 6.0737 | Init: 0.0730 | Outside: 0.0000 | Gen: 21.1802
+ [Controller Params] fc.weight = tensor([[-1.6896, -0.6680],
+        [-0.2504,  0.1743]])
+ ✓ Inside Goal passed, min V= 0.6569, min V_outside_lower= 0.5742, min V_lower=0.5983
+Epoch   460 | Total: 24.6721 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.1193 | Outside: 0.0000 | Gen: 24.5528
+ [Controller Params] fc.weight = tensor([[-1.7142, -0.6665],
+        [-0.2503,  0.1747]])
+ ✓ Inside Goal passed, min V= 0.7014, min V_outside_lower= 0.6144, min V_lower=0.6340
+Epoch   470 | Total: 29.3897 | Goal: 0.0000 | Unsafe: 9.9663 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.4234
+ [Controller Params] fc.weight = tensor([[-1.7386, -0.6667],
+        [-0.2502,  0.1751]])
+ ✓ Inside Goal passed, min V= 0.5170, min V_outside_lower= 0.4368, min V_lower=0.4596
+Epoch   480 | Total: 23.7076 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0385 | Outside: 0.0000 | Gen: 23.6691
+ [Controller Params] fc.weight = tensor([[-1.7637, -0.6672],
+        [-0.2500,  0.1755]])
+ ✓ Inside Goal passed, min V= 0.6744, min V_outside_lower= 0.5906, min V_lower=0.6093
+Epoch   490 | Total: 26.2474 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.3866 | Outside: 0.0000 | Gen: 25.8608
+ [Controller Params] fc.weight = tensor([[-1.7884, -0.6668],
+        [-0.2499,  0.1760]])
+ ✓ Inside Goal passed, min V= 0.7516, min V_outside_lower= 0.6590, min V_lower=0.6804
 [Refine-Generator] Epoch 500: 16 failing → refined 16 cells → 96 total
   Rebuilding CROWN caches with new generator cells...
     Rebuilding V cache with 262 cells...
@@ -293,14 +293,14 @@ Epoch   490 | Total: 25.3805 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Ou
 [SymbolicCROWNCache_Phi] Creating BoundedModule for 96 cells...
 [SymbolicCROWNCache_Phi] Initialized for 96 cells!
   Caches rebuilt successfully!
-Epoch   500 | Total: 10.7246 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0460 | Outside: 0.0000 | Gen: 10.6786
- [Controller Params] fc.weight = tensor([[-1.7496, -0.6676],
-        [-0.2418,  0.2332]])
- ✓ Inside Goal passed, min V= 0.6744, min V_outside_lower= 0.5854, min V_lower=0.6041
-Epoch   510 | Total: 10.7463 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 10.7463
- [Controller Params] fc.weight = tensor([[-1.7708, -0.6913],
-        [-0.2411,  0.2326]])
- ✓ Inside Goal passed, min V= 0.5136, min V_outside_lower= 0.4043, min V_lower=0.4372
+Epoch   500 | Total: 9.4760 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0008 | Outside: 0.0000 | Gen: 9.4752
+ [Controller Params] fc.weight = tensor([[-1.8134, -0.6669],
+        [-0.2497,  0.1763]])
+ ✓ Inside Goal passed, min V= 0.6151, min V_outside_lower= 0.5271, min V_lower=0.5507
+Epoch   510 | Total: 8.0657 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 8.0657
+ [Controller Params] fc.weight = tensor([[-1.8334, -0.6906],
+        [-0.2494,  0.1763]])
+ ✓ Inside Goal passed, min V= 0.2649, min V_outside_lower= 0.1707, min V_lower=0.1972
 [Merge-Outside] Epoch 512: merged 168 pairs → 32 total
 [Merge-Generator] Epoch 512: merged 3 pairs → 93 total
   Rebuilding CROWN caches with new generator cells...
@@ -311,396 +311,392 @@ Epoch   510 | Total: 10.7463 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Ou
 [SymbolicCROWNCache_Phi] Creating BoundedModule for 93 cells...
 [SymbolicCROWNCache_Phi] Initialized for 93 cells!
   Caches rebuilt successfully!
-Epoch   520 | Total: 11.3517 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0306 | Outside: 0.0000 | Gen: 11.3212
- [Controller Params] fc.weight = tensor([[-1.7892, -0.7272],
-        [-0.2404,  0.2311]])
- ✓ Inside Goal passed, min V= 0.5989, min V_outside_lower= 0.2381, min V_lower=0.5241
-Epoch   530 | Total: 10.2101 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.6261 | Outside: 0.0000 | Gen: 9.5840
- [Controller Params] fc.weight = tensor([[-1.8083, -0.7527],
-        [-0.2399,  0.2299]])
- ✓ Inside Goal passed, min V= 0.7136, min V_outside_lower= 0.3559, min V_lower=0.6382
-Epoch   540 | Total: 9.5259 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0360 | Outside: 0.0000 | Gen: 9.4900
- [Controller Params] fc.weight = tensor([[-1.8250, -0.7620],
-        [-0.2395,  0.2292]])
- ✓ Inside Goal passed, min V= 0.6168, min V_outside_lower= 0.3045, min V_lower=0.5518
-Epoch   550 | Total: 8.8625 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0894 | Outside: 0.0000 | Gen: 8.7731
- [Controller Params] fc.weight = tensor([[-1.8405, -0.7639],
-        [-0.2393,  0.2287]])
- ✓ Inside Goal passed, min V= 0.5957, min V_outside_lower= 0.2685, min V_lower=0.5268
-Epoch   560 | Total: 9.4556 | Goal: 0.0000 | Unsafe: 2.6636 | Init: 0.0000 | Outside: 0.1215 | Gen: 6.6705
- [Controller Params] fc.weight = tensor([[-1.8558, -0.7639],
-        [-0.2390,  0.2282]])
- ✓ Inside Goal passed, min V= 0.3579, min V_outside_lower= 0.0672, min V_lower=0.2954
-Epoch   570 | Total: 7.5896 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.2754 | Outside: 0.0000 | Gen: 7.3141
- [Controller Params] fc.weight = tensor([[-1.8704, -0.7618],
-        [-0.2388,  0.2278]])
- ✓ Inside Goal passed, min V= 0.6212, min V_outside_lower= 0.2890, min V_lower=0.5509
-Epoch   580 | Total: 8.3176 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0298 | Outside: 0.0000 | Gen: 8.2878
- [Controller Params] fc.weight = tensor([[-1.8845, -0.7573],
-        [-0.2386,  0.2275]])
- ✓ Inside Goal passed, min V= 0.5617, min V_outside_lower= 0.2231, min V_lower=0.4908
-Epoch   590 | Total: 8.6195 | Goal: 0.0000 | Unsafe: 1.9526 | Init: 0.0000 | Outside: 0.0837 | Gen: 6.5833
- [Controller Params] fc.weight = tensor([[-1.8989, -0.7530],
-        [-0.2384,  0.2273]])
- ✓ Inside Goal passed, min V= 0.3719, min V_outside_lower= 0.0766, min V_lower=0.3093
-Epoch   600 | Total: 7.1730 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.1730
- [Controller Params] fc.weight = tensor([[-1.9107, -0.7556],
-        [-0.2382,  0.2271]])
- ✓ Inside Goal passed, min V= 0.4640, min V_outside_lower= 0.1491, min V_lower=0.3977
-Epoch   610 | Total: 7.9310 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.6266 | Outside: 0.0000 | Gen: 7.3044
- [Controller Params] fc.weight = tensor([[-1.9228, -0.7560],
-        [-0.2380,  0.2264]])
- ✓ Inside Goal passed, min V= 0.6918, min V_outside_lower= 0.3392, min V_lower=0.6176
-Epoch   620 | Total: 7.3093 | Goal: 0.0000 | Unsafe: 0.8059 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.5034
- [Controller Params] fc.weight = tensor([[-1.9355, -0.7541],
-        [-0.2377,  0.2257]])
- ✓ Inside Goal passed, min V= 0.4508, min V_outside_lower= 0.1388, min V_lower=0.3844
-Epoch   630 | Total: 7.4659 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.3334 | Outside: 0.0000 | Gen: 7.1325
- [Controller Params] fc.weight = tensor([[-1.9493, -0.7507],
-        [-0.2375,  0.2251]])
- ✓ Inside Goal passed, min V= 0.6200, min V_outside_lower= 0.2693, min V_lower=0.5459
-Epoch   640 | Total: 8.8962 | Goal: 0.0000 | Unsafe: 2.7534 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.1428
- [Controller Params] fc.weight = tensor([[-1.9611, -0.7533],
-        [-0.2373,  0.2246]])
- ✓ Inside Goal passed, min V= 0.4279, min V_outside_lower= 0.1273, min V_lower=0.3642
-Epoch   650 | Total: 7.0878 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.0878
- [Controller Params] fc.weight = tensor([[-1.9737, -0.7534],
-        [-0.2371,  0.2240]])
- ✓ Inside Goal passed, min V= 0.5552, min V_outside_lower= 0.2350, min V_lower=0.4882
-Epoch   660 | Total: 6.6632 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.6632
- [Controller Params] fc.weight = tensor([[-1.9864, -0.7535],
-        [-0.2369,  0.2234]])
- ✓ Inside Goal passed, min V= 0.4911, min V_outside_lower= 0.1604, min V_lower=0.4208
-Epoch   670 | Total: 6.6461 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.6461
- [Controller Params] fc.weight = tensor([[-1.9986, -0.7562],
-        [-0.2367,  0.2228]])
- ✓ Inside Goal passed, min V= 0.5261, min V_outside_lower= 0.2025, min V_lower=0.4579
-Epoch   680 | Total: 6.4237 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.4237
- [Controller Params] fc.weight = tensor([[-2.0107, -0.7581],
-        [-0.2364,  0.2218]])
- ✓ Inside Goal passed, min V= 0.4598, min V_outside_lower= 0.1413, min V_lower=0.3923
-Epoch   690 | Total: 7.0442 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.3337 | Outside: 0.0000 | Gen: 6.7105
- [Controller Params] fc.weight = tensor([[-2.0237, -0.7589],
-        [-0.2361,  0.2209]])
- ✓ Inside Goal passed, min V= 0.6390, min V_outside_lower= 0.3014, min V_lower=0.5678
-Epoch   700 | Total: 6.4315 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.4315
- [Controller Params] fc.weight = tensor([[-2.0357, -0.7617],
-        [-0.2358,  0.2199]])
- ✓ Inside Goal passed, min V= 0.4678, min V_outside_lower= 0.1425, min V_lower=0.3987
-Epoch   710 | Total: 6.7009 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0885 | Outside: 0.0000 | Gen: 6.6124
- [Controller Params] fc.weight = tensor([[-2.0489, -0.7617],
-        [-0.2355,  0.2193]])
- ✓ Inside Goal passed, min V= 0.5728, min V_outside_lower= 0.2410, min V_lower=0.5029
-Epoch   720 | Total: 6.5703 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.5703
- [Controller Params] fc.weight = tensor([[-2.0610, -0.7648],
-        [-0.2353,  0.2187]])
- ✓ Inside Goal passed, min V= 0.4982, min V_outside_lower= 0.1669, min V_lower=0.4280
-Epoch   730 | Total: 6.6871 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.6871
- [Controller Params] fc.weight = tensor([[-2.0744, -0.7657],
-        [-0.2350,  0.2178]])
- ✓ Inside Goal passed, min V= 0.5245, min V_outside_lower= 0.1984, min V_lower=0.4560
-Epoch   740 | Total: 8.2742 | Goal: 0.0000 | Unsafe: 2.5821 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.6921
- [Controller Params] fc.weight = tensor([[-2.0875, -0.7675],
-        [-0.2346,  0.2164]])
- ✓ Inside Goal passed, min V= 0.4622, min V_outside_lower= 0.1593, min V_lower=0.3981
-Epoch   750 | Total: 6.7000 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0615 | Outside: 0.0000 | Gen: 6.6385
- [Controller Params] fc.weight = tensor([[-2.0992, -0.7692],
-        [-0.2341,  0.2146]])
- ✓ Inside Goal passed, min V= 0.5828, min V_outside_lower= 0.2576, min V_lower=0.5147
-Epoch   760 | Total: 6.0702 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0381 | Gen: 6.0320
- [Controller Params] fc.weight = tensor([[-2.1103, -0.7683],
-        [-0.2338,  0.2132]])
- ✓ Inside Goal passed, min V= 0.3841, min V_outside_lower= 0.0889, min V_lower=0.3220
-Epoch   770 | Total: 6.6471 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.6471
- [Controller Params] fc.weight = tensor([[-2.1214, -0.7666],
-        [-0.2334,  0.2121]])
- ✓ Inside Goal passed, min V= 0.5251, min V_outside_lower= 0.2079, min V_lower=0.4588
-Epoch   780 | Total: 6.4843 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.4843
- [Controller Params] fc.weight = tensor([[-2.1327, -0.7647],
-        [-0.2331,  0.2110]])
- ✓ Inside Goal passed, min V= 0.5278, min V_outside_lower= 0.2030, min V_lower=0.4595
-Epoch   790 | Total: 6.5349 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.1676 | Gen: 6.3673
- [Controller Params] fc.weight = tensor([[-2.1443, -0.7625],
-        [-0.2326,  0.2095]])
- ✓ Inside Goal passed, min V= 0.3817, min V_outside_lower= 0.0568, min V_lower=0.3132
-Epoch   800 | Total: 7.0112 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.0112
- [Controller Params] fc.weight = tensor([[-2.1556, -0.7630],
-        [-0.2320,  0.2072]])
- ✓ Inside Goal passed, min V= 0.4435, min V_outside_lower= 0.1463, min V_lower=0.3817
-Epoch   810 | Total: 10.1420 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.4335 | Outside: 0.0000 | Gen: 9.7085
- [Controller Params] fc.weight = tensor([[-2.1667, -0.7624],
-        [-0.2312,  0.2042]])
- ✓ Inside Goal passed, min V= 0.7243, min V_outside_lower= 0.3734, min V_lower=0.6527
-Epoch   820 | Total: 8.5803 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 8.5803
- [Controller Params] fc.weight = tensor([[-2.1783, -0.7593],
-        [-0.2306,  0.2021]])
- ✓ Inside Goal passed, min V= 0.5621, min V_outside_lower= 0.2332, min V_lower=0.4936
-Epoch   830 | Total: 6.5549 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.5549
- [Controller Params] fc.weight = tensor([[-2.1917, -0.7518],
-        [-0.2301,  0.2009]])
- ✓ Inside Goal passed, min V= 0.4286, min V_outside_lower= 0.1343, min V_lower=0.3658
-Epoch   840 | Total: 6.6703 | Goal: 0.0000 | Unsafe: 0.7138 | Init: 0.0000 | Outside: 0.2581 | Gen: 5.6984
- [Controller Params] fc.weight = tensor([[-2.2063, -0.7443],
-        [-0.2295,  0.2001]])
- ✓ Inside Goal passed, min V= 0.3140, min V_outside_lower= 0.0325, min V_lower=0.2538
-Epoch   850 | Total: 6.2259 | Goal: 0.0000 | Unsafe: 0.2921 | Init: 0.0000 | Outside: 0.0368 | Gen: 5.8969
- [Controller Params] fc.weight = tensor([[-2.2204, -0.7432],
-        [-0.2289,  0.1988]])
- ✓ Inside Goal passed, min V= 0.3773, min V_outside_lower= 0.0894, min V_lower=0.3167
-Epoch   860 | Total: 6.6390 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.6390
- [Controller Params] fc.weight = tensor([[-2.2343, -0.7450],
-        [-0.2284,  0.1975]])
- ✓ Inside Goal passed, min V= 0.5844, min V_outside_lower= 0.3066, min V_lower=0.5258
-Epoch   870 | Total: 6.7523 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.7523
- [Controller Params] fc.weight = tensor([[-2.2461, -0.7484],
-        [-0.2277,  0.1961]])
- ✓ Inside Goal passed, min V= 0.5145, min V_outside_lower= 0.2109, min V_lower=0.4504
-Epoch   880 | Total: 5.4052 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.4052
- [Controller Params] fc.weight = tensor([[-2.2585, -0.7500],
-        [-0.2272,  0.1952]])
- ✓ Inside Goal passed, min V= 0.4731, min V_outside_lower= 0.2048, min V_lower=0.4157
-Epoch   890 | Total: 6.0979 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.0979
- [Controller Params] fc.weight = tensor([[-2.2690, -0.7540],
-        [-0.2266,  0.1939]])
- ✓ Inside Goal passed, min V= 0.5544, min V_outside_lower= 0.2732, min V_lower=0.4951
-Epoch   900 | Total: 6.0603 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.0603
- [Controller Params] fc.weight = tensor([[-2.2795, -0.7562],
-        [-0.2262,  0.1929]])
- ✓ Inside Goal passed, min V= 0.4545, min V_outside_lower= 0.1673, min V_lower=0.3935
-Epoch   910 | Total: 5.8769 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.8769
- [Controller Params] fc.weight = tensor([[-2.2911, -0.7559],
-        [-0.2257,  0.1921]])
- ✓ Inside Goal passed, min V= 0.4857, min V_outside_lower= 0.1965, min V_lower=0.4242
-Epoch   920 | Total: 5.9513 | Goal: 0.0000 | Unsafe: 0.8399 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.1113
- [Controller Params] fc.weight = tensor([[-2.3011, -0.7598],
-        [-0.2252,  0.1909]])
- ✓ Inside Goal passed, min V= 0.4863, min V_outside_lower= 0.2166, min V_lower=0.4288
-Epoch   930 | Total: 5.8040 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.8040
- [Controller Params] fc.weight = tensor([[-2.3112, -0.7633],
-        [-0.2246,  0.1890]])
- ✓ Inside Goal passed, min V= 0.3866, min V_outside_lower= 0.1186, min V_lower=0.3299
-Epoch   940 | Total: 6.6774 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.5917 | Outside: 0.0000 | Gen: 6.0858
- [Controller Params] fc.weight = tensor([[-2.3225, -0.7634],
-        [-0.2239,  0.1868]])
- ✓ Inside Goal passed, min V= 0.6993, min V_outside_lower= 0.3760, min V_lower=0.6305
-Epoch   950 | Total: 5.5875 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.5875
- [Controller Params] fc.weight = tensor([[-2.3336, -0.7640],
-        [-0.2231,  0.1836]])
- ✓ Inside Goal passed, min V= 0.3762, min V_outside_lower= 0.1214, min V_lower=0.3226
-Epoch   960 | Total: 5.6483 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.6483
- [Controller Params] fc.weight = tensor([[-2.3437, -0.7668],
-        [-0.2224,  0.1810]])
- ✓ Inside Goal passed, min V= 0.3787, min V_outside_lower= 0.1126, min V_lower=0.3223
-Epoch   970 | Total: 6.1428 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.1428
- [Controller Params] fc.weight = tensor([[-2.3556, -0.7657],
-        [-0.2218,  0.1792]])
- ✓ Inside Goal passed, min V= 0.5074, min V_outside_lower= 0.2089, min V_lower=0.4442
-Epoch   980 | Total: 6.2105 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.2105
- [Controller Params] fc.weight = tensor([[-2.3671, -0.7660],
-        [-0.2210,  0.1760]])
- ✓ Inside Goal passed, min V= 0.5028, min V_outside_lower= 0.2222, min V_lower=0.4442
-Epoch   990 | Total: 5.2434 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.2434
- [Controller Params] fc.weight = tensor([[-2.3779, -0.7681],
-        [-0.2200,  0.1717]])
- ✓ Inside Goal passed, min V= 0.4269, min V_outside_lower= 0.1567, min V_lower=0.3695
-[Refine-Generator] Epoch 1000: 26 failing → refined 26 cells → 171 total
+Epoch   520 | Total: 7.8772 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.8772
+ [Controller Params] fc.weight = tensor([[-1.8507, -0.7261],
+        [-0.2488,  0.1754]])
+ ✓ Inside Goal passed, min V= 0.4613, min V_outside_lower= 0.1152, min V_lower=0.3880
+Epoch   530 | Total: 7.9012 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.9012
+ [Controller Params] fc.weight = tensor([[-1.8688, -0.7492],
+        [-0.2484,  0.1748]])
+ ✓ Inside Goal passed, min V= 0.3709, min V_outside_lower= 0.0680, min V_lower=0.3068
+Epoch   540 | Total: 7.8717 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.8717
+ [Controller Params] fc.weight = tensor([[-1.8863, -0.7576],
+        [-0.2481,  0.1742]])
+ ✓ Inside Goal passed, min V= 0.3822, min V_outside_lower= 0.0485, min V_lower=0.3100
+Epoch   550 | Total: 8.3784 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 8.3784
+ [Controller Params] fc.weight = tensor([[-1.9029, -0.7599],
+        [-0.2478,  0.1739]])
+ ✓ Inside Goal passed, min V= 0.5671, min V_outside_lower= 0.2513, min V_lower=0.5007
+Epoch   560 | Total: 7.8564 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.8564
+ [Controller Params] fc.weight = tensor([[-1.9183, -0.7571],
+        [-0.2476,  0.1736]])
+ ✓ Inside Goal passed, min V= 0.4387, min V_outside_lower= 0.1311, min V_lower=0.3738
+Epoch   570 | Total: 6.6857 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.6857
+ [Controller Params] fc.weight = tensor([[-1.9331, -0.7533],
+        [-0.2473,  0.1734]])
+ ✓ Inside Goal passed, min V= 0.4104, min V_outside_lower= 0.0869, min V_lower=0.3408
+Epoch   580 | Total: 7.0940 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.0940
+ [Controller Params] fc.weight = tensor([[-1.9457, -0.7551],
+        [-0.2471,  0.1732]])
+ ✓ Inside Goal passed, min V= 0.3997, min V_outside_lower= 0.0884, min V_lower=0.3341
+Epoch   590 | Total: 6.5613 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.5613
+ [Controller Params] fc.weight = tensor([[-1.9570, -0.7591],
+        [-0.2468,  0.1726]])
+ ✓ Inside Goal passed, min V= 0.3662, min V_outside_lower= 0.0657, min V_lower=0.3022
+Epoch   600 | Total: 7.4633 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.4633
+ [Controller Params] fc.weight = tensor([[-1.9697, -0.7588],
+        [-0.2466,  0.1720]])
+ ✓ Inside Goal passed, min V= 0.4843, min V_outside_lower= 0.1565, min V_lower=0.4154
+Epoch   610 | Total: 8.0334 | Goal: 0.0000 | Unsafe: 1.7803 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.2531
+ [Controller Params] fc.weight = tensor([[-1.9818, -0.7598],
+        [-0.2463,  0.1713]])
+ ✓ Inside Goal passed, min V= 0.3675, min V_outside_lower= 0.0851, min V_lower=0.3077
+Epoch   620 | Total: 7.0345 | Goal: 0.0000 | Unsafe: 0.7101 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.3244
+ [Controller Params] fc.weight = tensor([[-1.9936, -0.7610],
+        [-0.2460,  0.1706]])
+ ✓ Inside Goal passed, min V= 0.3179, min V_outside_lower= 0.0288, min V_lower=0.2565
+Epoch   630 | Total: 7.1409 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.1409
+ [Controller Params] fc.weight = tensor([[-2.0073, -0.7590],
+        [-0.2457,  0.1700]])
+ ✓ Inside Goal passed, min V= 0.3262, min V_outside_lower= 0.0224, min V_lower=0.2621
+Epoch   640 | Total: 6.6407 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.1437 | Outside: 0.0000 | Gen: 6.4970
+ [Controller Params] fc.weight = tensor([[-2.0198, -0.7608],
+        [-0.2455,  0.1694]])
+ ✓ Inside Goal passed, min V= 0.5701, min V_outside_lower= 0.2341, min V_lower=0.4988
+Epoch   650 | Total: 7.4918 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.2903 | Gen: 7.2014
+ [Controller Params] fc.weight = tensor([[-2.0314, -0.7641],
+        [-0.2452,  0.1689]])
+ ✓ Inside Goal passed, min V= 0.1915, min V_outside_lower= -0.0821, min V_lower=0.1345
+Epoch   660 | Total: 7.4513 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.6141 | Outside: 0.0000 | Gen: 6.8373
+ [Controller Params] fc.weight = tensor([[-2.0429, -0.7666],
+        [-0.2450,  0.1684]])
+ ✓ Inside Goal passed, min V= 0.6438, min V_outside_lower= 0.2909, min V_lower=0.5703
+Epoch   670 | Total: 7.7822 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.7822
+ [Controller Params] fc.weight = tensor([[-2.0555, -0.7667],
+        [-0.2447,  0.1677]])
+ ✓ Inside Goal passed, min V= 0.4127, min V_outside_lower= 0.1274, min V_lower=0.3539
+Epoch   680 | Total: 7.2315 | Goal: 0.0000 | Unsafe: 1.2091 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.0224
+ [Controller Params] fc.weight = tensor([[-2.0685, -0.7656],
+        [-0.2444,  0.1668]])
+ ✓ Inside Goal passed, min V= 0.3815, min V_outside_lower= 0.0846, min V_lower=0.3184
+Epoch   690 | Total: 6.8318 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.8318
+ [Controller Params] fc.weight = tensor([[-2.0828, -0.7629],
+        [-0.2440,  0.1658]])
+ ✓ Inside Goal passed, min V= 0.4221, min V_outside_lower= 0.1195, min V_lower=0.3584
+Epoch   700 | Total: 6.6047 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.2106 | Outside: 0.0000 | Gen: 6.3941
+ [Controller Params] fc.weight = tensor([[-2.0950, -0.7653],
+        [-0.2436,  0.1647]])
+ ✓ Inside Goal passed, min V= 0.5519, min V_outside_lower= 0.2066, min V_lower=0.4798
+Epoch   710 | Total: 6.4564 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.2279 | Gen: 6.2285
+ [Controller Params] fc.weight = tensor([[-2.1063, -0.7681],
+        [-0.2433,  0.1639]])
+ ✓ Inside Goal passed, min V= 0.2158, min V_outside_lower= -0.0691, min V_lower=0.1556
+Epoch   720 | Total: 6.9129 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.4372 | Outside: 0.0000 | Gen: 6.4757
+ [Controller Params] fc.weight = tensor([[-2.1180, -0.7683],
+        [-0.2430,  0.1631]])
+ ✓ Inside Goal passed, min V= 0.6632, min V_outside_lower= 0.3285, min V_lower=0.5929
+Epoch   730 | Total: 6.4468 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.4468
+ [Controller Params] fc.weight = tensor([[-2.1287, -0.7687],
+        [-0.2427,  0.1623]])
+ ✓ Inside Goal passed, min V= 0.3759, min V_outside_lower= 0.0658, min V_lower=0.3098
+Epoch   740 | Total: 6.5426 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.5426
+ [Controller Params] fc.weight = tensor([[-2.1405, -0.7671],
+        [-0.2423,  0.1616]])
+ ✓ Inside Goal passed, min V= 0.4785, min V_outside_lower= 0.1553, min V_lower=0.4101
+Epoch   750 | Total: 5.9258 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.9258
+ [Controller Params] fc.weight = tensor([[-2.1520, -0.7655],
+        [-0.2420,  0.1609]])
+ ✓ Inside Goal passed, min V= 0.3961, min V_outside_lower= 0.1047, min V_lower=0.3346
+Epoch   760 | Total: 7.0141 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.0141
+ [Controller Params] fc.weight = tensor([[-2.1630, -0.7646],
+        [-0.2417,  0.1602]])
+ ✓ Inside Goal passed, min V= 0.3540, min V_outside_lower= 0.0646, min V_lower=0.2935
+Epoch   770 | Total: 6.3150 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.3150
+ [Controller Params] fc.weight = tensor([[-2.1749, -0.7618],
+        [-0.2413,  0.1589]])
+ ✓ Inside Goal passed, min V= 0.4435, min V_outside_lower= 0.1434, min V_lower=0.3805
+Epoch   780 | Total: 8.0532 | Goal: 0.0000 | Unsafe: 2.2807 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.7726
+ [Controller Params] fc.weight = tensor([[-2.1858, -0.7605],
+        [-0.2407,  0.1573]])
+ ✓ Inside Goal passed, min V= 0.4545, min V_outside_lower= 0.1406, min V_lower=0.3893
+Epoch   790 | Total: 6.8613 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0863 | Gen: 6.7750
+ [Controller Params] fc.weight = tensor([[-2.1967, -0.7614],
+        [-0.2402,  0.1559]])
+ ✓ Inside Goal passed, min V= 0.2321, min V_outside_lower= -0.0312, min V_lower=0.1778
+Epoch   800 | Total: 6.2341 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.2341
+ [Controller Params] fc.weight = tensor([[-2.2073, -0.7619],
+        [-0.2398,  0.1548]])
+ ✓ Inside Goal passed, min V= 0.5141, min V_outside_lower= 0.2067, min V_lower=0.4491
+Epoch   810 | Total: 6.2284 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.2284
+ [Controller Params] fc.weight = tensor([[-2.2176, -0.7627],
+        [-0.2395,  0.1540]])
+ ✓ Inside Goal passed, min V= 0.4987, min V_outside_lower= 0.1768, min V_lower=0.4309
+Epoch   820 | Total: 5.8977 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.8977
+ [Controller Params] fc.weight = tensor([[-2.2302, -0.7597],
+        [-0.2390,  0.1529]])
+ ✓ Inside Goal passed, min V= 0.3182, min V_outside_lower= 0.0406, min V_lower=0.2599
+Epoch   830 | Total: 6.6457 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0547 | Outside: 0.0000 | Gen: 6.5910
+ [Controller Params] fc.weight = tensor([[-2.2415, -0.7601],
+        [-0.2386,  0.1517]])
+ ✓ Inside Goal passed, min V= 0.5747, min V_outside_lower= 0.2487, min V_lower=0.5063
+Epoch   840 | Total: 9.9349 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 1.2842 | Outside: 0.0000 | Gen: 8.6508
+ [Controller Params] fc.weight = tensor([[-2.2525, -0.7608],
+        [-0.2380,  0.1502]])
+ ✓ Inside Goal passed, min V= 0.7768, min V_outside_lower= 0.3562, min V_lower=0.6886
+Epoch   850 | Total: 8.4721 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 8.4721
+ [Controller Params] fc.weight = tensor([[-2.2654, -0.7589],
+        [-0.2374,  0.1486]])
+ ✓ Inside Goal passed, min V= 0.4312, min V_outside_lower= 0.2296, min V_lower=0.3763
+Epoch   860 | Total: 7.7657 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 1.1220 | Outside: 0.0000 | Gen: 6.6437
+ [Controller Params] fc.weight = tensor([[-2.2751, -0.7557],
+        [-0.2370,  0.1471]])
+ ✓ Inside Goal passed, min V= 0.8649, min V_outside_lower= 0.5639, min V_lower=0.8012
+Epoch   870 | Total: 8.8063 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.7014 | Outside: 0.0000 | Gen: 8.1049
+ [Controller Params] fc.weight = tensor([[-2.2866, -0.7488],
+        [-0.2366,  0.1460]])
+ ✓ Inside Goal passed, min V= 0.6184, min V_outside_lower= 0.2602, min V_lower=0.5410
+Epoch   880 | Total: 5.6256 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0378 | Outside: 0.0000 | Gen: 5.5878
+ [Controller Params] fc.weight = tensor([[-2.3015, -0.7402],
+        [-0.2361,  0.1456]])
+ ✓ Inside Goal passed, min V= 0.5676, min V_outside_lower= 0.3012, min V_lower=0.5091
+Epoch   890 | Total: 6.3876 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.3876
+ [Controller Params] fc.weight = tensor([[-2.3129, -0.7418],
+        [-0.2355,  0.1456]])
+ ✓ Inside Goal passed, min V= 0.5643, min V_outside_lower= 0.3215, min V_lower=0.5124
+Epoch   900 | Total: 5.8311 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.8311
+ [Controller Params] fc.weight = tensor([[-2.3233, -0.7451],
+        [-0.2349,  0.1451]])
+ ✓ Inside Goal passed, min V= 0.4489, min V_outside_lower= 0.1699, min V_lower=0.3885
+Epoch   910 | Total: 7.7999 | Goal: 0.0000 | Unsafe: 2.2164 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.5835
+ [Controller Params] fc.weight = tensor([[-2.3356, -0.7451],
+        [-0.2342,  0.1439]])
+ ✓ Inside Goal passed, min V= 0.4552, min V_outside_lower= 0.1672, min V_lower=0.3928
+Epoch   920 | Total: 6.2984 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.2984
+ [Controller Params] fc.weight = tensor([[-2.3482, -0.7464],
+        [-0.2332,  0.1419]])
+ ✓ Inside Goal passed, min V= 0.4227, min V_outside_lower= 0.1667, min V_lower=0.3682
+Epoch   930 | Total: 6.1202 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.1202
+ [Controller Params] fc.weight = tensor([[-2.3592, -0.7510],
+        [-0.2324,  0.1402]])
+ ✓ Inside Goal passed, min V= 0.3068, min V_outside_lower= 0.0599, min V_lower=0.2544
+Epoch   940 | Total: 5.7220 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0010 | Outside: 0.0000 | Gen: 5.7210
+ [Controller Params] fc.weight = tensor([[-2.3695, -0.7557],
+        [-0.2317,  0.1390]])
+ ✓ Inside Goal passed, min V= 0.5165, min V_outside_lower= 0.2120, min V_lower=0.4513
+Epoch   950 | Total: 5.6862 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0277 | Outside: 0.0000 | Gen: 5.6585
+ [Controller Params] fc.weight = tensor([[-2.3805, -0.7578],
+        [-0.2309,  0.1371]])
+ ✓ Inside Goal passed, min V= 0.5373, min V_outside_lower= 0.2325, min V_lower=0.4720
+Epoch   960 | Total: 6.0267 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.0267
+ [Controller Params] fc.weight = tensor([[-2.3923, -0.7588],
+        [-0.2301,  0.1355]])
+ ✓ Inside Goal passed, min V= 0.2579, min V_outside_lower= 0.0059, min V_lower=0.2043
+Epoch   970 | Total: 6.6622 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.2154 | Outside: 0.0000 | Gen: 6.4468
+ [Controller Params] fc.weight = tensor([[-2.4036, -0.7600],
+        [-0.2292,  0.1335]])
+ ✓ Inside Goal passed, min V= 0.6168, min V_outside_lower= 0.2897, min V_lower=0.5464
+Epoch   980 | Total: 5.6892 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0008 | Outside: 0.0000 | Gen: 5.6884
+ [Controller Params] fc.weight = tensor([[-2.4140, -0.7653],
+        [-0.2283,  0.1316]])
+ ✓ Inside Goal passed, min V= 0.4946, min V_outside_lower= 0.1843, min V_lower=0.4292
+Epoch   990 | Total: 5.1127 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.1127
+ [Controller Params] fc.weight = tensor([[-2.4257, -0.7677],
+        [-0.2276,  0.1303]])
+ ✓ Inside Goal passed, min V= 0.3884, min V_outside_lower= 0.1066, min V_lower=0.3276
+[Refine-Generator] Epoch 1000: 23 failing → refined 23 cells → 162 total
   Rebuilding CROWN caches with new generator cells...
     Rebuilding V cache with 94 cells...
 [SymbolicCROWNCache] Creating BoundedModule for 94 cells...
 [SymbolicCROWNCache] Initialized for 94 cells - symbolic structure cached!
-    Rebuilding Phi cache with 171 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 171 cells...
-[SymbolicCROWNCache_Phi] Initialized for 171 cells!
+    Rebuilding Phi cache with 162 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 162 cells...
+[SymbolicCROWNCache_Phi] Initialized for 162 cells!
   Caches rebuilt successfully!
-Epoch  1000 | Total: 3.3551 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 3.3551
- [Controller Params] fc.weight = tensor([[-2.3889, -0.7698],
-        [-0.2192,  0.1684]])
- ✓ Inside Goal passed, min V= 0.4595, min V_outside_lower= 0.1823, min V_lower=0.4013
+Epoch  1000 | Total: 5.2752 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 5.2752
+ [Controller Params] fc.weight = tensor([[-2.4375, -0.7682],
+        [-0.2268,  0.1288]])
+ ✓ Inside Goal passed, min V= 0.3588, min V_outside_lower= 0.1050, min V_lower=0.3056
 
 Epoch 1000 - Detailed Evaluation:
   Constraint Satisfaction:
-    Goal:      ✗ (V_min=0.459, V_mean=0.537, V_max=0.823)
-    Unsafe:    ✓ (V_min=20.739, V_max=54.697)
-    Init:      ✓ (V_min=0.771, V_max=0.888)
-    Outside:   ✓ (V_min=0.182, V_max=54.925)
-    Generator: ✗ (Phi_upper_min=-81.091, Phi_upper_max=0.241, failing=52)
-  Goal bounds: V ∈ [0.401, 0.875]
-  Unsafe bounds: V ∈ [20.739, 54.697]
-  Generator bounds: Φ ∈ [-465.791, 0.241]
-  Generator failing cells: 52/171 (30.4%)
+    Goal:      ✗ (V_min=0.355, V_mean=0.453, V_max=0.838)
+    Unsafe:    ✓ (V_min=23.182, V_max=60.458)
+    Init:      ✓ (V_min=0.590, V_max=0.692)
+    Outside:   ✓ (V_min=0.105, V_max=60.684)
+    Generator: ✗ (Phi_upper_min=-92.423, Phi_upper_max=0.342, failing=56)
+  Goal bounds: V ∈ [0.306, 0.882]
+  Unsafe bounds: V ∈ [23.182, 60.458]
+  Generator bounds: Φ ∈ [-526.351, 0.342]
+  Generator failing cells: 56/162 (34.6%)
 
   Creating visualization for epoch 1000...
   → Saved to 'training_progress/value_function_epoch_1000.png'
   → Saved to 'training_progress/generator_epoch_1000.png'
-Epoch  1010 | Total: 2.6401 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 2.6401
- [Controller Params] fc.weight = tensor([[-2.3966, -0.7969],
-        [-0.2187,  0.1667]])
- ✓ Inside Goal passed, min V= 0.4572, min V_outside_lower= 0.1643, min V_lower=0.3957
-Epoch  1020 | Total: 1.9183 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.9183
- [Controller Params] fc.weight = tensor([[-2.4008, -0.8385],
-        [-0.2181,  0.1703]])
- ✓ Inside Goal passed, min V= 0.4203, min V_outside_lower= 0.1383, min V_lower=0.3618
+Epoch  1010 | Total: 3.2381 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 3.2381
+ [Controller Params] fc.weight = tensor([[-2.4477, -0.7908],
+        [-0.2258,  0.1246]])
+ ✓ Inside Goal passed, min V= 0.3610, min V_outside_lower= 0.0778, min V_lower=0.3009
+Epoch  1020 | Total: 3.9135 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.4597 | Outside: 0.0000 | Gen: 3.4538
+ [Controller Params] fc.weight = tensor([[-2.4588, -0.8187],
+        [-0.2248,  0.1163]])
+ ✓ Inside Goal passed, min V= 0.6877, min V_outside_lower= 0.3768, min V_lower=0.6218
 [Merge-Outside] Epoch 1024: merged 0 pairs → 32 total
-[Merge-Generator] Epoch 1024: merged 5 pairs → 166 total
+[Merge-Generator] Epoch 1024: merged 5 pairs → 157 total
   Rebuilding CROWN caches with new generator cells...
     Rebuilding V cache with 94 cells...
 [SymbolicCROWNCache] Creating BoundedModule for 94 cells...
 [SymbolicCROWNCache] Initialized for 94 cells - symbolic structure cached!
-    Rebuilding Phi cache with 166 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 166 cells...
-[SymbolicCROWNCache_Phi] Initialized for 166 cells!
+    Rebuilding Phi cache with 157 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 157 cells...
+[SymbolicCROWNCache_Phi] Initialized for 157 cells!
   Caches rebuilt successfully!
-Epoch  1030 | Total: 1.5941 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0086 | Gen: 1.5855
- [Controller Params] fc.weight = tensor([[-2.4028, -0.8726],
-        [-0.2176,  0.1755]])
- ✓ Inside Goal passed, min V= 0.3740, min V_outside_lower= 0.0914, min V_lower=0.3159
-Epoch  1040 | Total: 1.6343 | Goal: 0.0000 | Unsafe: 0.2911 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.3433
- [Controller Params] fc.weight = tensor([[-2.4035, -0.8948],
-        [-0.2171,  0.1774]])
- ✓ Inside Goal passed, min V= 0.5191, min V_outside_lower= 0.2513, min V_lower=0.4650
-Epoch  1050 | Total: 1.3722 | Goal: 0.0000 | Unsafe: 0.0028 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.3694
- [Controller Params] fc.weight = tensor([[-2.4036, -0.9056],
-        [-0.2167,  0.1725]])
- ✓ Inside Goal passed, min V= 0.4358, min V_outside_lower= 0.1739, min V_lower=0.3826
-Epoch  1060 | Total: 1.3409 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.3409
- [Controller Params] fc.weight = tensor([[-2.4035, -0.9096],
-        [-0.2164,  0.1621]])
- ✓ Inside Goal passed, min V= 0.4132, min V_outside_lower= 0.1548, min V_lower=0.3612
-Epoch  1070 | Total: 1.3524 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.3524
- [Controller Params] fc.weight = tensor([[-2.4034, -0.9097],
-        [-0.2160,  0.1471]])
- ✓ Inside Goal passed, min V= 0.6238, min V_outside_lower= 0.3529, min V_lower=0.5690
-Epoch  1080 | Total: 1.1663 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.1663
- [Controller Params] fc.weight = tensor([[-2.4033, -0.9088],
-        [-0.2156,  0.1281]])
- ✓ Inside Goal passed, min V= 0.3404, min V_outside_lower= 0.1150, min V_lower=0.2947
-Epoch  1090 | Total: 1.2556 | Goal: 0.0000 | Unsafe: 0.1942 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.0614
- [Controller Params] fc.weight = tensor([[-2.4032, -0.9097],
-        [-0.2153,  0.1083]])
- ✓ Inside Goal passed, min V= 0.3441, min V_outside_lower= 0.1317, min V_lower=0.3012
-Epoch  1100 | Total: 1.1543 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.1543
- [Controller Params] fc.weight = tensor([[-2.4032, -0.9124],
-        [-0.2150,  0.0857]])
- ✓ Inside Goal passed, min V= 0.5561, min V_outside_lower= 0.3170, min V_lower=0.5083
-Epoch  1110 | Total: 1.0631 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.0631
- [Controller Params] fc.weight = tensor([[-2.4031, -0.9145],
-        [-0.2146,  0.0578]])
- ✓ Inside Goal passed, min V= 0.5403, min V_outside_lower= 0.3197, min V_lower=0.4959
-Epoch  1120 | Total: 0.9739 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.9739
- [Controller Params] fc.weight = tensor([[-2.4031, -0.9156],
-        [-0.2142,  0.0245]])
- ✓ Inside Goal passed, min V= 0.6042, min V_outside_lower= 0.3852, min V_lower=0.5606
-Epoch  1130 | Total: 0.9564 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.9564
- [Controller Params] fc.weight = tensor([[-2.4030, -0.9172],
-        [-0.2138, -0.0149]])
- ✓ Inside Goal passed, min V= 0.6305, min V_outside_lower= 0.4146, min V_lower=0.5868
-Epoch  1140 | Total: 0.7755 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.7755
- [Controller Params] fc.weight = tensor([[-2.4030, -0.9200],
-        [-0.2133, -0.0590]])
- ✓ Inside Goal passed, min V= 0.5202, min V_outside_lower= 0.3233, min V_lower=0.4799
-Epoch  1150 | Total: 0.8111 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.8111
- [Controller Params] fc.weight = tensor([[-2.4029, -0.9243],
-        [-0.2127, -0.1088]])
- ✓ Inside Goal passed, min V= 0.6463, min V_outside_lower= 0.4264, min V_lower=0.6004
-Epoch  1160 | Total: 0.5218 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.5218
- [Controller Params] fc.weight = tensor([[-2.4028, -0.9307],
-        [-0.2120, -0.1691]])
- ✓ Inside Goal passed, min V= 0.6918, min V_outside_lower= 0.4643, min V_lower=0.6444
-Epoch  1170 | Total: 0.4366 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.4366
- [Controller Params] fc.weight = tensor([[-2.4028, -0.9379],
-        [-0.2113, -0.2363]])
- ✓ Inside Goal passed, min V= 0.6050, min V_outside_lower= 0.3689, min V_lower=0.5579
-Epoch  1180 | Total: 0.2203 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.2203
- [Controller Params] fc.weight = tensor([[-2.4027, -0.9453],
-        [-0.2106, -0.3071]])
- ✓ Inside Goal passed, min V= 0.5522, min V_outside_lower= 0.3068, min V_lower=0.5046
-Epoch  1190 | Total: 0.2123 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.2123
- [Controller Params] fc.weight = tensor([[-2.4026, -0.9489],
-        [-0.2099, -0.3639]])
- ✓ Inside Goal passed, min V= 0.6402, min V_outside_lower= 0.3604, min V_lower=0.5854
-Epoch  1200 | Total: 0.1713 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.1713
- [Controller Params] fc.weight = tensor([[-2.4025, -0.9506],
-        [-0.2092, -0.4119]])
- ✓ Inside Goal passed, min V= 0.3785, min V_outside_lower= 0.1260, min V_lower=0.3285
-Epoch  1210 | Total: 0.1021 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.1021
- [Controller Params] fc.weight = tensor([[-2.4025, -0.9517],
-        [-0.2085, -0.4521]])
- ✓ Inside Goal passed, min V= 0.4036, min V_outside_lower= 0.1390, min V_lower=0.3517
-Epoch  1220 | Total: 0.0569 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0569
- [Controller Params] fc.weight = tensor([[-2.4024, -0.9526],
-        [-0.2080, -0.4827]])
- ✓ Inside Goal passed, min V= 0.5143, min V_outside_lower= 0.2262, min V_lower=0.4578
-Epoch  1230 | Total: 0.0344 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0344
- [Controller Params] fc.weight = tensor([[-2.4024, -0.9530],
-        [-0.2074, -0.5060]])
- ✓ Inside Goal passed, min V= 0.6282, min V_outside_lower= 0.3183, min V_lower=0.5682
-Epoch  1240 | Total: 0.1284 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.1284
- [Controller Params] fc.weight = tensor([[-2.4025, -0.9531],
-        [-0.2059, -0.5254]])
- ✓ Inside Goal passed, min V= 0.6007, min V_outside_lower= 0.3008, min V_lower=0.5404
-Epoch  1250 | Total: 0.1111 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.1111
- [Controller Params] fc.weight = tensor([[-2.4025, -0.9535],
-        [-0.2046, -0.5495]])
- ✓ Inside Goal passed, min V= 0.4551, min V_outside_lower= 0.1674, min V_lower=0.3969
-Epoch  1260 | Total: 0.0630 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0630
- [Controller Params] fc.weight = tensor([[-2.4025, -0.9542],
-        [-0.2038, -0.5756]])
- ✓ Inside Goal passed, min V= 0.5634, min V_outside_lower= 0.2453, min V_lower=0.5001
-Epoch  1270 | Total: 0.0398 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0398
- [Controller Params] fc.weight = tensor([[-2.4024, -0.9548],
-        [-0.2032, -0.5990]])
- ✓ Inside Goal passed, min V= 0.5744, min V_outside_lower= 0.2559, min V_lower=0.5117
-Epoch  1280 | Total: 0.0281 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0281
- [Controller Params] fc.weight = tensor([[-2.4024, -0.9554],
-        [-0.2028, -0.6169]])
- ✓ Inside Goal passed, min V= 0.5027, min V_outside_lower= 0.1939, min V_lower=0.4404
-Epoch  1290 | Total: 0.0213 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0213
- [Controller Params] fc.weight = tensor([[-2.4024, -0.9561],
-        [-0.2025, -0.6306]])
- ✓ Inside Goal passed, min V= 0.4906, min V_outside_lower= 0.1873, min V_lower=0.4302
-Epoch  1300 | Total: 0.0153 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0153
- [Controller Params] fc.weight = tensor([[-2.4024, -0.9564],
-        [-0.2023, -0.6406]])
- ✓ Inside Goal passed, min V= 0.5519, min V_outside_lower= 0.2377, min V_lower=0.4889
-Epoch  1310 | Total: 0.0105 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0105
- [Controller Params] fc.weight = tensor([[-2.4024, -0.9567],
-        [-0.2014, -0.6495]])
- ✓ Inside Goal passed, min V= 0.5378, min V_outside_lower= 0.2326, min V_lower=0.4757
-Epoch  1320 | Total: 0.0077 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0077
- [Controller Params] fc.weight = tensor([[-2.4025, -0.9570],
-        [-0.2007, -0.6580]])
- ✓ Inside Goal passed, min V= 0.5437, min V_outside_lower= 0.2408, min V_lower=0.4823
-Epoch  1330 | Total: 0.0062 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0062
- [Controller Params] fc.weight = tensor([[-2.4025, -0.9574],
-        [-0.1999, -0.6657]])
- ✓ Inside Goal passed, min V= 0.5471, min V_outside_lower= 0.2469, min V_lower=0.4857
-Epoch  1340 | Total: 0.0055 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0055
- [Controller Params] fc.weight = tensor([[-2.4026, -0.9580],
-        [-0.1990, -0.6726]])
- ✓ Inside Goal passed, min V= 0.5295, min V_outside_lower= 0.2345, min V_lower=0.4690
-Epoch  1350 | Total: 0.0027 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0027
- [Controller Params] fc.weight = tensor([[-2.4027, -0.9587],
-        [-0.1982, -0.6793]])
- ✓ Inside Goal passed, min V= 0.5149, min V_outside_lower= 0.2233, min V_lower=0.4554
-Epoch  1360 | Total: 0.0031 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0031
- [Controller Params] fc.weight = tensor([[-2.4028, -0.9593],
-        [-0.1971, -0.6863]])
- ✓ Inside Goal passed, min V= 0.4858, min V_outside_lower= 0.2018, min V_lower=0.4282
-Epoch  1370 | Total: 0.0012 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0012
- [Controller Params] fc.weight = tensor([[-2.4029, -0.9599],
-        [-0.1963, -0.6928]])
- ✓ Inside Goal passed, min V= 0.4843, min V_outside_lower= 0.2022, min V_lower=0.4270
+Epoch  1030 | Total: 3.7412 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 3.7412
+ [Controller Params] fc.weight = tensor([[-2.4696, -0.8391],
+        [-0.2239,  0.1047]])
+ ✓ Inside Goal passed, min V= 0.3580, min V_outside_lower= 0.0678, min V_lower=0.2966
+Epoch  1040 | Total: 6.9576 | Goal: 0.0000 | Unsafe: 3.5842 | Init: 0.0000 | Outside: 0.0067 | Gen: 3.3666
+ [Controller Params] fc.weight = tensor([[-2.4801, -0.8511],
+        [-0.2231,  0.0902]])
+ ✓ Inside Goal passed, min V= 0.2818, min V_outside_lower= -0.0067, min V_lower=0.2179
+Epoch  1050 | Total: 2.9371 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0470 | Gen: 2.8900
+ [Controller Params] fc.weight = tensor([[-2.4900, -0.8587],
+        [-0.2223,  0.0745]])
+ ✓ Inside Goal passed, min V= 0.2562, min V_outside_lower= -0.0243, min V_lower=0.1961
+Epoch  1060 | Total: 3.0800 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 3.0800
+ [Controller Params] fc.weight = tensor([[-2.5000, -0.8639],
+        [-0.2214,  0.0557]])
+ ✓ Inside Goal passed, min V= 0.3869, min V_outside_lower= 0.0659, min V_lower=0.3188
+Epoch  1070 | Total: 4.2637 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.8453 | Outside: 0.0000 | Gen: 3.4184
+ [Controller Params] fc.weight = tensor([[-2.5102, -0.8681],
+        [-0.2205,  0.0335]])
+ ✓ Inside Goal passed, min V= 0.7108, min V_outside_lower= 0.3473, min V_lower=0.6341
+Epoch  1080 | Total: 4.3360 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.9957 | Outside: 0.0000 | Gen: 3.3402
+ [Controller Params] fc.weight = tensor([[-2.5208, -0.8712],
+        [-0.2193,  0.0059]])
+ ✓ Inside Goal passed, min V= 0.7072, min V_outside_lower= 0.3273, min V_lower=0.6266
+Epoch  1090 | Total: 3.6538 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0727 | Outside: 0.0000 | Gen: 3.5811
+ [Controller Params] fc.weight = tensor([[-2.5316, -0.8744],
+        [-0.2179, -0.0262]])
+ ✓ Inside Goal passed, min V= 0.5476, min V_outside_lower= 0.2083, min V_lower=0.4757
+Epoch  1100 | Total: 2.8480 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 2.8480
+ [Controller Params] fc.weight = tensor([[-2.5424, -0.8757],
+        [-0.2166, -0.0615]])
+ ✓ Inside Goal passed, min V= 0.3692, min V_outside_lower= 0.0404, min V_lower=0.2988
+Epoch  1110 | Total: 2.5021 | Goal: 0.0000 | Unsafe: 0.0132 | Init: 0.0000 | Outside: 0.2623 | Gen: 2.2266
+ [Controller Params] fc.weight = tensor([[-2.5534, -0.8761],
+        [-0.2149, -0.1032]])
+ ✓ Inside Goal passed, min V= 0.2104, min V_outside_lower= -0.1006, min V_lower=0.1440
+Epoch  1120 | Total: 3.6129 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 1.1232 | Outside: 0.0000 | Gen: 2.4898
+ [Controller Params] fc.weight = tensor([[-2.5638, -0.8767],
+        [-0.2131, -0.1496]])
+ ✓ Inside Goal passed, min V= 0.7821, min V_outside_lower= 0.4131, min V_lower=0.7022
+Epoch  1130 | Total: 1.9109 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.9109
+ [Controller Params] fc.weight = tensor([[-2.5744, -0.8748],
+        [-0.2108, -0.2081]])
+ ✓ Inside Goal passed, min V= 0.3467, min V_outside_lower= 0.0184, min V_lower=0.2748
+Epoch  1140 | Total: 2.7000 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.8843 | Outside: 0.0000 | Gen: 1.8157
+ [Controller Params] fc.weight = tensor([[-2.5832, -0.8781],
+        [-0.2087, -0.2716]])
+ ✓ Inside Goal passed, min V= 0.6784, min V_outside_lower= 0.2952, min V_lower=0.5944
+Epoch  1150 | Total: 1.3874 | Goal: 0.0000 | Unsafe: 0.1605 | Init: 0.0000 | Outside: 0.0056 | Gen: 1.2214
+ [Controller Params] fc.weight = tensor([[-2.5919, -0.8801],
+        [-0.2058, -0.3485]])
+ ✓ Inside Goal passed, min V= 0.3118, min V_outside_lower= -0.0056, min V_lower=0.2434
+Epoch  1160 | Total: 0.8591 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0578 | Gen: 0.8013
+ [Controller Params] fc.weight = tensor([[-2.6007, -0.8798],
+        [-0.2028, -0.4400]])
+ ✓ Inside Goal passed, min V= 0.2983, min V_outside_lower= -0.0578, min V_lower=0.2213
+Epoch  1170 | Total: 0.8078 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.2403 | Gen: 0.5676
+ [Controller Params] fc.weight = tensor([[-2.6103, -0.8776],
+        [-0.1991, -0.5436]])
+ ✓ Inside Goal passed, min V= 0.2851, min V_outside_lower= -0.1370, min V_lower=0.1944
+Epoch  1180 | Total: 0.2243 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.2243
+ [Controller Params] fc.weight = tensor([[-2.6195, -0.8732],
+        [-0.1948, -0.6321]])
+ ✓ Inside Goal passed, min V= 0.4364, min V_outside_lower= 0.0305, min V_lower=0.3485
+Epoch  1190 | Total: 0.3802 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0345 | Outside: 0.1701 | Gen: 0.1757
+ [Controller Params] fc.weight = tensor([[-2.6246, -0.8702],
+        [-0.1918, -0.6961]])
+ ✓ Inside Goal passed, min V= 0.3184, min V_outside_lower= -0.1247, min V_lower=0.2227
+Epoch  1200 | Total: 0.1186 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0076 | Gen: 0.1110
+ [Controller Params] fc.weight = tensor([[-2.6272, -0.8702],
+        [-0.1904, -0.7360]])
+ ✓ Inside Goal passed, min V= 0.3834, min V_outside_lower= -0.0076, min V_lower=0.2974
+Epoch  1210 | Total: 0.1238 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.1238
+ [Controller Params] fc.weight = tensor([[-2.6280, -0.8723],
+        [-0.1897, -0.7608]])
+ ✓ Inside Goal passed, min V= 0.4076, min V_outside_lower= 0.0163, min V_lower=0.3212
+Epoch  1220 | Total: 0.0741 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0213 | Gen: 0.0528
+ [Controller Params] fc.weight = tensor([[-2.6298, -0.8712],
+        [-0.1892, -0.7800]])
+ ✓ Inside Goal passed, min V= 0.3694, min V_outside_lower= -0.0213, min V_lower=0.2830
+Epoch  1230 | Total: 0.0225 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0225
+ [Controller Params] fc.weight = tensor([[-2.6312, -0.8702],
+        [-0.1889, -0.7942]])
+ ✓ Inside Goal passed, min V= 0.3729, min V_outside_lower= 0.0046, min V_lower=0.2907
+Epoch  1240 | Total: 1.3813 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0680 | Outside: 0.0000 | Gen: 1.3132
+ [Controller Params] fc.weight = tensor([[-2.6322, -0.8699],
+        [-0.1884, -0.8043]])
+ ✓ Inside Goal passed, min V= 0.5338, min V_outside_lower= 0.1252, min V_lower=0.4423
+Epoch  1250 | Total: 1.2527 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.8646 | Gen: 0.3881
+ [Controller Params] fc.weight = tensor([[-2.6341, -0.8687],
+        [-0.1841, -0.8545]])
+ ✓ Inside Goal passed, min V= 0.1458, min V_outside_lower= -0.3171, min V_lower=0.0428
+Epoch  1260 | Total: 0.3209 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0309 | Gen: 0.2900
+ [Controller Params] fc.weight = tensor([[-2.6412, -0.8561],
+        [-0.1805, -0.8958]])
+ ✓ Inside Goal passed, min V= 0.3208, min V_outside_lower= -0.0309, min V_lower=0.2413
+Epoch  1270 | Total: 0.0487 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0487
+ [Controller Params] fc.weight = tensor([[-2.6447, -0.8520],
+        [-0.1760, -0.9258]])
+ ✓ Inside Goal passed, min V= 0.3576, min V_outside_lower= 0.0175, min V_lower=0.2793
+Epoch  1280 | Total: 0.0231 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0099 | Outside: 0.0000 | Gen: 0.0132
+ [Controller Params] fc.weight = tensor([[-2.6464, -0.8505],
+        [-0.1741, -0.9418]])
+ ✓ Inside Goal passed, min V= 0.4413, min V_outside_lower= 0.0826, min V_lower=0.3602
+Epoch  1290 | Total: 0.0031 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0031
+ [Controller Params] fc.weight = tensor([[-2.6476, -0.8499],
+        [-0.1728, -0.9513]])
+ ✓ Inside Goal passed, min V= 0.4068, min V_outside_lower= 0.0670, min V_lower=0.3302
+Epoch  1300 | Total: 0.1693 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.1693
+ [Controller Params] fc.weight = tensor([[-2.6482, -0.8505],
+        [-0.1705, -0.9588]])
+ ✓ Inside Goal passed, min V= 0.3957, min V_outside_lower= 0.0451, min V_lower=0.3171
+Epoch  1310 | Total: 0.0502 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0343 | Gen: 0.0159
+ [Controller Params] fc.weight = tensor([[-2.6492, -0.8509],
+        [-0.1687, -0.9722]])
+ ✓ Inside Goal passed, min V= 0.3468, min V_outside_lower= -0.0343, min V_lower=0.2615
+Epoch  1320 | Total: 0.0186 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0186
+ [Controller Params] fc.weight = tensor([[-2.6507, -0.8496],
+        [-0.1669, -0.9820]])
+ ✓ Inside Goal passed, min V= 0.3915, min V_outside_lower= 0.0517, min V_lower=0.3144
+Epoch  1330 | Total: 0.0920 | Goal: 0.0000 | Unsafe: 0.0865 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0055
+ [Controller Params] fc.weight = tensor([[-2.6521, -0.8484],
+        [-0.1644, -0.9908]])
+ ✓ Inside Goal passed, min V= 0.4241, min V_outside_lower= 0.0999, min V_lower=0.3489
+Epoch  1340 | Total: 0.0475 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0475
+ [Controller Params] fc.weight = tensor([[-2.6527, -0.8492],
+        [-0.1627, -1.0014]])
+ ✓ Inside Goal passed, min V= 0.4341, min V_outside_lower= 0.0720, min V_lower=0.3527
+Epoch  1350 | Total: 0.0094 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0019 | Outside: 0.0000 | Gen: 0.0075
+ [Controller Params] fc.weight = tensor([[-2.6549, -0.8463],
+        [-0.1615, -1.0133]])
+ ✓ Inside Goal passed, min V= 0.4051, min V_outside_lower= 0.0275, min V_lower=0.3211
+Epoch  1360 | Total: 0.0000 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0000
+ [Controller Params] fc.weight = tensor([[-2.6567, -0.8444],
+        [-0.1591, -1.0217]])
+ ✓ Inside Goal passed, min V= 0.4071, min V_outside_lower= 0.0410, min V_lower=0.3253
 
 ================================================================================
 ALL CONSTRAINTS SATISFIED - EARLY STOPPING!
 ================================================================================
-Training converged at epoch 1375
+Training converged at epoch 1360
 Final losses: Goal=0.0000, Unsafe=0.0000, Init=0.0000, Outside=0.0000, Gen=0.0000
- [Controller Params] fc.weight = tensor([[-2.4029, -0.9601],
-        [-0.1959, -0.6959]])
-final beta_s: 0.2071
+ [Controller Params] fc.weight = tensor([[-2.6567, -0.8444],
+        [-0.1591, -1.0217]])
+final beta_s: 0.0410
 
-Training completed in 58.06 seconds (0.97 minutes)
+Training completed in 54.36 seconds (0.91 minutes)
 
 ================================================================================
 FINAL EVALUATION
@@ -713,14 +709,14 @@ FINAL EVALUATION
 [SymbolicCROWNCache] Initialized for 4 cells - symbolic structure cached!
 [SymbolicCROWNCache] Creating BoundedModule for 32 cells...
 [SymbolicCROWNCache] Initialized for 32 cells - symbolic structure cached!
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 166 cells...
-[SymbolicCROWNCache_Phi] Initialized for 166 cells!
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 157 cells...
+[SymbolicCROWNCache_Phi] Initialized for 157 cells!
 Constraint Satisfaction:
-  Goal:      ✗ (V_min=0.489, V_mean=0.536, V_max=0.715)
-  Unsafe:    ✓ (V_min=22.666, V_max=72.821)
-  Init:      ✓ (V_min=0.684, V_max=0.786)
-  Outside:   ✓ (V_min=0.207, V_max=72.747)
-  Generator: ✓ (Phi_upper_min=-78.129, Phi_upper_max=-0.000, failing=0)
+  Goal:      ✗ (V_min=0.407, V_mean=0.499, V_max=0.836)
+  Unsafe:    ✓ (V_min=21.830, V_max=60.552)
+  Init:      ✓ (V_min=0.819, V_max=0.996)
+  Outside:   ✓ (V_min=0.041, V_max=60.866)
+  Generator: ✓ (Phi_upper_min=-95.634, Phi_upper_max=-0.002, failing=0)
 
 ================================================================================
 CREATING FINAL VISUALIZATIONS

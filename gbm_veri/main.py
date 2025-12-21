@@ -800,7 +800,7 @@ def main():
     # Set beta_s to a value (constant), or set to None to make it learnable
     # If learnable_beta_s is True, this value will be used as initialization
     params.training.learnable_beta_s = False  # Set to True to make beta_s learnable
-    params.constraints.beta_s = 0.1
+    params.constraints.beta_s = 0.0
     params.constraints.beta_ra = 20.0
 
     # Control what to compute during training
