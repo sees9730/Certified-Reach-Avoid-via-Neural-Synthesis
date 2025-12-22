@@ -394,6 +394,12 @@ def train_network_bounds(
     start_time = time.time()
     final_beta_s = params.constraints.beta_s 
 
+    # Constraint switching state
+    locked_to_all_sum = False
+    current_sum_constraint = None
+    constraint_largest_counts = {}
+    prev_total_loss = None  # Track previous epoch's total loss for switching logic
+
     for epoch in range(params.training.num_epochs):
         V_net.train()
 
@@ -456,7 +462,10 @@ def train_network_bounds(
             'compute_V': params.compute_V,
             'compute_GV': params.compute_GV,
             'epoch': epoch,
-            'w_soft': 2000.0,
+            'locked_to_all_sum': locked_to_all_sum,
+            'current_sum_constraint': current_sum_constraint,
+            'constraint_largest_counts': constraint_largest_counts,
+            'prev_total_loss': prev_total_loss
         }
 
         # Add V bounds if computing V
@@ -480,10 +489,54 @@ def train_network_bounds(
                 'generator_weight': current_gen_weight
             })
 
-        total_loss, loss_dict = compute_total_loss_bounds(**loss_kwargs)
+        # total_loss, loss_dict = compute_total_loss_bounds(**loss_kwargs)
+        prev_locked = locked_to_all_sum
+        prev_sum_constraint = current_sum_constraint
+        total_loss, loss_dict, locked_to_all_sum, current_sum_constraint, constraint_largest_counts = compute_total_loss_bounds(**loss_kwargs)
+
+        # Update prev_total_loss for next iteration
+        prev_total_loss = total_loss.item()
+
+        # Reset optimizer if we just switched to all sums (loss scale changes dramatically)
+        should_skip_step = False
+        if locked_to_all_sum and not prev_locked:
+            print(f"  Resetting optimizer and scheduler state after switching to all sums")
+            print(f"  constraint_largest_counts: {constraint_largest_counts}")
+            # Recreate optimizer with fresh state
+            current_lr = optimizer.param_groups[0]['lr']
+            optimizer = torch.optim.Adam(opt_params, lr=params.training.learning_rate)
+            # Recreate scheduler with new optimizer
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer,
+                mode='min',
+                factor=0.5,
+                patience=300,
+                verbose=True,
+                min_lr=1e-6,
+                threshold=1e-3
+            )
+            should_skip_step = True  # Skip this step since we're resetting
+        elif current_sum_constraint != prev_sum_constraint and prev_sum_constraint is not None:
+            print(f"  Resetting optimizer and scheduler state after switching focus")
+            print(f"  constraint_largest_counts: {constraint_largest_counts}")
+            # Recreate optimizer with fresh state when switching sum focus
+            current_lr = optimizer.param_groups[0]['lr']
+            optimizer = torch.optim.Adam(opt_params, lr=params.training.learning_rate)
+            # Recreate scheduler with new optimizer
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer,
+                mode='min',
+                factor=0.5,
+                patience=300,
+                verbose=True,
+                min_lr=1e-6,
+                threshold=1e-3
+            )
+            should_skip_step = True  # Skip this step since we're resetting
 
         # Backward pass
-        total_loss.backward()
+        if not should_skip_step:
+            total_loss.backward()
 
         # Recompute bounds after optimizer step for verification
         V_net.eval()
@@ -514,47 +567,69 @@ def train_network_bounds(
         # Get current beta_s value for constraint checks
         beta_s_check = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
 
-        # Adaptive refinement for V outside region cells
+        # Adaptive refinement based on highest loss region
         needs_cache_rebuild = False
-        if params.compute_V and len(bounds_updated['outside'][0]) > 0:
-            # Track failing cells in outside region
-            outside_failing_mask = bounds_updated['outside'][0] < beta_s_check
-            num_outside_failing = outside_failing_mask.sum().item()
-            outside_failing_mask_relax = bounds_updated['outside'][0] < (beta_s_check + 0.1)
+        if params.compute_V:
+            # Compute per-region losses
+            region_losses = {}
+            if len(bounds_updated['outside'][0]) > 0:
+                region_losses['outside'] = F.relu(beta_s_check - bounds_updated['outside'][0]).sum().item()
+            if len(bounds_updated['unsafe'][0]) > 0:
+                region_losses['unsafe'] = F.relu(params.constraints.beta_ra - bounds_updated['unsafe'][0]).sum().item()
+            if len(bounds_updated['init'][0]) > 0:
+                region_losses['init'] = F.relu(bounds_updated['init'][1] - 1.0).sum().item()
 
-            # Ensure bounds match current cell count
-            if len(outside_failing_mask) == len(region_cells['outside']) and num_outside_failing > 0:
-                REFINE_INTERVAL = 250
-                REFINE_FACTOR = 2
-                MAX_CELLS = 30000
+            # Find region with highest loss
+            if region_losses:
+                highest_loss_region = max(region_losses, key=region_losses.get)
+                highest_loss_value = region_losses[highest_loss_region]
 
-                if epoch > 2500:
-                    REFINE_INTERVAL = 50
+                # Only refine if loss is significant
+                if highest_loss_value > 0:
+                    # Set up region-specific failing masks
+                    if highest_loss_region == 'outside':
+                        failing_mask = bounds_updated['outside'][0] < beta_s_check
+                    elif highest_loss_region == 'unsafe':
+                        failing_mask = bounds_updated['unsafe'][0] < params.constraints.beta_ra
+                    elif highest_loss_region == 'init':
+                        failing_mask = bounds_updated['init'][1] > 1.0
 
-                if ((epoch + 1) % REFINE_INTERVAL == 0 and
-                    len(region_cells['outside']) < MAX_CELLS):
-                    new_cells, num_refined = refine_failing_cells(
-                        region_cells['outside'],
-                        outside_failing_mask,
-                        REFINE_FACTOR
-                    )
-                    region_cells['outside'] = new_cells
-                    print(f"[Refine-Outside] Epoch {epoch+1}: {num_outside_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
-                    needs_cache_rebuild = True
-                    refinement_epochs['outside'].append(epoch + 1)
+                    num_failing = failing_mask.sum().item()
 
-            if((epoch + 1) % 501 == 0):
-                merged_cells, num_merges = merge_passing_neighbor_cells(
-                    region_cells['outside'],
-                    outside_failing_mask_relax,
-                    max_passes=8,
-                    max_merges=None,   # cap work; set None for full greedy
-                    seed=0,
-                    eps=1e-6,
-                )
-                region_cells['outside'] = merged_cells
-                print(f"[Merge-Outside] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
-                needs_cache_rebuild = True
+                    if num_failing > 0 and len(failing_mask) == len(region_cells[highest_loss_region]):
+                        REFINE_INTERVAL_V = 500
+                        REFINE_FACTOR = 2
+                        MAX_CELLS = 10000
+
+                        if epoch > 2500:
+                            REFINE_INTERVAL_V = 100
+
+                        if ((epoch + 1) % REFINE_INTERVAL_V == 0 and
+                            len(region_cells[highest_loss_region]) < MAX_CELLS):
+                            new_cells, num_refined = refine_failing_cells(
+                                region_cells[highest_loss_region],
+                                failing_mask,
+                                REFINE_FACTOR
+                            )
+                            region_cells[highest_loss_region] = new_cells
+                            print(f"[Refine-{highest_loss_region.capitalize()}] Epoch {epoch+1}: Loss={highest_loss_value:.3f}, {num_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
+                            needs_cache_rebuild = True
+                            if highest_loss_region not in refinement_epochs:
+                                refinement_epochs[highest_loss_region] = []
+                            refinement_epochs[highest_loss_region].append(epoch + 1)
+
+                # if((epoch + 1) % 501 == 0):
+                #     merged_cells, num_merges = merge_passing_neighbor_cells(
+                #         region_cells['outside'],
+                #         outside_failing_mask_relax,
+                #         max_passes=8,
+                #         max_merges=None,   # cap work; set None for full greedy
+                #         seed=0,
+                #         eps=1e-6,
+                #     )
+                #     region_cells['outside'] = merged_cells
+                #     print(f"[Merge-Outside] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+                #     needs_cache_rebuild = True
 
         # Adaptive refinement for generator cells (before optimizer step)
         if params.compute_GV:

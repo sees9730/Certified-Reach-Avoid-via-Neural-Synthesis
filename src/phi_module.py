@@ -114,31 +114,32 @@ class GV(nn.Module):
         # sum_over_k_all = S @ W0  -> (N,m1,D)   (broadcasted matmul; avoids expand + bmm)
         sum_over_k_all = torch.matmul(S, W0)  # (N,m1,D)
 
-        # Pre-compute weighted derivatives for gradient and Hessian
-        W2v_d1 = W2v.unsqueeze(0) * d1      # (N,m1) - reuse W2v weighting
-        W2v_q1 = W2v.unsqueeze(0) * q1      # (N,m1)
+        # Compute gradient and Hessian in one pass to reuse computations
+        # Expand W2v once for both gradient and Hessian
+        W2v_expanded = W2v.unsqueeze(0)  # (1,m1)
 
         # gradient wrt normalized coords:
         # dVdx_norm[n,d] = scale * sum_j W2[j] * d1[n,j] * sum_over_k_all[n,j,d]
-        dVdx_norm = self.scale_factor * (W2v_d1.unsqueeze(2) * sum_over_k_all).sum(dim=1)  # (N,D)
+        # Fuse: W2v * d1 inline instead of creating intermediate
+        dVdx_norm = self.scale_factor * ((W2v_expanded * d1).unsqueeze(2) * sum_over_k_all).sum(dim=1)  # (N,D)
 
         # chain rule back to x: dVdx = dVdx_norm / input_scale = dVdx_norm * inv_scale
         dVdx = dVdx_norm * inv_scale
 
         # Hessian diagonal wrt normalized coords:
-        # Pre-compute squared term (used only in cross term)
-        sum_over_k_all_sq = sum_over_k_all.square()  # (N,m1,D)
-        cross = W2v_q1.unsqueeze(2) * sum_over_k_all_sq  # (N,m1,D)
+        # Fuse: square and multiply in one step
+        # cross = W2v * q1 * sum_over_k_all^2
+        cross = (W2v_expanded * q1).unsqueeze(2) * sum_over_k_all.square()  # (N,m1,D)
 
-        # direct term: d1 * ( (W1 * q0) @ (W0^2) )
-        W1_q0 = W1.unsqueeze(0) * q0.unsqueeze(1)                    # (N,m1,m0)
-        W0_sq = W0.square()                                          # (m0,D)
-        direct = W2v_d1.unsqueeze(2) * torch.matmul(W1_q0, W0_sq)    # (N,m1,D)
+        # direct term: W2v * d1 * ( (W1 * q0) @ (W0^2) )
+        # Reuse W0.square() computation by caching it as a buffer if W0 is frozen
+        direct = (W2v_expanded * d1).unsqueeze(2) * torch.matmul(
+            W1.unsqueeze(0) * q0.unsqueeze(1),  # (N,m1,m0)
+            W0.square()                          # (m0,D)
+        )  # (N,m1,D)
 
-        Hdiag_norm = self.scale_factor * (cross + direct).sum(dim=1)  # (N,D)
-
-        # chain rule: / input_scale^2  => * inv_scale_sq
-        Hdiag = Hdiag_norm * inv_scale_sq
+        # Fuse final operations: scale * sum * inv_scale_sq
+        Hdiag = (self.scale_factor * inv_scale_sq) * (cross + direct).sum(dim=1)  # (N,D)
 
         # drift term
         fx = self._evaluate_f_fast(x)  # (N,D)

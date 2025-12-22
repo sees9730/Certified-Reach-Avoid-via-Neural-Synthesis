@@ -139,7 +139,18 @@ def compute_loss_goal_bounds(
 
     # Softer loss on minimum of sampled points
     threshold = V_outside_lower.min().item()
-    loss_rest = F.relu(v_samples.min() - threshold) * w_soft
+    loss_rest = F.relu(v_samples.min() - threshold) * 1.0
+
+    # Replace the min-based loss with percentile
+    v_all = torch.cat([v_samples, v_center.unsqueeze(0)])
+    v_sorted = torch.sort(v_all)[0]
+
+    # Use bottom 5% of samples (automatically scales with n_samples)
+    k = max(1, len(v_all) // 50)
+    bottom_k = v_sorted[:k]
+
+    # Mean of bottom samples - more gradient signal than single min
+    loss_rest = F.relu(bottom_k.mean() - threshold)
 
     # Combined soft loss
     loss_soft =  loss_rest
@@ -323,8 +334,11 @@ def compute_total_loss_bounds(
     compute_V: bool = True,
     compute_GV: bool = True,
     epoch: int = 0,
-    w_soft = 2000,
-) -> Tuple[torch.Tensor, dict]:
+    locked_to_all_sum: bool = False,
+    current_sum_constraint: str = None,
+    constraint_largest_counts: dict = None,
+    prev_total_loss: float = None
+) -> Tuple[torch.Tensor, dict, bool, str, dict]:
     """
     Compute total training loss from CROWN bounds.
 
@@ -341,9 +355,14 @@ def compute_total_loss_bounds(
         generator_weight: Weight for generator loss
         loss_weights: Optional dictionary of weights for each loss component
         device: Device
+        locked_to_all_sum: If True, always use sum for all constraints (never switch back)
+        current_sum_constraint: Which constraint currently has .sum() focus
+        constraint_largest_counts: Dict tracking how many epochs each constraint has been largest
 
     Returns:
-        (total_loss, loss_dict) where loss_dict contains individual losses
+        (total_loss, loss_dict, locked_to_all_sum, current_sum_constraint, constraint_largest_counts)
+        where loss_dict contains individual losses, locked_to_all_sum indicates if we've
+        permanently switched to all sums, and constraint_largest_counts tracks accumulated evidence
     """
     if loss_weights is None:
         loss_weights = {
@@ -354,15 +373,102 @@ def compute_total_loss_bounds(
             'generator': 1.0
         }
 
-    # Compute individual losses
+    # Compute violations first
+    loss_components = {}
+
     if compute_V:
-        loss_unsafe = compute_loss_unsafe_bounds(V_unsafe_lower, V_unsafe_upper, beta_ra)
-        loss_goal, _ = compute_loss_goal_bounds(model, goal_region, V_goal_lower, V_goal_upper, beta_s, V_outside_lower,
-                                                 device=device, n_samples=10000, show=False, w_soft=w_soft)
-        loss_init = compute_loss_init_bounds(V_init_lower, V_init_upper, beta_s)
-        loss_outside = compute_loss_outside_bounds(V_outside_lower, V_outside_upper, beta_s)
+        violations_unsafe = F.relu(beta_ra - V_unsafe_lower)
+        violations_init = F.relu(V_init_upper - 1.0)# + F.relu(V_outside_lower.min().item() - V_init_lower).sum()
+        violations_outside = F.relu(0.0 - V_outside_lower)
+        # violations_goal = F.relu(0.0 - V_goal_lower)
+
+        loss_components['unsafe'] = violations_unsafe
+        loss_components['init'] = violations_init
+        loss_components['outside'] = violations_outside
+
     if compute_GV:
-        loss_generator = compute_loss_generator_bounds(Phi_lower, Phi_upper)
+        violations_generator = F.relu(Phi_upper)
+        loss_components['generator'] = violations_generator
+
+    # Compute total sum loss for decision making
+    loss_sums = {name: viols.sum().item() for name, viols in loss_components.items()}
+    total_sum_loss = sum(loss_sums.values())
+
+    # Note: We'll check for "all sums" switch AFTER computing total_loss below
+
+    if locked_to_all_sum:
+        # Use sum for all constraints to prevent oscillation near convergence
+        largest_loss = 'ALL'
+        if compute_V:
+            loss_unsafe = violations_unsafe.sum()
+            # loss_goal, _ = compute_loss_goal_bounds(model, goal_region, V_goal_lower, V_goal_upper, beta_s, V_outside_lower, device=device, n_samples=10000, show=False)
+            # loss_goal = violations_goal.sum()
+            loss_init = violations_init.sum()
+            loss_outside = violations_outside.sum()
+        if compute_GV:
+            loss_generator = violations_generator.sum()
+    else:
+        # Dynamic: use sum for largest, mean for others
+        candidate_largest = max(loss_sums, key=loss_sums.get) if loss_sums else None
+
+        STABILITY_THRESHOLD = 500
+
+        # Initialize counts dict if needed
+        if constraint_largest_counts is None:
+            constraint_largest_counts = {}
+
+        # Increment count for whichever constraint is currently largest
+        if candidate_largest is not None:
+            constraint_largest_counts[candidate_largest] = constraint_largest_counts.get(candidate_largest, 0) + 1
+
+        # Initialize on first epoch
+        if current_sum_constraint is None:
+            current_sum_constraint = candidate_largest
+        else:
+            # Only allow switching focus if prev_total_loss >= (beta_ra - 1.0)
+            # If loss is below threshold, keep current focus (it's working)
+            # Use prev_total_loss from main training loop (the actual optimized loss)
+            if prev_total_loss is not None:
+                allow_focus_switch = (prev_total_loss >= (beta_ra - 1.0))
+            else:
+                # Fallback to total_sum_loss if prev_total_loss not provided (backward compatibility)
+                allow_focus_switch = (total_sum_loss >= (beta_ra - 1.0))
+
+            # # Debug print
+            # if epoch % 10 == 0:
+            #     prev_loss_str = f"{prev_total_loss:.4f}" if prev_total_loss is not None else "N/A"
+            #     print(f"  [DEBUG] prev_total_loss={prev_loss_str}, beta_ra={beta_ra:.1f}, allow_switch={allow_focus_switch}")
+            #     print(f"  [DEBUG] candidate_largest={candidate_largest}, current={current_sum_constraint}")
+            #     print(f"  [DEBUG] constraint_largest_counts: {constraint_largest_counts}")
+
+            if allow_focus_switch:
+                # Look for constraints (other than current) that have exceeded threshold
+                candidates_to_switch = {
+                    name: count for name, count in constraint_largest_counts.items()
+                    if name != current_sum_constraint and count >= STABILITY_THRESHOLD
+                }
+
+                if candidates_to_switch:
+                    # Switch to the constraint with the most accumulated evidence
+                    new_constraint = max(candidates_to_switch, key=candidates_to_switch.get)
+                    print(f"[SWITCH] Switching from {current_sum_constraint} to {new_constraint}")
+                    # print(f"  constraint_largest_counts: {constraint_largest_counts}")
+                    current_sum_constraint = new_constraint
+                    # Reset its count so it needs to prove itself again if we switch away
+                    constraint_largest_counts[new_constraint] = 0
+
+        # Use the stable sum constraint (not necessarily the current largest)
+        largest_loss = current_sum_constraint
+
+        if compute_V:
+            loss_unsafe = violations_unsafe.sum() if largest_loss == 'unsafe' else violations_unsafe.mean()
+            # loss_goal, _ = compute_loss_goal_bounds(model, goal_region, V_goal_lower, V_goal_upper, beta_s, V_outside_lower, device=device, n_samples=10000, show=False)
+            # loss_goal = violations_goal.sum() if largest_loss == 'goal' else violations_goal.mean()
+            loss_init = violations_init.sum() if largest_loss == 'init' else violations_init.mean()
+            loss_outside = violations_outside.sum() if largest_loss == 'outside' else violations_outside.mean()
+
+        if compute_GV:
+            loss_generator = violations_generator.sum() if largest_loss == 'generator' else violations_generator.mean()
         # loss_generator_unsafe = compute_loss_generator_bounds_unsafe(Phi_lower_unsafe, Phi_upper_unsafe)
         # loss_generator_goal = compute_loss_generator_bounds_goal(Phi_lower_goal, Phi_upper_goal)
 
@@ -371,7 +477,7 @@ def compute_total_loss_bounds(
     # This matches original: total_loss = total_loss + generator_weight * loss_gen
     if compute_V and compute_GV:
         total_loss = (
-            loss_weights['goal'] * loss_goal +
+            # loss_weights['goal'] * loss_goal +
             loss_weights['unsafe'] * loss_unsafe +
             loss_weights['init'] * loss_init +
             loss_weights['outside'] * loss_outside +
@@ -380,16 +486,17 @@ def compute_total_loss_bounds(
 
         loss_dict = {
             'total': total_loss.item(),
-            'goal': loss_goal.item(),
+            # 'goal': loss_goal.item(),
             'unsafe': loss_unsafe.item(),
             'init': loss_init.item(),
             'outside': loss_outside.item(),
-            'generator': loss_generator.item()
+            'generator': loss_generator.item(),
+            'largest_loss': largest_loss
         }
 
     elif compute_V and not compute_GV:
         total_loss = (
-            loss_weights['goal'] * loss_goal +
+            # loss_weights['goal'] * loss_goal +
             loss_weights['unsafe'] * loss_unsafe +
             loss_weights['init'] * loss_init +
             loss_weights['outside'] * loss_outside
@@ -397,10 +504,11 @@ def compute_total_loss_bounds(
 
         loss_dict = {
             'total': total_loss.item(),
-            'goal': loss_goal.item(),
+            # 'goal': loss_goal.item(),
             'unsafe': loss_unsafe.item(),
             'init': loss_init.item(),
-            'outside': loss_outside.item()
+            'outside': loss_outside.item(),
+            'largest_loss': largest_loss
         }
 
     elif not compute_V and compute_GV:
@@ -409,10 +517,17 @@ def compute_total_loss_bounds(
         )
 
         loss_dict = {
-            'generator': loss_generator.item()
+            'generator': loss_generator.item(),
+            'largest_loss': largest_loss
         }
 
-    return total_loss, loss_dict
+    # Check if we should switch to all sums based on total_loss
+    if not locked_to_all_sum and total_loss.item() < 1.0:
+        locked_to_all_sum = True
+        print(f'[SWITCH] Switching to all sums at epoch {epoch} (total_loss={total_loss.item():.4f} < 1.0)')
+
+    return total_loss, loss_dict, locked_to_all_sum, current_sum_constraint, constraint_largest_counts
+
 
 
 def evaluate_constraints(
@@ -486,18 +601,19 @@ def evaluate_constraints(
                 else:
                     region_bounds[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
 
-        # Goal: sample + bounds (existential)
-        if len(region_cells['goal']) > 0:
-            x_goal = sample_from_cells(region_cells['goal'], n_samples, device)
-            v_goal_samples = V_net(x_goal).squeeze(-1)
-            goal_satisfied = ((v_goal_samples.min() < beta_s).item() and
-                              (region_bounds['goal'][0].min() >= 0).item())
-            v_goal_min = v_goal_samples.min().item()
-            v_goal_max = v_goal_samples.max().item()
-            v_goal_mean = v_goal_samples.mean().item()
-        else:
-            goal_satisfied = False
-            v_goal_min = v_goal_max = v_goal_mean = 0.0
+        # # Goal: sample + bounds (existential)
+        # if len(region_cells['goal']) > 0:
+        #     # x_goal = sample_from_cells(region_cells['goal'], n_samples, device)
+        #     # v_goal_samples = V_net(x_goal).squeeze(-1)
+        #     # goal_satisfied = ((v_goal_samples.min() < beta_s).item() and
+        #                     #   (region_bounds['goal'][0].min() >= 0).item())
+        #     goal_satisfied = region_bounds['goal'][0].min() >= 0.0
+        #     v_goal_min = region_bounds['goal'][0].min().item()
+        #     v_goal_max = region_bounds['goal'][1].max().item()
+        #     v_goal_mean = region_bounds['goal'][0].mean().item()
+        # else:
+        #     goal_satisfied = False
+        #     # v_goal_min = v_goal_max = v_goal_mean = 0.0
 
         # Outside: bounds only (universal)
         if len(region_bounds['outside'][0]) > 0:
@@ -561,15 +677,15 @@ def evaluate_constraints(
             phi_min = phi_max = phi_mean = 0.0
 
     results = {
-        'goal_satisfied': goal_satisfied,
+        # 'goal_satisfied': goal_satisfied,
         'unsafe_satisfied': unsafe_satisfied,
         'init_satisfied': init_satisfied,
         'outside_satisfied': outside_satisfied,
         'generator_satisfied': generator_satisfied,
 
-        'V_goal_min': v_goal_min,
-        'V_goal_max': v_goal_max,
-        'V_goal_mean': v_goal_mean,
+        # 'V_goal_min': v_goal_min,
+        # 'V_goal_max': v_goal_max,
+        # 'V_goal_mean': v_goal_mean,
         'V_unsafe_min': v_unsafe_min,
         'V_unsafe_max': v_unsafe_max,
         'V_init_min': v_init_min,
@@ -598,7 +714,7 @@ def print_loss_summary(epoch: int, loss_dict: dict, prefix: str = "", compute_V:
     if compute_V and compute_GV:
         print(f"{prefix}Epoch {epoch:5d} | "
             f"Total: {loss_dict['total']:.4f} | "
-            f"Goal: {loss_dict['goal']:.4f} | "
+            # f"Goal: {loss_dict['goal']:.4f} | "
             f"Unsafe: {loss_dict['unsafe']:.4f} | "
             f"Init: {loss_dict['init']:.4f} | "
             f"Outside: {loss_dict['outside']:.4f} | "
@@ -628,8 +744,8 @@ def print_constraint_summary(results: dict, prefix: str = ""):
         return "✓" if satisfied else "✗"
 
     print(f"{prefix}Constraint Satisfaction:")
-    print(f"{prefix}  Goal:      {status_str(results['goal_satisfied'])} "
-          f"(V_min={results['V_goal_min']:.3f}, V_mean={results['V_goal_mean']:.3f}, V_max={results['V_goal_max']:.3f})")
+    # print(f"{prefix}  Goal:      {status_str(results['goal_satisfied'])} "
+    #       f"(V_min={results['V_goal_min']:.3f}, V_mean={results['V_goal_mean']:.3f}, V_max={results['V_goal_max']:.3f})")
     print(f"{prefix}  Unsafe:    {status_str(results['unsafe_satisfied'])} "
           f"(V_min={results['V_unsafe_min']:.3f}, V_max={results['V_unsafe_max']:.3f})")
     print(f"{prefix}  Init:      {status_str(results['init_satisfied'])} "
@@ -638,6 +754,29 @@ def print_constraint_summary(results: dict, prefix: str = ""):
           f"(V_min={results['V_outside_min']:.3f}, V_max={results['V_outside_max']:.3f})")
     print(f"{prefix}  Generator: {status_str(results['generator_satisfied'])} "
           f"(Phi_upper_min={results['Phi_min']:.3f}, Phi_upper_max={results['Phi_max']:.3f}, failing={results['num_failing_cells']})")
+
+
+def print_cell_counts(region_cells: dict, prefix: str = ""):
+    """
+    Print the number of cells for each region.
+
+    Args:
+        region_cells: Dictionary mapping region names to lists of cells
+        prefix: Optional prefix for print
+    """
+    print(f"{prefix}Discretization cell counts:")
+    total_v_cells = 0
+    for name in ['init', 'goal', 'unsafe', 'outside']:
+        if name in region_cells:
+            count = len(region_cells[name])
+            print(f"{prefix}  {name}: {count} cells")
+            total_v_cells += count
+
+    print(f"{prefix}  Total V cells: {total_v_cells}")
+
+    if 'generator' in region_cells:
+        gen_count = len(region_cells['generator'])
+        print(f"{prefix}  generator: {gen_count} cells")
 
 
 def refine_failing_cells(

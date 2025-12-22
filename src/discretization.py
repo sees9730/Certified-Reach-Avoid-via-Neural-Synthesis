@@ -333,12 +333,9 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
     region_cells['unsafe'] = discretize_region(regions.unsafe, discretization_config.n_unsafe)
     print(f"  → {len(region_cells['unsafe'])} cells")
 
-    # Outside goal (for V constraint)
-    print(f"\nOutside goal region: {discretization_config.n_outside_goal} per-dim per rectangle")
-    outside_goal_rects = compute_rectangular_partition_outside_goal(regions.full, regions.goal)
-    region_cells['outside'] = []
-    for rect in outside_goal_rects:
-        region_cells['outside'].extend(discretize_region(rect, discretization_config.n_outside_goal))
+    # Outside goal (for V constraint) - now covers entire space
+    print(f"\nOutside region (entire space): {discretization_config.n_outside_goal} per-dim")
+    region_cells['outside'] = discretize_region(regions.full, discretization_config.n_outside_goal)
     print(f"  → {len(region_cells['outside'])} cells")
 
     # Generator region (outside goal and unsafe)
@@ -347,7 +344,7 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
         print(f"  Using adaptive refinement based on distance from origin")
 
         RADIUS_THRESHOLDS = [25.0, 40.0]
-        N_SPLITS = [2, 1, 1]
+        N_SPLITS = [5, 1, 1]
 
         all_cells = discretize_region_radial(
             regions.full,

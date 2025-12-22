@@ -528,7 +528,7 @@ def plot_loss_history(
     axes[0, 0].grid(True, alpha=0.3)
 
     # Goal loss
-    axes[0, 1].plot(epochs, [d['goal'] for d in loss_history], 'b-', linewidth=2)
+    # axes[0, 1].plot(epochs, [d['goal'] for d in loss_history], 'b-', linewidth=2)
     axes[0, 1].set_title('Goal Loss')
     axes[0, 1].set_xlabel('Epoch')
     axes[0, 1].set_ylabel('Loss')
