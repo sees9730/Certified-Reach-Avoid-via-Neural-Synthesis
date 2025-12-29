@@ -1,0 +1,1229 @@
+Network: 3 -> 64 -> 64 -> 1
+Training: 200000 epochs, LR=0.005
+Constraints: beta_s=0.0, beta_ra=10.0
+Generator: weight=1.0, start_epoch=0
+Training method: CROWN bounds (rigorous)
+
+Dynamics(dim=2, f(x)=<callable>, g(x)=<callable>)
+V network: ValueNetwork(
+  input_dim=3,
+  hidden=[64, 64],
+  output_dim=1,
+  activation=builtin_function_or_method,
+  input_scale=[60.0, 60.0, 60.0],
+  scale_factor=20.0
+)
+
+Using device: cpu
+
+================================================================================
+PRE-TRAINING: Constraint-Structured Initialization (Sample-Based)
+================================================================================
+  GV (Φ) pre-training ENABLED (using provided GV_net)
+  Epoch [0/1000]: V=2738.138184 (full=0.000, init=1295.565, unsafe=0.000, goal=1442.573, others=0.000), Φ=27.228840, Total=2765.366943
+  Epoch [100/1000]: V=1049.302979 (full=0.000, init=0.000, unsafe=989.023, goal=60.280, others=0.000), Φ=2.316540, Total=1051.619507
+  Epoch [200/1000]: V=1046.459595 (full=0.000, init=0.000, unsafe=901.982, goal=144.478, others=0.000), Φ=2.359056, Total=1048.818604
+  Epoch [300/1000]: V=1036.894897 (full=0.000, init=0.000, unsafe=900.178, goal=136.717, others=0.000), Φ=8.828655, Total=1045.723511
+  Epoch [400/1000]: V=860.015137 (full=0.000, init=0.000, unsafe=781.648, goal=78.367, others=0.000), Φ=154.748306, Total=1014.763428
+  Epoch [500/1000]: V=57.863743 (full=16.161, init=0.000, unsafe=16.938, goal=18.861, others=5.904), Φ=148.091797, Total=205.955536
+  Epoch [600/1000]: V=32.969406 (full=18.668, init=0.000, unsafe=3.137, goal=6.244, others=4.920), Φ=62.714588, Total=95.683990
+  Epoch [700/1000]: V=27.855005 (full=17.604, init=0.000, unsafe=3.470, goal=4.648, others=2.133), Φ=27.714237, Total=55.569244
+  Epoch [800/1000]: V=27.011847 (full=12.367, init=0.000, unsafe=0.000, goal=14.422, others=0.222), Φ=9.713881, Total=36.725727
+  Epoch [900/1000]: V=22.493950 (full=19.200, init=0.000, unsafe=0.000, goal=0.121, others=3.173), Φ=3.694345, Total=26.188295
+
+  Best loss: 18.674271
+================================================================================
+Pre-training complete. V + GV (Φ) + Controller initialized.
+================================================================================
+
+Pretraining completed!
+
+
+Using device: cpu
+
+================================================================================
+BOUND-BASED TRAINING (using CROWN)
+================================================================================
+
+Collecting all cells for V network...
+  init: 1 cells
+  goal: 1 cells
+  unsafe: 1 cells
+  outside: 1 cells
+  Total V cells: 4
+
+Preparing concatenated input bounds for V network...
+
+Initializing CROWN cache for ALL 4 V cells...
+[SymbolicCROWNCache] Creating BoundedModule for 4 cells...
+[SymbolicCROWNCache] Initialized for 4 cells - symbolic structure cached!
+
+Creating CROWN cache for 'generator' (Phi)...
+  generator: 76 cells
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 76 cells...
+/Users/sebastianescobar/Desktop/Neural_Certificate/src/phi_module.py:173: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  self._cached_scale_D == D
+[SymbolicCROWNCache_Phi] Initialized for 76 cells!
+
+Using CONSTANT beta_s = 0.0
+/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:28: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.
+  warnings.warn("The verbose parameter is deprecated. Please use get_last_lr() "
+Epoch     0 | Total: 127440.8203 | Unsafe: 3.2370 | Init: 0.1810 | Outside: 10.8567 | Gen: 127426.5469 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=6.763, ACTUAL SAMPLES: V_min=11.342, V_max=24.978, beta_ra=10.0
+
+Epoch 0 - Detailed Evaluation:
+  [DEBUG] Unsafe: 1/1 cells violate (V_lower < 10.0)
+  Constraint Satisfaction:
+    Unsafe:    ✗ (V_min=6.763, V_max=28.065)
+    Init:      ✗ (V_min=-1.420, V_max=1.181)
+    Outside:   ✗ (V_min=-10.857, V_max=52.383)
+    Generator: ✗ (Phi_upper_min=24.783, Phi_upper_max=11401.184, failing=76)
+  Goal bounds: V ∈ [-3.395, 3.224]
+  Unsafe bounds: V ∈ [6.763, 28.065]
+  Generator bounds: Φ ∈ [-16037.709, 11401.184]
+  Generator failing cells: 76/76 (100.0%)
+
+  Creating visualization for epoch 0...
+  → Saved to 'training_progress/value_function_epoch_0.png'
+  → Saved to 'training_progress/generator_epoch_0.png'
+  → Saved 3D plot to 'training_progress/value_function_3d_epoch_0.png'
+Epoch    10 | Total: 85967.1406 | Unsafe: 7.8160 | Init: 0.0000 | Outside: 3.0940 | Gen: 85956.2344 | Focus: generator
+Epoch    20 | Total: 42358.7227 | Unsafe: 9.6106 | Init: 0.0000 | Outside: 0.7411 | Gen: 42348.3711 | Focus: generator
+Epoch    30 | Total: 10820.8242 | Unsafe: 9.7711 | Init: 0.0000 | Outside: 0.1467 | Gen: 10810.9062 | Focus: generator
+Epoch    40 | Total: 2528.9285 | Unsafe: 9.7158 | Init: 0.0000 | Outside: 0.0000 | Gen: 2519.2126 | Focus: generator
+Epoch    50 | Total: 963.8587 | Unsafe: 9.6839 | Init: 0.0000 | Outside: 0.0000 | Gen: 954.1748 | Focus: generator
+Epoch    60 | Total: 560.4938 | Unsafe: 9.6751 | Init: 0.0000 | Outside: 0.0000 | Gen: 550.8187 | Focus: generator
+Epoch    70 | Total: 412.9489 | Unsafe: 9.6458 | Init: 0.0000 | Outside: 0.0000 | Gen: 403.3031 | Focus: generator
+Epoch    80 | Total: 340.6846 | Unsafe: 9.6112 | Init: 0.0000 | Outside: 0.0000 | Gen: 331.0735 | Focus: generator
+Epoch    90 | Total: 295.0095 | Unsafe: 9.5778 | Init: 0.0000 | Outside: 0.0000 | Gen: 285.4317 | Focus: generator
+Epoch   100 | Total: 263.2995 | Unsafe: 9.5433 | Init: 0.0000 | Outside: 0.0000 | Gen: 253.7562 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=0.457, ACTUAL SAMPLES: V_min=0.457, V_max=0.462, beta_ra=10.0
+Epoch   110 | Total: 238.6754 | Unsafe: 9.5082 | Init: 0.0000 | Outside: 0.0000 | Gen: 229.1672 | Focus: generator
+Epoch   120 | Total: 217.9013 | Unsafe: 9.4711 | Init: 0.0000 | Outside: 0.0000 | Gen: 208.4301 | Focus: generator
+Epoch   130 | Total: 199.7777 | Unsafe: 9.4335 | Init: 0.0000 | Outside: 0.0000 | Gen: 190.3442 | Focus: generator
+Epoch   140 | Total: 184.1606 | Unsafe: 9.3964 | Init: 0.0000 | Outside: 0.0000 | Gen: 174.7642 | Focus: generator
+Epoch   150 | Total: 170.4693 | Unsafe: 9.3573 | Init: 0.0000 | Outside: 0.0000 | Gen: 161.1120 | Focus: generator
+Epoch   160 | Total: 158.5385 | Unsafe: 9.3181 | Init: 0.0000 | Outside: 0.0000 | Gen: 149.2204 | Focus: generator
+Epoch   170 | Total: 147.7462 | Unsafe: 9.2799 | Init: 0.0000 | Outside: 0.0000 | Gen: 138.4664 | Focus: generator
+Epoch   180 | Total: 138.4789 | Unsafe: 9.2394 | Init: 0.0000 | Outside: 0.0000 | Gen: 129.2395 | Focus: generator
+Epoch   190 | Total: 129.8178 | Unsafe: 9.1983 | Init: 0.0000 | Outside: 0.0000 | Gen: 120.6194 | Focus: generator
+[Refine-Unsafe] Epoch 200: Loss=9.162, 1 failing → refined 1 cells → 8 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 11 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 11 cells...
+[SymbolicCROWNCache] Initialized for 11 cells - symbolic structure cached!
+    Rebuilding Phi cache with 76 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 76 cells...
+[SymbolicCROWNCache_Phi] Initialized for 76 cells!
+  Caches rebuilt successfully!
+Epoch   200 | Total: 122.1173 | Unsafe: 9.1573 | Init: 0.0000 | Outside: 0.0000 | Gen: 112.9600 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=0.842, ACTUAL SAMPLES: V_min=0.843, V_max=0.845, beta_ra=10.0
+[Merge-Generator] Epoch 202: merged 0 pairs → 76 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 11 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 11 cells...
+[SymbolicCROWNCache] Initialized for 11 cells - symbolic structure cached!
+    Rebuilding Phi cache with 76 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 76 cells...
+[SymbolicCROWNCache_Phi] Initialized for 76 cells!
+  Caches rebuilt successfully!
+Epoch   210 | Total: 114.8907 | Unsafe: 9.1157 | Init: 0.0000 | Outside: 0.0000 | Gen: 105.7750 | Focus: generator
+Epoch   220 | Total: 108.6357 | Unsafe: 9.0739 | Init: 0.0000 | Outside: 0.0000 | Gen: 99.5618 | Focus: generator
+Epoch   230 | Total: 102.8651 | Unsafe: 9.0326 | Init: 0.0000 | Outside: 0.0000 | Gen: 93.8325 | Focus: generator
+Epoch   240 | Total: 97.6921 | Unsafe: 8.9912 | Init: 0.0084 | Outside: 0.0000 | Gen: 88.6924 | Focus: generator
+Epoch   250 | Total: 92.6151 | Unsafe: 8.9710 | Init: 0.0287 | Outside: 0.0000 | Gen: 83.6155 | Focus: generator
+Epoch   260 | Total: 88.6129 | Unsafe: 8.9643 | Init: 0.0355 | Outside: 0.0000 | Gen: 79.6131 | Focus: generator
+Epoch   270 | Total: 84.5461 | Unsafe: 8.9611 | Init: 0.0386 | Outside: 0.0000 | Gen: 75.5464 | Focus: generator
+Epoch   280 | Total: 80.6642 | Unsafe: 8.9601 | Init: 0.0396 | Outside: 0.0000 | Gen: 71.6645 | Focus: generator
+Epoch   290 | Total: 77.6855 | Unsafe: 8.9601 | Init: 0.0398 | Outside: 0.0000 | Gen: 68.6856 | Focus: generator
+Epoch   300 | Total: 74.0642 | Unsafe: 8.9599 | Init: 0.0399 | Outside: 0.0000 | Gen: 65.0644 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.040, ACTUAL SAMPLES: V_min=1.040, V_max=1.041, beta_ra=10.0
+Epoch   310 | Total: 71.1079 | Unsafe: 8.9593 | Init: 0.0403 | Outside: 0.0000 | Gen: 62.1082 | Focus: generator
+Epoch   320 | Total: 68.0931 | Unsafe: 8.9597 | Init: 0.0400 | Outside: 0.0000 | Gen: 59.0934 | Focus: generator
+Epoch   330 | Total: 66.1434 | Unsafe: 8.9597 | Init: 0.0401 | Outside: 0.0000 | Gen: 57.1436 | Focus: generator
+Epoch   340 | Total: 63.6702 | Unsafe: 8.9600 | Init: 0.0399 | Outside: 0.0000 | Gen: 54.6703 | Focus: generator
+Epoch   350 | Total: 61.3076 | Unsafe: 8.9603 | Init: 0.0396 | Outside: 0.0000 | Gen: 52.3077 | Focus: generator
+Epoch   360 | Total: 59.2119 | Unsafe: 8.9598 | Init: 0.0400 | Outside: 0.0000 | Gen: 50.2121 | Focus: generator
+Epoch   370 | Total: 57.5233 | Unsafe: 8.9604 | Init: 0.0397 | Outside: 0.0000 | Gen: 48.5232 | Focus: generator
+Epoch   380 | Total: 55.4162 | Unsafe: 8.9602 | Init: 0.0397 | Outside: 0.0000 | Gen: 46.4163 | Focus: generator
+Epoch   390 | Total: 53.8880 | Unsafe: 8.9594 | Init: 0.0403 | Outside: 0.0000 | Gen: 44.8882 | Focus: generator
+[Refine-Unsafe] Epoch 400: Loss=71.680, 8 failing → refined 8 cells → 64 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 67 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 67 cells...
+[SymbolicCROWNCache] Initialized for 67 cells - symbolic structure cached!
+    Rebuilding Phi cache with 76 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 76 cells...
+[SymbolicCROWNCache_Phi] Initialized for 76 cells!
+  Caches rebuilt successfully!
+Epoch   400 | Total: 52.3988 | Unsafe: 8.9593 | Init: 0.0403 | Outside: 0.0000 | Gen: 43.3992 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.041, ACTUAL SAMPLES: V_min=1.041, V_max=1.041, beta_ra=10.0
+[Merge-Generator] Epoch 404: merged 0 pairs → 76 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 67 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 67 cells...
+[SymbolicCROWNCache] Initialized for 67 cells - symbolic structure cached!
+    Rebuilding Phi cache with 76 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 76 cells...
+[SymbolicCROWNCache_Phi] Initialized for 76 cells!
+  Caches rebuilt successfully!
+Epoch   410 | Total: 50.9347 | Unsafe: 8.9595 | Init: 0.0402 | Outside: 0.0000 | Gen: 41.9351 | Focus: generator
+Epoch   420 | Total: 49.2391 | Unsafe: 8.9594 | Init: 0.0402 | Outside: 0.0000 | Gen: 40.2394 | Focus: generator
+Epoch   430 | Total: 48.2875 | Unsafe: 8.9604 | Init: 0.0395 | Outside: 0.0000 | Gen: 39.2876 | Focus: generator
+Epoch   440 | Total: 46.9955 | Unsafe: 8.9602 | Init: 0.0397 | Outside: 0.0000 | Gen: 37.9956 | Focus: generator
+Epoch   450 | Total: 45.4921 | Unsafe: 8.9605 | Init: 0.0394 | Outside: 0.0000 | Gen: 36.4922 | Focus: generator
+Epoch   460 | Total: 44.0773 | Unsafe: 8.9602 | Init: 0.0397 | Outside: 0.0000 | Gen: 35.0775 | Focus: generator
+Epoch   470 | Total: 43.2611 | Unsafe: 8.9595 | Init: 0.0402 | Outside: 0.0000 | Gen: 34.2614 | Focus: generator
+Epoch   480 | Total: 42.1751 | Unsafe: 8.9601 | Init: 0.0398 | Outside: 0.0000 | Gen: 33.1752 | Focus: generator
+Epoch   490 | Total: 41.3165 | Unsafe: 8.9602 | Init: 0.0397 | Outside: 0.0000 | Gen: 32.3166 | Focus: generator
+[Refine-Generator] Epoch 500: 76 failing → refined 76 cells → 608 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 67 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 67 cells...
+[SymbolicCROWNCache] Initialized for 67 cells - symbolic structure cached!
+    Rebuilding Phi cache with 608 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 608 cells...
+[SymbolicCROWNCache_Phi] Initialized for 608 cells!
+  Caches rebuilt successfully!
+Epoch   500 | Total: 52.6982 | Unsafe: 8.9600 | Init: 0.0399 | Outside: 0.0000 | Gen: 43.6984 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.040, ACTUAL SAMPLES: V_min=1.040, V_max=1.040, beta_ra=10.0
+Epoch   510 | Total: 56.0394 | Unsafe: 8.9594 | Init: 0.0404 | Outside: 0.0000 | Gen: 47.0396 | Focus: generator
+Epoch   520 | Total: 53.1251 | Unsafe: 8.9574 | Init: 0.0417 | Outside: 0.0000 | Gen: 44.1260 | Focus: generator
+Epoch   530 | Total: 52.4749 | Unsafe: 8.9590 | Init: 0.0406 | Outside: 0.0000 | Gen: 43.4752 | Focus: generator
+Epoch   540 | Total: 50.3047 | Unsafe: 8.9579 | Init: 0.0414 | Outside: 0.0000 | Gen: 41.3054 | Focus: generator
+Epoch   550 | Total: 48.6591 | Unsafe: 8.9592 | Init: 0.0405 | Outside: 0.0000 | Gen: 39.6595 | Focus: generator
+Epoch   560 | Total: 49.0076 | Unsafe: 8.9578 | Init: 0.0415 | Outside: 0.0000 | Gen: 40.0083 | Focus: generator
+Epoch   570 | Total: 45.8403 | Unsafe: 8.9581 | Init: 0.0413 | Outside: 0.0000 | Gen: 36.8409 | Focus: generator
+Epoch   580 | Total: 45.3073 | Unsafe: 8.9586 | Init: 0.0410 | Outside: 0.0000 | Gen: 36.3078 | Focus: generator
+Epoch   590 | Total: 43.5296 | Unsafe: 8.9599 | Init: 0.0400 | Outside: 0.0000 | Gen: 34.5298 | Focus: generator
+[Refine-Unsafe] Epoch 600: Loss=573.411, 64 failing → refined 64 cells → 512 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 515 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 515 cells...
+[SymbolicCROWNCache] Initialized for 515 cells - symbolic structure cached!
+    Rebuilding Phi cache with 608 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 608 cells...
+[SymbolicCROWNCache_Phi] Initialized for 608 cells!
+  Caches rebuilt successfully!
+Epoch   600 | Total: 41.9074 | Unsafe: 8.9593 | Init: 0.0403 | Outside: 0.0000 | Gen: 32.9078 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.041, ACTUAL SAMPLES: V_min=1.041, V_max=1.041, beta_ra=10.0
+[Merge-Generator] Epoch 606: merged 0 pairs → 608 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 515 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 515 cells...
+[SymbolicCROWNCache] Initialized for 515 cells - symbolic structure cached!
+    Rebuilding Phi cache with 608 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 608 cells...
+[SymbolicCROWNCache_Phi] Initialized for 608 cells!
+  Caches rebuilt successfully!
+Epoch   610 | Total: 41.0693 | Unsafe: 8.9587 | Init: 0.0408 | Outside: 0.0000 | Gen: 32.0698 | Focus: generator
+Epoch   620 | Total: 40.1340 | Unsafe: 8.9589 | Init: 0.0407 | Outside: 0.0000 | Gen: 31.1344 | Focus: generator
+Epoch   630 | Total: 38.2576 | Unsafe: 8.9589 | Init: 0.0405 | Outside: 0.0000 | Gen: 29.2581 | Focus: generator
+Epoch   640 | Total: 37.1010 | Unsafe: 8.9585 | Init: 0.0408 | Outside: 0.0000 | Gen: 28.1016 | Focus: generator
+Epoch   650 | Total: 35.8427 | Unsafe: 8.9592 | Init: 0.0404 | Outside: 0.0000 | Gen: 26.8431 | Focus: generator
+Epoch   660 | Total: 35.0762 | Unsafe: 8.9596 | Init: 0.0400 | Outside: 0.0000 | Gen: 26.0766 | Focus: generator
+Epoch   670 | Total: 34.5255 | Unsafe: 8.9588 | Init: 0.0406 | Outside: 0.0000 | Gen: 25.5260 | Focus: generator
+Epoch   680 | Total: 33.9453 | Unsafe: 8.9597 | Init: 0.0401 | Outside: 0.0000 | Gen: 24.9456 | Focus: generator
+Epoch   690 | Total: 33.6233 | Unsafe: 8.9592 | Init: 0.0404 | Outside: 0.0000 | Gen: 24.6237 | Focus: generator
+Epoch   700 | Total: 33.0941 | Unsafe: 8.9600 | Init: 0.0398 | Outside: 0.0000 | Gen: 24.0943 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.040, ACTUAL SAMPLES: V_min=1.040, V_max=1.040, beta_ra=10.0
+Epoch   710 | Total: 32.5562 | Unsafe: 8.9594 | Init: 0.0402 | Outside: 0.0000 | Gen: 23.5566 | Focus: generator
+Epoch   720 | Total: 32.0454 | Unsafe: 8.9589 | Init: 0.0406 | Outside: 0.0000 | Gen: 23.0460 | Focus: generator
+Epoch   730 | Total: 30.6450 | Unsafe: 8.9597 | Init: 0.0400 | Outside: 0.0000 | Gen: 21.6453 | Focus: generator
+Epoch   740 | Total: 29.5222 | Unsafe: 8.9598 | Init: 0.0399 | Outside: 0.0000 | Gen: 20.5225 | Focus: generator
+Epoch   750 | Total: 28.9283 | Unsafe: 8.9595 | Init: 0.0401 | Outside: 0.0000 | Gen: 19.9287 | Focus: generator
+Epoch   760 | Total: 28.6170 | Unsafe: 8.9594 | Init: 0.0401 | Outside: 0.0000 | Gen: 19.6175 | Focus: generator
+Epoch   770 | Total: 28.8494 | Unsafe: 8.9597 | Init: 0.0400 | Outside: 0.0000 | Gen: 19.8497 | Focus: generator
+[SWITCH] Switching from generator to unsafe
+  Resetting optimizer and scheduler state after switching focus
+  constraint_largest_counts: {'generator': 0, 'unsafe': 0}
+Epoch   780 | Total: 4587.1733 | Unsafe: 4587.1001 | Init: 0.0403 | Outside: 0.0000 | Gen: 0.0326 | Focus: unsafe
+Epoch   790 | Total: 4203.4775 | Unsafe: 4200.7720 | Init: 0.5848 | Outside: 0.0000 | Gen: 2.1204 | Focus: unsafe
+[Refine-Unsafe] Epoch 800: Loss=1585.366, 512 failing → refined 100 cells → 1212 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 1215 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 1215 cells...
+[SymbolicCROWNCache] Initialized for 1215 cells - symbolic structure cached!
+    Rebuilding Phi cache with 608 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 608 cells...
+[SymbolicCROWNCache_Phi] Initialized for 608 cells!
+  Caches rebuilt successfully!
+Epoch   800 | Total: 2088.5266 | Unsafe: 2062.2842 | Init: 5.5311 | Outside: 0.0000 | Gen: 20.7115 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=7.876, ACTUAL SAMPLES: V_min=8.013, V_max=8.835, beta_ra=10.0
+[Merge-Unsafe] Epoch 808: merged 746 pairs → 466 total
+[Merge-Generator] Epoch 808: merged 157 pairs → 451 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 469 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 469 cells...
+[SymbolicCROWNCache] Initialized for 469 cells - symbolic structure cached!
+    Rebuilding Phi cache with 451 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 451 cells...
+[SymbolicCROWNCache_Phi] Initialized for 451 cells!
+  Caches rebuilt successfully!
+Epoch   810 | Total: 113.2840 | Unsafe: 0.0000 | Init: 20.4207 | Outside: 0.0000 | Gen: 92.8634 | Focus: unsafe
+Epoch   820 | Total: 147.6274 | Unsafe: 0.0000 | Init: 30.5836 | Outside: 0.0000 | Gen: 117.0438 | Focus: unsafe
+Epoch   830 | Total: 147.7490 | Unsafe: 0.0000 | Init: 33.5525 | Outside: 0.0000 | Gen: 114.1965 | Focus: unsafe
+Epoch   840 | Total: 134.5563 | Unsafe: 0.0000 | Init: 32.8722 | Outside: 0.0000 | Gen: 101.6841 | Focus: unsafe
+Epoch   850 | Total: 119.5753 | Unsafe: 0.0000 | Init: 30.9378 | Outside: 0.0000 | Gen: 88.6375 | Focus: unsafe
+Epoch   860 | Total: 105.9776 | Unsafe: 0.0000 | Init: 28.7568 | Outside: 0.0000 | Gen: 77.2209 | Focus: unsafe
+Epoch   870 | Total: 94.3021 | Unsafe: 0.0000 | Init: 26.6649 | Outside: 0.0000 | Gen: 67.6372 | Focus: unsafe
+Epoch   880 | Total: 84.4811 | Unsafe: 0.0000 | Init: 24.7554 | Outside: 0.0000 | Gen: 59.7256 | Focus: unsafe
+Epoch   890 | Total: 76.1987 | Unsafe: 0.0000 | Init: 23.0368 | Outside: 0.0000 | Gen: 53.1619 | Focus: unsafe
+Epoch   900 | Total: 69.1150 | Unsafe: 0.0000 | Init: 21.4908 | Outside: 0.0000 | Gen: 47.6243 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=25.738, ACTUAL SAMPLES: V_min=26.638, V_max=28.512, beta_ra=10.0
+Epoch   910 | Total: 63.0132 | Unsafe: 0.0000 | Init: 20.0991 | Outside: 0.0000 | Gen: 42.9141 | Focus: unsafe
+Epoch   920 | Total: 57.6816 | Unsafe: 0.0000 | Init: 18.8387 | Outside: 0.0000 | Gen: 38.8429 | Focus: unsafe
+Epoch   930 | Total: 53.0398 | Unsafe: 0.0000 | Init: 17.6911 | Outside: 0.0000 | Gen: 35.3487 | Focus: unsafe
+Epoch   940 | Total: 48.9664 | Unsafe: 0.0000 | Init: 16.6433 | Outside: 0.0000 | Gen: 32.3231 | Focus: unsafe
+Epoch   950 | Total: 45.3809 | Unsafe: 0.0000 | Init: 15.6870 | Outside: 0.0000 | Gen: 29.6938 | Focus: unsafe
+Epoch   960 | Total: 42.1996 | Unsafe: 0.0000 | Init: 14.8097 | Outside: 0.0000 | Gen: 27.3898 | Focus: unsafe
+Epoch   970 | Total: 39.3711 | Unsafe: 0.0000 | Init: 14.0050 | Outside: 0.0000 | Gen: 25.3661 | Focus: unsafe
+Epoch   980 | Total: 36.8638 | Unsafe: 0.0000 | Init: 13.2637 | Outside: 0.0000 | Gen: 23.6001 | Focus: unsafe
+Epoch   990 | Total: 34.6307 | Unsafe: 0.0000 | Init: 12.5794 | Outside: 0.0000 | Gen: 22.0513 | Focus: unsafe
+[Refine-Init] Epoch 1000: Loss=12.008, 1 failing → refined 1 cells → 8 total
+[Refine-Generator] Epoch 1000: 339 failing → refined 100 cells → 1151 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 476 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 476 cells...
+[SymbolicCROWNCache] Initialized for 476 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1151 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1151 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1151 cells!
+  Caches rebuilt successfully!
+Epoch  1000 | Total: 25.8878 | Unsafe: 0.0000 | Init: 11.5711 | Outside: 0.0000 | Gen: 14.3167 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=15.358, ACTUAL SAMPLES: V_min=15.870, V_max=17.017, beta_ra=10.0
+
+Epoch 1000 - Detailed Evaluation:
+  Constraint Satisfaction:
+    Unsafe:    ✓ (V_min=15.358, V_max=17.583)
+    Init:      ✗ (V_min=11.733, V_max=12.704)
+    Outside:   ✓ (V_min=5.238, V_max=28.503)
+    Generator: ✗ (Phi_upper_min=-83.239, Phi_upper_max=266.187, failing=871)
+  Goal bounds: V ∈ [8.900, 12.123]
+  Unsafe bounds: V ∈ [15.358, 17.583]
+  Generator bounds: Φ ∈ [-301.628, 266.187]
+  Generator failing cells: 871/1151 (75.7%)
+
+  Creating visualization for epoch 1000...
+  → Saved to 'training_progress/value_function_epoch_1000.png'
+  → Saved to 'training_progress/generator_epoch_1000.png'
+  → Saved 3D plot to 'training_progress/value_function_3d_epoch_1000.png'
+[Merge-Generator] Epoch 1010: merged 423 pairs → 728 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 476 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 476 cells...
+[SymbolicCROWNCache] Initialized for 476 cells - symbolic structure cached!
+    Rebuilding Phi cache with 728 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 728 cells...
+[SymbolicCROWNCache_Phi] Initialized for 728 cells!
+  Caches rebuilt successfully!
+Epoch  1010 | Total: 29.2677 | Unsafe: 0.0000 | Init: 11.0475 | Outside: 0.0000 | Gen: 18.2203 | Focus: unsafe
+Epoch  1020 | Total: 27.8610 | Unsafe: 0.0000 | Init: 10.5639 | Outside: 0.0000 | Gen: 17.2971 | Focus: unsafe
+Epoch  1030 | Total: 26.5023 | Unsafe: 0.0000 | Init: 10.0937 | Outside: 0.0000 | Gen: 16.4086 | Focus: unsafe
+Epoch  1040 | Total: 25.2195 | Unsafe: 0.0000 | Init: 9.6471 | Outside: 0.0000 | Gen: 15.5724 | Focus: unsafe
+Epoch  1050 | Total: 24.0199 | Unsafe: 0.0000 | Init: 9.2246 | Outside: 0.0000 | Gen: 14.7953 | Focus: unsafe
+Epoch  1060 | Total: 22.9014 | Unsafe: 0.0000 | Init: 8.8260 | Outside: 0.0000 | Gen: 14.0754 | Focus: unsafe
+Epoch  1070 | Total: 21.8575 | Unsafe: 0.0000 | Init: 8.4505 | Outside: 0.0000 | Gen: 13.4070 | Focus: unsafe
+Epoch  1080 | Total: 20.8778 | Unsafe: 0.0000 | Init: 8.0968 | Outside: 0.0000 | Gen: 12.7810 | Focus: unsafe
+Epoch  1090 | Total: 19.9576 | Unsafe: 0.0000 | Init: 7.7624 | Outside: 0.0000 | Gen: 12.1951 | Focus: unsafe
+Epoch  1100 | Total: 19.0905 | Unsafe: 0.0000 | Init: 7.4459 | Outside: 0.0000 | Gen: 11.6446 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=10.400, ACTUAL SAMPLES: V_min=10.716, V_max=11.590, beta_ra=10.0
+Epoch  1110 | Total: 18.2724 | Unsafe: 0.0000 | Init: 7.1459 | Outside: 0.0000 | Gen: 11.1266 | Focus: unsafe
+Epoch  1120 | Total: 18.1771 | Unsafe: 0.0000 | Init: 7.1682 | Outside: 0.0000 | Gen: 11.0090 | Focus: unsafe
+Epoch  1130 | Total: 17.9753 | Unsafe: 0.0163 | Init: 7.1334 | Outside: 0.0000 | Gen: 10.8256 | Focus: unsafe
+Epoch  1140 | Total: 17.8817 | Unsafe: 0.0000 | Init: 7.1639 | Outside: 0.0000 | Gen: 10.7178 | Focus: unsafe
+Epoch  1150 | Total: 17.7547 | Unsafe: 0.0134 | Init: 7.1660 | Outside: 0.0000 | Gen: 10.5752 | Focus: unsafe
+Epoch  1160 | Total: 17.6414 | Unsafe: 0.0142 | Init: 7.1814 | Outside: 0.0000 | Gen: 10.4458 | Focus: unsafe
+Epoch  1170 | Total: 17.5254 | Unsafe: 0.0197 | Init: 7.1942 | Outside: 0.0000 | Gen: 10.3115 | Focus: unsafe
+Epoch  1180 | Total: 17.4114 | Unsafe: 0.0189 | Init: 7.2118 | Outside: 0.0000 | Gen: 10.1807 | Focus: unsafe
+Epoch  1190 | Total: 17.2976 | Unsafe: 0.0160 | Init: 7.2315 | Outside: 0.0000 | Gen: 10.0501 | Focus: unsafe
+[Refine-Init] Epoch 1200: Loss=57.976, 8 failing → refined 8 cells → 64 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 532 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 532 cells...
+[SymbolicCROWNCache] Initialized for 532 cells - symbolic structure cached!
+    Rebuilding Phi cache with 728 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 728 cells...
+[SymbolicCROWNCache_Phi] Initialized for 728 cells!
+  Caches rebuilt successfully!
+Epoch  1200 | Total: 17.0781 | Unsafe: 0.0170 | Init: 7.1451 | Outside: 0.0000 | Gen: 9.9160 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=9.983, ACTUAL SAMPLES: V_min=10.252, V_max=11.033, beta_ra=10.0
+Epoch  1210 | Total: 16.9645 | Unsafe: 0.0240 | Init: 7.1614 | Outside: 0.0000 | Gen: 9.7790 | Focus: unsafe
+[Merge-Generator] Epoch 1212: merged 46 pairs → 682 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 532 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 532 cells...
+[SymbolicCROWNCache] Initialized for 532 cells - symbolic structure cached!
+    Rebuilding Phi cache with 682 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 682 cells...
+[SymbolicCROWNCache_Phi] Initialized for 682 cells!
+  Caches rebuilt successfully!
+Epoch  1220 | Total: 17.3565 | Unsafe: 0.0163 | Init: 7.1855 | Outside: 0.0000 | Gen: 10.1546 | Focus: unsafe
+Epoch  1230 | Total: 17.2272 | Unsafe: 0.0221 | Init: 7.2045 | Outside: 0.0000 | Gen: 10.0006 | Focus: unsafe
+Epoch  1240 | Total: 17.0968 | Unsafe: 0.0165 | Init: 7.2298 | Outside: 0.0000 | Gen: 9.8505 | Focus: unsafe
+Epoch  1250 | Total: 16.9673 | Unsafe: 0.0233 | Init: 7.2501 | Outside: 0.0000 | Gen: 9.6938 | Focus: unsafe
+Epoch  1260 | Total: 16.8374 | Unsafe: 0.0134 | Init: 7.2789 | Outside: 0.0000 | Gen: 9.5451 | Focus: unsafe
+Epoch  1270 | Total: 16.7066 | Unsafe: 0.0218 | Init: 7.2979 | Outside: 0.0000 | Gen: 9.3869 | Focus: unsafe
+Epoch  1280 | Total: 16.5766 | Unsafe: 0.0144 | Init: 7.3255 | Outside: 0.0000 | Gen: 9.2367 | Focus: unsafe
+Epoch  1290 | Total: 16.4463 | Unsafe: 0.0140 | Init: 7.3502 | Outside: 0.0000 | Gen: 9.0821 | Focus: unsafe
+[SWITCH] Switching from unsafe to generator
+  Resetting optimizer and scheduler state after switching focus
+  constraint_largest_counts: {'generator': 0, 'unsafe': 0}
+Epoch  1300 | Total: 2409.7209 | Unsafe: 3.7713 | Init: 4.4696 | Outside: 0.0000 | Gen: 2401.4800 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=5.985, ACTUAL SAMPLES: V_min=6.149, V_max=6.435, beta_ra=10.0
+Epoch  1310 | Total: 499.7128 | Unsafe: 7.0500 | Init: 1.8608 | Outside: 0.0000 | Gen: 490.8020 | Focus: generator
+Epoch  1320 | Total: 162.8344 | Unsafe: 8.6610 | Init: 0.2817 | Outside: 0.0000 | Gen: 153.8917 | Focus: generator
+Epoch  1330 | Total: 56.7049 | Unsafe: 8.5830 | Init: 0.4151 | Outside: 0.0000 | Gen: 47.7068 | Focus: generator
+Epoch  1340 | Total: 22.8982 | Unsafe: 8.8313 | Init: 0.1671 | Outside: 0.0000 | Gen: 13.8998 | Focus: generator
+Epoch  1350 | Total: 18.0881 | Unsafe: 8.7983 | Init: 0.1989 | Outside: 0.0000 | Gen: 9.0909 | Focus: generator
+Epoch  1360 | Total: 16.6285 | Unsafe: 8.8072 | Init: 0.1919 | Outside: 0.0000 | Gen: 7.6294 | Focus: generator
+Epoch  1370 | Total: 12.3178 | Unsafe: 8.8091 | Init: 0.1908 | Outside: 0.0000 | Gen: 3.3179 | Focus: generator
+Epoch  1380 | Total: 11.0622 | Unsafe: 8.8199 | Init: 0.1797 | Outside: 0.0000 | Gen: 2.0625 | Focus: generator
+Epoch  1390 | Total: 11.4813 | Unsafe: 8.8265 | Init: 0.1731 | Outside: 0.0000 | Gen: 2.4818 | Focus: generator
+[Refine-Unsafe] Epoch 1400: Loss=4107.254, 466 failing → refined 100 cells → 1166 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 1232 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 1232 cells...
+[SymbolicCROWNCache] Initialized for 1232 cells - symbolic structure cached!
+    Rebuilding Phi cache with 682 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 682 cells...
+[SymbolicCROWNCache_Phi] Initialized for 682 cells!
+  Caches rebuilt successfully!
+Epoch  1400 | Total: 12.9163 | Unsafe: 8.8349 | Init: 0.1641 | Outside: 0.0000 | Gen: 3.9173 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.165, ACTUAL SAMPLES: V_min=1.165, V_max=1.165, beta_ra=10.0
+Epoch  1410 | Total: 14.1572 | Unsafe: 8.7860 | Init: 0.2150 | Outside: 0.0000 | Gen: 5.1562 | Focus: generator
+[Merge-Init] Epoch 1414: merged 60 pairs → 4 total
+[Merge-Generator] Epoch 1414: merged 0 pairs → 682 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 1172 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 1172 cells...
+[SymbolicCROWNCache] Initialized for 1172 cells - symbolic structure cached!
+    Rebuilding Phi cache with 682 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 682 cells...
+[SymbolicCROWNCache_Phi] Initialized for 682 cells!
+  Caches rebuilt successfully!
+Epoch  1420 | Total: 12.8983 | Unsafe: 8.8162 | Init: 0.1835 | Outside: 0.0000 | Gen: 3.8986 | Focus: generator
+Epoch  1430 | Total: 11.1070 | Unsafe: 8.8146 | Init: 0.1855 | Outside: 0.0000 | Gen: 2.1069 | Focus: generator
+Epoch  1440 | Total: 9.8011 | Unsafe: 8.8247 | Init: 0.1752 | Outside: 0.0000 | Gen: 0.8012 | Focus: generator
+Epoch  1450 | Total: 11.3569 | Unsafe: 8.8098 | Init: 0.1905 | Outside: 0.0000 | Gen: 2.3566 | Focus: generator
+Epoch  1460 | Total: 11.0324 | Unsafe: 8.8153 | Init: 0.1845 | Outside: 0.0000 | Gen: 2.0326 | Focus: generator
+Epoch  1470 | Total: 11.0937 | Unsafe: 8.8119 | Init: 0.1883 | Outside: 0.0000 | Gen: 2.0935 | Focus: generator
+Epoch  1480 | Total: 11.4968 | Unsafe: 8.8146 | Init: 0.1857 | Outside: 0.0000 | Gen: 2.4964 | Focus: generator
+Epoch  1490 | Total: 10.7284 | Unsafe: 8.8256 | Init: 0.1741 | Outside: 0.0000 | Gen: 1.7287 | Focus: generator
+[Refine-Generator] Epoch 1500: 615 failing → refined 100 cells → 1382 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 1172 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 1172 cells...
+[SymbolicCROWNCache] Initialized for 1172 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1382 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1382 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1382 cells!
+  Caches rebuilt successfully!
+Epoch  1500 | Total: 10.6844 | Unsafe: 8.8286 | Init: 0.1712 | Outside: 0.0000 | Gen: 1.6846 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.171, ACTUAL SAMPLES: V_min=1.171, V_max=1.171, beta_ra=10.0
+Epoch  1510 | Total: 11.6543 | Unsafe: 8.8178 | Init: 0.1818 | Outside: 0.0000 | Gen: 2.6547 | Focus: generator
+Epoch  1520 | Total: 13.8752 | Unsafe: 8.7915 | Init: 0.2089 | Outside: 0.0000 | Gen: 4.8748 | Focus: generator
+Epoch  1530 | Total: 12.0096 | Unsafe: 8.8053 | Init: 0.1947 | Outside: 0.0000 | Gen: 3.0096 | Focus: generator
+Epoch  1540 | Total: 11.1810 | Unsafe: 8.8138 | Init: 0.1860 | Outside: 0.0000 | Gen: 2.1812 | Focus: generator
+Epoch  1550 | Total: 11.0174 | Unsafe: 8.8163 | Init: 0.1832 | Outside: 0.0000 | Gen: 2.0179 | Focus: generator
+Epoch  1560 | Total: 11.4532 | Unsafe: 8.8189 | Init: 0.1812 | Outside: 0.0000 | Gen: 2.4532 | Focus: generator
+Epoch  1570 | Total: 10.8437 | Unsafe: 8.8179 | Init: 0.1819 | Outside: 0.0000 | Gen: 1.8439 | Focus: generator
+Epoch  1580 | Total: 10.9097 | Unsafe: 8.8200 | Init: 0.1796 | Outside: 0.0000 | Gen: 1.9101 | Focus: generator
+Epoch  1590 | Total: 12.2394 | Unsafe: 8.8100 | Init: 0.1903 | Outside: 0.0000 | Gen: 3.2391 | Focus: generator
+[Refine-Unsafe] Epoch 1600: Loss=10260.136, 1166 failing → refined 100 cells → 1866 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 1872 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 1872 cells...
+[SymbolicCROWNCache] Initialized for 1872 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1382 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1382 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1382 cells!
+  Caches rebuilt successfully!
+Epoch  1600 | Total: 13.3886 | Unsafe: 8.7958 | Init: 0.2047 | Outside: 0.0000 | Gen: 4.3882 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.204, ACTUAL SAMPLES: V_min=1.204, V_max=1.204, beta_ra=10.0
+Epoch  1610 | Total: 11.3276 | Unsafe: 8.8129 | Init: 0.1865 | Outside: 0.0000 | Gen: 2.3282 | Focus: generator
+[Merge-Generator] Epoch 1616: merged 0 pairs → 1382 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 1872 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 1872 cells...
+[SymbolicCROWNCache] Initialized for 1872 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1382 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1382 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1382 cells!
+  Caches rebuilt successfully!
+Epoch  1620 | Total: 10.7628 | Unsafe: 8.8113 | Init: 0.1884 | Outside: 0.0000 | Gen: 1.7631 | Focus: generator
+Epoch  1630 | Total: 11.7258 | Unsafe: 8.8116 | Init: 0.1876 | Outside: 0.0000 | Gen: 2.7266 | Focus: generator
+Epoch  1640 | Total: 14.3432 | Unsafe: 8.8086 | Init: 0.1900 | Outside: 0.0000 | Gen: 5.3445 | Focus: generator
+Epoch  1650 | Total: 13.4078 | Unsafe: 8.8057 | Init: 0.1931 | Outside: 0.0000 | Gen: 4.4090 | Focus: generator
+Epoch  1660 | Total: 11.9575 | Unsafe: 8.8144 | Init: 0.1847 | Outside: 0.0000 | Gen: 2.9584 | Focus: generator
+Epoch  1670 | Total: 11.0235 | Unsafe: 8.8192 | Init: 0.1806 | Outside: 0.0000 | Gen: 2.0237 | Focus: generator
+Epoch  1680 | Total: 10.8294 | Unsafe: 8.8269 | Init: 0.1728 | Outside: 0.0000 | Gen: 1.8297 | Focus: generator
+Epoch  1690 | Total: 10.5724 | Unsafe: 8.8093 | Init: 0.1905 | Outside: 0.0000 | Gen: 1.5726 | Focus: generator
+Epoch  1700 | Total: 11.5559 | Unsafe: 8.8165 | Init: 0.1828 | Outside: 0.0000 | Gen: 2.5566 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.183, ACTUAL SAMPLES: V_min=1.183, V_max=1.184, beta_ra=10.0
+Epoch  1710 | Total: 10.7292 | Unsafe: 8.8114 | Init: 0.1885 | Outside: 0.0000 | Gen: 1.7293 | Focus: generator
+Epoch  1720 | Total: 10.3949 | Unsafe: 8.8181 | Init: 0.1817 | Outside: 0.0000 | Gen: 1.3951 | Focus: generator
+Epoch  1730 | Total: 10.3777 | Unsafe: 8.8169 | Init: 0.1830 | Outside: 0.0000 | Gen: 1.3779 | Focus: generator
+Epoch  1740 | Total: 10.6395 | Unsafe: 8.8103 | Init: 0.1896 | Outside: 0.0000 | Gen: 1.6396 | Focus: generator
+Epoch  1750 | Total: 10.1575 | Unsafe: 8.8186 | Init: 0.1812 | Outside: 0.0000 | Gen: 1.1577 | Focus: generator
+Epoch  1760 | Total: 9.6305 | Unsafe: 8.8228 | Init: 0.1771 | Outside: 0.0000 | Gen: 0.6306 | Focus: generator
+Epoch  1770 | Total: 9.7799 | Unsafe: 8.8207 | Init: 0.1793 | Outside: 0.0000 | Gen: 0.7799 | Focus: generator
+Epoch  1780 | Total: 9.6536 | Unsafe: 8.8232 | Init: 0.1767 | Outside: 0.0000 | Gen: 0.6537 | Focus: generator
+Epoch  1790 | Total: 9.8720 | Unsafe: 8.8258 | Init: 0.1741 | Outside: 0.0000 | Gen: 0.8721 | Focus: generator
+[Refine-Unsafe] Epoch 1800: Loss=16465.455, 1866 failing → refined 100 cells → 2566 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 2572 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 2572 cells...
+[SymbolicCROWNCache] Initialized for 2572 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1382 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1382 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1382 cells!
+  Caches rebuilt successfully!
+[SWITCH] Switching from generator to unsafe
+  Resetting optimizer and scheduler state after switching focus
+  constraint_largest_counts: {'generator': 0, 'unsafe': 0}
+Epoch  1800 | Total: 22639.9746 | Unsafe: 22639.7969 | Init: 0.1768 | Outside: 0.0000 | Gen: 0.0006 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=1.177, ACTUAL SAMPLES: V_min=1.177, V_max=1.177, beta_ra=10.0
+Epoch  1810 | Total: 16678.6992 | Unsafe: 16675.9590 | Init: 2.3606 | Outside: 0.0000 | Gen: 0.3789 | Focus: unsafe
+[Merge-Generator] Epoch 1818: merged 185 pairs → 1197 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 2572 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 2572 cells...
+[SymbolicCROWNCache] Initialized for 2572 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1197 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1197 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1197 cells!
+  Caches rebuilt successfully!
+Epoch  1820 | Total: 13.1987 | Unsafe: 0.0000 | Init: 7.8576 | Outside: 0.0000 | Gen: 5.3412 | Focus: unsafe
+Epoch  1830 | Total: 34.9406 | Unsafe: 0.0000 | Init: 16.6665 | Outside: 0.0000 | Gen: 18.2740 | Focus: unsafe
+Epoch  1840 | Total: 49.5178 | Unsafe: 0.0000 | Init: 22.6131 | Outside: 0.0000 | Gen: 26.9047 | Focus: unsafe
+Epoch  1850 | Total: 55.5879 | Unsafe: 0.0000 | Init: 25.2438 | Outside: 0.0000 | Gen: 30.3442 | Focus: unsafe
+Epoch  1860 | Total: 57.0832 | Unsafe: 0.0000 | Init: 26.0215 | Outside: 0.0000 | Gen: 31.0617 | Focus: unsafe
+Epoch  1870 | Total: 56.5916 | Unsafe: 0.0000 | Init: 25.9803 | Outside: 0.0000 | Gen: 30.6114 | Focus: unsafe
+Epoch  1880 | Total: 55.3241 | Unsafe: 0.0000 | Init: 25.6118 | Outside: 0.0000 | Gen: 29.7123 | Focus: unsafe
+Epoch  1890 | Total: 53.7799 | Unsafe: 0.0000 | Init: 25.1200 | Outside: 0.0000 | Gen: 28.6599 | Focus: unsafe
+Epoch  1900 | Total: 52.1525 | Unsafe: 0.0000 | Init: 24.5862 | Outside: 0.0000 | Gen: 27.5663 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=30.969, ACTUAL SAMPLES: V_min=31.553, V_max=33.763, beta_ra=10.0
+Epoch  1910 | Total: 50.5366 | Unsafe: 0.0000 | Init: 24.0412 | Outside: 0.0000 | Gen: 26.4953 | Focus: unsafe
+Epoch  1920 | Total: 48.9507 | Unsafe: 0.0000 | Init: 23.4994 | Outside: 0.0000 | Gen: 25.4513 | Focus: unsafe
+Epoch  1930 | Total: 47.4225 | Unsafe: 0.0000 | Init: 22.9680 | Outside: 0.0000 | Gen: 24.4545 | Focus: unsafe
+Epoch  1940 | Total: 45.9417 | Unsafe: 0.0000 | Init: 22.4487 | Outside: 0.0000 | Gen: 23.4930 | Focus: unsafe
+Epoch  1950 | Total: 44.5158 | Unsafe: 0.0000 | Init: 21.9430 | Outside: 0.0000 | Gen: 22.5728 | Focus: unsafe
+Epoch  1960 | Total: 43.1465 | Unsafe: 0.0000 | Init: 21.4519 | Outside: 0.0000 | Gen: 21.6947 | Focus: unsafe
+Epoch  1970 | Total: 41.8324 | Unsafe: 0.0000 | Init: 20.9766 | Outside: 0.0000 | Gen: 20.8558 | Focus: unsafe
+Epoch  1980 | Total: 40.5731 | Unsafe: 0.0000 | Init: 20.5168 | Outside: 0.0000 | Gen: 20.0562 | Focus: unsafe
+Epoch  1990 | Total: 39.3670 | Unsafe: 0.0000 | Init: 20.0726 | Outside: 0.0000 | Gen: 19.2945 | Focus: unsafe
+[Refine-Init] Epoch 2000: Loss=78.744, 4 failing → refined 4 cells → 32 total
+[Refine-Generator] Epoch 2000: 1026 failing → refined 100 cells → 1897 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 2600 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 2600 cells...
+[SymbolicCROWNCache] Initialized for 2600 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1897 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1897 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1897 cells!
+  Caches rebuilt successfully!
+Epoch  2000 | Total: 36.2766 | Unsafe: 0.0000 | Init: 19.3983 | Outside: 0.0000 | Gen: 16.8782 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=24.698, ACTUAL SAMPLES: V_min=25.093, V_max=26.829, beta_ra=10.0
+
+Epoch 2000 - Detailed Evaluation:
+  Constraint Satisfaction:
+    Unsafe:    ✓ (V_min=24.698, V_max=27.279)
+    Init:      ✗ (V_min=19.777, V_max=20.748)
+    Outside:   ✓ (V_min=13.075, V_max=37.370)
+    Generator: ✗ (Phi_upper_min=-89.653, Phi_upper_max=300.065, failing=1659)
+  Goal bounds: V ∈ [16.540, 19.640]
+  Unsafe bounds: V ∈ [24.698, 27.279]
+  Generator bounds: Φ ∈ [-503.930, 300.065]
+  Generator failing cells: 1659/1897 (87.5%)
+
+  Creating visualization for epoch 2000...
+  → Saved to 'training_progress/value_function_epoch_2000.png'
+  → Saved to 'training_progress/generator_epoch_2000.png'
+  → Saved 3D plot to 'training_progress/value_function_3d_epoch_2000.png'
+Epoch  2010 | Total: 35.2685 | Unsafe: 0.0000 | Init: 19.0025 | Outside: 0.0000 | Gen: 16.2659 | Focus: unsafe
+[Merge-Unsafe] Epoch 2020: merged 1825 pairs → 741 total
+[Merge-Generator] Epoch 2020: merged 372 pairs → 1525 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 775 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 775 cells...
+[SymbolicCROWNCache] Initialized for 775 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1525 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1525 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1525 cells!
+  Caches rebuilt successfully!
+Epoch  2020 | Total: 36.0137 | Unsafe: 0.0000 | Init: 18.6286 | Outside: 0.0000 | Gen: 17.3851 | Focus: unsafe
+Epoch  2030 | Total: 35.0098 | Unsafe: 0.0000 | Init: 18.2615 | Outside: 0.0000 | Gen: 16.7483 | Focus: unsafe
+Epoch  2040 | Total: 34.0217 | Unsafe: 0.0000 | Init: 17.9013 | Outside: 0.0000 | Gen: 16.1203 | Focus: unsafe
+Epoch  2050 | Total: 33.0670 | Unsafe: 0.0000 | Init: 17.5534 | Outside: 0.0000 | Gen: 15.5136 | Focus: unsafe
+Epoch  2060 | Total: 32.1512 | Unsafe: 0.0000 | Init: 17.2195 | Outside: 0.0000 | Gen: 14.9316 | Focus: unsafe
+Epoch  2070 | Total: 31.2739 | Unsafe: 0.0000 | Init: 16.8997 | Outside: 0.0000 | Gen: 14.3741 | Focus: unsafe
+Epoch  2080 | Total: 30.4341 | Unsafe: 0.0000 | Init: 16.5937 | Outside: 0.0000 | Gen: 13.8404 | Focus: unsafe
+Epoch  2090 | Total: 29.6302 | Unsafe: 0.0000 | Init: 16.3009 | Outside: 0.0000 | Gen: 13.3294 | Focus: unsafe
+Epoch  2100 | Total: 28.8608 | Unsafe: 0.0000 | Init: 16.0206 | Outside: 0.0000 | Gen: 12.8402 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=20.248, ACTUAL SAMPLES: V_min=20.546, V_max=21.942, beta_ra=10.0
+Epoch  2110 | Total: 28.1247 | Unsafe: 0.0000 | Init: 15.7524 | Outside: 0.0000 | Gen: 12.3722 | Focus: unsafe
+Epoch  2120 | Total: 27.4204 | Unsafe: 0.0000 | Init: 15.4960 | Outside: 0.0000 | Gen: 11.9244 | Focus: unsafe
+Epoch  2130 | Total: 27.0464 | Unsafe: 0.0000 | Init: 15.3599 | Outside: 0.0000 | Gen: 11.6865 | Focus: unsafe
+Epoch  2140 | Total: 26.7136 | Unsafe: 0.0000 | Init: 15.2387 | Outside: 0.0000 | Gen: 11.4749 | Focus: unsafe
+Epoch  2150 | Total: 26.3860 | Unsafe: 0.0000 | Init: 15.1195 | Outside: 0.0000 | Gen: 11.2665 | Focus: unsafe
+Epoch  2160 | Total: 26.0633 | Unsafe: 0.0000 | Init: 15.0021 | Outside: 0.0000 | Gen: 11.0612 | Focus: unsafe
+Epoch  2170 | Total: 25.7451 | Unsafe: 0.0000 | Init: 14.8864 | Outside: 0.0000 | Gen: 10.8587 | Focus: unsafe
+Epoch  2180 | Total: 25.4317 | Unsafe: 0.0000 | Init: 14.7724 | Outside: 0.0000 | Gen: 10.6592 | Focus: unsafe
+Epoch  2190 | Total: 25.1229 | Unsafe: 0.0000 | Init: 14.6602 | Outside: 0.0000 | Gen: 10.4626 | Focus: unsafe
+[Refine-Init] Epoch 2200: Loss=465.945, 32 failing → refined 32 cells → 256 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 999 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 999 cells...
+[SymbolicCROWNCache] Initialized for 999 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1525 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1525 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1525 cells!
+  Caches rebuilt successfully!
+Epoch  2200 | Total: 24.7476 | Unsafe: 0.0000 | Init: 14.4787 | Outside: 0.0000 | Gen: 10.2689 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=18.251, ACTUAL SAMPLES: V_min=18.520, V_max=19.653, beta_ra=10.0
+Epoch  2210 | Total: 24.4497 | Unsafe: 0.0000 | Init: 14.3713 | Outside: 0.0000 | Gen: 10.0784 | Focus: unsafe
+Epoch  2220 | Total: 24.1570 | Unsafe: 0.0000 | Init: 14.2658 | Outside: 0.0000 | Gen: 9.8912 | Focus: unsafe
+[Merge-Unsafe] Epoch 2222: merged 15 pairs → 726 total
+[Merge-Generator] Epoch 2222: merged 16 pairs → 1509 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 984 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 984 cells...
+[SymbolicCROWNCache] Initialized for 984 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1509 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1509 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1509 cells!
+  Caches rebuilt successfully!
+Epoch  2230 | Total: 23.9635 | Unsafe: 0.0000 | Init: 14.1620 | Outside: 0.0000 | Gen: 9.8015 | Focus: unsafe
+Epoch  2240 | Total: 23.6772 | Unsafe: 0.0000 | Init: 14.0597 | Outside: 0.0000 | Gen: 9.6175 | Focus: unsafe
+Epoch  2250 | Total: 23.3955 | Unsafe: 0.0000 | Init: 13.9591 | Outside: 0.0000 | Gen: 9.4364 | Focus: unsafe
+Epoch  2260 | Total: 23.1184 | Unsafe: 0.0000 | Init: 13.8603 | Outside: 0.0000 | Gen: 9.2581 | Focus: unsafe
+Epoch  2270 | Total: 22.8460 | Unsafe: 0.0000 | Init: 13.7632 | Outside: 0.0000 | Gen: 9.0828 | Focus: unsafe
+Epoch  2280 | Total: 22.5783 | Unsafe: 0.0000 | Init: 13.6678 | Outside: 0.0000 | Gen: 8.9104 | Focus: unsafe
+Epoch  2290 | Total: 22.3153 | Unsafe: 0.0000 | Init: 13.5742 | Outside: 0.0000 | Gen: 8.7411 | Focus: unsafe
+Epoch  2300 | Total: 22.0569 | Unsafe: 0.0000 | Init: 13.4823 | Outside: 0.0000 | Gen: 8.5746 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=16.857, ACTUAL SAMPLES: V_min=17.095, V_max=18.032, beta_ra=10.0
+Epoch  2310 | Total: 21.8030 | Unsafe: 0.0000 | Init: 13.3921 | Outside: 0.0000 | Gen: 8.4109 | Focus: unsafe
+[SWITCH] Switching from unsafe to generator
+  Resetting optimizer and scheduler state after switching focus
+  constraint_largest_counts: {'generator': 0, 'unsafe': 0}
+Epoch  2320 | Total: 10341.1641 | Unsafe: 0.0000 | Init: 12.8939 | Outside: 0.0000 | Gen: 10328.2705 | Focus: generator
+Epoch  2330 | Total: 1753.5182 | Unsafe: 0.0000 | Init: 10.9167 | Outside: 0.0000 | Gen: 1742.6014 | Focus: generator
+Epoch  2340 | Total: 658.3135 | Unsafe: 1.2334 | Init: 7.7142 | Outside: 0.0000 | Gen: 649.3658 | Focus: generator
+Epoch  2350 | Total: 266.8102 | Unsafe: 3.5861 | Init: 5.3825 | Outside: 0.0000 | Gen: 257.8417 | Focus: generator
+Epoch  2360 | Total: 160.8159 | Unsafe: 5.3262 | Init: 3.6169 | Outside: 0.0000 | Gen: 151.8728 | Focus: generator
+Epoch  2370 | Total: 103.1949 | Unsafe: 6.2593 | Init: 2.7009 | Outside: 0.0000 | Gen: 94.2347 | Focus: generator
+Epoch  2380 | Total: 76.2731 | Unsafe: 6.8810 | Init: 2.0956 | Outside: 0.0000 | Gen: 67.2964 | Focus: generator
+Epoch  2390 | Total: 55.8216 | Unsafe: 7.4466 | Init: 1.5332 | Outside: 0.0000 | Gen: 46.8418 | Focus: generator
+[Refine-Unsafe] Epoch 2400: Loss=5724.532, 726 failing → refined 100 cells → 1426 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 1684 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 1684 cells...
+[SymbolicCROWNCache] Initialized for 1684 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1509 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1509 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1509 cells!
+  Caches rebuilt successfully!
+Epoch  2400 | Total: 42.2966 | Unsafe: 7.9284 | Init: 1.0553 | Outside: 0.0000 | Gen: 33.3129 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=2.065, ACTUAL SAMPLES: V_min=2.069, V_max=2.077, beta_ra=10.0
+Epoch  2410 | Total: 31.3172 | Unsafe: 8.3085 | Init: 0.6808 | Outside: 0.0000 | Gen: 22.3280 | Focus: generator
+Epoch  2420 | Total: 22.9205 | Unsafe: 8.3815 | Init: 0.6122 | Outside: 0.0000 | Gen: 13.9268 | Focus: generator
+[Merge-Generator] Epoch 2424: merged 0 pairs → 1509 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 1684 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 1684 cells...
+[SymbolicCROWNCache] Initialized for 1684 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1509 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1509 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1509 cells!
+  Caches rebuilt successfully!
+Epoch  2430 | Total: 16.7799 | Unsafe: 8.2865 | Init: 0.7110 | Outside: 0.0000 | Gen: 7.7823 | Focus: generator
+Epoch  2440 | Total: 13.7487 | Unsafe: 8.3538 | Init: 0.6455 | Outside: 0.0000 | Gen: 4.7494 | Focus: generator
+Epoch  2450 | Total: 12.8493 | Unsafe: 8.3645 | Init: 0.6355 | Outside: 0.0000 | Gen: 3.8494 | Focus: generator
+Epoch  2460 | Total: 15.4917 | Unsafe: 8.3739 | Init: 0.6256 | Outside: 0.0000 | Gen: 6.4922 | Focus: generator
+Epoch  2470 | Total: 12.7800 | Unsafe: 8.3749 | Init: 0.6254 | Outside: 0.0000 | Gen: 3.7796 | Focus: generator
+Epoch  2480 | Total: 11.6655 | Unsafe: 8.4048 | Init: 0.5953 | Outside: 0.0000 | Gen: 2.6653 | Focus: generator
+Epoch  2490 | Total: 11.8557 | Unsafe: 8.4084 | Init: 0.5920 | Outside: 0.0000 | Gen: 2.8554 | Focus: generator
+[Refine-Generator] Epoch 2500: 450 failing → refined 100 cells → 2209 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 1684 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 1684 cells...
+[SymbolicCROWNCache] Initialized for 1684 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2209 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2209 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2209 cells!
+  Caches rebuilt successfully!
+Epoch  2500 | Total: 20.8224 | Unsafe: 8.4186 | Init: 0.5824 | Outside: 0.0000 | Gen: 11.8214 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.581, ACTUAL SAMPLES: V_min=1.581, V_max=1.582, beta_ra=10.0
+Epoch  2510 | Total: 18.8131 | Unsafe: 8.4561 | Init: 0.5444 | Outside: 0.0000 | Gen: 9.8126 | Focus: generator
+Epoch  2520 | Total: 12.3416 | Unsafe: 8.5119 | Init: 0.4878 | Outside: 0.0000 | Gen: 3.3418 | Focus: generator
+Epoch  2530 | Total: 11.4701 | Unsafe: 8.5352 | Init: 0.4647 | Outside: 0.0000 | Gen: 2.4702 | Focus: generator
+Epoch  2540 | Total: 11.3799 | Unsafe: 8.5751 | Init: 0.4244 | Outside: 0.0000 | Gen: 2.3804 | Focus: generator
+Epoch  2550 | Total: 10.3077 | Unsafe: 8.5796 | Init: 0.4202 | Outside: 0.0000 | Gen: 1.3079 | Focus: generator
+Epoch  2560 | Total: 11.8317 | Unsafe: 8.5938 | Init: 0.4061 | Outside: 0.0000 | Gen: 2.8318 | Focus: generator
+Epoch  2570 | Total: 10.9909 | Unsafe: 8.6289 | Init: 0.3708 | Outside: 0.0000 | Gen: 1.9912 | Focus: generator
+Epoch  2580 | Total: 10.9247 | Unsafe: 8.6207 | Init: 0.3793 | Outside: 0.0000 | Gen: 1.9248 | Focus: generator
+Epoch  2590 | Total: 11.9535 | Unsafe: 8.6518 | Init: 0.3475 | Outside: 0.0000 | Gen: 2.9541 | Focus: generator
+[Refine-Unsafe] Epoch 2600: Loss=12316.268, 1426 failing → refined 100 cells → 2126 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 2384 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 2384 cells...
+[SymbolicCROWNCache] Initialized for 2384 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2209 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2209 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2209 cells!
+  Caches rebuilt successfully!
+Epoch  2600 | Total: 11.0400 | Unsafe: 8.6328 | Init: 0.3672 | Outside: 0.0000 | Gen: 2.0400 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.367, ACTUAL SAMPLES: V_min=1.367, V_max=1.367, beta_ra=10.0
+Epoch  2610 | Total: 10.7975 | Unsafe: 8.6676 | Init: 0.3324 | Outside: 0.0000 | Gen: 1.7974 | Focus: generator
+Epoch  2620 | Total: 10.6999 | Unsafe: 8.6921 | Init: 0.3076 | Outside: 0.0000 | Gen: 1.7001 | Focus: generator
+[Merge-Init] Epoch 2626: merged 240 pairs → 16 total
+[Merge-Generator] Epoch 2626: merged 0 pairs → 2209 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 2144 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 2144 cells...
+[SymbolicCROWNCache] Initialized for 2144 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2209 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2209 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2209 cells!
+  Caches rebuilt successfully!
+Epoch  2630 | Total: 10.5062 | Unsafe: 8.6919 | Init: 0.3081 | Outside: 0.0000 | Gen: 1.5062 | Focus: generator
+Epoch  2640 | Total: 10.2960 | Unsafe: 8.7021 | Init: 0.2978 | Outside: 0.0000 | Gen: 1.2961 | Focus: generator
+Epoch  2650 | Total: 10.3764 | Unsafe: 8.6995 | Init: 0.3005 | Outside: 0.0000 | Gen: 1.3764 | Focus: generator
+Epoch  2660 | Total: 10.2058 | Unsafe: 8.7179 | Init: 0.2820 | Outside: 0.0000 | Gen: 1.2059 | Focus: generator
+Epoch  2670 | Total: 10.0794 | Unsafe: 8.7361 | Init: 0.2637 | Outside: 0.0000 | Gen: 1.0796 | Focus: generator
+Epoch  2680 | Total: 10.0970 | Unsafe: 8.7388 | Init: 0.2612 | Outside: 0.0000 | Gen: 1.0970 | Focus: generator
+Epoch  2690 | Total: 9.8664 | Unsafe: 8.7514 | Init: 0.2486 | Outside: 0.0000 | Gen: 0.8665 | Focus: generator
+[Refine-Unsafe] Epoch 2700: Loss=18654.508, 2126 failing → refined 100 cells → 2826 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 2844 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 2844 cells...
+[SymbolicCROWNCache] Initialized for 2844 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2209 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2209 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2209 cells!
+  Caches rebuilt successfully!
+Epoch  2700 | Total: 10.1052 | Unsafe: 8.7723 | Init: 0.2276 | Outside: 0.0000 | Gen: 1.1053 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.228, ACTUAL SAMPLES: V_min=1.228, V_max=1.228, beta_ra=10.0
+Epoch  2710 | Total: 10.0115 | Unsafe: 8.7727 | Init: 0.2271 | Outside: 0.0000 | Gen: 1.0117 | Focus: generator
+Epoch  2720 | Total: 10.3093 | Unsafe: 8.7803 | Init: 0.2197 | Outside: 0.0000 | Gen: 1.3093 | Focus: generator
+Epoch  2730 | Total: 10.2772 | Unsafe: 8.7668 | Init: 0.2331 | Outside: 0.0000 | Gen: 1.2774 | Focus: generator
+Epoch  2740 | Total: 10.1449 | Unsafe: 8.7764 | Init: 0.2234 | Outside: 0.0000 | Gen: 1.1451 | Focus: generator
+Epoch  2750 | Total: 10.2870 | Unsafe: 8.7887 | Init: 0.2111 | Outside: 0.0000 | Gen: 1.2872 | Focus: generator
+Epoch  2760 | Total: 10.7025 | Unsafe: 8.7777 | Init: 0.2222 | Outside: 0.0000 | Gen: 1.7026 | Focus: generator
+Epoch  2770 | Total: 10.1198 | Unsafe: 8.7784 | Init: 0.2213 | Outside: 0.0000 | Gen: 1.1201 | Focus: generator
+Epoch  2780 | Total: 10.0797 | Unsafe: 8.7708 | Init: 0.2291 | Outside: 0.0000 | Gen: 1.0798 | Focus: generator
+Epoch  2790 | Total: 10.0948 | Unsafe: 8.7676 | Init: 0.2323 | Outside: 0.0000 | Gen: 1.0950 | Focus: generator
+[Refine-Unsafe] Epoch 2800: Loss=24850.932, 2826 failing → refined 100 cells → 3526 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 3544 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 3544 cells...
+[SymbolicCROWNCache] Initialized for 3544 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2209 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2209 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2209 cells!
+  Caches rebuilt successfully!
+Epoch  2800 | Total: 10.0396 | Unsafe: 8.7891 | Init: 0.2107 | Outside: 0.0000 | Gen: 1.0398 | Focus: generator
+  [DEBUG] Unsafe BOUNDS: V_min=1.211, ACTUAL SAMPLES: V_min=1.211, V_max=1.211, beta_ra=10.0
+Epoch  2810 | Total: 9.8021 | Unsafe: 8.7703 | Init: 0.2295 | Outside: 0.0000 | Gen: 0.8023 | Focus: generator
+Epoch  2820 | Total: 9.8677 | Unsafe: 8.7892 | Init: 0.2106 | Outside: 0.0000 | Gen: 0.8679 | Focus: generator
+[Merge-Generator] Epoch 2828: merged 0 pairs → 2209 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 3544 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 3544 cells...
+[SymbolicCROWNCache] Initialized for 3544 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2209 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2209 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2209 cells!
+  Caches rebuilt successfully!
+Epoch  2830 | Total: 10.9761 | Unsafe: 8.7937 | Init: 0.2063 | Outside: 0.0000 | Gen: 1.9761 | Focus: generator
+Epoch  2840 | Total: 10.3130 | Unsafe: 8.7849 | Init: 0.2148 | Outside: 0.0000 | Gen: 1.3132 | Focus: generator
+[SWITCH] Switching from generator to unsafe
+  Resetting optimizer and scheduler state after switching focus
+  constraint_largest_counts: {'generator': 0, 'unsafe': 0, 'init': 19}
+Epoch  2850 | Total: 25674.7246 | Unsafe: 25672.9629 | Init: 1.6581 | Outside: 0.0000 | Gen: 0.1039 | Focus: unsafe
+Epoch  2860 | Total: 6533.7222 | Unsafe: 6525.8379 | Init: 6.2743 | Outside: 0.0000 | Gen: 1.6101 | Focus: unsafe
+Epoch  2870 | Total: 21.8734 | Unsafe: 0.0000 | Init: 14.6502 | Outside: 0.0000 | Gen: 7.2232 | Focus: unsafe
+Epoch  2880 | Total: 32.6699 | Unsafe: 0.0000 | Init: 20.8712 | Outside: 0.0000 | Gen: 11.7987 | Focus: unsafe
+Epoch  2890 | Total: 37.8048 | Unsafe: 0.0000 | Init: 23.8994 | Outside: 0.0000 | Gen: 13.9054 | Focus: unsafe
+[Refine-Init] Epoch 2900: Loss=399.749, 16 failing → refined 16 cells → 128 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 3656 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 3656 cells...
+[SymbolicCROWNCache] Initialized for 3656 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2209 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2209 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2209 cells!
+  Caches rebuilt successfully!
+Epoch  2900 | Total: 39.3666 | Unsafe: 0.0000 | Init: 24.8042 | Outside: 0.0000 | Gen: 14.5624 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=30.728, ACTUAL SAMPLES: V_min=31.404, V_max=33.423, beta_ra=10.0
+Epoch  2910 | Total: 39.6732 | Unsafe: 0.0000 | Init: 25.1003 | Outside: 0.0000 | Gen: 14.5729 | Focus: unsafe
+Epoch  2920 | Total: 39.3680 | Unsafe: 0.0000 | Init: 25.0505 | Outside: 0.0000 | Gen: 14.3175 | Focus: unsafe
+Epoch  2930 | Total: 38.8194 | Unsafe: 0.0000 | Init: 24.8625 | Outside: 0.0000 | Gen: 13.9569 | Focus: unsafe
+Epoch  2940 | Total: 38.1802 | Unsafe: 0.0000 | Init: 24.6190 | Outside: 0.0000 | Gen: 13.5611 | Focus: unsafe
+Epoch  2950 | Total: 37.5038 | Unsafe: 0.0000 | Init: 24.3532 | Outside: 0.0000 | Gen: 13.1506 | Focus: unsafe
+Epoch  2960 | Total: 36.8145 | Unsafe: 0.0000 | Init: 24.0780 | Outside: 0.0000 | Gen: 12.7365 | Focus: unsafe
+Epoch  2970 | Total: 36.1225 | Unsafe: 0.0000 | Init: 23.7992 | Outside: 0.0000 | Gen: 12.3233 | Focus: unsafe
+Epoch  2980 | Total: 35.4348 | Unsafe: 0.0000 | Init: 23.5199 | Outside: 0.0000 | Gen: 11.9148 | Focus: unsafe
+Epoch  2990 | Total: 34.7541 | Unsafe: 0.0000 | Init: 23.2413 | Outside: 0.0000 | Gen: 11.5128 | Focus: unsafe
+[Refine-Init] Epoch 3000: Loss=2942.991, 128 failing → refined 100 cells → 828 total
+[Refine-Generator] Epoch 3000: 1666 failing → refined 100 cells → 2909 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 4356 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 4356 cells...
+[SymbolicCROWNCache] Initialized for 4356 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2909 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2909 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2909 cells!
+  Caches rebuilt successfully!
+Epoch  3000 | Total: 33.4534 | Unsafe: 0.0000 | Init: 22.8626 | Outside: 0.0000 | Gen: 10.5909 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=28.083, ACTUAL SAMPLES: V_min=28.674, V_max=30.311, beta_ra=10.0
+
+Epoch 3000 - Detailed Evaluation:
+  Constraint Satisfaction:
+    Unsafe:    ✓ (V_min=28.083, V_max=30.893)
+    Init:      ✗ (V_min=23.442, V_max=24.431)
+    Outside:   ✓ (V_min=15.221, V_max=43.620)
+    Generator: ✗ (Phi_upper_min=-139.518, Phi_upper_max=311.496, failing=2251)
+  Goal bounds: V ∈ [20.365, 24.462]
+  Unsafe bounds: V ∈ [28.083, 30.893]
+  Generator bounds: Φ ∈ [-603.372, 311.496]
+  Generator failing cells: 2251/2909 (77.4%)
+
+  Creating visualization for epoch 3000...
+  → Saved to 'training_progress/value_function_epoch_3000.png'
+  → Saved to 'training_progress/generator_epoch_3000.png'
+  → Saved 3D plot to 'training_progress/value_function_3d_epoch_3000.png'
+Epoch  3010 | Total: 32.8170 | Unsafe: 0.0000 | Init: 22.5939 | Outside: 0.0000 | Gen: 10.2231 | Focus: unsafe
+Epoch  3020 | Total: 32.1998 | Unsafe: 0.0000 | Init: 22.3312 | Outside: 0.0000 | Gen: 9.8687 | Focus: unsafe
+[Merge-Unsafe] Epoch 3030: merged 2423 pairs → 1103 total
+[Merge-Generator] Epoch 3030: merged 969 pairs → 1940 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 1933 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 1933 cells...
+[SymbolicCROWNCache] Initialized for 1933 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1940 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1940 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1940 cells!
+  Caches rebuilt successfully!
+Epoch  3030 | Total: 33.6503 | Unsafe: 0.0000 | Init: 22.0726 | Outside: 0.0000 | Gen: 11.5777 | Focus: unsafe
+Epoch  3040 | Total: 32.9862 | Unsafe: 0.0000 | Init: 21.8103 | Outside: 0.0000 | Gen: 11.1759 | Focus: unsafe
+Epoch  3050 | Total: 32.3171 | Unsafe: 0.0000 | Init: 21.5454 | Outside: 0.0000 | Gen: 10.7717 | Focus: unsafe
+Epoch  3060 | Total: 31.6600 | Unsafe: 0.0000 | Init: 21.2827 | Outside: 0.0000 | Gen: 10.3774 | Focus: unsafe
+Epoch  3070 | Total: 31.0232 | Unsafe: 0.0000 | Init: 21.0237 | Outside: 0.0000 | Gen: 9.9995 | Focus: unsafe
+Epoch  3080 | Total: 30.4088 | Unsafe: 0.0000 | Init: 20.7691 | Outside: 0.0000 | Gen: 9.6397 | Focus: unsafe
+Epoch  3090 | Total: 29.8244 | Unsafe: 0.0000 | Init: 20.5191 | Outside: 0.0000 | Gen: 9.3053 | Focus: unsafe
+[Refine-Init] Epoch 3100: Loss=16806.619, 828 failing → refined 100 cells → 1528 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 2633 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 2633 cells...
+[SymbolicCROWNCache] Initialized for 2633 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1940 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1940 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1940 cells!
+  Caches rebuilt successfully!
+Epoch  3100 | Total: 29.2341 | Unsafe: 0.0000 | Init: 20.2441 | Outside: 0.0000 | Gen: 8.9900 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=24.556, ACTUAL SAMPLES: V_min=25.006, V_max=26.446, beta_ra=10.0
+Epoch  3110 | Total: 28.6945 | Unsafe: 0.0000 | Init: 20.0038 | Outside: 0.0000 | Gen: 8.6907 | Focus: unsafe
+Epoch  3120 | Total: 28.1780 | Unsafe: 0.0000 | Init: 19.7679 | Outside: 0.0000 | Gen: 8.4100 | Focus: unsafe
+Epoch  3130 | Total: 27.6824 | Unsafe: 0.0000 | Init: 19.5362 | Outside: 0.0000 | Gen: 8.1462 | Focus: unsafe
+Epoch  3140 | Total: 27.2076 | Unsafe: 0.0000 | Init: 19.3085 | Outside: 0.0000 | Gen: 7.8991 | Focus: unsafe
+Epoch  3150 | Total: 26.7529 | Unsafe: 0.0000 | Init: 19.0844 | Outside: 0.0000 | Gen: 7.6685 | Focus: unsafe
+Epoch  3160 | Total: 26.3129 | Unsafe: 0.0000 | Init: 18.8641 | Outside: 0.0000 | Gen: 7.4488 | Focus: unsafe
+Epoch  3170 | Total: 26.0136 | Unsafe: 0.0000 | Init: 18.7122 | Outside: 0.0000 | Gen: 7.3015 | Focus: unsafe
+Epoch  3180 | Total: 25.8036 | Unsafe: 0.0000 | Init: 18.6044 | Outside: 0.0000 | Gen: 7.1992 | Focus: unsafe
+Epoch  3190 | Total: 25.5957 | Unsafe: 0.0000 | Init: 18.4969 | Outside: 0.0000 | Gen: 7.0988 | Focus: unsafe
+[Refine-Init] Epoch 3200: Loss=28115.885, 1528 failing → refined 100 cells → 2228 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 3333 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 3333 cells...
+[SymbolicCROWNCache] Initialized for 3333 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1940 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1940 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1940 cells!
+  Caches rebuilt successfully!
+Epoch  3200 | Total: 25.3781 | Unsafe: 0.0000 | Init: 18.3783 | Outside: 0.0000 | Gen: 6.9998 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=22.114, ACTUAL SAMPLES: V_min=22.499, V_max=23.669, beta_ra=10.0
+Epoch  3210 | Total: 25.1738 | Unsafe: 0.0000 | Init: 18.2716 | Outside: 0.0000 | Gen: 6.9022 | Focus: unsafe
+Epoch  3220 | Total: 24.9714 | Unsafe: 0.0000 | Init: 18.1650 | Outside: 0.0000 | Gen: 6.8064 | Focus: unsafe
+Epoch  3230 | Total: 24.7711 | Unsafe: 0.0000 | Init: 18.0588 | Outside: 0.0000 | Gen: 6.7122 | Focus: unsafe
+[Merge-Unsafe] Epoch 3232: merged 124 pairs → 979 total
+[Merge-Generator] Epoch 3232: merged 189 pairs → 1751 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 3209 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 3209 cells...
+[SymbolicCROWNCache] Initialized for 3209 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1751 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1751 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1751 cells!
+  Caches rebuilt successfully!
+Epoch  3240 | Total: 25.1311 | Unsafe: 0.0000 | Init: 17.9522 | Outside: 0.0000 | Gen: 7.1789 | Focus: unsafe
+Epoch  3250 | Total: 24.9207 | Unsafe: 0.0000 | Init: 17.8449 | Outside: 0.0000 | Gen: 7.0758 | Focus: unsafe
+Epoch  3260 | Total: 24.7110 | Unsafe: 0.0000 | Init: 17.7377 | Outside: 0.0000 | Gen: 6.9733 | Focus: unsafe
+Epoch  3270 | Total: 24.5030 | Unsafe: 0.0000 | Init: 17.6309 | Outside: 0.0000 | Gen: 6.8721 | Focus: unsafe
+Epoch  3280 | Total: 24.2970 | Unsafe: 0.0000 | Init: 17.5245 | Outside: 0.0000 | Gen: 6.7724 | Focus: unsafe
+Epoch  3290 | Total: 24.0934 | Unsafe: 0.0000 | Init: 17.4188 | Outside: 0.0000 | Gen: 6.6747 | Focus: unsafe
+[Refine-Init] Epoch 3300: Loss=38598.141, 2228 failing → refined 100 cells → 2928 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 3909 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 3909 cells...
+[SymbolicCROWNCache] Initialized for 3909 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1751 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1751 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1751 cells!
+  Caches rebuilt successfully!
+Epoch  3300 | Total: 23.8842 | Unsafe: 0.0000 | Init: 17.3057 | Outside: 0.0000 | Gen: 6.5785 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=20.751, ACTUAL SAMPLES: V_min=21.100, V_max=22.167, beta_ra=10.0
+Epoch  3310 | Total: 23.6852 | Unsafe: 0.0000 | Init: 17.2013 | Outside: 0.0000 | Gen: 6.4840 | Focus: unsafe
+Epoch  3320 | Total: 23.4886 | Unsafe: 0.0000 | Init: 17.0975 | Outside: 0.0000 | Gen: 6.3911 | Focus: unsafe
+Epoch  3330 | Total: 23.2944 | Unsafe: 0.0000 | Init: 16.9944 | Outside: 0.0000 | Gen: 6.3000 | Focus: unsafe
+Epoch  3340 | Total: 23.1026 | Unsafe: 0.0000 | Init: 16.8920 | Outside: 0.0000 | Gen: 6.2106 | Focus: unsafe
+Epoch  3350 | Total: 22.9132 | Unsafe: 0.0000 | Init: 16.7904 | Outside: 0.0000 | Gen: 6.1228 | Focus: unsafe
+Epoch  3360 | Total: 22.7261 | Unsafe: 0.0000 | Init: 16.6894 | Outside: 0.0000 | Gen: 6.0366 | Focus: unsafe
+Epoch  3370 | Total: 22.5409 | Unsafe: 0.0000 | Init: 16.5892 | Outside: 0.0000 | Gen: 5.9517 | Focus: unsafe
+Epoch  3380 | Total: 22.3576 | Unsafe: 0.0000 | Init: 16.4898 | Outside: 0.0000 | Gen: 5.8678 | Focus: unsafe
+Epoch  3390 | Total: 22.1763 | Unsafe: 0.0000 | Init: 16.3912 | Outside: 0.0000 | Gen: 5.7851 | Focus: unsafe
+[Refine-Init] Epoch 3400: Loss=47735.945, 2928 failing → refined 100 cells → 3628 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 4609 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 4609 cells...
+[SymbolicCROWNCache] Initialized for 4609 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1751 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1751 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1751 cells!
+  Caches rebuilt successfully!
+Epoch  3400 | Total: 21.9927 | Unsafe: 0.0000 | Init: 16.2892 | Outside: 0.0000 | Gen: 5.7035 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=19.473, ACTUAL SAMPLES: V_min=19.770, V_max=20.740, beta_ra=10.0
+Epoch  3410 | Total: 21.8159 | Unsafe: 0.0000 | Init: 16.1924 | Outside: 0.0000 | Gen: 5.6235 | Focus: unsafe
+Epoch  3420 | Total: 21.6413 | Unsafe: 0.0000 | Init: 16.0965 | Outside: 0.0000 | Gen: 5.5448 | Focus: unsafe
+Epoch  3430 | Total: 21.4688 | Unsafe: 0.0000 | Init: 16.0014 | Outside: 0.0000 | Gen: 5.4675 | Focus: unsafe
+[Merge-Unsafe] Epoch 3434: merged 17 pairs → 962 total
+[Merge-Generator] Epoch 3434: merged 79 pairs → 1672 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 4592 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 4592 cells...
+[SymbolicCROWNCache] Initialized for 4592 cells - symbolic structure cached!
+    Rebuilding Phi cache with 1672 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1672 cells...
+[SymbolicCROWNCache_Phi] Initialized for 1672 cells!
+  Caches rebuilt successfully!
+Epoch  3440 | Total: 21.5442 | Unsafe: 0.0000 | Init: 15.9069 | Outside: 0.0000 | Gen: 5.6373 | Focus: unsafe
+Epoch  3450 | Total: 21.3701 | Unsafe: 0.0000 | Init: 15.8127 | Outside: 0.0000 | Gen: 5.5574 | Focus: unsafe
+Epoch  3460 | Total: 21.1973 | Unsafe: 0.0000 | Init: 15.7191 | Outside: 0.0000 | Gen: 5.4782 | Focus: unsafe
+Epoch  3470 | Total: 21.0690 | Unsafe: 0.0000 | Init: 15.6495 | Outside: 0.0000 | Gen: 5.4195 | Focus: unsafe
+Epoch  3480 | Total: 20.9838 | Unsafe: 0.0000 | Init: 15.6032 | Outside: 0.0000 | Gen: 5.3806 | Focus: unsafe
+Epoch  3490 | Total: 20.8988 | Unsafe: 0.0000 | Init: 15.5570 | Outside: 0.0000 | Gen: 5.3418 | Focus: unsafe
+[Refine-Init] Epoch 3500: Loss=56289.809, 3628 failing → refined 100 cells → 4328 total
+[Refine-Generator] Epoch 3500: 1412 failing → refined 100 cells → 2372 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 5292 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 5292 cells...
+[SymbolicCROWNCache] Initialized for 5292 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2372 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2372 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2372 cells!
+  Caches rebuilt successfully!
+Epoch  3500 | Total: 20.2000 | Unsafe: 0.0000 | Init: 15.5075 | Outside: 0.0000 | Gen: 4.6925 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=18.499, ACTUAL SAMPLES: V_min=18.767, V_max=19.691, beta_ra=10.0
+Epoch  3510 | Total: 20.1209 | Unsafe: 0.0000 | Init: 15.4621 | Outside: 0.0000 | Gen: 4.6588 | Focus: unsafe
+Epoch  3520 | Total: 20.0432 | Unsafe: 0.0000 | Init: 15.4175 | Outside: 0.0000 | Gen: 4.6257 | Focus: unsafe
+Epoch  3530 | Total: 19.9660 | Unsafe: 0.0000 | Init: 15.3732 | Outside: 0.0000 | Gen: 4.5928 | Focus: unsafe
+Epoch  3540 | Total: 19.8891 | Unsafe: 0.0000 | Init: 15.3290 | Outside: 0.0000 | Gen: 4.5601 | Focus: unsafe
+Epoch  3550 | Total: 19.8124 | Unsafe: 0.0000 | Init: 15.2848 | Outside: 0.0000 | Gen: 4.5275 | Focus: unsafe
+Epoch  3560 | Total: 19.7358 | Unsafe: 0.0000 | Init: 15.2408 | Outside: 0.0000 | Gen: 4.4950 | Focus: unsafe
+Epoch  3570 | Total: 19.6594 | Unsafe: 0.0000 | Init: 15.1968 | Outside: 0.0000 | Gen: 4.4626 | Focus: unsafe
+[SWITCH] Switching from unsafe to init
+  Resetting optimizer and scheduler state after switching focus
+  constraint_largest_counts: {'generator': 239, 'unsafe': 0, 'init': 0}
+Epoch  3580 | Total: 65585.9297 | Unsafe: 0.0000 | Init: 65581.5000 | Outside: 0.0000 | Gen: 4.4303 | Focus: init
+Epoch  3590 | Total: 30270.5977 | Unsafe: 1.4141 | Init: 30267.9277 | Outside: 0.0000 | Gen: 1.2552 | Focus: init
+[Refine-Init] Epoch 3600: Loss=13253.866, 4328 failing → refined 100 cells → 5028 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 5992 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 5992 cells...
+[SymbolicCROWNCache] Initialized for 5992 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2372 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2372 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2372 cells!
+  Caches rebuilt successfully!
+Epoch  3600 | Total: 13625.9053 | Unsafe: 6.1570 | Init: 13619.4395 | Outside: 0.0000 | Gen: 0.3082 | Focus: init
+  [DEBUG] Unsafe BOUNDS: V_min=3.800, ACTUAL SAMPLES: V_min=3.828, V_max=3.877, beta_ra=10.0
+Epoch  3610 | Total: 9.3121 | Unsafe: 9.1887 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.1234 | Focus: init
+Epoch  3620 | Total: 11.2302 | Unsafe: 10.5542 | Init: 0.0000 | Outside: 0.6220 | Gen: 0.0541 | Focus: init
+Epoch  3630 | Total: 12.2016 | Unsafe: 11.0487 | Init: 0.0000 | Outside: 1.1120 | Gen: 0.0409 | Focus: init
+[Merge-Init] Epoch 3636: merged 3687 pairs → 1341 total
+[Merge-Generator] Epoch 3636: merged 0 pairs → 2372 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 2305 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 2305 cells...
+[SymbolicCROWNCache] Initialized for 2305 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2372 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2372 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2372 cells!
+  Caches rebuilt successfully!
+Epoch  3640 | Total: 12.5686 | Unsafe: 11.2337 | Init: 0.0000 | Outside: 1.2966 | Gen: 0.0382 | Focus: init
+Epoch  3650 | Total: 12.7053 | Unsafe: 11.3023 | Init: 0.0000 | Outside: 1.3654 | Gen: 0.0376 | Focus: init
+Epoch  3660 | Total: 12.7543 | Unsafe: 11.3266 | Init: 0.0000 | Outside: 1.3900 | Gen: 0.0376 | Focus: init
+Epoch  3670 | Total: 12.7701 | Unsafe: 11.3343 | Init: 0.0000 | Outside: 1.3980 | Gen: 0.0379 | Focus: init
+Epoch  3680 | Total: 12.7734 | Unsafe: 11.3356 | Init: 0.0000 | Outside: 1.3996 | Gen: 0.0382 | Focus: init
+Epoch  3690 | Total: 12.7718 | Unsafe: 11.3344 | Init: 0.0000 | Outside: 1.3989 | Gen: 0.0385 | Focus: init
+[Refine-Unsafe] Epoch 3700: Loss=10901.812, 962 failing → refined 100 cells → 1662 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 3005 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 3005 cells...
+[SymbolicCROWNCache] Initialized for 3005 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2372 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2372 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2372 cells!
+  Caches rebuilt successfully!
+Epoch  3700 | Total: 12.7681 | Unsafe: 11.3319 | Init: 0.0000 | Outside: 1.3972 | Gen: 0.0390 | Focus: init
+  [DEBUG] Unsafe BOUNDS: V_min=-1.338, ACTUAL SAMPLES: V_min=-1.333, V_max=-1.329, beta_ra=10.0
+Epoch  3710 | Total: 12.7638 | Unsafe: 11.3293 | Init: 0.0000 | Outside: 1.3951 | Gen: 0.0395 | Focus: init
+Epoch  3720 | Total: 12.7591 | Unsafe: 11.3264 | Init: 0.0000 | Outside: 1.3927 | Gen: 0.0400 | Focus: init
+Epoch  3730 | Total: 12.7540 | Unsafe: 11.3232 | Init: 0.0000 | Outside: 1.3902 | Gen: 0.0406 | Focus: init
+Epoch  3740 | Total: 12.7486 | Unsafe: 11.3199 | Init: 0.0000 | Outside: 1.3875 | Gen: 0.0413 | Focus: init
+Epoch  3750 | Total: 12.7429 | Unsafe: 11.3163 | Init: 0.0000 | Outside: 1.3846 | Gen: 0.0420 | Focus: init
+Epoch  3760 | Total: 12.7369 | Unsafe: 11.3124 | Init: 0.0000 | Outside: 1.3816 | Gen: 0.0428 | Focus: init
+Epoch  3770 | Total: 12.7305 | Unsafe: 11.3083 | Init: 0.0000 | Outside: 1.3784 | Gen: 0.0438 | Focus: init
+Epoch  3780 | Total: 12.7237 | Unsafe: 11.3038 | Init: 0.0000 | Outside: 1.3750 | Gen: 0.0449 | Focus: init
+Epoch  3790 | Total: 12.7165 | Unsafe: 11.2990 | Init: 0.0000 | Outside: 1.3714 | Gen: 0.0461 | Focus: init
+[Refine-Unsafe] Epoch 3800: Loss=18771.031, 1662 failing → refined 100 cells → 2362 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 3705 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 3705 cells...
+[SymbolicCROWNCache] Initialized for 3705 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2372 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2372 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2372 cells!
+  Caches rebuilt successfully!
+Epoch  3800 | Total: 12.7086 | Unsafe: 11.2936 | Init: 0.0000 | Outside: 1.3675 | Gen: 0.0475 | Focus: init
+  [DEBUG] Unsafe BOUNDS: V_min=-1.300, ACTUAL SAMPLES: V_min=-1.295, V_max=-1.291, beta_ra=10.0
+Epoch  3810 | Total: 12.7000 | Unsafe: 11.2877 | Init: 0.0000 | Outside: 1.3632 | Gen: 0.0492 | Focus: init
+Epoch  3820 | Total: 12.6906 | Unsafe: 11.2810 | Init: 0.0000 | Outside: 1.3584 | Gen: 0.0511 | Focus: init
+Epoch  3830 | Total: 12.6800 | Unsafe: 11.2734 | Init: 0.0000 | Outside: 1.3532 | Gen: 0.0535 | Focus: init
+[Merge-Init] Epoch 3838: merged 545 pairs → 796 total
+[Merge-Generator] Epoch 3838: merged 0 pairs → 2372 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 3160 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 3160 cells...
+[SymbolicCROWNCache] Initialized for 3160 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2372 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2372 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2372 cells!
+  Caches rebuilt successfully!
+Epoch  3840 | Total: 12.6677 | Unsafe: 11.2645 | Init: 0.0000 | Outside: 1.3471 | Gen: 0.0561 | Focus: init
+Epoch  3850 | Total: 12.6526 | Unsafe: 11.2537 | Init: 0.0000 | Outside: 1.3397 | Gen: 0.0593 | Focus: init
+Epoch  3860 | Total: 12.6331 | Unsafe: 11.2399 | Init: 0.0000 | Outside: 1.3302 | Gen: 0.0630 | Focus: init
+Epoch  3870 | Total: 12.6053 | Unsafe: 11.2211 | Init: 0.0000 | Outside: 1.3172 | Gen: 0.0671 | Focus: init
+Epoch  3880 | Total: 12.5604 | Unsafe: 11.1928 | Init: 0.0000 | Outside: 1.2966 | Gen: 0.0709 | Focus: init
+Epoch  3890 | Total: 12.4755 | Unsafe: 11.1439 | Init: 0.0000 | Outside: 1.2581 | Gen: 0.0735 | Focus: init
+[Refine-Unsafe] Epoch 3900: Loss=26122.637, 2362 failing → refined 100 cells → 3062 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 3860 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 3860 cells...
+[SymbolicCROWNCache] Initialized for 3860 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2372 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2372 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2372 cells!
+  Caches rebuilt successfully!
+Epoch  3900 | Total: 12.3055 | Unsafe: 11.0460 | Init: 0.0000 | Outside: 1.1764 | Gen: 0.0831 | Focus: init
+  [DEBUG] Unsafe BOUNDS: V_min=-1.056, ACTUAL SAMPLES: V_min=-1.046, V_max=-1.044, beta_ra=10.0
+Epoch  3910 | Total: 11.9452 | Unsafe: 10.8385 | Init: 0.0000 | Outside: 0.9989 | Gen: 0.1078 | Focus: init
+Epoch  3920 | Total: 11.6373 | Unsafe: 10.6674 | Init: 0.0000 | Outside: 0.8480 | Gen: 0.1219 | Focus: init
+Epoch  3930 | Total: 11.2716 | Unsafe: 10.4763 | Init: 0.0000 | Outside: 0.6688 | Gen: 0.1265 | Focus: init
+Epoch  3940 | Total: 10.9466 | Unsafe: 10.3253 | Init: 0.0000 | Outside: 0.5108 | Gen: 0.1105 | Focus: init
+Epoch  3950 | Total: 10.7185 | Unsafe: 10.2333 | Init: 0.0000 | Outside: 0.3975 | Gen: 0.0877 | Focus: init
+Epoch  3960 | Total: 10.5793 | Unsafe: 10.1829 | Init: 0.0000 | Outside: 0.3267 | Gen: 0.0697 | Focus: init
+Epoch  3970 | Total: 10.4948 | Unsafe: 10.1538 | Init: 0.0000 | Outside: 0.2831 | Gen: 0.0579 | Focus: init
+Epoch  3980 | Total: 10.4402 | Unsafe: 10.1347 | Init: 0.0000 | Outside: 0.2547 | Gen: 0.0507 | Focus: init
+Epoch  3990 | Total: 10.4011 | Unsafe: 10.1196 | Init: 0.0000 | Outside: 0.2345 | Gen: 0.0470 | Focus: init
+[Refine-Unsafe] Epoch 4000: Loss=30947.074, 3062 failing → refined 100 cells → 3762 total
+[Refine-Generator] Epoch 4000: 1672 failing → refined 100 cells → 3072 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 4560 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 4560 cells...
+[SymbolicCROWNCache] Initialized for 4560 cells - symbolic structure cached!
+    Rebuilding Phi cache with 3072 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 3072 cells...
+[SymbolicCROWNCache_Phi] Initialized for 3072 cells!
+  Caches rebuilt successfully!
+Epoch  4000 | Total: 10.3619 | Unsafe: 10.1053 | Init: 0.0000 | Outside: 0.2183 | Gen: 0.0383 | Focus: init
+  [DEBUG] Unsafe BOUNDS: V_min=-0.113, ACTUAL SAMPLES: V_min=-0.106, V_max=-0.103, beta_ra=10.0
+
+Epoch 4000 - Detailed Evaluation:
+  [DEBUG] Unsafe: 3762/3762 cells violate (V_lower < 10.0)
+  Constraint Satisfaction:
+    Unsafe:    ✗ (V_min=-0.113, V_max=-0.095)
+    Init:      ✗ (V_min=-0.110, V_max=-0.100)
+    Outside:   ✗ (V_min=-0.218, V_max=0.015)
+    Generator: ✗ (Phi_upper_min=-0.102, Phi_upper_max=2.387, failing=2190)
+  Goal bounds: V ∈ [-0.119, -0.088]
+  Unsafe bounds: V ∈ [-0.113, -0.095]
+  Generator bounds: Φ ∈ [-2.316, 2.387]
+  Generator failing cells: 2190/3072 (71.3%)
+
+  Creating visualization for epoch 4000...
+  → Saved to 'training_progress/value_function_epoch_4000.png'
+  → Saved to 'training_progress/generator_epoch_4000.png'
+  → Saved 3D plot to 'training_progress/value_function_3d_epoch_4000.png'
+Epoch  4010 | Total: 10.3357 | Unsafe: 10.0900 | Init: 0.0000 | Outside: 0.2036 | Gen: 0.0422 | Focus: init
+Epoch  4020 | Total: 10.3083 | Unsafe: 10.0712 | Init: 0.0000 | Outside: 0.1879 | Gen: 0.0492 | Focus: init
+Epoch  4030 | Total: 10.2674 | Unsafe: 10.0428 | Init: 0.0000 | Outside: 0.1666 | Gen: 0.0580 | Focus: init
+[Merge-Init] Epoch 4040: merged 128 pairs → 668 total
+[Merge-Generator] Epoch 4040: merged 0 pairs → 3072 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 4432 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 4432 cells...
+[SymbolicCROWNCache] Initialized for 4432 cells - symbolic structure cached!
+    Rebuilding Phi cache with 3072 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 3072 cells...
+[SymbolicCROWNCache_Phi] Initialized for 3072 cells!
+  Caches rebuilt successfully!
+Epoch  4040 | Total: 10.1610 | Unsafe: 9.9784 | Init: 0.0000 | Outside: 0.1189 | Gen: 0.0637 | Focus: init
+Epoch  4050 | Total: 9.8443 | Unsafe: 9.7509 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0934 | Focus: init
+Epoch  4060 | Total: 9.4566 | Unsafe: 9.3304 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.1262 | Focus: init
+Epoch  4070 | Total: 9.1396 | Unsafe: 9.0501 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.0894 | Focus: init
+Epoch  4080 | Total: 9.2396 | Unsafe: 9.1311 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.1084 | Focus: init
+Epoch  4090 | Total: 9.3211 | Unsafe: 9.2014 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.1196 | Focus: init
+[Refine-Unsafe] Epoch 4100: Loss=34683.004, 3762 failing → refined 100 cells → 4462 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 5132 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 5132 cells...
+[SymbolicCROWNCache] Initialized for 5132 cells - symbolic structure cached!
+    Rebuilding Phi cache with 3072 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 3072 cells...
+[SymbolicCROWNCache_Phi] Initialized for 3072 cells!
+  Caches rebuilt successfully!
+Epoch  4100 | Total: 9.3411 | Unsafe: 9.2196 | Init: 0.0000 | Outside: 0.0000 | Gen: 0.1214 | Focus: init
+  [DEBUG] Unsafe BOUNDS: V_min=0.761, ACTUAL SAMPLES: V_min=0.779, V_max=0.784, beta_ra=10.0
+[SWITCH] Switching from init to unsafe
+  Resetting optimizer and scheduler state after switching focus
+  constraint_largest_counts: {'generator': 239, 'unsafe': 0, 'init': 0}
+Epoch  4110 | Total: 38567.1367 | Unsafe: 38566.6641 | Init: 0.2634 | Outside: 0.0000 | Gen: 0.2097 | Focus: unsafe
+Epoch  4120 | Total: 24801.0410 | Unsafe: 24796.3477 | Init: 2.3891 | Outside: 0.0000 | Gen: 2.3045 | Focus: unsafe
+Epoch  4130 | Total: 25.3554 | Unsafe: 0.0000 | Init: 13.9820 | Outside: 0.0000 | Gen: 11.3734 | Focus: unsafe
+Epoch  4140 | Total: 47.3716 | Unsafe: 0.0000 | Init: 27.2897 | Outside: 0.0000 | Gen: 20.0820 | Focus: unsafe
+Epoch  4150 | Total: 58.3738 | Unsafe: 0.0000 | Init: 34.4334 | Outside: 0.0000 | Gen: 23.9404 | Focus: unsafe
+Epoch  4160 | Total: 62.5413 | Unsafe: 0.0000 | Init: 37.3735 | Outside: 0.0000 | Gen: 25.1678 | Focus: unsafe
+Epoch  4170 | Total: 63.5942 | Unsafe: 0.0000 | Init: 38.3611 | Outside: 0.0000 | Gen: 25.2331 | Focus: unsafe
+Epoch  4180 | Total: 63.3458 | Unsafe: 0.0000 | Init: 38.5447 | Outside: 0.0000 | Gen: 24.8011 | Focus: unsafe
+Epoch  4190 | Total: 62.5779 | Unsafe: 0.0000 | Init: 38.4101 | Outside: 0.0000 | Gen: 24.1679 | Focus: unsafe
+[Refine-Init] Epoch 4200: Loss=25503.443, 668 failing → refined 100 cells → 1368 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 5832 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 5832 cells...
+[SymbolicCROWNCache] Initialized for 5832 cells - symbolic structure cached!
+    Rebuilding Phi cache with 3072 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 3072 cells...
+[SymbolicCROWNCache_Phi] Initialized for 3072 cells!
+  Caches rebuilt successfully!
+Epoch  4200 | Total: 61.5277 | Unsafe: 0.0000 | Init: 38.0667 | Outside: 0.0000 | Gen: 23.4611 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=45.718, ACTUAL SAMPLES: V_min=47.034, V_max=49.867, beta_ra=10.0
+Epoch  4210 | Total: 60.4869 | Unsafe: 0.0000 | Init: 37.7562 | Outside: 0.0000 | Gen: 22.7307 | Focus: unsafe
+Epoch  4220 | Total: 59.4865 | Unsafe: 0.0000 | Init: 37.4224 | Outside: 0.0000 | Gen: 22.0641 | Focus: unsafe
+Epoch  4230 | Total: 58.4935 | Unsafe: 0.0000 | Init: 37.0760 | Outside: 0.0000 | Gen: 21.4174 | Focus: unsafe
+Epoch  4240 | Total: 57.4994 | Unsafe: 0.0000 | Init: 36.7228 | Outside: 0.0000 | Gen: 20.7766 | Focus: unsafe
+[Merge-Unsafe] Epoch 4242: merged 2961 pairs → 1501 total
+[Merge-Generator] Epoch 4242: merged 842 pairs → 2230 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 2871 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 2871 cells...
+[SymbolicCROWNCache] Initialized for 2871 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2230 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2230 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2230 cells!
+  Caches rebuilt successfully!
+[Refine-Generator] Epoch 4250: 1922 failing → refined 100 cells → 2930 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 2871 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 2871 cells...
+[SymbolicCROWNCache] Initialized for 2871 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2930 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2930 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2930 cells!
+  Caches rebuilt successfully!
+Epoch  4250 | Total: 57.8920 | Unsafe: 0.0000 | Init: 36.3587 | Outside: 0.0000 | Gen: 21.5333 | Focus: unsafe
+Epoch  4260 | Total: 56.8225 | Unsafe: 0.0000 | Init: 35.9877 | Outside: 0.0000 | Gen: 20.8348 | Focus: unsafe
+Epoch  4270 | Total: 55.7754 | Unsafe: 0.0000 | Init: 35.6180 | Outside: 0.0000 | Gen: 20.1573 | Focus: unsafe
+Epoch  4280 | Total: 54.7500 | Unsafe: 0.0000 | Init: 35.2487 | Outside: 0.0000 | Gen: 19.5012 | Focus: unsafe
+Epoch  4290 | Total: 53.7443 | Unsafe: 0.0000 | Init: 34.8799 | Outside: 0.0000 | Gen: 18.8644 | Focus: unsafe
+[Refine-Init] Epoch 4300: Loss=47262.422, 1368 failing → refined 100 cells → 2068 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 3571 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 3571 cells...
+[SymbolicCROWNCache] Initialized for 3571 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2930 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2930 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2930 cells!
+  Caches rebuilt successfully!
+Epoch  4300 | Total: 52.7319 | Unsafe: 0.0000 | Init: 34.4856 | Outside: 0.0000 | Gen: 18.2463 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=40.897, ACTUAL SAMPLES: V_min=42.157, V_max=44.711, beta_ra=10.0
+Epoch  4310 | Total: 51.7661 | Unsafe: 0.0000 | Init: 34.1189 | Outside: 0.0000 | Gen: 17.6471 | Focus: unsafe
+Epoch  4320 | Total: 50.8243 | Unsafe: 0.0000 | Init: 33.7534 | Outside: 0.0000 | Gen: 17.0709 | Focus: unsafe
+Epoch  4330 | Total: 49.9046 | Unsafe: 0.0000 | Init: 33.3895 | Outside: 0.0000 | Gen: 16.5151 | Focus: unsafe
+Epoch  4340 | Total: 49.0051 | Unsafe: 0.0000 | Init: 33.0277 | Outside: 0.0000 | Gen: 15.9774 | Focus: unsafe
+Epoch  4350 | Total: 48.1300 | Unsafe: 0.0000 | Init: 32.6680 | Outside: 0.0000 | Gen: 15.4620 | Focus: unsafe
+Epoch  4360 | Total: 47.2794 | Unsafe: 0.0000 | Init: 32.3103 | Outside: 0.0000 | Gen: 14.9691 | Focus: unsafe
+Epoch  4370 | Total: 46.4534 | Unsafe: 0.0000 | Init: 31.9547 | Outside: 0.0000 | Gen: 14.4987 | Focus: unsafe
+Epoch  4380 | Total: 45.6574 | Unsafe: 0.0000 | Init: 31.6013 | Outside: 0.0000 | Gen: 14.0561 | Focus: unsafe
+Epoch  4390 | Total: 44.8895 | Unsafe: 0.0000 | Init: 31.2500 | Outside: 0.0000 | Gen: 13.6395 | Focus: unsafe
+[Refine-Init] Epoch 4400: Loss=63975.816, 2068 failing → refined 100 cells → 2768 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 4271 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 4271 cells...
+[SymbolicCROWNCache] Initialized for 4271 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2930 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2930 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2930 cells!
+  Caches rebuilt successfully!
+Epoch  4400 | Total: 44.1374 | Unsafe: 0.0000 | Init: 30.8912 | Outside: 0.0000 | Gen: 13.2462 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=36.311, ACTUAL SAMPLES: V_min=37.359, V_max=39.404, beta_ra=10.0
+Epoch  4410 | Total: 43.4186 | Unsafe: 0.0000 | Init: 30.5447 | Outside: 0.0000 | Gen: 12.8739 | Focus: unsafe
+Epoch  4420 | Total: 42.7232 | Unsafe: 0.0000 | Init: 30.2009 | Outside: 0.0000 | Gen: 12.5223 | Focus: unsafe
+Epoch  4430 | Total: 42.1506 | Unsafe: 0.0000 | Init: 29.9107 | Outside: 0.0000 | Gen: 12.2399 | Focus: unsafe
+Epoch  4440 | Total: 41.8224 | Unsafe: 0.0000 | Init: 29.7400 | Outside: 0.0000 | Gen: 12.0823 | Focus: unsafe
+[Merge-Unsafe] Epoch 4444: merged 251 pairs → 1250 total
+[Merge-Generator] Epoch 4444: merged 406 pairs → 2524 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 4020 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 4020 cells...
+[SymbolicCROWNCache] Initialized for 4020 cells - symbolic structure cached!
+    Rebuilding Phi cache with 2524 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 2524 cells...
+[SymbolicCROWNCache_Phi] Initialized for 2524 cells!
+  Caches rebuilt successfully!
+Epoch  4450 | Total: 42.8708 | Unsafe: 0.0000 | Init: 29.5678 | Outside: 0.0000 | Gen: 13.3029 | Focus: unsafe
+Epoch  4460 | Total: 42.5216 | Unsafe: 0.0000 | Init: 29.3930 | Outside: 0.0000 | Gen: 13.1286 | Focus: unsafe
+Epoch  4470 | Total: 42.1735 | Unsafe: 0.0000 | Init: 29.2174 | Outside: 0.0000 | Gen: 12.9561 | Focus: unsafe
+Epoch  4480 | Total: 41.8274 | Unsafe: 0.0000 | Init: 29.0406 | Outside: 0.0000 | Gen: 12.7867 | Focus: unsafe
+Epoch  4490 | Total: 41.4845 | Unsafe: 0.0000 | Init: 28.8634 | Outside: 0.0000 | Gen: 12.6211 | Focus: unsafe
+[Refine-Init] Epoch 4500: Loss=79452.258, 2768 failing → refined 100 cells → 3468 total
+[Refine-Generator] Epoch 4500: 2216 failing → refined 100 cells → 3224 total
+  Rebuilding CROWN caches with new generator cells...
+    Rebuilding V cache with 4720 cells...
+[SymbolicCROWNCache] Creating BoundedModule for 4720 cells...
+[SymbolicCROWNCache] Initialized for 4720 cells - symbolic structure cached!
+    Rebuilding Phi cache with 3224 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 3224 cells...
+[SymbolicCROWNCache_Phi] Initialized for 3224 cells!
+  Caches rebuilt successfully!
+Epoch  4500 | Total: 39.8535 | Unsafe: 0.0000 | Init: 28.6734 | Outside: 0.0000 | Gen: 11.1801 | Focus: unsafe
+  [DEBUG] Unsafe BOUNDS: V_min=33.640, ACTUAL SAMPLES: V_min=34.542, V_max=36.557, beta_ra=10.0
+Epoch  4510 | Total: 39.5415 | Unsafe: 0.0000 | Init: 28.4993 | Outside: 0.0000 | Gen: 11.0421 | Focus: unsafe
+Epoch  4520 | Total: 39.2366 | Unsafe: 0.0000 | Init: 28.3279 | Outside: 0.0000 | Gen: 10.9087 | Focus: unsafe
+Traceback (most recent call last):
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/lorentz3d_syn/main.py", line 1389, in <module>
+    main()
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/lorentz3d_syn/main.py", line 1238, in main
+    loss_history, final_beta_s, refinement_epochs = train_network_bounds(
+                                                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/lorentz3d_syn/main.py", line 669, in train_network_bounds
+    total_loss.backward()
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/torch/_tensor.py", line 525, in backward
+    torch.autograd.backward(
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/torch/autograd/__init__.py", line 267, in backward
+    _engine_run_backward(
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/torch/autograd/graph.py", line 744, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

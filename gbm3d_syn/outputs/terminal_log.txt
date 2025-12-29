@@ -1,4 +1,4 @@
-Network: 3 -> 64 -> 16 -> 1
+Network: 3 -> 256 -> 16 -> 1
 Training: 200000 epochs, LR=0.005
 Constraints: beta_s=0.01, beta_ra=20.0
 Generator: weight=1.0, start_epoch=0
@@ -7,7 +7,7 @@ Training method: CROWN bounds (rigorous)
 Dynamics(dim=2, f(x)=<callable>, g(x)=<callable>)
 V network: ValueNetwork(
   input_dim=3,
-  hidden=[64, 16],
+  hidden=[256, 16],
   output_dim=1,
   activation=builtin_function_or_method,
   input_scale=[100.0, 100.0, 100.0],
@@ -20,18 +20,18 @@ Using device: cpu
 PRE-TRAINING: Constraint-Structured Initialization (Sample-Based)
 ================================================================================
   GV (Φ) pre-training ENABLED (using provided GV_net)
-  Epoch [0/1000]: V=13958.195312 (full=1964.557, init=0.000, unsafe=10066.030, goal=0.000, others=1927.608), Φ=37.335056, Total=13995.530273
-  Epoch [100/1000]: V=1040.498047 (full=190.682, init=0.000, unsafe=22.467, goal=646.981, others=180.369), Φ=4.124974, Total=1044.623047
-  Epoch [200/1000]: V=51.542305 (full=1.082, init=0.000, unsafe=0.000, goal=50.461, others=0.000), Φ=1.094736, Total=52.637043
-  Epoch [300/1000]: V=20.650002 (full=6.961, init=0.000, unsafe=0.361, goal=12.531, others=0.797), Φ=0.535168, Total=21.185169
-  Epoch [400/1000]: V=19.870823 (full=9.203, init=0.000, unsafe=0.391, goal=9.327, others=0.950), Φ=0.000000, Total=19.870823
-  Epoch [500/1000]: V=156.030045 (full=0.000, init=0.048, unsafe=0.000, goal=155.982, others=0.000), Φ=0.000000, Total=156.030045
-  Epoch [600/1000]: V=14.824877 (full=2.213, init=0.000, unsafe=0.000, goal=12.573, others=0.039), Φ=0.000000, Total=14.824877
-  Epoch [700/1000]: V=9.865544 (full=3.305, init=0.000, unsafe=0.044, goal=6.355, others=0.161), Φ=0.000000, Total=9.865544
-  Epoch [800/1000]: V=8.593235 (full=2.892, init=0.000, unsafe=0.000, goal=5.551, others=0.150), Φ=0.000000, Total=8.593235
-  Epoch [900/1000]: V=8.064632 (full=5.541, init=0.000, unsafe=0.403, goal=1.583, others=0.538), Φ=0.000000, Total=8.064632
+  Epoch [0/1000]: V=10190.201172 (full=0.000, init=2202.494, unsafe=5354.389, goal=2633.319, others=0.000), Φ=26.076962, Total=10216.278320
+  Epoch [100/1000]: V=33.321152 (full=16.514, init=0.000, unsafe=0.000, goal=13.726, others=3.081), Φ=3.217467, Total=36.538620
+  Epoch [200/1000]: V=30.270735 (full=3.779, init=0.000, unsafe=0.000, goal=26.492, others=0.000), Φ=1.767889, Total=32.038624
+  Epoch [300/1000]: V=19.688854 (full=15.042, init=0.000, unsafe=0.000, goal=2.158, others=2.488), Φ=1.434194, Total=21.123049
+  Epoch [400/1000]: V=24.882893 (full=19.332, init=0.000, unsafe=0.000, goal=0.632, others=4.919), Φ=0.819530, Total=25.702423
+  Epoch [500/1000]: V=16.871912 (full=10.293, init=0.000, unsafe=0.000, goal=6.166, others=0.412), Φ=0.652420, Total=17.524332
+  Epoch [600/1000]: V=20.104757 (full=15.756, init=0.000, unsafe=0.000, goal=1.130, others=3.218), Φ=0.162099, Total=20.266855
+  Epoch [700/1000]: V=17.322262 (full=6.673, init=0.000, unsafe=0.000, goal=10.649, others=0.001), Φ=0.020627, Total=17.342890
+  Epoch [800/1000]: V=12.340900 (full=5.398, init=0.000, unsafe=0.002, goal=6.908, others=0.033), Φ=0.018121, Total=12.359021
+  Epoch [900/1000]: V=6.761387 (full=4.061, init=0.000, unsafe=0.107, goal=2.525, others=0.068), Φ=0.045423, Total=6.806810
 
-  Best loss: 4.490180
+  Best loss: 2.793936
 ================================================================================
 Pre-training complete. V + GV (Φ) + Controller initialized.
 ================================================================================
@@ -61,2426 +61,341 @@ Initializing CROWN cache for ALL 4 V cells...
 Creating CROWN cache for 'generator' (Phi)...
   generator: 44 cells
 [SymbolicCROWNCache_Phi] Creating BoundedModule for 44 cells...
-/Users/sebastianescobar/Desktop/Neural_Certificate/src/phi_module.py:173: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+/Users/sebastianescobar/Desktop/Neural_Certificate/src/phi_module.py:169: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
   self._cached_scale_D == D
 [SymbolicCROWNCache_Phi] Initialized for 44 cells!
 
 Using CONSTANT beta_s = 0.01
 /Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:28: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.
   warnings.warn("The verbose parameter is deprecated. Please use get_last_lr() "
-Epoch     0 | Total: 5276.6528 | Unsafe: 15.1688 | Init: 0.0000 | Outside: 4.6918 | Gen: 5256.7925
- [Controller Params] fc.weight = tensor([[ 0.0675, -0.1045,  0.2053],
-        [-0.0855, -0.6648, -0.7871],
-        [ 0.2066,  0.0782,  0.0576]])
+Epoch     0 | Total: 4238.2769 | Unsafe: 15.4518 | Init: 0.0000 | Outside: 1.7885 | Gen: 4221.0366 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0986, -0.0127,  0.1174],
+        [-0.1159, -0.4120, -0.3571],
+        [ 0.1043,  0.0113,  0.0795]])
 
 Epoch 0 - Detailed Evaluation:
+  [DEBUG] Unsafe: 1/1 cells violate (V_lower < 20.0)
   Constraint Satisfaction:
-    Unsafe:    ✗ (V_min=4.831, V_max=36.825)
-    Init:      ✓ (V_min=0.109, V_max=0.664)
-    Outside:   ✗ (V_min=-4.692, V_max=43.535)
-    Generator: ✗ (Phi_upper_min=7.957, Phi_upper_max=423.589, failing=44)
-  Goal bounds: V ∈ [-1.914, 3.286]
-  Unsafe bounds: V ∈ [4.831, 36.825]
-  Generator bounds: Φ ∈ [-488.777, 423.589]
+    Unsafe:    ✗ (V_min=4.548, V_max=39.304)
+    Init:      ✓ (V_min=0.014, V_max=0.220)
+    Outside:   ✗ (V_min=-1.789, V_max=42.086)
+    Generator: ✗ (Phi_upper_min=5.269, Phi_upper_max=346.779, failing=44)
+  Goal bounds: V ∈ [-0.875, 1.251]
+  Unsafe bounds: V ∈ [4.548, 39.304]
+  Generator bounds: Φ ∈ [-418.550, 346.779]
   Generator failing cells: 44/44 (100.0%)
-Epoch    10 | Total: 1486.7847 | Unsafe: 19.5486 | Init: 0.0000 | Outside: 1.3844 | Gen: 1465.8517
- [Controller Params] fc.weight = tensor([[ 0.0194, -0.0616,  0.1576],
-        [-0.0393, -0.6168, -0.7400],
-        [ 0.1591,  0.0342,  0.0097]])
-Epoch    20 | Total: 348.9716 | Unsafe: 19.2076 | Init: 0.0000 | Outside: 0.0000 | Gen: 329.7640
- [Controller Params] fc.weight = tensor([[-0.0152, -0.0477,  0.1229],
-        [-0.0093, -0.5804, -0.7072],
-        [ 0.1258,  0.0139, -0.0223]])
-Epoch    30 | Total: 131.0642 | Unsafe: 19.1619 | Init: 0.0415 | Outside: 0.0000 | Gen: 111.8608
- [Controller Params] fc.weight = tensor([[-0.0315, -0.0495,  0.1038],
-        [ 0.0061, -0.5598, -0.6895],
-        [ 0.1081,  0.0087, -0.0365]])
-Epoch    40 | Total: 76.2979 | Unsafe: 19.2695 | Init: 0.0000 | Outside: 0.0000 | Gen: 57.0283
- [Controller Params] fc.weight = tensor([[-0.0386, -0.0537,  0.0941],
-        [ 0.0124, -0.5492, -0.6810],
-        [ 0.0996,  0.0077, -0.0425]])
-Epoch    50 | Total: 57.0611 | Unsafe: 19.1331 | Init: 0.0000 | Outside: 0.0000 | Gen: 37.9280
- [Controller Params] fc.weight = tensor([[-0.0418, -0.0575,  0.0892],
-        [ 0.0146, -0.5437, -0.6773],
-        [ 0.0953,  0.0080, -0.0450]])
-Epoch    60 | Total: 47.9912 | Unsafe: 18.7635 | Init: 0.2745 | Outside: 0.0000 | Gen: 28.9531
- [Controller Params] fc.weight = tensor([[-0.0434, -0.0606,  0.0864],
-        [ 0.0153, -0.5406, -0.6758],
-        [ 0.0931,  0.0086, -0.0462]])
-Epoch    70 | Total: 42.9475 | Unsafe: 18.7717 | Init: 0.2441 | Outside: 0.0000 | Gen: 23.9317
- [Controller Params] fc.weight = tensor([[-0.0443, -0.0632,  0.0846],
-        [ 0.0154, -0.5386, -0.6750],
-        [ 0.0917,  0.0091, -0.0468]])
-Epoch    80 | Total: 39.6745 | Unsafe: 18.8218 | Init: 0.1901 | Outside: 0.0000 | Gen: 20.6627
- [Controller Params] fc.weight = tensor([[-0.0449, -0.0654,  0.0832],
-        [ 0.0153, -0.5372, -0.6746],
-        [ 0.0906,  0.0097, -0.0472]])
-Epoch    90 | Total: 37.1901 | Unsafe: 18.9154 | Init: 0.0951 | Outside: 0.0000 | Gen: 18.1796
- [Controller Params] fc.weight = tensor([[-0.0454, -0.0674,  0.0821],
-        [ 0.0151, -0.5360, -0.6744],
-        [ 0.0898,  0.0102, -0.0474]])
-Epoch   100 | Total: 35.2110 | Unsafe: 19.0036 | Init: 0.0035 | Outside: 0.0000 | Gen: 16.2039
- [Controller Params] fc.weight = tensor([[-0.0458, -0.0692,  0.0811],
-        [ 0.0149, -0.5349, -0.6743],
-        [ 0.0891,  0.0106, -0.0477]])
-Epoch   110 | Total: 33.6109 | Unsafe: 18.9488 | Init: 0.0580 | Outside: 0.0000 | Gen: 14.6042
- [Controller Params] fc.weight = tensor([[-0.0462, -0.0708,  0.0801],
-        [ 0.0146, -0.5339, -0.6742],
-        [ 0.0884,  0.0110, -0.0479]])
-Epoch   120 | Total: 32.2483 | Unsafe: 18.9581 | Init: 0.0471 | Outside: 0.0000 | Gen: 13.2431
- [Controller Params] fc.weight = tensor([[-0.0465, -0.0723,  0.0792],
-        [ 0.0143, -0.5330, -0.6742],
-        [ 0.0878,  0.0114, -0.0481]])
-Epoch   130 | Total: 31.0274 | Unsafe: 18.9972 | Init: 0.0073 | Outside: 0.0000 | Gen: 12.0230
- [Controller Params] fc.weight = tensor([[-0.0469, -0.0737,  0.0784],
-        [ 0.0140, -0.5321, -0.6742],
-        [ 0.0872,  0.0118, -0.0483]])
-Epoch   140 | Total: 29.9428 | Unsafe: 18.9876 | Init: 0.0159 | Outside: 0.0000 | Gen: 10.9393
- [Controller Params] fc.weight = tensor([[-0.0472, -0.0751,  0.0776],
-        [ 0.0138, -0.5313, -0.6742],
-        [ 0.0866,  0.0121, -0.0484]])
-Epoch   150 | Total: 29.0444 | Unsafe: 18.9882 | Init: 0.0149 | Outside: 0.0000 | Gen: 10.0413
- [Controller Params] fc.weight = tensor([[-0.0475, -0.0763,  0.0768],
-        [ 0.0135, -0.5305, -0.6742],
-        [ 0.0861,  0.0124, -0.0486]])
-Epoch   160 | Total: 28.2598 | Unsafe: 19.0012 | Init: 0.0017 | Outside: 0.0000 | Gen: 9.2569
- [Controller Params] fc.weight = tensor([[-0.0478, -0.0775,  0.0761],
-        [ 0.0133, -0.5298, -0.6742],
-        [ 0.0856,  0.0127, -0.0488]])
-Epoch   170 | Total: 27.5068 | Unsafe: 18.9819 | Init: 0.0204 | Outside: 0.0000 | Gen: 8.5045
- [Controller Params] fc.weight = tensor([[-0.0481, -0.0787,  0.0754],
-        [ 0.0131, -0.5291, -0.6741],
-        [ 0.0851,  0.0130, -0.0489]])
-Epoch   180 | Total: 26.9015 | Unsafe: 18.9900 | Init: 0.0124 | Outside: 0.0000 | Gen: 7.8991
- [Controller Params] fc.weight = tensor([[-0.0484, -0.0798,  0.0748],
-        [ 0.0130, -0.5284, -0.6741],
-        [ 0.0846,  0.0133, -0.0491]])
-Epoch   190 | Total: 26.4056 | Unsafe: 19.0067 | Init: 0.0000 | Outside: 0.0000 | Gen: 7.3990
- [Controller Params] fc.weight = tensor([[-0.0486, -0.0809,  0.0742],
-        [ 0.0128, -0.5278, -0.6740],
-        [ 0.0842,  0.0136, -0.0492]])
-Epoch   200 | Total: 25.9187 | Unsafe: 18.9767 | Init: 0.0253 | Outside: 0.0000 | Gen: 6.9167
- [Controller Params] fc.weight = tensor([[-0.0489, -0.0819,  0.0736],
-        [ 0.0127, -0.5272, -0.6739],
-        [ 0.0838,  0.0138, -0.0493]])
-Epoch   210 | Total: 25.4988 | Unsafe: 19.0109 | Init: 0.0000 | Outside: 0.0000 | Gen: 6.4879
- [Controller Params] fc.weight = tensor([[-0.0491, -0.0828,  0.0730],
-        [ 0.0126, -0.5266, -0.6739],
-        [ 0.0834,  0.0140, -0.0495]])
-Epoch   220 | Total: 25.0756 | Unsafe: 18.9760 | Init: 0.0255 | Outside: 0.0000 | Gen: 6.0740
- [Controller Params] fc.weight = tensor([[-0.0493, -0.0838,  0.0725],
-        [ 0.0125, -0.5261, -0.6738],
-        [ 0.0830,  0.0143, -0.0496]])
-Epoch   230 | Total: 24.7012 | Unsafe: 18.9972 | Init: 0.0044 | Outside: 0.0000 | Gen: 5.6996
- [Controller Params] fc.weight = tensor([[-0.0496, -0.0847,  0.0719],
-        [ 0.0123, -0.5255, -0.6738],
-        [ 0.0826,  0.0145, -0.0497]])
-Epoch   240 | Total: 24.3821 | Unsafe: 18.9935 | Init: 0.0082 | Outside: 0.0000 | Gen: 5.3804
- [Controller Params] fc.weight = tensor([[-0.0498, -0.0856,  0.0714],
-        [ 0.0122, -0.5250, -0.6738],
-        [ 0.0823,  0.0147, -0.0498]])
-Epoch   250 | Total: 24.0905 | Unsafe: 18.9862 | Init: 0.0150 | Outside: 0.0000 | Gen: 5.0893
- [Controller Params] fc.weight = tensor([[-0.0500, -0.0864,  0.0709],
-        [ 0.0120, -0.5245, -0.6738],
-        [ 0.0819,  0.0149, -0.0499]])
-Epoch   260 | Total: 23.8443 | Unsafe: 18.9924 | Init: 0.0089 | Outside: 0.0000 | Gen: 4.8430
- [Controller Params] fc.weight = tensor([[-0.0502, -0.0872,  0.0704],
-        [ 0.0119, -0.5241, -0.6738],
-        [ 0.0816,  0.0151, -0.0500]])
-Epoch   270 | Total: 23.5932 | Unsafe: 18.9925 | Init: 0.0090 | Outside: 0.0000 | Gen: 4.5918
- [Controller Params] fc.weight = tensor([[-0.0504, -0.0880,  0.0700],
-        [ 0.0118, -0.5236, -0.6738],
-        [ 0.0813,  0.0153, -0.0501]])
-Epoch   280 | Total: 23.3337 | Unsafe: 18.9784 | Init: 0.0225 | Outside: 0.0000 | Gen: 4.3328
- [Controller Params] fc.weight = tensor([[-0.0506, -0.0888,  0.0695],
-        [ 0.0116, -0.5231, -0.6738],
-        [ 0.0810,  0.0155, -0.0502]])
-Epoch   290 | Total: 23.1158 | Unsafe: 18.9974 | Init: 0.0036 | Outside: 0.0000 | Gen: 4.1148
- [Controller Params] fc.weight = tensor([[-0.0507, -0.0895,  0.0691],
-        [ 0.0115, -0.5227, -0.6738],
-        [ 0.0807,  0.0156, -0.0503]])
-Epoch   300 | Total: 22.9324 | Unsafe: 18.9553 | Init: 0.0456 | Outside: 0.0000 | Gen: 3.9315
- [Controller Params] fc.weight = tensor([[-0.0509, -0.0903,  0.0687],
-        [ 0.0114, -0.5223, -0.6738],
-        [ 0.0804,  0.0158, -0.0504]])
-Epoch   310 | Total: 22.7414 | Unsafe: 18.9885 | Init: 0.0121 | Outside: 0.0000 | Gen: 3.7407
- [Controller Params] fc.weight = tensor([[-0.0511, -0.0910,  0.0683],
-        [ 0.0113, -0.5219, -0.6738],
-        [ 0.0801,  0.0160, -0.0505]])
-Epoch   320 | Total: 22.5863 | Unsafe: 18.9956 | Init: 0.0052 | Outside: 0.0000 | Gen: 3.5854
- [Controller Params] fc.weight = tensor([[-0.0513, -0.0916,  0.0679],
-        [ 0.0111, -0.5215, -0.6738],
-        [ 0.0798,  0.0162, -0.0506]])
-Epoch   330 | Total: 22.4231 | Unsafe: 18.9437 | Init: 0.0570 | Outside: 0.0000 | Gen: 3.4224
- [Controller Params] fc.weight = tensor([[-0.0514, -0.0923,  0.0675],
-        [ 0.0110, -0.5211, -0.6738],
-        [ 0.0795,  0.0163, -0.0507]])
-Epoch   340 | Total: 22.2757 | Unsafe: 18.9298 | Init: 0.0711 | Outside: 0.0000 | Gen: 3.2749
- [Controller Params] fc.weight = tensor([[-0.0516, -0.0929,  0.0671],
-        [ 0.0109, -0.5207, -0.6738],
-        [ 0.0793,  0.0165, -0.0508]])
-Epoch   350 | Total: 22.1280 | Unsafe: 18.9899 | Init: 0.0109 | Outside: 0.0000 | Gen: 3.1271
- [Controller Params] fc.weight = tensor([[-0.0517, -0.0935,  0.0668],
-        [ 0.0108, -0.5204, -0.6738],
-        [ 0.0790,  0.0166, -0.0508]])
-Epoch   360 | Total: 22.0168 | Unsafe: 19.0064 | Init: 0.0000 | Outside: 0.0000 | Gen: 3.0104
- [Controller Params] fc.weight = tensor([[-0.0519, -0.0941,  0.0664],
-        [ 0.0107, -0.5200, -0.6738],
-        [ 0.0788,  0.0168, -0.0509]])
-Epoch   370 | Total: 21.9182 | Unsafe: 18.9668 | Init: 0.0339 | Outside: 0.0000 | Gen: 2.9175
- [Controller Params] fc.weight = tensor([[-0.0520, -0.0947,  0.0661],
-        [ 0.0106, -0.5197, -0.6738],
-        [ 0.0785,  0.0169, -0.0510]])
-Epoch   380 | Total: 21.8026 | Unsafe: 18.9850 | Init: 0.0157 | Outside: 0.0000 | Gen: 2.8019
- [Controller Params] fc.weight = tensor([[-0.0522, -0.0952,  0.0657],
-        [ 0.0105, -0.5193, -0.6738],
-        [ 0.0783,  0.0170, -0.0511]])
-Epoch   390 | Total: 21.6981 | Unsafe: 18.9822 | Init: 0.0184 | Outside: 0.0000 | Gen: 2.6975
- [Controller Params] fc.weight = tensor([[-0.0523, -0.0957,  0.0654],
-        [ 0.0105, -0.5190, -0.6738],
-        [ 0.0781,  0.0172, -0.0511]])
-Epoch   400 | Total: 21.6014 | Unsafe: 18.8963 | Init: 0.1045 | Outside: 0.0000 | Gen: 2.6006
- [Controller Params] fc.weight = tensor([[-0.0524, -0.0963,  0.0651],
-        [ 0.0104, -0.5187, -0.6738],
-        [ 0.0779,  0.0173, -0.0512]])
-Epoch   410 | Total: 21.5328 | Unsafe: 18.9111 | Init: 0.0899 | Outside: 0.0000 | Gen: 2.5319
- [Controller Params] fc.weight = tensor([[-0.0526, -0.0968,  0.0647],
-        [ 0.0103, -0.5184, -0.6738],
-        [ 0.0776,  0.0174, -0.0513]])
-Epoch   420 | Total: 21.3885 | Unsafe: 18.9528 | Init: 0.0477 | Outside: 0.0000 | Gen: 2.3881
- [Controller Params] fc.weight = tensor([[-0.0527, -0.0973,  0.0644],
-        [ 0.0102, -0.5181, -0.6738],
-        [ 0.0774,  0.0176, -0.0513]])
-Epoch   430 | Total: 21.3042 | Unsafe: 18.9726 | Init: 0.0283 | Outside: 0.0000 | Gen: 2.3033
- [Controller Params] fc.weight = tensor([[-0.0528, -0.0978,  0.0641],
-        [ 0.0101, -0.5178, -0.6738],
-        [ 0.0772,  0.0177, -0.0514]])
-Epoch   440 | Total: 21.2450 | Unsafe: 18.9576 | Init: 0.0433 | Outside: 0.0000 | Gen: 2.2441
- [Controller Params] fc.weight = tensor([[-0.0529, -0.0983,  0.0638],
-        [ 0.0101, -0.5175, -0.6738],
-        [ 0.0770,  0.0178, -0.0514]])
-Epoch   450 | Total: 21.1662 | Unsafe: 18.9566 | Init: 0.0445 | Outside: 0.0000 | Gen: 2.1651
- [Controller Params] fc.weight = tensor([[-0.0531, -0.0988,  0.0636],
-        [ 0.0100, -0.5172, -0.6737],
-        [ 0.0768,  0.0179, -0.0515]])
-Epoch   460 | Total: 21.1105 | Unsafe: 18.9715 | Init: 0.0299 | Outside: 0.0000 | Gen: 2.1091
- [Controller Params] fc.weight = tensor([[-0.0532, -0.0993,  0.0633],
-        [ 0.0099, -0.5169, -0.6737],
-        [ 0.0766,  0.0180, -0.0516]])
-Epoch   470 | Total: 21.0267 | Unsafe: 18.9704 | Init: 0.0306 | Outside: 0.0000 | Gen: 2.0258
- [Controller Params] fc.weight = tensor([[-0.0533, -0.0997,  0.0630],
-        [ 0.0098, -0.5166, -0.6737],
-        [ 0.0764,  0.0181, -0.0516]])
-Epoch   480 | Total: 20.9577 | Unsafe: 18.9526 | Init: 0.0480 | Outside: 0.0000 | Gen: 1.9572
- [Controller Params] fc.weight = tensor([[-0.0534, -0.1002,  0.0627],
-        [ 0.0098, -0.5163, -0.6737],
-        [ 0.0763,  0.0182, -0.0517]])
-Epoch   490 | Total: 20.8993 | Unsafe: 18.9815 | Init: 0.0190 | Outside: 0.0000 | Gen: 1.8989
- [Controller Params] fc.weight = tensor([[-0.0535, -0.1006,  0.0625],
-        [ 0.0097, -0.5161, -0.6737],
-        [ 0.0761,  0.0183, -0.0517]])
-[Refine-Unsafe] Epoch 500: Loss=18.960, 1 failing → refined 1 cells → 8 total
-[Refine-Generator] Epoch 500: 44 failing → refined 44 cells → 352 total
+
+  Creating visualization for epoch 0...
+Epoch    10 | Total: 168.1237 | Unsafe: 19.0991 | Init: 0.2294 | Outside: 0.0000 | Gen: 148.7953 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0562, -0.0222,  0.0756],
+        [-0.0746, -0.3701, -0.3181],
+        [ 0.0629,  0.0573,  0.0380]])
+Epoch    20 | Total: 23.8601 | Unsafe: 18.6123 | Init: 0.3888 | Outside: 0.0000 | Gen: 4.8590 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0372, -0.0390,  0.0572],
+        [-0.0546, -0.3510, -0.3007],
+        [ 0.0447,  0.0809,  0.0195]])
+Epoch    30 | Total: 21.3324 | Unsafe: 18.6034 | Init: 0.3980 | Outside: 0.0000 | Gen: 2.3310 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0297, -0.0459,  0.0499],
+        [-0.0466, -0.3434, -0.2938],
+        [ 0.0375,  0.0903,  0.0123]])
+Epoch    40 | Total: 20.2178 | Unsafe: 18.5651 | Init: 0.4354 | Outside: 0.0000 | Gen: 1.2173 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0267, -0.0488,  0.0470],
+        [-0.0434, -0.3401, -0.2910],
+        [ 0.0346,  0.0940,  0.0094]])
+Epoch    50 | Total: 19.8561 | Unsafe: 18.5353 | Init: 0.4648 | Outside: 0.0000 | Gen: 0.8560 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0256, -0.0499,  0.0459],
+        [-0.0421, -0.3387, -0.2899],
+        [ 0.0335,  0.0955,  0.0082]])
+Epoch    60 | Total: 19.7107 | Unsafe: 18.5142 | Init: 0.4858 | Outside: 0.0000 | Gen: 0.7108 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0251, -0.0505,  0.0454],
+        [-0.0416, -0.3381, -0.2894],
+        [ 0.0330,  0.0961,  0.0077]])
+Epoch    70 | Total: 19.6375 | Unsafe: 18.4983 | Init: 0.5017 | Outside: 0.0000 | Gen: 0.6376 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0249, -0.0507,  0.0452],
+        [-0.0414, -0.3378, -0.2892],
+        [ 0.0328,  0.0963,  0.0075]])
+Epoch    80 | Total: 19.5926 | Unsafe: 18.4852 | Init: 0.5147 | Outside: 0.0000 | Gen: 0.5927 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0248, -0.0509,  0.0451],
+        [-0.0412, -0.3376, -0.2891],
+        [ 0.0327,  0.0965,  0.0074]])
+Epoch    90 | Total: 19.5605 | Unsafe: 18.4736 | Init: 0.5263 | Outside: 0.0000 | Gen: 0.5606 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0247, -0.0510,  0.0450],
+        [-0.0412, -0.3375, -0.2891],
+        [ 0.0326,  0.0965,  0.0074]])
+Epoch   100 | Total: 19.5349 | Unsafe: 18.4628 | Init: 0.5371 | Outside: 0.0000 | Gen: 0.5350 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0247, -0.0511,  0.0450],
+        [-0.0411, -0.3374, -0.2890],
+        [ 0.0326,  0.0966,  0.0073]])
+Epoch   110 | Total: 19.5131 | Unsafe: 18.4525 | Init: 0.5474 | Outside: 0.0000 | Gen: 0.5132 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0246, -0.0511,  0.0449],
+        [-0.0411, -0.3373, -0.2890],
+        [ 0.0325,  0.0967,  0.0073]])
+Epoch   120 | Total: 19.4939 | Unsafe: 18.4426 | Init: 0.5573 | Outside: 0.0000 | Gen: 0.4941 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0246, -0.0512,  0.0449],
+        [-0.0411, -0.3372, -0.2890],
+        [ 0.0325,  0.0967,  0.0073]])
+Epoch   130 | Total: 19.4766 | Unsafe: 18.4329 | Init: 0.5669 | Outside: 0.0000 | Gen: 0.4768 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0245, -0.0513,  0.0448],
+        [-0.0410, -0.3371, -0.2890],
+        [ 0.0325,  0.0968,  0.0072]])
+Epoch   140 | Total: 19.4608 | Unsafe: 18.4235 | Init: 0.5764 | Outside: 0.0000 | Gen: 0.4610 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0245, -0.0514,  0.0448],
+        [-0.0410, -0.3370, -0.2889],
+        [ 0.0324,  0.0968,  0.0072]])
+Epoch   150 | Total: 19.4462 | Unsafe: 18.4142 | Init: 0.5856 | Outside: 0.0000 | Gen: 0.4464 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0244, -0.0515,  0.0448],
+        [-0.0410, -0.3369, -0.2889],
+        [ 0.0324,  0.0969,  0.0071]])
+Epoch   160 | Total: 19.4327 | Unsafe: 18.4051 | Init: 0.5947 | Outside: 0.0000 | Gen: 0.4328 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0244, -0.0516,  0.0447],
+        [-0.0409, -0.3369, -0.2889],
+        [ 0.0323,  0.0969,  0.0071]])
+Epoch   170 | Total: 19.4199 | Unsafe: 18.3962 | Init: 0.6036 | Outside: 0.0000 | Gen: 0.4201 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0244, -0.0517,  0.0447],
+        [-0.0409, -0.3368, -0.2889],
+        [ 0.0323,  0.0970,  0.0070]])
+Epoch   180 | Total: 19.4079 | Unsafe: 18.3875 | Init: 0.6124 | Outside: 0.0000 | Gen: 0.4081 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0243, -0.0518,  0.0446],
+        [-0.0409, -0.3367, -0.2888],
+        [ 0.0322,  0.0970,  0.0070]])
+Epoch   190 | Total: 19.3966 | Unsafe: 18.3788 | Init: 0.6210 | Outside: 0.0000 | Gen: 0.3968 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0243, -0.0519,  0.0446],
+        [-0.0408, -0.3366, -0.2888],
+        [ 0.0322,  0.0971,  0.0069]])
+Epoch   200 | Total: 19.3859 | Unsafe: 18.3703 | Init: 0.6295 | Outside: 0.0000 | Gen: 0.3860 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0242, -0.0520,  0.0445],
+        [-0.0408, -0.3365, -0.2888],
+        [ 0.0321,  0.0971,  0.0069]])
+Epoch   210 | Total: 19.3756 | Unsafe: 18.3620 | Init: 0.6379 | Outside: 0.0000 | Gen: 0.3758 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0242, -0.0521,  0.0445],
+        [-0.0408, -0.3364, -0.2888],
+        [ 0.0321,  0.0972,  0.0069]])
+Epoch   220 | Total: 19.3659 | Unsafe: 18.3537 | Init: 0.6461 | Outside: 0.0000 | Gen: 0.3661 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0241, -0.0522,  0.0444],
+        [-0.0407, -0.3364, -0.2888],
+        [ 0.0320,  0.0973,  0.0068]])
+Epoch   230 | Total: 19.3565 | Unsafe: 18.3456 | Init: 0.6542 | Outside: 0.0000 | Gen: 0.3567 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0241, -0.0523,  0.0444],
+        [-0.0407, -0.3363, -0.2887],
+        [ 0.0320,  0.0973,  0.0068]])
+Epoch   240 | Total: 19.3476 | Unsafe: 18.3376 | Init: 0.6623 | Outside: 0.0000 | Gen: 0.3478 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0240, -0.0524,  0.0443],
+        [-0.0407, -0.3362, -0.2887],
+        [ 0.0319,  0.0974,  0.0067]])
+Epoch   250 | Total: 19.3390 | Unsafe: 18.3297 | Init: 0.6702 | Outside: 0.0000 | Gen: 0.3392 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0240, -0.0525,  0.0443],
+        [-0.0407, -0.3361, -0.2887],
+        [ 0.0319,  0.0974,  0.0067]])
+Epoch   260 | Total: 19.3308 | Unsafe: 18.3219 | Init: 0.6780 | Outside: 0.0000 | Gen: 0.3310 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0239, -0.0526,  0.0442],
+        [-0.0406, -0.3360, -0.2887],
+        [ 0.0318,  0.0975,  0.0066]])
+Epoch   270 | Total: 19.3229 | Unsafe: 18.3142 | Init: 0.6857 | Outside: 0.0000 | Gen: 0.3230 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0239, -0.0527,  0.0442],
+        [-0.0406, -0.3360, -0.2887],
+        [ 0.0318,  0.0975,  0.0066]])
+Epoch   280 | Total: 19.3152 | Unsafe: 18.3066 | Init: 0.6933 | Outside: 0.0000 | Gen: 0.3154 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0238, -0.0528,  0.0441],
+        [-0.0406, -0.3359, -0.2886],
+        [ 0.0317,  0.0976,  0.0065]])
+Epoch   290 | Total: 19.3079 | Unsafe: 18.2990 | Init: 0.7008 | Outside: 0.0000 | Gen: 0.3080 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0238, -0.0529,  0.0441],
+        [-0.0406, -0.3358, -0.2886],
+        [ 0.0317,  0.0977,  0.0065]])
+Epoch   300 | Total: 19.3008 | Unsafe: 18.2916 | Init: 0.7082 | Outside: 0.0000 | Gen: 0.3009 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0237, -0.0530,  0.0440],
+        [-0.0405, -0.3357, -0.2886],
+        [ 0.0316,  0.0977,  0.0064]])
+Epoch   310 | Total: 19.2939 | Unsafe: 18.2843 | Init: 0.7155 | Outside: 0.0000 | Gen: 0.2940 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0237, -0.0531,  0.0440],
+        [-0.0405, -0.3356, -0.2886],
+        [ 0.0316,  0.0978,  0.0064]])
+Epoch   320 | Total: 19.2873 | Unsafe: 18.2771 | Init: 0.7228 | Outside: 0.0000 | Gen: 0.2874 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0236, -0.0533,  0.0439],
+        [-0.0405, -0.3356, -0.2886],
+        [ 0.0315,  0.0978,  0.0063]])
+Epoch   330 | Total: 19.2809 | Unsafe: 18.2699 | Init: 0.7299 | Outside: 0.0000 | Gen: 0.2810 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0236, -0.0534,  0.0439],
+        [-0.0405, -0.3355, -0.2886],
+        [ 0.0315,  0.0978,  0.0063]])
+Epoch   340 | Total: 19.2746 | Unsafe: 18.2628 | Init: 0.7370 | Outside: 0.0000 | Gen: 0.2748 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0235, -0.0535,  0.0438],
+        [-0.0404, -0.3354, -0.2885],
+        [ 0.0314,  0.0979,  0.0062]])
+Epoch   350 | Total: 19.2686 | Unsafe: 18.2559 | Init: 0.7440 | Outside: 0.0000 | Gen: 0.2688 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0235, -0.0536,  0.0438],
+        [-0.0404, -0.3354, -0.2885],
+        [ 0.0314,  0.0979,  0.0062]])
+Epoch   360 | Total: 19.2628 | Unsafe: 18.2489 | Init: 0.7509 | Outside: 0.0000 | Gen: 0.2630 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0234, -0.0537,  0.0437],
+        [-0.0404, -0.3353, -0.2885],
+        [ 0.0313,  0.0979,  0.0061]])
+Epoch   370 | Total: 19.2572 | Unsafe: 18.2421 | Init: 0.7578 | Outside: 0.0000 | Gen: 0.2573 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0234, -0.0538,  0.0437],
+        [-0.0404, -0.3352, -0.2885],
+        [ 0.0313,  0.0979,  0.0061]])
+Epoch   380 | Total: 19.2517 | Unsafe: 18.2354 | Init: 0.7645 | Outside: 0.0000 | Gen: 0.2518 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0233, -0.0539,  0.0436],
+        [-0.0403, -0.3351, -0.2885],
+        [ 0.0312,  0.0980,  0.0060]])
+Epoch   390 | Total: 19.2464 | Unsafe: 18.2287 | Init: 0.7712 | Outside: 0.0000 | Gen: 0.2465 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0233, -0.0540,  0.0436],
+        [-0.0403, -0.3351, -0.2884],
+        [ 0.0312,  0.0980,  0.0060]])
+Epoch   400 | Total: 19.2413 | Unsafe: 18.2221 | Init: 0.7778 | Outside: 0.0000 | Gen: 0.2414 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0232, -0.0541,  0.0435],
+        [-0.0403, -0.3350, -0.2884],
+        [ 0.0311,  0.0980,  0.0059]])
+Epoch   410 | Total: 19.2363 | Unsafe: 18.2155 | Init: 0.7844 | Outside: 0.0000 | Gen: 0.2364 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0232, -0.0542,  0.0435],
+        [-0.0403, -0.3349, -0.2884],
+        [ 0.0311,  0.0980,  0.0059]])
+Epoch   420 | Total: 19.2314 | Unsafe: 18.2091 | Init: 0.7908 | Outside: 0.0000 | Gen: 0.2315 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0231, -0.0543,  0.0434],
+        [-0.0402, -0.3349, -0.2884],
+        [ 0.0310,  0.0981,  0.0059]])
+Epoch   430 | Total: 19.2267 | Unsafe: 18.2027 | Init: 0.7972 | Outside: 0.0000 | Gen: 0.2268 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0231, -0.0544,  0.0434],
+        [-0.0402, -0.3348, -0.2884],
+        [ 0.0310,  0.0981,  0.0058]])
+Epoch   440 | Total: 19.2221 | Unsafe: 18.1963 | Init: 0.8036 | Outside: 0.0000 | Gen: 0.2222 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0230, -0.0545,  0.0433],
+        [-0.0402, -0.3347, -0.2884],
+        [ 0.0309,  0.0981,  0.0058]])
+Epoch   450 | Total: 19.2177 | Unsafe: 18.1900 | Init: 0.8099 | Outside: 0.0000 | Gen: 0.2178 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0230, -0.0546,  0.0433],
+        [-0.0402, -0.3347, -0.2883],
+        [ 0.0309,  0.0981,  0.0057]])
+Epoch   460 | Total: 19.2134 | Unsafe: 18.1838 | Init: 0.8161 | Outside: 0.0000 | Gen: 0.2135 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0229, -0.0547,  0.0432],
+        [-0.0402, -0.3346, -0.2883],
+        [ 0.0308,  0.0982,  0.0057]])
+Epoch   470 | Total: 19.2092 | Unsafe: 18.1777 | Init: 0.8222 | Outside: 0.0000 | Gen: 0.2093 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0229, -0.0548,  0.0432],
+        [-0.0401, -0.3345, -0.2883],
+        [ 0.0308,  0.0982,  0.0056]])
+Epoch   480 | Total: 19.2051 | Unsafe: 18.1716 | Init: 0.8283 | Outside: 0.0000 | Gen: 0.2052 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0229, -0.0549,  0.0432],
+        [-0.0401, -0.3345, -0.2883],
+        [ 0.0307,  0.0982,  0.0056]])
+Epoch   490 | Total: 19.2011 | Unsafe: 18.1656 | Init: 0.8343 | Outside: 0.0000 | Gen: 0.2012 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0228, -0.0550,  0.0431],
+        [-0.0401, -0.3344, -0.2883],
+        [ 0.0307,  0.0983,  0.0055]])
+[Refine-Unsafe] Epoch 500: Loss=18.160, 1 failing → refined 1 cells → 8 total
+[Refine-Generator] Epoch 500: 44 failing → refined 10 cells → 114 total
   Rebuilding CROWN caches with new generator cells...
     Rebuilding V cache with 11 cells...
 [SymbolicCROWNCache] Creating BoundedModule for 11 cells...
 [SymbolicCROWNCache] Initialized for 11 cells - symbolic structure cached!
-    Rebuilding Phi cache with 352 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 352 cells...
-[SymbolicCROWNCache_Phi] Initialized for 352 cells!
+    Rebuilding Phi cache with 114 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 114 cells...
+[SymbolicCROWNCache_Phi] Initialized for 114 cells!
   Caches rebuilt successfully!
-[Merge-Generator] Epoch 501: merged 0 pairs → 352 total
-Epoch   500 | Total: 21.1241 | Unsafe: 18.9603 | Init: 0.0379 | Outside: 0.0000 | Gen: 2.1259
- [Controller Params] fc.weight = tensor([[-0.0536, -0.1011,  0.0622],
-        [ 0.0096, -0.5158, -0.6737],
-        [ 0.0759,  0.0184, -0.0518]])
+[Merge-Generator] Epoch 501: merged 0 pairs → 114 total
+Epoch   500 | Total: 19.2113 | Unsafe: 18.1593 | Init: 0.8403 | Outside: 0.0000 | Gen: 0.2117 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0228, -0.0551,  0.0431],
+        [-0.0401, -0.3343, -0.2883],
+        [ 0.0306,  0.0983,  0.0055]])
   Rebuilding CROWN caches with new generator cells...
     Rebuilding V cache with 11 cells...
 [SymbolicCROWNCache] Creating BoundedModule for 11 cells...
 [SymbolicCROWNCache] Initialized for 11 cells - symbolic structure cached!
-    Rebuilding Phi cache with 352 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 352 cells...
-[SymbolicCROWNCache_Phi] Initialized for 352 cells!
+    Rebuilding Phi cache with 114 cells...
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 114 cells...
+[SymbolicCROWNCache_Phi] Initialized for 114 cells!
   Caches rebuilt successfully!
-Epoch   510 | Total: 21.2542 | Unsafe: 19.0023 | Init: 0.0000 | Outside: 0.0000 | Gen: 2.2519
- [Controller Params] fc.weight = tensor([[-0.0538, -0.1024,  0.0618],
-        [ 0.0096, -0.5156, -0.6738],
-        [ 0.0757,  0.0189, -0.0519]])
-Epoch   520 | Total: 21.0483 | Unsafe: 18.8464 | Init: 0.1521 | Outside: 0.0000 | Gen: 2.0498
- [Controller Params] fc.weight = tensor([[-0.0541, -0.1047,  0.0614],
-        [ 0.0095, -0.5154, -0.6740],
-        [ 0.0754,  0.0198, -0.0521]])
-Epoch   530 | Total: 20.9279 | Unsafe: 18.8943 | Init: 0.1041 | Outside: 0.0000 | Gen: 1.9296
- [Controller Params] fc.weight = tensor([[-0.0544, -0.1072,  0.0610],
-        [ 0.0095, -0.5152, -0.6742],
-        [ 0.0751,  0.0208, -0.0522]])
-Epoch   540 | Total: 21.0036 | Unsafe: 18.9902 | Init: 0.0083 | Outside: 0.0000 | Gen: 2.0051
- [Controller Params] fc.weight = tensor([[-0.0548, -0.1097,  0.0605],
-        [ 0.0095, -0.5150, -0.6744],
-        [ 0.0748,  0.0218, -0.0524]])
-Epoch   550 | Total: 20.7903 | Unsafe: 18.9812 | Init: 0.0172 | Outside: 0.0000 | Gen: 1.7920
- [Controller Params] fc.weight = tensor([[-0.0551, -0.1123,  0.0601],
-        [ 0.0094, -0.5148, -0.6746],
-        [ 0.0745,  0.0228, -0.0526]])
-Epoch   560 | Total: 20.7368 | Unsafe: 18.9563 | Init: 0.0423 | Outside: 0.0000 | Gen: 1.7382
- [Controller Params] fc.weight = tensor([[-0.0554, -0.1148,  0.0597],
-        [ 0.0094, -0.5147, -0.6748],
-        [ 0.0742,  0.0237, -0.0528]])
-Epoch   570 | Total: 20.6236 | Unsafe: 18.8604 | Init: 0.1381 | Outside: 0.0000 | Gen: 1.6250
- [Controller Params] fc.weight = tensor([[-0.0557, -0.1172,  0.0593],
-        [ 0.0094, -0.5145, -0.6751],
-        [ 0.0739,  0.0246, -0.0529]])
-Epoch   580 | Total: 20.7070 | Unsafe: 18.8874 | Init: 0.1115 | Outside: 0.0000 | Gen: 1.7081
- [Controller Params] fc.weight = tensor([[-0.0560, -0.1196,  0.0589],
-        [ 0.0093, -0.5144, -0.6753],
-        [ 0.0736,  0.0255, -0.0531]])
+Epoch   510 | Total: 19.2070 | Unsafe: 18.1531 | Init: 0.8465 | Outside: 0.0000 | Gen: 0.2074 | Focus: generator
+ [Controller Params] fc.weight = tensor([[ 0.0227, -0.0553,  0.0430],
+        [-0.0400, -0.3343, -0.2882],
+        [ 0.0306,  0.0984,  0.0054]])
 [SWITCH] Switching from generator to unsafe
   Resetting optimizer and scheduler state after switching focus
-  constraint_largest_counts: {'generator': 87, 'unsafe': 0}
-Epoch   590 | Total: 143.6815 | Unsafe: 142.4669 | Init: 1.1903 | Outside: 0.0000 | Gen: 0.0243
- [Controller Params] fc.weight = tensor([[-0.0712, -0.1357,  0.0437],
-        [ 0.0103, -0.5001, -0.6902],
-        [ 0.0586,  0.0405, -0.0681]])
-Epoch   600 | Total: 110.1505 | Unsafe: 104.0346 | Init: 5.8099 | Outside: 0.0000 | Gen: 0.3059
- [Controller Params] fc.weight = tensor([[-0.1217, -0.1848, -0.0051],
-        [ 0.0561, -0.4532, -0.6598],
-        [ 0.0104,  0.0889, -0.1165]])
-Epoch   610 | Total: 54.8108 | Unsafe: 41.1736 | Init: 11.9055 | Outside: 0.0000 | Gen: 1.7317
- [Controller Params] fc.weight = tensor([[-0.1732, -0.2388, -0.0594],
-        [ 0.1108, -0.3986, -0.6055],
-        [-0.0435,  0.1429, -0.1659]])
-Epoch   620 | Total: 24.3892 | Unsafe: 0.0000 | Init: 17.9362 | Outside: 0.0000 | Gen: 6.4529
- [Controller Params] fc.weight = tensor([[-0.2332, -0.3002, -0.1201],
-        [ 0.1734, -0.3362, -0.5447],
-        [-0.1042,  0.2037, -0.2251]])
-Epoch   630 | Total: 23.7360 | Unsafe: 0.0000 | Init: 18.6538 | Outside: 0.0000 | Gen: 5.0822
- [Controller Params] fc.weight = tensor([[-0.3025, -0.3698, -0.1896],
-        [ 0.2343, -0.2669, -0.5468],
-        [-0.1741,  0.2733, -0.2946]])
-Epoch   640 | Total: 20.0385 | Unsafe: 0.0000 | Init: 17.6241 | Outside: 0.0000 | Gen: 2.4144
- [Controller Params] fc.weight = tensor([[-0.3637, -0.4314, -0.2535],
-        [ 0.2589, -0.2051, -0.6075],
-        [-0.2393,  0.3360, -0.3580]])
-Epoch   650 | Total: 17.5514 | Unsafe: 0.0000 | Init: 16.3891 | Outside: 0.0000 | Gen: 1.1623
- [Controller Params] fc.weight = tensor([[-0.4054, -0.4737, -0.3014],
-        [ 0.2394, -0.1614, -0.6763],
-        [-0.2877,  0.3775, -0.4011]])
-Epoch   660 | Total: 16.8327 | Unsafe: 0.5272 | Init: 15.4492 | Outside: 0.0000 | Gen: 0.8562
- [Controller Params] fc.weight = tensor([[-0.4297, -0.4987, -0.3319],
-        [ 0.2118, -0.1340, -0.7316],
-        [-0.3198,  0.4024, -0.4265]])
-Epoch   670 | Total: 16.1850 | Unsafe: 0.0000 | Init: 15.0886 | Outside: 0.0000 | Gen: 1.0965
- [Controller Params] fc.weight = tensor([[-0.4447, -0.5159, -0.3530],
-        [ 0.1919, -0.1164, -0.7754],
-        [-0.3425,  0.4187, -0.4412]])
-Epoch   680 | Total: 15.2535 | Unsafe: 0.0811 | Init: 14.0954 | Outside: 0.0000 | Gen: 1.0770
- [Controller Params] fc.weight = tensor([[-0.4552, -0.5313, -0.3718],
-        [ 0.1889, -0.1045, -0.8113],
-        [-0.3633,  0.4338, -0.4506]])
-Epoch   690 | Total: 14.3069 | Unsafe: 0.0211 | Init: 13.0999 | Outside: 0.0000 | Gen: 1.1858
- [Controller Params] fc.weight = tensor([[-0.4638, -0.5466, -0.3911],
-        [ 0.1985, -0.0955, -0.8428],
-        [-0.3847,  0.4500, -0.4586]])
-Epoch   700 | Total: 13.3307 | Unsafe: 0.1571 | Init: 11.9238 | Outside: 0.0000 | Gen: 1.2498
- [Controller Params] fc.weight = tensor([[-0.4727, -0.5632, -0.4134],
-        [ 0.2170, -0.0872, -0.8740],
-        [-0.4091,  0.4696, -0.4675]])
-Epoch   710 | Total: 12.0590 | Unsafe: 0.0000 | Init: 10.6645 | Outside: 0.0000 | Gen: 1.3945
- [Controller Params] fc.weight = tensor([[-0.4818, -0.5809, -0.4381],
-        [ 0.2448, -0.0801, -0.9030],
-        [-0.4365,  0.4919, -0.4757]])
-Epoch   720 | Total: 10.9290 | Unsafe: 0.0000 | Init: 9.3164 | Outside: 0.0000 | Gen: 1.6126
- [Controller Params] fc.weight = tensor([[-0.4907, -0.5988, -0.4640],
-        [ 0.2836, -0.0741, -0.9270],
-        [-0.4669,  0.5166, -0.4831]])
-Epoch   730 | Total: 9.3821 | Unsafe: 0.0000 | Init: 7.8199 | Outside: 0.0000 | Gen: 1.5622
- [Controller Params] fc.weight = tensor([[-0.4979, -0.6157, -0.4915],
-        [ 0.3300, -0.0683, -0.9486],
-        [-0.4994,  0.5425, -0.4904]])
-Epoch   740 | Total: 8.0125 | Unsafe: 0.0000 | Init: 6.3254 | Outside: 0.0000 | Gen: 1.6871
- [Controller Params] fc.weight = tensor([[-0.5046, -0.6337, -0.5192],
-        [ 0.3786, -0.0627, -0.9660],
-        [-0.5320,  0.5670, -0.4956]])
-Epoch   750 | Total: 6.3367 | Unsafe: 0.0000 | Init: 4.7574 | Outside: 0.0000 | Gen: 1.5794
- [Controller Params] fc.weight = tensor([[-0.5116, -0.6550, -0.5493],
-        [ 0.4213, -0.0568, -0.9865],
-        [-0.5660,  0.5903, -0.4985]])
-Epoch   760 | Total: 4.8149 | Unsafe: 0.0000 | Init: 3.2082 | Outside: 0.0000 | Gen: 1.6067
- [Controller Params] fc.weight = tensor([[-0.5200, -0.6794, -0.5811],
-        [ 0.4612, -0.0507, -1.0058],
-        [-0.6014,  0.6148, -0.5010]])
-Epoch   770 | Total: 3.2508 | Unsafe: 0.0000 | Init: 1.6106 | Outside: 0.0000 | Gen: 1.6402
- [Controller Params] fc.weight = tensor([[-0.5300, -0.7033, -0.6126],
-        [ 0.4848, -0.0424, -1.0286],
-        [-0.6382,  0.6417, -0.5033]])
-Epoch   780 | Total: 1.7146 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.7146
- [Controller Params] fc.weight = tensor([[-0.5397, -0.7237, -0.6432],
-        [ 0.4868, -0.0317, -1.0586],
-        [-0.6742,  0.6662, -0.5056]])
-Epoch   790 | Total: 1.7815 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0635 | Gen: 1.7180
- [Controller Params] fc.weight = tensor([[-0.5491, -0.7405, -0.6730],
-        [ 0.4893, -0.0212, -1.0864],
-        [-0.7094,  0.6858, -0.5058]])
-Epoch   800 | Total: 1.4974 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.4974
- [Controller Params] fc.weight = tensor([[-0.5572, -0.7535, -0.7023],
-        [ 0.4829, -0.0101, -1.1161],
-        [-0.7437,  0.7003, -0.5055]])
-Epoch   810 | Total: 1.4553 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.4553
- [Controller Params] fc.weight = tensor([[-5.6436e-01, -7.6312e-01, -7.2930e-01],
-        [ 4.7245e-01,  3.9492e-04, -1.1435e+00],
-        [-7.7518e-01,  7.1110e-01, -5.0737e-01]])
-Epoch   820 | Total: 1.3007 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.3007
- [Controller Params] fc.weight = tensor([[-0.5715, -0.7709, -0.7548],
-        [ 0.4589,  0.0042, -1.1695],
-        [-0.8041,  0.7196, -0.5106]])
-Epoch   830 | Total: 1.2524 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.2524
- [Controller Params] fc.weight = tensor([[-0.5789, -0.7781, -0.7791],
-        [ 0.4402,  0.0033, -1.1942],
-        [-0.8301,  0.7275, -0.5148]])
-Epoch   840 | Total: 1.2865 | Unsafe: 0.1715 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.1151
- [Controller Params] fc.weight = tensor([[-5.8743e-01, -7.8487e-01, -8.0206e-01],
-        [ 4.1798e-01,  1.0097e-03, -1.2177e+00],
-        [-8.5430e-01,  7.3628e-01, -5.2032e-01]])
-Epoch   850 | Total: 1.1232 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.1232
- [Controller Params] fc.weight = tensor([[-5.9674e-01, -7.9149e-01, -8.2372e-01],
-        [ 3.9130e-01,  1.2334e-04, -1.2420e+00],
-        [-8.7675e-01,  7.4387e-01, -5.2625e-01]])
-Epoch   860 | Total: 1.1077 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.1077
- [Controller Params] fc.weight = tensor([[-6.0662e-01, -7.9690e-01, -8.4382e-01],
-        [ 3.6324e-01,  8.4133e-04, -1.2664e+00],
-        [-8.9717e-01,  7.4734e-01, -5.3166e-01]])
-Epoch   870 | Total: 1.1193 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 1.1193
- [Controller Params] fc.weight = tensor([[-6.1694e-01, -8.0190e-01, -8.6331e-01],
-        [ 3.3239e-01,  1.7802e-04, -1.2907e+00],
-        [-9.1606e-01,  7.4802e-01, -5.3754e-01]])
-[SWITCH] Switching to all sums at epoch 878 (total_loss=0.9859 < 1.0)
-  Resetting optimizer and scheduler state after switching to all sums
-  constraint_largest_counts: {'generator': 366, 'unsafe': 13}
-Epoch   880 | Total: 286.3239 | Unsafe: 4.2769 | Init: 0.0000 | Outside: 0.0000 | Gen: 282.0470
- [Controller Params] fc.weight = tensor([[-0.6307, -0.7995, -0.8835],
-        [ 0.3127,  0.0053, -1.3099],
-        [-0.9359,  0.7540, -0.5477]])
-Epoch   890 | Total: 127.5996 | Unsafe: 69.2857 | Init: 4.1842 | Outside: 0.0000 | Gen: 54.1297
- [Controller Params] fc.weight = tensor([[-0.6751, -0.7679, -0.9270],
-        [ 0.2678,  0.0456, -1.3546],
-        [-0.9791,  0.7780, -0.5945]])
-Epoch   900 | Total: 91.0030 | Unsafe: 57.6160 | Init: 8.5171 | Outside: 0.0000 | Gen: 24.8699
- [Controller Params] fc.weight = tensor([[-0.7061, -0.7806, -0.9560],
-        [ 0.2359,  0.0852, -1.3871],
-        [-1.0068,  0.7454, -0.6281]])
-Epoch   910 | Total: 59.8671 | Unsafe: 28.3014 | Init: 12.8037 | Outside: 0.0000 | Gen: 18.7620
- [Controller Params] fc.weight = tensor([[-0.7274, -0.7926, -0.9755],
-        [ 0.2168,  0.1127, -1.4089],
-        [-1.0254,  0.7314, -0.6517]])
-Epoch   920 | Total: 34.2933 | Unsafe: 0.5976 | Init: 16.9532 | Outside: 0.0000 | Gen: 16.7424
- [Controller Params] fc.weight = tensor([[-0.7442, -0.7800, -0.9899],
-        [ 0.2031,  0.1329, -1.4251],
-        [-1.0393,  0.7204, -0.6711]])
-Epoch   930 | Total: 31.0615 | Unsafe: 0.0000 | Init: 19.1369 | Outside: 0.0000 | Gen: 11.9245
- [Controller Params] fc.weight = tensor([[-0.7588, -0.7757, -1.0024],
-        [ 0.1916,  0.1492, -1.4387],
-        [-1.0508,  0.7185, -0.6898]])
-Epoch   940 | Total: 26.8215 | Unsafe: 0.0000 | Init: 19.5002 | Outside: 0.0000 | Gen: 7.3213
- [Controller Params] fc.weight = tensor([[-0.7711, -0.7790, -1.0128],
-        [ 0.1819,  0.1609, -1.4498],
-        [-1.0599,  0.7157, -0.7058]])
-Epoch   950 | Total: 23.8918 | Unsafe: 0.0000 | Init: 19.1280 | Outside: 0.0000 | Gen: 4.7638
- [Controller Params] fc.weight = tensor([[-0.7806, -0.7787, -1.0205],
-        [ 0.1743,  0.1679, -1.4583],
-        [-1.0666,  0.7109, -0.7178]])
-Epoch   960 | Total: 22.2102 | Unsafe: 0.2833 | Init: 18.4852 | Outside: 0.0000 | Gen: 3.4416
- [Controller Params] fc.weight = tensor([[-0.7874, -0.7740, -1.0259],
-        [ 0.1686,  0.1710, -1.4643],
-        [-1.0714,  0.7071, -0.7261]])
-Epoch   970 | Total: 21.5841 | Unsafe: 0.0000 | Init: 18.8385 | Outside: 0.0000 | Gen: 2.7456
- [Controller Params] fc.weight = tensor([[-0.7921, -0.7687, -1.0296],
-        [ 0.1648,  0.1685, -1.4683],
-        [-1.0748,  0.7033, -0.7314]])
-Epoch   980 | Total: 21.1076 | Unsafe: 0.1540 | Init: 18.6752 | Outside: 0.0000 | Gen: 2.2784
- [Controller Params] fc.weight = tensor([[-0.7957, -0.7678, -1.0324],
-        [ 0.1619,  0.1638, -1.4712],
-        [-1.0774,  0.7015, -0.7351]])
-Epoch   990 | Total: 20.7517 | Unsafe: 0.0104 | Init: 18.7882 | Outside: 0.0000 | Gen: 1.9532
- [Controller Params] fc.weight = tensor([[-0.7986, -0.7662, -1.0347],
-        [ 0.1595,  0.1586, -1.4736],
-        [-1.0796,  0.6999, -0.7379]])
-[Refine-Init] Epoch 1000: Loss=18.809, 1 failing → refined 1 cells → 8 total
-[Refine-Generator] Epoch 1000: 213 failing → refined 100 cells → 1052 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 18 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 18 cells...
-[SymbolicCROWNCache] Initialized for 18 cells - symbolic structure cached!
-    Rebuilding Phi cache with 1052 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 1052 cells...
-[SymbolicCROWNCache_Phi] Initialized for 1052 cells!
-  Caches rebuilt successfully!
-Epoch  1000 | Total: 152.1119 | Unsafe: 0.0286 | Init: 150.3987 | Outside: 0.0000 | Gen: 1.6846
- [Controller Params] fc.weight = tensor([[-0.8011, -0.7653, -1.0367],
-        [ 0.1575,  0.1535, -1.4756],
-        [-1.0815,  0.6986, -0.7403]])
-
-Epoch 1000 - Detailed Evaluation:
-  Constraint Satisfaction:
-    Unsafe:    ✗ (V_min=19.976, V_max=20.863)
-    Init:      ✗ (V_min=19.800, V_max=19.800)
-    Outside:   ✓ (V_min=19.790, V_max=21.128)
-    Generator: ✗ (Phi_upper_min=-0.693, Phi_upper_max=0.024, failing=554)
-  Goal bounds: V ∈ [19.797, 19.803]
-  Unsafe bounds: V ∈ [19.976, 20.863]
-  Generator bounds: Φ ∈ [-11.582, 0.024]
-  Generator failing cells: 554/1052 (52.7%)
-[Merge-Generator] Epoch 1002: merged 0 pairs → 1052 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 18 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 18 cells...
-[SymbolicCROWNCache] Initialized for 18 cells - symbolic structure cached!
-    Rebuilding Phi cache with 1052 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 1052 cells...
-[SymbolicCROWNCache_Phi] Initialized for 1052 cells!
-  Caches rebuilt successfully!
-Epoch  1010 | Total: 151.8285 | Unsafe: 5.9494 | Init: 143.9877 | Outside: 0.0000 | Gen: 1.8914
- [Controller Params] fc.weight = tensor([[-0.8021, -0.7698, -1.0383],
-        [ 0.1562,  0.1466, -1.4775],
-        [-1.0831,  0.6986, -0.7402]])
-Epoch  1020 | Total: 151.5965 | Unsafe: 8.0607 | Init: 141.7067 | Outside: 0.0000 | Gen: 1.8291
- [Controller Params] fc.weight = tensor([[-0.8021, -0.7855, -1.0400],
-        [ 0.1555,  0.1367, -1.4793],
-        [-1.0847,  0.7039, -0.7383]])
-Epoch  1030 | Total: 151.4085 | Unsafe: 9.4496 | Init: 140.2160 | Outside: 0.0000 | Gen: 1.7429
- [Controller Params] fc.weight = tensor([[-0.8023, -0.7967, -1.0416],
-        [ 0.1551,  0.1252, -1.4810],
-        [-1.0863,  0.7057, -0.7374]])
-Epoch  1040 | Total: 151.3192 | Unsafe: 9.9381 | Init: 139.5603 | Outside: 0.0000 | Gen: 1.8208
- [Controller Params] fc.weight = tensor([[-0.8025, -0.8108, -1.0435],
-        [ 0.1548,  0.1122, -1.4829],
-        [-1.0881,  0.7129, -0.7363]])
-Epoch  1050 | Total: 151.1805 | Unsafe: 9.7598 | Init: 139.4991 | Outside: 0.0000 | Gen: 1.9216
- [Controller Params] fc.weight = tensor([[-0.8024, -0.8280, -1.0459],
-        [ 0.1546,  0.0983, -1.4850],
-        [-1.0902,  0.7255, -0.7349]])
-Epoch  1060 | Total: 151.0266 | Unsafe: 9.5294 | Init: 139.4372 | Outside: 0.0000 | Gen: 2.0600
- [Controller Params] fc.weight = tensor([[-0.8024, -0.8432, -1.0484],
-        [ 0.1542,  0.0864, -1.4875],
-        [-1.0925,  0.7377, -0.7339]])
-Epoch  1070 | Total: 150.8334 | Unsafe: 9.2475 | Init: 139.3540 | Outside: 0.0000 | Gen: 2.2319
- [Controller Params] fc.weight = tensor([[-0.8024, -0.8568, -1.0512],
-        [ 0.1535,  0.0770, -1.4906],
-        [-1.0950,  0.7494, -0.7330]])
-Epoch  1080 | Total: 150.5941 | Unsafe: 8.7540 | Init: 139.3554 | Outside: 0.0000 | Gen: 2.4847
- [Controller Params] fc.weight = tensor([[-0.8025, -0.8693, -1.0546],
-        [ 0.1527,  0.0688, -1.4940],
-        [-1.0980,  0.7613, -0.7321]])
-Epoch  1090 | Total: 150.2774 | Unsafe: 8.1183 | Init: 139.3322 | Outside: 0.0000 | Gen: 2.8269
- [Controller Params] fc.weight = tensor([[-0.8032, -0.8790, -1.0588],
-        [ 0.1517,  0.0618, -1.4978],
-        [-1.1017,  0.7721, -0.7322]])
-Epoch  1100 | Total: 149.8321 | Unsafe: 7.2291 | Init: 139.2869 | Outside: 0.0000 | Gen: 3.3161
- [Controller Params] fc.weight = tensor([[-0.8043, -0.8866, -1.0638],
-        [ 0.1506,  0.0557, -1.5021],
-        [-1.1061,  0.7823, -0.7329]])
-Epoch  1110 | Total: 149.1574 | Unsafe: 5.8883 | Init: 139.2095 | Outside: 0.0000 | Gen: 4.0597
- [Controller Params] fc.weight = tensor([[-0.8059, -0.8934, -1.0700],
-        [ 0.1491,  0.0509, -1.5070],
-        [-1.1114,  0.7915, -0.7342]])
-Epoch  1120 | Total: 148.0923 | Unsafe: 3.6980 | Init: 139.0910 | Outside: 0.0000 | Gen: 5.3034
- [Controller Params] fc.weight = tensor([[-0.8078, -0.8986, -1.0778],
-        [ 0.1471,  0.0484, -1.5125],
-        [-1.1179,  0.8005, -0.7363]])
-Epoch  1130 | Total: 146.3739 | Unsafe: 5.5881 | Init: 133.7167 | Outside: 0.0000 | Gen: 7.0690
- [Controller Params] fc.weight = tensor([[-0.8103, -0.9008, -1.0881],
-        [ 0.1443,  0.0489, -1.5190],
-        [-1.1264,  0.8088, -0.7395]])
-Epoch  1140 | Total: 143.4605 | Unsafe: 7.5376 | Init: 125.6803 | Outside: 0.0000 | Gen: 10.2426
- [Controller Params] fc.weight = tensor([[-0.8141, -0.8996, -1.1021],
-        [ 0.1403,  0.0532, -1.5271],
-        [-1.1379,  0.8150, -0.7447]])
-Epoch  1150 | Total: 138.6865 | Unsafe: 9.5564 | Init: 113.2947 | Outside: 0.0000 | Gen: 15.8354
- [Controller Params] fc.weight = tensor([[-0.8205, -0.8930, -1.1221],
-        [ 0.1346,  0.0637, -1.5375],
-        [-1.1544,  0.8207, -0.7536]])
-Epoch  1160 | Total: 131.6845 | Unsafe: 13.4512 | Init: 94.5160 | Outside: 0.0000 | Gen: 23.7172
- [Controller Params] fc.weight = tensor([[-0.8326, -0.8817, -1.1516],
-        [ 0.1265,  0.0823, -1.5510],
-        [-1.1792,  0.8281, -0.7684]])
-Epoch  1170 | Total: 122.8273 | Unsafe: 18.2936 | Init: 71.3507 | Outside: 0.0000 | Gen: 33.1830
- [Controller Params] fc.weight = tensor([[-0.8556, -0.8698, -1.1934],
-        [ 0.1189,  0.0834, -1.5654],
-        [-1.2148,  0.8468, -0.7954]])
-Epoch  1180 | Total: 113.0608 | Unsafe: 22.5250 | Init: 48.1303 | Outside: 0.0000 | Gen: 42.4055
- [Controller Params] fc.weight = tensor([[-0.8949, -0.8870, -1.2446],
-        [ 0.1123,  0.0711, -1.5782],
-        [-1.2617,  0.8626, -0.8323]])
-Epoch  1190 | Total: 107.0758 | Unsafe: 24.7911 | Init: 35.5860 | Outside: 0.0000 | Gen: 46.6986
- [Controller Params] fc.weight = tensor([[-0.9274, -0.8958, -1.2761],
-        [ 0.1085,  0.0635, -1.5847],
-        [-1.2933,  0.8669, -0.8579]])
-Epoch  1200 | Total: 100.5634 | Unsafe: 26.5986 | Init: 23.0366 | Outside: 0.0000 | Gen: 50.9282
- [Controller Params] fc.weight = tensor([[-0.9682, -0.8927, -1.3101],
-        [ 0.1046,  0.0574, -1.5911],
-        [-1.3295,  0.8692, -0.8892]])
-Epoch  1210 | Total: 93.3643 | Unsafe: 29.2471 | Init: 10.0741 | Outside: 0.0000 | Gen: 54.0430
- [Controller Params] fc.weight = tensor([[-1.0084, -0.8846, -1.3465],
-        [ 0.1009,  0.0522, -1.5972],
-        [-1.3680,  0.8756, -0.9219]])
-Epoch  1220 | Total: 87.8762 | Unsafe: 30.3152 | Init: 0.0000 | Outside: 0.0000 | Gen: 57.5610
- [Controller Params] fc.weight = tensor([[-1.0434, -0.8984, -1.3823],
-        [ 0.0974,  0.0475, -1.6028],
-        [-1.4065,  0.8817, -0.9454]])
-Epoch  1230 | Total: 82.3939 | Unsafe: 16.2451 | Init: 3.7672 | Outside: 0.0000 | Gen: 62.3816
- [Controller Params] fc.weight = tensor([[-1.0828, -0.8853, -1.4200],
-        [ 0.0944,  0.0456, -1.6079],
-        [-1.4477,  0.8773, -0.9697]])
-Epoch  1240 | Total: 76.2533 | Unsafe: 9.4791 | Init: 0.0000 | Outside: 0.0000 | Gen: 66.7742
- [Controller Params] fc.weight = tensor([[-1.1245, -0.8747, -1.4573],
-        [ 0.0920,  0.0416, -1.6126],
-        [-1.4892,  0.8888, -0.9929]])
-Epoch  1250 | Total: 71.2966 | Unsafe: 9.7544 | Init: 0.0098 | Outside: 0.0000 | Gen: 61.5324
- [Controller Params] fc.weight = tensor([[-1.1672, -0.8659, -1.4943],
-        [ 0.0900,  0.0378, -1.6171],
-        [-1.5282,  0.8871, -1.0281]])
-Epoch  1260 | Total: 67.4937 | Unsafe: 10.7902 | Init: 0.2086 | Outside: 0.0000 | Gen: 56.4950
- [Controller Params] fc.weight = tensor([[-1.2086, -0.8467, -1.5287],
-        [ 0.0882,  0.0325, -1.6214],
-        [-1.5647,  0.8915, -1.0625]])
-Epoch  1270 | Total: 64.2743 | Unsafe: 10.0024 | Init: 0.0000 | Outside: 0.0000 | Gen: 54.2718
- [Controller Params] fc.weight = tensor([[-1.2471, -0.8462, -1.5622],
-        [ 0.0866,  0.0284, -1.6252],
-        [-1.5995,  0.8905, -1.0956]])
-Epoch  1280 | Total: 61.4318 | Unsafe: 10.3375 | Init: 0.0000 | Outside: 0.0000 | Gen: 51.0944
- [Controller Params] fc.weight = tensor([[-1.2779, -0.8796, -1.5937],
-        [ 0.0853,  0.0245, -1.6288],
-        [-1.6316,  0.8708, -1.1207]])
-Epoch  1290 | Total: 59.2593 | Unsafe: 10.1714 | Init: 0.0000 | Outside: 0.0000 | Gen: 49.0879
- [Controller Params] fc.weight = tensor([[-1.3044, -0.8722, -1.6227],
-        [ 0.0843,  0.0186, -1.6317],
-        [-1.6594,  0.8620, -1.1472]])
-Epoch  1300 | Total: 57.1797 | Unsafe: 10.9013 | Init: 0.0003 | Outside: 0.0000 | Gen: 46.2781
- [Controller Params] fc.weight = tensor([[-1.3294, -0.8565, -1.6494],
-        [ 0.0837,  0.0120, -1.6342],
-        [-1.6832,  0.8573, -1.1793]])
-Epoch  1310 | Total: 55.5533 | Unsafe: 10.6359 | Init: 0.1070 | Outside: 0.0000 | Gen: 44.8105
- [Controller Params] fc.weight = tensor([[-1.3528, -0.8553, -1.6741],
-        [ 0.0833,  0.0068, -1.6359],
-        [-1.7060,  0.8504, -1.2077]])
-Epoch  1320 | Total: 54.0525 | Unsafe: 10.8491 | Init: 0.0000 | Outside: 0.0000 | Gen: 43.2034
- [Controller Params] fc.weight = tensor([[-1.3747e+00, -8.4561e-01, -1.6979e+00],
-        [ 8.2970e-02,  6.3588e-04, -1.6373e+00],
-        [-1.7284e+00,  8.4251e-01, -1.2299e+00]])
-Epoch  1330 | Total: 52.8942 | Unsafe: 10.9478 | Init: 0.0000 | Outside: 0.0000 | Gen: 41.9464
- [Controller Params] fc.weight = tensor([[-1.3952, -0.8385, -1.7205],
-        [ 0.0828, -0.0022, -1.6384],
-        [-1.7495,  0.8334, -1.2498]])
-Epoch  1340 | Total: 51.5236 | Unsafe: 11.2291 | Init: 0.0000 | Outside: 0.0000 | Gen: 40.2945
- [Controller Params] fc.weight = tensor([[-1.4140, -0.8365, -1.7424],
-        [ 0.0827, -0.0019, -1.6392],
-        [-1.7692,  0.8224, -1.2694]])
-Epoch  1350 | Total: 50.4580 | Unsafe: 10.6675 | Init: 0.1943 | Outside: 0.0000 | Gen: 39.5962
- [Controller Params] fc.weight = tensor([[-1.4324e+00, -8.2934e-01, -1.7636e+00],
-        [ 8.2636e-02,  3.5190e-04, -1.6399e+00],
-        [-1.7880e+00,  8.1842e-01, -1.2898e+00]])
-Epoch  1360 | Total: 49.5209 | Unsafe: 11.7164 | Init: 0.0033 | Outside: 0.0000 | Gen: 37.8012
- [Controller Params] fc.weight = tensor([[-1.4506e+00, -8.2330e-01, -1.7833e+00],
-        [ 8.2489e-02, -3.0365e-04, -1.6403e+00],
-        [-1.8057e+00,  8.1489e-01, -1.3083e+00]])
-Epoch  1370 | Total: 48.3948 | Unsafe: 11.0841 | Init: 0.0000 | Outside: 0.0000 | Gen: 37.3107
- [Controller Params] fc.weight = tensor([[-1.4697e+00, -8.2213e-01, -1.8019e+00],
-        [ 8.2225e-02, -1.4699e-03, -1.6407e+00],
-        [-1.8230e+00,  8.0795e-01, -1.3264e+00]])
-Epoch  1380 | Total: 47.5773 | Unsafe: 10.8405 | Init: 0.1422 | Outside: 0.0000 | Gen: 36.5945
- [Controller Params] fc.weight = tensor([[-1.4889, -0.8208, -1.8198],
-        [ 0.0819, -0.0020, -1.6411],
-        [-1.8400,  0.8048, -1.3440]])
-Epoch  1390 | Total: 46.8142 | Unsafe: 11.3471 | Init: 0.0000 | Outside: 0.0000 | Gen: 35.4672
- [Controller Params] fc.weight = tensor([[-1.5064e+00, -8.2177e-01, -1.8373e+00],
-        [ 8.1698e-02, -1.6962e-03, -1.6415e+00],
-        [-1.8562e+00,  8.0291e-01, -1.3604e+00]])
-Epoch  1400 | Total: 46.0474 | Unsafe: 11.5178 | Init: 0.0000 | Outside: 0.0000 | Gen: 34.5296
- [Controller Params] fc.weight = tensor([[-1.5232e+00, -8.2047e-01, -1.8547e+00],
-        [ 8.1453e-02,  7.5014e-04, -1.6419e+00],
-        [-1.8722e+00,  8.0449e-01, -1.3769e+00]])
-Epoch  1410 | Total: 45.4315 | Unsafe: 11.8131 | Init: 0.0000 | Outside: 0.0000 | Gen: 33.6184
- [Controller Params] fc.weight = tensor([[-1.5393e+00, -8.2083e-01, -1.8718e+00],
-        [ 8.1174e-02, -2.9076e-04, -1.6423e+00],
-        [-1.8878e+00,  8.0341e-01, -1.3932e+00]])
-Epoch  1420 | Total: 44.6860 | Unsafe: 11.0047 | Init: 0.0008 | Outside: 0.0000 | Gen: 33.6805
- [Controller Params] fc.weight = tensor([[-1.5547e+00, -8.2352e-01, -1.8887e+00],
-        [ 8.0799e-02, -7.5627e-05, -1.6426e+00],
-        [-1.9031e+00,  7.9971e-01, -1.4086e+00]])
-Epoch  1430 | Total: 44.1205 | Unsafe: 10.9539 | Init: 0.1473 | Outside: 0.0000 | Gen: 33.0194
- [Controller Params] fc.weight = tensor([[-1.5695e+00, -8.2687e-01, -1.9051e+00],
-        [ 8.0306e-02, -5.9813e-04, -1.6430e+00],
-        [-1.9183e+00,  7.9785e-01, -1.4218e+00]])
-Epoch  1440 | Total: 43.3635 | Unsafe: 11.4134 | Init: 0.0000 | Outside: 0.0000 | Gen: 31.9501
- [Controller Params] fc.weight = tensor([[-1.5853, -0.8226, -1.9204],
-        [ 0.0799, -0.0021, -1.6433],
-        [-1.9334,  0.7966, -1.4351]])
-Epoch  1450 | Total: 43.0133 | Unsafe: 11.6621 | Init: 0.0000 | Outside: 0.0000 | Gen: 31.3512
- [Controller Params] fc.weight = tensor([[-1.6019e+00, -8.1356e-01, -1.9346e+00],
-        [ 7.9522e-02, -1.3883e-03, -1.6436e+00],
-        [-1.9481e+00,  7.9318e-01, -1.4485e+00]])
-Epoch  1460 | Total: 42.7140 | Unsafe: 10.4770 | Init: 0.0000 | Outside: 0.0000 | Gen: 32.2369
- [Controller Params] fc.weight = tensor([[-1.6174e+00, -8.1215e-01, -1.9490e+00],
-        [ 7.9067e-02,  1.5459e-03, -1.6439e+00],
-        [-1.9625e+00,  7.8540e-01, -1.4615e+00]])
-Epoch  1470 | Total: 42.0182 | Unsafe: 11.2290 | Init: 0.0000 | Outside: 0.0000 | Gen: 30.7891
- [Controller Params] fc.weight = tensor([[-1.6332e+00, -8.1016e-01, -1.9625e+00],
-        [ 7.8586e-02,  1.6341e-04, -1.6443e+00],
-        [-1.9766e+00,  7.7602e-01, -1.4742e+00]])
-Epoch  1480 | Total: 41.2862 | Unsafe: 11.7273 | Init: 0.0000 | Outside: 0.0000 | Gen: 29.5588
- [Controller Params] fc.weight = tensor([[-1.6492e+00, -8.0719e-01, -1.9755e+00],
-        [ 7.8129e-02, -1.1126e-03, -1.6446e+00],
-        [-1.9906e+00,  7.6797e-01, -1.4863e+00]])
-Epoch  1490 | Total: 41.0135 | Unsafe: 11.5298 | Init: 0.1972 | Outside: 0.0000 | Gen: 29.2864
- [Controller Params] fc.weight = tensor([[-1.6572e+00, -8.0576e-01, -1.9819e+00],
-        [ 7.7964e-02, -8.0146e-04, -1.6447e+00],
-        [-1.9976e+00,  7.6454e-01, -1.4921e+00]])
-[Refine-Unsafe] Epoch 1500: Loss=11.584, 2 failing → refined 2 cells → 22 total
-[Refine-Generator] Epoch 1500: 441 failing → refined 100 cells → 1752 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 32 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 32 cells...
-[SymbolicCROWNCache] Initialized for 32 cells - symbolic structure cached!
-    Rebuilding Phi cache with 1752 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 1752 cells...
-[SymbolicCROWNCache_Phi] Initialized for 1752 cells!
-  Caches rebuilt successfully!
-Epoch  1500 | Total: 76.5996 | Unsafe: 47.1488 | Init: 0.0851 | Outside: 0.0000 | Gen: 29.3657
- [Controller Params] fc.weight = tensor([[-1.6649e+00, -8.0441e-01, -1.9880e+00],
-        [ 7.7828e-02,  1.6660e-04, -1.6449e+00],
-        [-2.0044e+00,  7.6026e-01, -1.4973e+00]])
-[Merge-Generator] Epoch 1503: merged 0 pairs → 1752 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 32 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 32 cells...
-[SymbolicCROWNCache] Initialized for 32 cells - symbolic structure cached!
-    Rebuilding Phi cache with 1752 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 1752 cells...
-[SymbolicCROWNCache_Phi] Initialized for 1752 cells!
-  Caches rebuilt successfully!
-Epoch  1510 | Total: 53.3447 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 53.3447
- [Controller Params] fc.weight = tensor([[-1.6758e+00, -8.0910e-01, -1.9949e+00],
-        [ 7.7633e-02,  5.4069e-04, -1.6450e+00],
-        [-2.0124e+00,  7.5750e-01, -1.5059e+00]])
-Epoch  1520 | Total: 49.2534 | Unsafe: 9.7686 | Init: 0.0000 | Outside: 0.0000 | Gen: 39.4848
- [Controller Params] fc.weight = tensor([[-1.6916e+00, -8.2439e-01, -2.0043e+00],
-        [ 7.7371e-02, -1.3888e-03, -1.6454e+00],
-        [-2.0237e+00,  7.5987e-01, -1.5179e+00]])
-Epoch  1530 | Total: 45.6957 | Unsafe: 0.0279 | Init: 0.9328 | Outside: 0.0000 | Gen: 44.7349
- [Controller Params] fc.weight = tensor([[-1.7033, -0.8394, -2.0118],
-        [ 0.0773, -0.0062, -1.6459],
-        [-2.0336,  0.7700, -1.5228]])
-Epoch  1540 | Total: 45.1783 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 45.1783
- [Controller Params] fc.weight = tensor([[-1.7155, -0.8455, -2.0201],
-        [ 0.0771, -0.0122, -1.6462],
-        [-2.0441,  0.7844, -1.5286]])
-Epoch  1550 | Total: 44.1568 | Unsafe: 1.2947 | Init: 0.0000 | Outside: 0.0000 | Gen: 42.8621
- [Controller Params] fc.weight = tensor([[-1.7289, -0.8481, -2.0289],
-        [ 0.0769, -0.0180, -1.6464],
-        [-2.0555,  0.7995, -1.5349]])
-Epoch  1560 | Total: 43.6517 | Unsafe: 1.2729 | Init: 0.0000 | Outside: 0.0000 | Gen: 42.3789
- [Controller Params] fc.weight = tensor([[-1.7414, -0.8482, -2.0372],
-        [ 0.0767, -0.0224, -1.6465],
-        [-2.0666,  0.8155, -1.5385]])
-Epoch  1570 | Total: 43.1029 | Unsafe: 0.0000 | Init: 0.0359 | Outside: 0.0000 | Gen: 43.0670
- [Controller Params] fc.weight = tensor([[-1.7541, -0.8465, -2.0454],
-        [ 0.0766, -0.0256, -1.6468],
-        [-2.0780,  0.8294, -1.5409]])
-Epoch  1580 | Total: 42.7596 | Unsafe: 1.3853 | Init: 0.0000 | Outside: 0.0000 | Gen: 41.3743
- [Controller Params] fc.weight = tensor([[-1.7666, -0.8490, -2.0536],
-        [ 0.0763, -0.0277, -1.6471],
-        [-2.0894,  0.8332, -1.5424]])
-Epoch  1590 | Total: 41.9930 | Unsafe: 0.5236 | Init: 0.0000 | Outside: 0.0000 | Gen: 41.4694
- [Controller Params] fc.weight = tensor([[-1.7783, -0.8521, -2.0614],
-        [ 0.0761, -0.0295, -1.6474],
-        [-2.1002,  0.8329, -1.5436]])
-Epoch  1600 | Total: 41.5095 | Unsafe: 0.3264 | Init: 0.1208 | Outside: 0.0000 | Gen: 41.0623
- [Controller Params] fc.weight = tensor([[-1.7906, -0.8496, -2.0693],
-        [ 0.0759, -0.0318, -1.6477],
-        [-2.1110,  0.8377, -1.5466]])
-Epoch  1610 | Total: 41.2391 | Unsafe: 0.8977 | Init: 0.0000 | Outside: 0.0000 | Gen: 40.3414
- [Controller Params] fc.weight = tensor([[-1.8029, -0.8491, -2.0770],
-        [ 0.0756, -0.0340, -1.6479],
-        [-2.1214,  0.8394, -1.5498]])
-Epoch  1620 | Total: 40.6745 | Unsafe: 0.0150 | Init: 0.2009 | Outside: 0.0000 | Gen: 40.4587
- [Controller Params] fc.weight = tensor([[-1.8154, -0.8515, -2.0842],
-        [ 0.0753, -0.0360, -1.6482],
-        [-2.1312,  0.8356, -1.5541]])
-Epoch  1630 | Total: 40.2903 | Unsafe: 0.0000 | Init: 0.0857 | Outside: 0.0000 | Gen: 40.2046
- [Controller Params] fc.weight = tensor([[-1.8284, -0.8521, -2.0913],
-        [ 0.0750, -0.0388, -1.6485],
-        [-2.1408,  0.8323, -1.5596]])
-Epoch  1640 | Total: 39.8539 | Unsafe: 0.1004 | Init: 0.0000 | Outside: 0.0000 | Gen: 39.7535
- [Controller Params] fc.weight = tensor([[-1.8419, -0.8524, -2.0980],
-        [ 0.0748, -0.0424, -1.6487],
-        [-2.1504,  0.8297, -1.5641]])
-Epoch  1650 | Total: 39.7695 | Unsafe: 0.8057 | Init: 0.0000 | Outside: 0.0000 | Gen: 38.9638
- [Controller Params] fc.weight = tensor([[-1.8551, -0.8516, -2.1045],
-        [ 0.0744, -0.0455, -1.6489],
-        [-2.1600,  0.8289, -1.5672]])
-Epoch  1660 | Total: 39.1757 | Unsafe: 0.3144 | Init: 0.0020 | Outside: 0.0000 | Gen: 38.8593
- [Controller Params] fc.weight = tensor([[-1.8678, -0.8488, -2.1114],
-        [ 0.0741, -0.0499, -1.6492],
-        [-2.1697,  0.8279, -1.5701]])
-Epoch  1670 | Total: 39.0544 | Unsafe: 0.0000 | Init: 0.1202 | Outside: 0.0000 | Gen: 38.9342
- [Controller Params] fc.weight = tensor([[-1.8799, -0.8457, -2.1182],
-        [ 0.0738, -0.0552, -1.6493],
-        [-2.1792,  0.8275, -1.5719]])
-Epoch  1680 | Total: 39.0563 | Unsafe: 1.9287 | Init: 0.0418 | Outside: 0.0000 | Gen: 37.0858
- [Controller Params] fc.weight = tensor([[-1.8924, -0.8409, -2.1250],
-        [ 0.0735, -0.0619, -1.6495],
-        [-2.1886,  0.8293, -1.5746]])
-Epoch  1690 | Total: 38.4419 | Unsafe: 0.8791 | Init: 0.1296 | Outside: 0.0000 | Gen: 37.4332
- [Controller Params] fc.weight = tensor([[-1.9050, -0.8412, -2.1318],
-        [ 0.0732, -0.0691, -1.6497],
-        [-2.1980,  0.8254, -1.5777]])
-Epoch  1700 | Total: 37.8779 | Unsafe: 0.0000 | Init: 0.0425 | Outside: 0.0000 | Gen: 37.8354
- [Controller Params] fc.weight = tensor([[-1.9169, -0.8428, -2.1381],
-        [ 0.0728, -0.0764, -1.6499],
-        [-2.2072,  0.8211, -1.5791]])
-Epoch  1710 | Total: 37.5688 | Unsafe: 0.0000 | Init: 0.0376 | Outside: 0.0000 | Gen: 37.5312
- [Controller Params] fc.weight = tensor([[-1.9293, -0.8398, -2.1444],
-        [ 0.0724, -0.0853, -1.6500],
-        [-2.2163,  0.8214, -1.5816]])
-Epoch  1720 | Total: 37.2917 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 37.2917
- [Controller Params] fc.weight = tensor([[-1.9420, -0.8364, -2.1505],
-        [ 0.0720, -0.0964, -1.6501],
-        [-2.2252,  0.8209, -1.5852]])
-Epoch  1730 | Total: 36.9687 | Unsafe: 0.0000 | Init: 0.0162 | Outside: 0.0000 | Gen: 36.9525
- [Controller Params] fc.weight = tensor([[-1.9551, -0.8349, -2.1563],
-        [ 0.0716, -0.1087, -1.6502],
-        [-2.2337,  0.8215, -1.5911]])
-Epoch  1740 | Total: 36.4526 | Unsafe: 0.1276 | Init: 0.0000 | Outside: 0.0000 | Gen: 36.3250
- [Controller Params] fc.weight = tensor([[-1.9683, -0.8373, -2.1618],
-        [ 0.0712, -0.1213, -1.6504],
-        [-2.2420,  0.8183, -1.5973]])
-Epoch  1750 | Total: 36.1108 | Unsafe: 0.2034 | Init: 0.0000 | Outside: 0.0000 | Gen: 35.9074
- [Controller Params] fc.weight = tensor([[-1.9816, -0.8357, -2.1673],
-        [ 0.0708, -0.1369, -1.6505],
-        [-2.2505,  0.8200, -1.6031]])
-Epoch  1760 | Total: 36.4757 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 36.4757
- [Controller Params] fc.weight = tensor([[-1.9947, -0.8368, -2.1726],
-        [ 0.0704, -0.1556, -1.6505],
-        [-2.2589,  0.8171, -1.6078]])
-Epoch  1770 | Total: 35.8150 | Unsafe: 0.5882 | Init: 0.0000 | Outside: 0.0000 | Gen: 35.2268
- [Controller Params] fc.weight = tensor([[-2.0076, -0.8366, -2.1780],
-        [ 0.0701, -0.1769, -1.6506],
-        [-2.2671,  0.8123, -1.6134]])
-Epoch  1780 | Total: 35.2464 | Unsafe: 0.0063 | Init: 0.0000 | Outside: 0.0000 | Gen: 35.2401
- [Controller Params] fc.weight = tensor([[-2.0200, -0.8333, -2.1835],
-        [ 0.0698, -0.2004, -1.6507],
-        [-2.2750,  0.8102, -1.6194]])
-Epoch  1790 | Total: 35.1104 | Unsafe: 0.3036 | Init: 0.0000 | Outside: 0.0000 | Gen: 34.8069
- [Controller Params] fc.weight = tensor([[-2.0267, -0.8315, -2.1865],
-        [ 0.0696, -0.2145, -1.6507],
-        [-2.2793,  0.8090, -1.6225]])
-Epoch  1800 | Total: 35.0450 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 35.0450
- [Controller Params] fc.weight = tensor([[-2.0329, -0.8295, -2.1893],
-        [ 0.0694, -0.2282, -1.6507],
-        [-2.2833,  0.8081, -1.6253]])
-Epoch  1810 | Total: 34.8204 | Unsafe: 0.3425 | Init: 0.0000 | Outside: 0.0000 | Gen: 34.4780
- [Controller Params] fc.weight = tensor([[-2.0389, -0.8280, -2.1920],
-        [ 0.0693, -0.2428, -1.6507],
-        [-2.2872,  0.8069, -1.6276]])
-Epoch  1820 | Total: 34.5855 | Unsafe: 0.1801 | Init: 0.0162 | Outside: 0.0000 | Gen: 34.3893
- [Controller Params] fc.weight = tensor([[-2.0450, -0.8265, -2.1947],
-        [ 0.0691, -0.2581, -1.6506],
-        [-2.2912,  0.8060, -1.6299]])
-Epoch  1830 | Total: 34.6150 | Unsafe: 0.0000 | Init: 0.0150 | Outside: 0.0000 | Gen: 34.6000
- [Controller Params] fc.weight = tensor([[-2.0511, -0.8251, -2.1974],
-        [ 0.0689, -0.2740, -1.6506],
-        [-2.2952,  0.8054, -1.6322]])
-Epoch  1840 | Total: 34.2475 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 34.2475
- [Controller Params] fc.weight = tensor([[-2.0572, -0.8242, -2.2000],
-        [ 0.0687, -0.2904, -1.6505],
-        [-2.2991,  0.8051, -1.6344]])
-Epoch  1850 | Total: 34.2221 | Unsafe: 0.0000 | Init: 0.0775 | Outside: 0.0000 | Gen: 34.1446
- [Controller Params] fc.weight = tensor([[-2.0636, -0.8229, -2.2026],
-        [ 0.0685, -0.3073, -1.6505],
-        [-2.3032,  0.8045, -1.6369]])
-Epoch  1860 | Total: 34.1585 | Unsafe: 0.4629 | Init: 0.0313 | Outside: 0.0000 | Gen: 33.6643
- [Controller Params] fc.weight = tensor([[-2.0698, -0.8228, -2.2052],
-        [ 0.0683, -0.3246, -1.6505],
-        [-2.3073,  0.8026, -1.6387]])
-Epoch  1870 | Total: 33.8411 | Unsafe: 0.1313 | Init: 0.0151 | Outside: 0.0000 | Gen: 33.6947
- [Controller Params] fc.weight = tensor([[-2.0758, -0.8224, -2.2078],
-        [ 0.0681, -0.3423, -1.6506],
-        [-2.3113,  0.8010, -1.6404]])
-Epoch  1880 | Total: 33.6981 | Unsafe: 0.1322 | Init: 0.0000 | Outside: 0.0000 | Gen: 33.5659
- [Controller Params] fc.weight = tensor([[-2.0818, -0.8209, -2.2104],
-        [ 0.0679, -0.3606, -1.6506],
-        [-2.3153,  0.8005, -1.6422]])
-Epoch  1890 | Total: 33.6084 | Unsafe: 0.2721 | Init: 0.0000 | Outside: 0.0000 | Gen: 33.3363
- [Controller Params] fc.weight = tensor([[-2.0877, -0.8190, -2.2132],
-        [ 0.0676, -0.3792, -1.6506],
-        [-2.3194,  0.8003, -1.6440]])
-Epoch  1900 | Total: 33.5828 | Unsafe: 0.0000 | Init: 0.0658 | Outside: 0.0000 | Gen: 33.5169
- [Controller Params] fc.weight = tensor([[-2.0935, -0.8181, -2.2158],
-        [ 0.0674, -0.3982, -1.6506],
-        [-2.3235,  0.8000, -1.6454]])
-Epoch  1910 | Total: 33.2480 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 33.2480
- [Controller Params] fc.weight = tensor([[-2.0995, -0.8185, -2.2187],
-        [ 0.0671, -0.4173, -1.6506],
-        [-2.3276,  0.7976, -1.6473]])
-Epoch  1920 | Total: 33.1489 | Unsafe: 0.2724 | Init: 0.0000 | Outside: 0.0000 | Gen: 32.8764
- [Controller Params] fc.weight = tensor([[-2.1053, -0.8185, -2.2215],
-        [ 0.0669, -0.4367, -1.6507],
-        [-2.3317,  0.7962, -1.6490]])
-Epoch  1930 | Total: 33.0990 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 33.0990
- [Controller Params] fc.weight = tensor([[-2.1109, -0.8189, -2.2242],
-        [ 0.0666, -0.4563, -1.6507],
-        [-2.3357,  0.7949, -1.6505]])
-Epoch  1940 | Total: 32.9116 | Unsafe: 0.0000 | Init: 0.0497 | Outside: 0.0000 | Gen: 32.8619
- [Controller Params] fc.weight = tensor([[-2.1166, -0.8182, -2.2269],
-        [ 0.0663, -0.4760, -1.6508],
-        [-2.3397,  0.7943, -1.6522]])
-Epoch  1950 | Total: 32.6358 | Unsafe: 0.0000 | Init: 0.0402 | Outside: 0.0000 | Gen: 32.5956
- [Controller Params] fc.weight = tensor([[-2.1223, -0.8168, -2.2297],
-        [ 0.0660, -0.4958, -1.6508],
-        [-2.3436,  0.7941, -1.6543]])
-Epoch  1960 | Total: 32.6168 | Unsafe: 0.5168 | Init: 0.0000 | Outside: 0.0000 | Gen: 32.1000
- [Controller Params] fc.weight = tensor([[-2.1281, -0.8150, -2.2325],
-        [ 0.0658, -0.5159, -1.6509],
-        [-2.3476,  0.7941, -1.6563]])
-Epoch  1970 | Total: 32.2015 | Unsafe: 0.0000 | Init: 0.0101 | Outside: 0.0000 | Gen: 32.1914
- [Controller Params] fc.weight = tensor([[-2.1338, -0.8135, -2.2351],
-        [ 0.0655, -0.5359, -1.6511],
-        [-2.3515,  0.7938, -1.6580]])
-Epoch  1980 | Total: 32.1175 | Unsafe: 0.2547 | Init: 0.0000 | Outside: 0.0000 | Gen: 31.8628
- [Controller Params] fc.weight = tensor([[-2.1396, -0.8116, -2.2377],
-        [ 0.0653, -0.5560, -1.6514],
-        [-2.3554,  0.7937, -1.6598]])
-Epoch  1990 | Total: 31.8544 | Unsafe: 0.0747 | Init: 0.0548 | Outside: 0.0000 | Gen: 31.7249
- [Controller Params] fc.weight = tensor([[-2.1455, -0.8106, -2.2402],
-        [ 0.0652, -0.5760, -1.6516],
-        [-2.3594,  0.7920, -1.6614]])
-[Refine-Generator] Epoch 2000: 725 failing → refined 100 cells → 2452 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 32 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 32 cells...
-[SymbolicCROWNCache] Initialized for 32 cells - symbolic structure cached!
-    Rebuilding Phi cache with 2452 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 2452 cells...
-[SymbolicCROWNCache_Phi] Initialized for 2452 cells!
-  Caches rebuilt successfully!
-Epoch  2000 | Total: 32.1124 | Unsafe: 0.0000 | Init: 0.0010 | Outside: 0.0000 | Gen: 32.1114
- [Controller Params] fc.weight = tensor([[-2.1512, -0.8106, -2.2428],
-        [ 0.0650, -0.5960, -1.6520],
-        [-2.3633,  0.7892, -1.6627]])
-
-Epoch 2000 - Detailed Evaluation:
-  Constraint Satisfaction:
-    Unsafe:    ✓ (V_min=20.112, V_max=59.288)
-    Init:      ✗ (V_min=0.991, V_max=1.001)
-    Outside:   ✓ (V_min=0.874, V_max=59.449)
-    Generator: ✗ (Phi_upper_min=-121.739, Phi_upper_max=0.776, failing=1054)
-  Goal bounds: V ∈ [0.932, 1.060]
-  Unsafe bounds: V ∈ [20.112, 59.288]
-  Generator bounds: Φ ∈ [-1810.877, 0.776]
-  Generator failing cells: 1054/2452 (43.0%)
-[Merge-Generator] Epoch 2004: merged 11 pairs → 2441 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 32 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 32 cells...
-[SymbolicCROWNCache] Initialized for 32 cells - symbolic structure cached!
-    Rebuilding Phi cache with 2441 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 2441 cells...
-[SymbolicCROWNCache_Phi] Initialized for 2441 cells!
-  Caches rebuilt successfully!
-Epoch  2010 | Total: 31.7394 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 31.7394
- [Controller Params] fc.weight = tensor([[-2.1565, -0.8112, -2.2456],
-        [ 0.0660, -0.6184, -1.6541],
-        [-2.3674,  0.7895, -1.6636]])
-Epoch  2020 | Total: 31.2239 | Unsafe: 0.1026 | Init: 0.0013 | Outside: 0.0000 | Gen: 31.1200
- [Controller Params] fc.weight = tensor([[-2.1614, -0.8144, -2.2489],
-        [ 0.0688, -0.6422, -1.6585],
-        [-2.3716,  0.7886, -1.6644]])
-Epoch  2030 | Total: 30.9588 | Unsafe: 0.2684 | Init: 0.0000 | Outside: 0.0000 | Gen: 30.6904
- [Controller Params] fc.weight = tensor([[-2.1661, -0.8181, -2.2521],
-        [ 0.0725, -0.6657, -1.6641],
-        [-2.3756,  0.7869, -1.6657]])
-Epoch  2040 | Total: 30.7295 | Unsafe: 0.0000 | Init: 0.0396 | Outside: 0.0000 | Gen: 30.6898
- [Controller Params] fc.weight = tensor([[-2.1711, -0.8214, -2.2553],
-        [ 0.0765, -0.6885, -1.6698],
-        [-2.3797,  0.7846, -1.6670]])
-Epoch  2050 | Total: 30.2126 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 30.2126
- [Controller Params] fc.weight = tensor([[-2.1761, -0.8239, -2.2583],
-        [ 0.0803, -0.7105, -1.6750],
-        [-2.3838,  0.7830, -1.6675]])
-Epoch  2060 | Total: 29.7912 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 29.7912
- [Controller Params] fc.weight = tensor([[-2.1811, -0.8256, -2.2612],
-        [ 0.0842, -0.7318, -1.6803],
-        [-2.3880,  0.7814, -1.6676]])
-Epoch  2070 | Total: 29.6373 | Unsafe: 0.4245 | Init: 0.0000 | Outside: 0.0000 | Gen: 29.2128
- [Controller Params] fc.weight = tensor([[-2.1863, -0.8271, -2.2641],
-        [ 0.0883, -0.7523, -1.6855],
-        [-2.3921,  0.7786, -1.6682]])
-Epoch  2080 | Total: 29.1647 | Unsafe: 0.0000 | Init: 0.0670 | Outside: 0.0000 | Gen: 29.0977
- [Controller Params] fc.weight = tensor([[-2.1915, -0.8277, -2.2668],
-        [ 0.0922, -0.7721, -1.6905],
-        [-2.3962,  0.7757, -1.6682]])
-Epoch  2090 | Total: 28.9855 | Unsafe: 0.1552 | Init: 0.0000 | Outside: 0.0000 | Gen: 28.8303
- [Controller Params] fc.weight = tensor([[-2.1946, -0.8277, -2.2683],
-        [ 0.0945, -0.7835, -1.6932],
-        [-2.3986,  0.7738, -1.6680]])
-Epoch  2100 | Total: 28.7599 | Unsafe: 0.0334 | Init: 0.0000 | Outside: 0.0000 | Gen: 28.7265
- [Controller Params] fc.weight = tensor([[-2.1973, -0.8274, -2.2696],
-        [ 0.0964, -0.7926, -1.6955],
-        [-2.4007,  0.7718, -1.6677]])
-Epoch  2110 | Total: 28.6415 | Unsafe: 0.0564 | Init: 0.0000 | Outside: 0.0000 | Gen: 28.5851
- [Controller Params] fc.weight = tensor([[-2.1999, -0.8268, -2.2708],
-        [ 0.0983, -0.8014, -1.6977],
-        [-2.4028,  0.7699, -1.6674]])
-Epoch  2120 | Total: 28.4713 | Unsafe: 0.0118 | Init: 0.0000 | Outside: 0.0000 | Gen: 28.4595
- [Controller Params] fc.weight = tensor([[-2.2025, -0.8258, -2.2719],
-        [ 0.1003, -0.8097, -1.6998],
-        [-2.4048,  0.7684, -1.6670]])
-Epoch  2130 | Total: 28.3369 | Unsafe: 0.0293 | Init: 0.0000 | Outside: 0.0000 | Gen: 28.3076
- [Controller Params] fc.weight = tensor([[-2.2053, -0.8248, -2.2732],
-        [ 0.1023, -0.8179, -1.7019],
-        [-2.4068,  0.7662, -1.6670]])
-Epoch  2140 | Total: 28.1824 | Unsafe: 0.0356 | Init: 0.0018 | Outside: 0.0000 | Gen: 28.1450
- [Controller Params] fc.weight = tensor([[-2.2079, -0.8236, -2.2743],
-        [ 0.1044, -0.8258, -1.7040],
-        [-2.4088,  0.7645, -1.6668]])
-Epoch  2150 | Total: 28.0981 | Unsafe: 0.0000 | Init: 0.0033 | Outside: 0.0000 | Gen: 28.0948
- [Controller Params] fc.weight = tensor([[-2.2105, -0.8222, -2.2755],
-        [ 0.1064, -0.8336, -1.7061],
-        [-2.4108,  0.7629, -1.6667]])
-Epoch  2160 | Total: 28.0077 | Unsafe: 0.1914 | Init: 0.0000 | Outside: 0.0000 | Gen: 27.8163
- [Controller Params] fc.weight = tensor([[-2.2132, -0.8209, -2.2767],
-        [ 0.1084, -0.8411, -1.7080],
-        [-2.4128,  0.7607, -1.6669]])
-Epoch  2170 | Total: 27.7894 | Unsafe: 0.0102 | Init: 0.0140 | Outside: 0.0000 | Gen: 27.7652
- [Controller Params] fc.weight = tensor([[-2.2158, -0.8192, -2.2778],
-        [ 0.1102, -0.8483, -1.7096],
-        [-2.4146,  0.7592, -1.6671]])
-Epoch  2180 | Total: 27.6673 | Unsafe: 0.0146 | Init: 0.0000 | Outside: 0.0000 | Gen: 27.6527
- [Controller Params] fc.weight = tensor([[-2.2185, -0.8174, -2.2789],
-        [ 0.1119, -0.8552, -1.7111],
-        [-2.4165,  0.7577, -1.6674]])
-Epoch  2190 | Total: 27.5425 | Unsafe: 0.0089 | Init: 0.0002 | Outside: 0.0000 | Gen: 27.5334
- [Controller Params] fc.weight = tensor([[-2.2212, -0.8156, -2.2800],
-        [ 0.1135, -0.8620, -1.7123],
-        [-2.4184,  0.7561, -1.6680]])
-Epoch  2200 | Total: 27.4750 | Unsafe: 0.0902 | Init: 0.0000 | Outside: 0.0000 | Gen: 27.3848
- [Controller Params] fc.weight = tensor([[-2.2240, -0.8136, -2.2810],
-        [ 0.1152, -0.8686, -1.7136],
-        [-2.4202,  0.7545, -1.6686]])
-Epoch  2210 | Total: 27.3221 | Unsafe: 0.0213 | Init: 0.0003 | Outside: 0.0000 | Gen: 27.3006
- [Controller Params] fc.weight = tensor([[-2.2267, -0.8114, -2.2820],
-        [ 0.1169, -0.8751, -1.7148],
-        [-2.4221,  0.7532, -1.6690]])
-Epoch  2220 | Total: 27.2572 | Unsafe: 0.0741 | Init: 0.0000 | Outside: 0.0000 | Gen: 27.1830
- [Controller Params] fc.weight = tensor([[-2.2296, -0.8095, -2.2830],
-        [ 0.1184, -0.8815, -1.7158],
-        [-2.4239,  0.7512, -1.6697]])
-Epoch  2230 | Total: 27.1990 | Unsafe: 0.0000 | Init: 0.0099 | Outside: 0.0000 | Gen: 27.1891
- [Controller Params] fc.weight = tensor([[-2.2323, -0.8074, -2.2839],
-        [ 0.1197, -0.8877, -1.7162],
-        [-2.4257,  0.7497, -1.6703]])
-Epoch  2240 | Total: 27.0295 | Unsafe: 0.0428 | Init: 0.0260 | Outside: 0.0000 | Gen: 26.9607
- [Controller Params] fc.weight = tensor([[-2.2351, -0.8054, -2.2848],
-        [ 0.1207, -0.8938, -1.7163],
-        [-2.4275,  0.7476, -1.6710]])
-Epoch  2250 | Total: 26.9208 | Unsafe: 0.0000 | Init: 0.0064 | Outside: 0.0000 | Gen: 26.9144
- [Controller Params] fc.weight = tensor([[-2.2379, -0.8034, -2.2858],
-        [ 0.1217, -0.8998, -1.7164],
-        [-2.4293,  0.7457, -1.6717]])
-Epoch  2260 | Total: 26.8604 | Unsafe: 0.1006 | Init: 0.0000 | Outside: 0.0000 | Gen: 26.7597
- [Controller Params] fc.weight = tensor([[-2.2407, -0.8012, -2.2867],
-        [ 0.1226, -0.9058, -1.7163],
-        [-2.4311,  0.7436, -1.6723]])
-Epoch  2270 | Total: 26.7428 | Unsafe: 0.0000 | Init: 0.0003 | Outside: 0.0000 | Gen: 26.7425
- [Controller Params] fc.weight = tensor([[-2.2435, -0.7989, -2.2876],
-        [ 0.1235, -0.9117, -1.7163],
-        [-2.4329,  0.7417, -1.6729]])
-Epoch  2280 | Total: 26.5998 | Unsafe: 0.0349 | Init: 0.0026 | Outside: 0.0000 | Gen: 26.5623
- [Controller Params] fc.weight = tensor([[-2.2463, -0.7967, -2.2886],
-        [ 0.1244, -0.9175, -1.7161],
-        [-2.4347,  0.7394, -1.6737]])
-Epoch  2290 | Total: 26.5313 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 26.5313
- [Controller Params] fc.weight = tensor([[-2.2490, -0.7943, -2.2895],
-        [ 0.1255, -0.9232, -1.7162],
-        [-2.4364,  0.7372, -1.6743]])
-Epoch  2300 | Total: 26.5192 | Unsafe: 0.1995 | Init: 0.0000 | Outside: 0.0000 | Gen: 26.3197
- [Controller Params] fc.weight = tensor([[-2.2517, -0.7918, -2.2905],
-        [ 0.1265, -0.9287, -1.7162],
-        [-2.4382,  0.7349, -1.6749]])
-Epoch  2310 | Total: 26.4011 | Unsafe: 0.0000 | Init: 0.0180 | Outside: 0.0000 | Gen: 26.3831
- [Controller Params] fc.weight = tensor([[-2.2544, -0.7894, -2.2915],
-        [ 0.1277, -0.9343, -1.7163],
-        [-2.4400,  0.7323, -1.6756]])
-Epoch  2320 | Total: 26.2239 | Unsafe: 0.0381 | Init: 0.0000 | Outside: 0.0000 | Gen: 26.1857
- [Controller Params] fc.weight = tensor([[-2.2571, -0.7869, -2.2924],
-        [ 0.1289, -0.9398, -1.7164],
-        [-2.4418,  0.7299, -1.6761]])
-Epoch  2330 | Total: 26.1488 | Unsafe: 0.0390 | Init: 0.0000 | Outside: 0.0000 | Gen: 26.1098
- [Controller Params] fc.weight = tensor([[-2.2598, -0.7843, -2.2935],
-        [ 0.1303, -0.9452, -1.7165],
-        [-2.4437,  0.7271, -1.6769]])
-Epoch  2340 | Total: 26.0665 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 26.0665
- [Controller Params] fc.weight = tensor([[-2.2624, -0.7815, -2.2944],
-        [ 0.1317, -0.9506, -1.7163],
-        [-2.4454,  0.7250, -1.6772]])
-Epoch  2350 | Total: 25.9432 | Unsafe: 0.0389 | Init: 0.0000 | Outside: 0.0000 | Gen: 25.9043
- [Controller Params] fc.weight = tensor([[-2.2651, -0.7786, -2.2953],
-        [ 0.1330, -0.9559, -1.7159],
-        [-2.4472,  0.7227, -1.6776]])
-Epoch  2360 | Total: 25.8446 | Unsafe: 0.0009 | Init: 0.0028 | Outside: 0.0000 | Gen: 25.8410
- [Controller Params] fc.weight = tensor([[-2.2677, -0.7763, -2.2964],
-        [ 0.1341, -0.9612, -1.7153],
-        [-2.4490,  0.7201, -1.6781]])
-Epoch  2370 | Total: 25.7630 | Unsafe: 0.0140 | Init: 0.0008 | Outside: 0.0000 | Gen: 25.7482
- [Controller Params] fc.weight = tensor([[-2.2701, -0.7750, -2.2976],
-        [ 0.1353, -0.9664, -1.7145],
-        [-2.4508,  0.7178, -1.6784]])
-Epoch  2380 | Total: 25.7210 | Unsafe: 0.1078 | Init: 0.0007 | Outside: 0.0000 | Gen: 25.6125
- [Controller Params] fc.weight = tensor([[-2.2726, -0.7741, -2.2988],
-        [ 0.1364, -0.9716, -1.7134],
-        [-2.4526,  0.7155, -1.6787]])
-Epoch  2390 | Total: 25.6332 | Unsafe: 0.0557 | Init: 0.0048 | Outside: 0.0000 | Gen: 25.5727
- [Controller Params] fc.weight = tensor([[-2.2742, -0.7736, -2.2996],
-        [ 0.1373, -0.9750, -1.7127],
-        [-2.4538,  0.7140, -1.6789]])
-Epoch  2400 | Total: 25.5664 | Unsafe: 0.0046 | Init: 0.0024 | Outside: 0.0000 | Gen: 25.5594
- [Controller Params] fc.weight = tensor([[-2.2754, -0.7732, -2.3003],
-        [ 0.1379, -0.9776, -1.7121],
-        [-2.4547,  0.7128, -1.6790]])
-Epoch  2410 | Total: 25.5461 | Unsafe: 0.0000 | Init: 0.0085 | Outside: 0.0000 | Gen: 25.5375
- [Controller Params] fc.weight = tensor([[-2.2767, -0.7728, -2.3009],
-        [ 0.1386, -0.9802, -1.7116],
-        [-2.4556,  0.7117, -1.6792]])
-Epoch  2420 | Total: 25.5059 | Unsafe: 0.0586 | Init: 0.0000 | Outside: 0.0000 | Gen: 25.4473
- [Controller Params] fc.weight = tensor([[-2.2779, -0.7724, -2.3015],
-        [ 0.1393, -0.9827, -1.7109],
-        [-2.4565,  0.7105, -1.6793]])
-Epoch  2430 | Total: 25.4401 | Unsafe: 0.0031 | Init: 0.0060 | Outside: 0.0000 | Gen: 25.4310
- [Controller Params] fc.weight = tensor([[-2.2792, -0.7721, -2.3022],
-        [ 0.1398, -0.9853, -1.7101],
-        [-2.4575,  0.7093, -1.6796]])
-Epoch  2440 | Total: 25.3967 | Unsafe: 0.0021 | Init: 0.0006 | Outside: 0.0000 | Gen: 25.3941
- [Controller Params] fc.weight = tensor([[-2.2804, -0.7716, -2.3028],
-        [ 0.1404, -0.9878, -1.7092],
-        [-2.4583,  0.7083, -1.6797]])
-Epoch  2450 | Total: 25.3580 | Unsafe: 0.0000 | Init: 0.0021 | Outside: 0.0000 | Gen: 25.3559
- [Controller Params] fc.weight = tensor([[-2.2816, -0.7712, -2.3034],
-        [ 0.1410, -0.9903, -1.7084],
-        [-2.4592,  0.7073, -1.6798]])
-Epoch  2460 | Total: 25.3134 | Unsafe: 0.0000 | Init: 0.0014 | Outside: 0.0000 | Gen: 25.3120
- [Controller Params] fc.weight = tensor([[-2.2829, -0.7708, -2.3040],
-        [ 0.1415, -0.9928, -1.7075],
-        [-2.4602,  0.7061, -1.6801]])
-Epoch  2470 | Total: 25.2707 | Unsafe: 0.0096 | Init: 0.0042 | Outside: 0.0000 | Gen: 25.2569
- [Controller Params] fc.weight = tensor([[-2.2842, -0.7704, -2.3047],
-        [ 0.1421, -0.9953, -1.7066],
-        [-2.4611,  0.7051, -1.6803]])
-Epoch  2480 | Total: 25.2275 | Unsafe: 0.0011 | Init: 0.0025 | Outside: 0.0000 | Gen: 25.2239
- [Controller Params] fc.weight = tensor([[-2.2855, -0.7700, -2.3053],
-        [ 0.1428, -0.9978, -1.7056],
-        [-2.4620,  0.7041, -1.6806]])
-Epoch  2490 | Total: 25.1818 | Unsafe: 0.0026 | Init: 0.0014 | Outside: 0.0000 | Gen: 25.1777
- [Controller Params] fc.weight = tensor([[-2.2868, -0.7696, -2.3059],
-        [ 0.1434, -1.0002, -1.7046],
-        [-2.4629,  0.7032, -1.6809]])
-[Refine-Unsafe] Epoch 2500: Loss=0.014, 3 failing → refined 3 cells → 43 total
-[Refine-Generator] Epoch 2500: 636 failing → refined 100 cells → 3141 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 53 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 53 cells...
-[SymbolicCROWNCache] Initialized for 53 cells - symbolic structure cached!
-    Rebuilding Phi cache with 3141 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 3141 cells...
-[SymbolicCROWNCache_Phi] Initialized for 3141 cells!
-  Caches rebuilt successfully!
-Epoch  2500 | Total: 23.1153 | Unsafe: 0.0000 | Init: 0.0036 | Outside: 0.0000 | Gen: 23.1116
- [Controller Params] fc.weight = tensor([[-2.2881, -0.7693, -2.3065],
-        [ 0.1441, -1.0027, -1.7035],
-        [-2.4638,  0.7022, -1.6813]])
-[Merge-Generator] Epoch 2505: merged 1 pairs → 3140 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 53 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 53 cells...
-[SymbolicCROWNCache] Initialized for 53 cells - symbolic structure cached!
-    Rebuilding Phi cache with 3140 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 3140 cells...
-[SymbolicCROWNCache_Phi] Initialized for 3140 cells!
-  Caches rebuilt successfully!
-Epoch  2510 | Total: 23.0700 | Unsafe: 0.0000 | Init: 0.0056 | Outside: 0.0000 | Gen: 23.0644
- [Controller Params] fc.weight = tensor([[-2.2893, -0.7695, -2.3071],
-        [ 0.1453, -1.0052, -1.7034],
-        [-2.4646,  0.7014, -1.6814]])
-Epoch  2520 | Total: 23.0188 | Unsafe: 0.0317 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.9871
- [Controller Params] fc.weight = tensor([[-2.2905, -0.7703, -2.3078],
-        [ 0.1470, -1.0077, -1.7042],
-        [-2.4655,  0.7002, -1.6817]])
-Epoch  2530 | Total: 22.9732 | Unsafe: 0.0000 | Init: 0.0002 | Outside: 0.0000 | Gen: 22.9730
- [Controller Params] fc.weight = tensor([[-2.2916, -0.7709, -2.3084],
-        [ 0.1488, -1.0102, -1.7052],
-        [-2.4664,  0.6994, -1.6816]])
-Epoch  2540 | Total: 22.9126 | Unsafe: 0.0189 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.8936
- [Controller Params] fc.weight = tensor([[-2.2928, -0.7716, -2.3090],
-        [ 0.1506, -1.0126, -1.7060],
-        [-2.4673,  0.6981, -1.6819]])
-Epoch  2550 | Total: 22.8722 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.8722
- [Controller Params] fc.weight = tensor([[-2.2940, -0.7722, -2.3097],
-        [ 0.1524, -1.0151, -1.7068],
-        [-2.4682,  0.6972, -1.6819]])
-Epoch  2560 | Total: 22.8507 | Unsafe: 0.0672 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.7835
- [Controller Params] fc.weight = tensor([[-2.2951, -0.7728, -2.3103],
-        [ 0.1541, -1.0175, -1.7074],
-        [-2.4691,  0.6960, -1.6821]])
-Epoch  2570 | Total: 22.8571 | Unsafe: 0.1328 | Init: 0.0007 | Outside: 0.0000 | Gen: 22.7236
- [Controller Params] fc.weight = tensor([[-2.2963, -0.7733, -2.3109],
-        [ 0.1557, -1.0200, -1.7078],
-        [-2.4700,  0.6949, -1.6822]])
-Epoch  2580 | Total: 22.7781 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.7781
- [Controller Params] fc.weight = tensor([[-2.2975, -0.7738, -2.3116],
-        [ 0.1571, -1.0224, -1.7080],
-        [-2.4709,  0.6938, -1.6824]])
-Epoch  2590 | Total: 22.7358 | Unsafe: 0.0000 | Init: 0.0086 | Outside: 0.0000 | Gen: 22.7272
- [Controller Params] fc.weight = tensor([[-2.2988, -0.7745, -2.3123],
-        [ 0.1585, -1.0247, -1.7080],
-        [-2.4718,  0.6922, -1.6828]])
-[Refine-Unsafe] Epoch 2600: Loss=0.035, 5 failing → refined 5 cells → 78 total
-[Refine-Generator] Epoch 2600: 792 failing → refined 100 cells → 3840 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 88 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 88 cells...
-[SymbolicCROWNCache] Initialized for 88 cells - symbolic structure cached!
-    Rebuilding Phi cache with 3840 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 3840 cells...
-[SymbolicCROWNCache_Phi] Initialized for 3840 cells!
-  Caches rebuilt successfully!
-Epoch  2600 | Total: 22.6393 | Unsafe: 0.0000 | Init: 0.0049 | Outside: 0.0000 | Gen: 22.6344
- [Controller Params] fc.weight = tensor([[-2.2999, -0.7749, -2.3129],
-        [ 0.1597, -1.0271, -1.7079],
-        [-2.4727,  0.6911, -1.6829]])
-Epoch  2610 | Total: 22.7620 | Unsafe: 0.0000 | Init: 0.0045 | Outside: 0.0000 | Gen: 22.7575
- [Controller Params] fc.weight = tensor([[-2.3011, -0.7754, -2.3134],
-        [ 0.1615, -1.0294, -1.7086],
-        [-2.4735,  0.6901, -1.6830]])
-Epoch  2620 | Total: 22.5891 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.5891
- [Controller Params] fc.weight = tensor([[-2.3024, -0.7762, -2.3141],
-        [ 0.1637, -1.0318, -1.7101],
-        [-2.4744,  0.6886, -1.6836]])
-Epoch  2630 | Total: 22.7441 | Unsafe: 0.2978 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.4463
- [Controller Params] fc.weight = tensor([[-2.3036, -0.7766, -2.3146],
-        [ 0.1660, -1.0342, -1.7116],
-        [-2.4752,  0.6877, -1.6840]])
-Epoch  2640 | Total: 22.5434 | Unsafe: 0.0000 | Init: 0.0003 | Outside: 0.0000 | Gen: 22.5431
- [Controller Params] fc.weight = tensor([[-2.3048, -0.7770, -2.3151],
-        [ 0.1682, -1.0366, -1.7132],
-        [-2.4760,  0.6870, -1.6842]])
-Epoch  2650 | Total: 22.4460 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.4460
- [Controller Params] fc.weight = tensor([[-2.3061, -0.7774, -2.3157],
-        [ 0.1704, -1.0389, -1.7146],
-        [-2.4769,  0.6856, -1.6849]])
-Epoch  2660 | Total: 22.3391 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.3391
- [Controller Params] fc.weight = tensor([[-2.3074, -0.7772, -2.3161],
-        [ 0.1726, -1.0413, -1.7161],
-        [-2.4777,  0.6847, -1.6853]])
-Epoch  2670 | Total: 22.4051 | Unsafe: 0.1070 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.2981
- [Controller Params] fc.weight = tensor([[-2.3087, -0.7775, -2.3167],
-        [ 0.1748, -1.0436, -1.7174],
-        [-2.4785,  0.6833, -1.6860]])
-Epoch  2680 | Total: 22.3113 | Unsafe: 0.0000 | Init: 0.0011 | Outside: 0.0000 | Gen: 22.3102
- [Controller Params] fc.weight = tensor([[-2.3100, -0.7774, -2.3172],
-        [ 0.1769, -1.0459, -1.7187],
-        [-2.4794,  0.6819, -1.6866]])
-Epoch  2690 | Total: 22.2499 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.2499
- [Controller Params] fc.weight = tensor([[-2.3108, -0.7773, -2.3176],
-        [ 0.1783, -1.0475, -1.7195],
-        [-2.4799,  0.6813, -1.6869]])
-[Refine-Init] Epoch 2700: Loss=0.001, 1 failing → refined 1 cells → 15 total
-[Refine-Generator] Epoch 2700: 949 failing → refined 100 cells → 4540 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 95 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 95 cells...
-[SymbolicCROWNCache] Initialized for 95 cells - symbolic structure cached!
-    Rebuilding Phi cache with 4540 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 4540 cells...
-[SymbolicCROWNCache_Phi] Initialized for 4540 cells!
-  Caches rebuilt successfully!
-Epoch  2700 | Total: 21.0484 | Unsafe: 0.0709 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.9776
- [Controller Params] fc.weight = tensor([[-2.3114, -0.7773, -2.3178],
-        [ 0.1793, -1.0486, -1.7200],
-        [-2.4803,  0.6809, -1.6870]])
-Epoch  2710 | Total: 20.9665 | Unsafe: 0.0000 | Init: 0.0008 | Outside: 0.0000 | Gen: 20.9657
- [Controller Params] fc.weight = tensor([[-2.3120, -0.7774, -2.3180],
-        [ 0.1806, -1.0497, -1.7211],
-        [-2.4807,  0.6808, -1.6873]])
-Epoch  2720 | Total: 20.9434 | Unsafe: 0.0217 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.9218
- [Controller Params] fc.weight = tensor([[-2.3127, -0.7776, -2.3183],
-        [ 0.1822, -1.0509, -1.7225],
-        [-2.4811,  0.6803, -1.6879]])
-Epoch  2730 | Total: 20.9032 | Unsafe: 0.0000 | Init: 0.0026 | Outside: 0.0000 | Gen: 20.9006
- [Controller Params] fc.weight = tensor([[-2.3133, -0.7777, -2.3186],
-        [ 0.1838, -1.0521, -1.7240],
-        [-2.4815,  0.6800, -1.6884]])
-Epoch  2740 | Total: 20.8974 | Unsafe: 0.0422 | Init: 0.0005 | Outside: 0.0000 | Gen: 20.8546
- [Controller Params] fc.weight = tensor([[-2.3140, -0.7777, -2.3188],
-        [ 0.1853, -1.0532, -1.7255],
-        [-2.4819,  0.6797, -1.6890]])
-Epoch  2750 | Total: 20.8472 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.8472
- [Controller Params] fc.weight = tensor([[-2.3147, -0.7778, -2.3191],
-        [ 0.1868, -1.0544, -1.7268],
-        [-2.4823,  0.6794, -1.6895]])
-Epoch  2760 | Total: 20.8152 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.8152
- [Controller Params] fc.weight = tensor([[-2.3154, -0.7779, -2.3193],
-        [ 0.1882, -1.0555, -1.7281],
-        [-2.4827,  0.6792, -1.6900]])
-Epoch  2770 | Total: 20.7815 | Unsafe: 0.0015 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.7800
- [Controller Params] fc.weight = tensor([[-2.3161, -0.7779, -2.3196],
-        [ 0.1896, -1.0567, -1.7292],
-        [-2.4831,  0.6788, -1.6906]])
-Epoch  2780 | Total: 20.7548 | Unsafe: 0.0000 | Init: 0.0007 | Outside: 0.0000 | Gen: 20.7541
- [Controller Params] fc.weight = tensor([[-2.3167, -0.7779, -2.3198],
-        [ 0.1909, -1.0578, -1.7302],
-        [-2.4835,  0.6786, -1.6911]])
-Epoch  2790 | Total: 20.7306 | Unsafe: 0.0000 | Init: 0.0006 | Outside: 0.0000 | Gen: 20.7300
- [Controller Params] fc.weight = tensor([[-2.3174, -0.7780, -2.3201],
-        [ 0.1922, -1.0589, -1.7313],
-        [-2.4839,  0.6782, -1.6917]])
-[Refine-Generator] Epoch 2800: 1200 failing → refined 100 cells → 5240 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 95 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 95 cells...
-[SymbolicCROWNCache] Initialized for 95 cells - symbolic structure cached!
-    Rebuilding Phi cache with 5240 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 5240 cells...
-[SymbolicCROWNCache_Phi] Initialized for 5240 cells!
-  Caches rebuilt successfully!
-Epoch  2800 | Total: 19.6529 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.6529
- [Controller Params] fc.weight = tensor([[-2.3181, -0.7781, -2.3204],
-        [ 0.1935, -1.0601, -1.7323],
-        [-2.4843,  0.6779, -1.6923]])
-Epoch  2810 | Total: 19.6209 | Unsafe: 0.0000 | Init: 0.0020 | Outside: 0.0000 | Gen: 19.6189
- [Controller Params] fc.weight = tensor([[-2.3188, -0.7782, -2.3207],
-        [ 0.1951, -1.0612, -1.7340],
-        [-2.4847,  0.6779, -1.6929]])
-Epoch  2820 | Total: 19.5742 | Unsafe: 0.0107 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.5634
- [Controller Params] fc.weight = tensor([[-2.3194, -0.7782, -2.3210],
-        [ 0.1971, -1.0624, -1.7361],
-        [-2.4851,  0.6781, -1.6936]])
-Epoch  2830 | Total: 19.5293 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.5293
- [Controller Params] fc.weight = tensor([[-2.3200, -0.7781, -2.3213],
-        [ 0.1991, -1.0636, -1.7383],
-        [-2.4854,  0.6784, -1.6943]])
-Epoch  2840 | Total: 19.4852 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.4852
- [Controller Params] fc.weight = tensor([[-2.3207, -0.7781, -2.3216],
-        [ 0.2010, -1.0648, -1.7404],
-        [-2.4858,  0.6787, -1.6950]])
-Epoch  2850 | Total: 19.4509 | Unsafe: 0.0000 | Init: 0.0003 | Outside: 0.0000 | Gen: 19.4505
- [Controller Params] fc.weight = tensor([[-2.3213, -0.7781, -2.3219],
-        [ 0.2028, -1.0660, -1.7423],
-        [-2.4862,  0.6790, -1.6958]])
-Epoch  2860 | Total: 19.4233 | Unsafe: 0.0000 | Init: 0.0004 | Outside: 0.0000 | Gen: 19.4229
- [Controller Params] fc.weight = tensor([[-2.3220, -0.7781, -2.3221],
-        [ 0.2045, -1.0671, -1.7441],
-        [-2.4866,  0.6792, -1.6965]])
-Epoch  2870 | Total: 19.3727 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.3727
- [Controller Params] fc.weight = tensor([[-2.3227, -0.7782, -2.3224],
-        [ 0.2062, -1.0683, -1.7458],
-        [-2.4870,  0.6793, -1.6973]])
-Epoch  2880 | Total: 19.3300 | Unsafe: 0.0000 | Init: 0.0002 | Outside: 0.0000 | Gen: 19.3298
- [Controller Params] fc.weight = tensor([[-2.3233, -0.7782, -2.3227],
-        [ 0.2078, -1.0694, -1.7475],
-        [-2.4874,  0.6794, -1.6981]])
-Epoch  2890 | Total: 19.2985 | Unsafe: 0.0120 | Init: 0.0006 | Outside: 0.0000 | Gen: 19.2859
- [Controller Params] fc.weight = tensor([[-2.3240, -0.7783, -2.3230],
-        [ 0.2094, -1.0706, -1.7490],
-        [-2.4878,  0.6795, -1.6988]])
-[Refine-Unsafe] Epoch 2900: Loss=0.004, 4 failing → refined 4 cells → 106 total
-[Refine-Generator] Epoch 2900: 1373 failing → refined 100 cells → 5940 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 123 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 123 cells...
-[SymbolicCROWNCache] Initialized for 123 cells - symbolic structure cached!
-    Rebuilding Phi cache with 5940 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 5940 cells...
-[SymbolicCROWNCache_Phi] Initialized for 5940 cells!
-  Caches rebuilt successfully!
-Epoch  2900 | Total: 18.8279 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.8279
- [Controller Params] fc.weight = tensor([[-2.3247, -0.7783, -2.3233],
-        [ 0.2109, -1.0717, -1.7504],
-        [-2.4881,  0.6796, -1.6996]])
-Epoch  2910 | Total: 18.8068 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.8068
- [Controller Params] fc.weight = tensor([[-2.3254, -0.7786, -2.3235],
-        [ 0.2125, -1.0728, -1.7520],
-        [-2.4885,  0.6797, -1.7003]])
-Epoch  2920 | Total: 18.7591 | Unsafe: 0.0201 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.7390
- [Controller Params] fc.weight = tensor([[-2.3261, -0.7790, -2.3237],
-        [ 0.2143, -1.0740, -1.7538],
-        [-2.4889,  0.6798, -1.7011]])
-Epoch  2930 | Total: 18.7285 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.7285
- [Controller Params] fc.weight = tensor([[-2.3268, -0.7793, -2.3239],
-        [ 0.2160, -1.0751, -1.7557],
-        [-2.4893,  0.6800, -1.7018]])
-Epoch  2940 | Total: 18.7036 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.7036
- [Controller Params] fc.weight = tensor([[-2.3276, -0.7797, -2.3241],
-        [ 0.2177, -1.0763, -1.7574],
-        [-2.4898,  0.6801, -1.7026]])
-Epoch  2950 | Total: 18.6733 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.6733
- [Controller Params] fc.weight = tensor([[-2.3284, -0.7800, -2.3242],
-        [ 0.2194, -1.0774, -1.7590],
-        [-2.4901,  0.6803, -1.7032]])
-Epoch  2960 | Total: 18.6363 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.6363
- [Controller Params] fc.weight = tensor([[-2.3292, -0.7804, -2.3244],
-        [ 0.2209, -1.0786, -1.7606],
-        [-2.4906,  0.6803, -1.7039]])
-Epoch  2970 | Total: 18.5800 | Unsafe: 0.0000 | Init: 0.0241 | Outside: 0.0000 | Gen: 18.5560
- [Controller Params] fc.weight = tensor([[-2.3299, -0.7807, -2.3245],
-        [ 0.2224, -1.0797, -1.7621],
-        [-2.4910,  0.6803, -1.7046]])
-Epoch  2980 | Total: 18.5075 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.5075
- [Controller Params] fc.weight = tensor([[-2.3307, -0.7811, -2.3246],
-        [ 0.2239, -1.0808, -1.7634],
-        [-2.4914,  0.6804, -1.7052]])
-Epoch  2990 | Total: 18.4893 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.4893
- [Controller Params] fc.weight = tensor([[-2.3313, -0.7814, -2.3247],
-        [ 0.2249, -1.0817, -1.7644],
-        [-2.4917,  0.6803, -1.7058]])
-[Refine-Init] Epoch 3000: Loss=0.004, 6 failing → refined 6 cells → 57 total
-[Refine-Generator] Epoch 3000: 1606 failing → refined 100 cells → 6640 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 165 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 165 cells...
-[SymbolicCROWNCache] Initialized for 165 cells - symbolic structure cached!
-    Rebuilding Phi cache with 6640 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 6640 cells...
-[SymbolicCROWNCache_Phi] Initialized for 6640 cells!
-  Caches rebuilt successfully!
-Epoch  3000 | Total: 18.8304 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.8304
- [Controller Params] fc.weight = tensor([[-2.3317, -0.7814, -2.3247],
-        [ 0.2256, -1.0822, -1.7650],
-        [-2.4919,  0.6805, -1.7060]])
-
-Epoch 3000 - Detailed Evaluation:
-  Constraint Satisfaction:
-    Unsafe:    ✓ (V_min=20.010, V_max=61.216)
-    Init:      ✗ (V_min=0.987, V_max=1.000)
-    Outside:   ✓ (V_min=0.843, V_max=61.417)
-    Generator: ✗ (Phi_upper_min=-122.400, Phi_upper_max=0.731, failing=1964)
-  Goal bounds: V ∈ [0.916, 1.065]
-  Unsafe bounds: V ∈ [20.010, 61.216]
-  Generator bounds: Φ ∈ [-2114.768, 0.731]
-  Generator failing cells: 1964/6640 (29.6%)
-[Merge-Generator] Epoch 3006: merged 0 pairs → 6640 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 165 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 165 cells...
-[SymbolicCROWNCache] Initialized for 165 cells - symbolic structure cached!
-    Rebuilding Phi cache with 6640 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 6640 cells...
-[SymbolicCROWNCache_Phi] Initialized for 6640 cells!
-  Caches rebuilt successfully!
-Epoch  3010 | Total: 18.8237 | Unsafe: 0.0000 | Init: 0.0003 | Outside: 0.0000 | Gen: 18.8233
- [Controller Params] fc.weight = tensor([[-2.3321, -0.7815, -2.3247],
-        [ 0.2262, -1.0827, -1.7656],
-        [-2.4921,  0.6805, -1.7064]])
-Epoch  3020 | Total: 18.7805 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.7805
- [Controller Params] fc.weight = tensor([[-2.3325, -0.7816, -2.3247],
-        [ 0.2268, -1.0833, -1.7661],
-        [-2.4923,  0.6806, -1.7070]])
-Epoch  3030 | Total: 18.7604 | Unsafe: 0.0000 | Init: 0.0011 | Outside: 0.0000 | Gen: 18.7593
- [Controller Params] fc.weight = tensor([[-2.3330, -0.7817, -2.3247],
-        [ 0.2274, -1.0838, -1.7666],
-        [-2.4924,  0.6806, -1.7075]])
-Epoch  3040 | Total: 18.7428 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.7428
- [Controller Params] fc.weight = tensor([[-2.3334, -0.7818, -2.3247],
-        [ 0.2280, -1.0843, -1.7672],
-        [-2.4926,  0.6805, -1.7081]])
-Epoch  3050 | Total: 18.7156 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.7156
- [Controller Params] fc.weight = tensor([[-2.3339, -0.7819, -2.3247],
-        [ 0.2286, -1.0849, -1.7677],
-        [-2.4927,  0.6806, -1.7086]])
-Epoch  3060 | Total: 18.7049 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.7049
- [Controller Params] fc.weight = tensor([[-2.3343, -0.7820, -2.3247],
-        [ 0.2292, -1.0854, -1.7682],
-        [-2.4929,  0.6805, -1.7092]])
-Epoch  3070 | Total: 18.6873 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.6873
- [Controller Params] fc.weight = tensor([[-2.3348, -0.7820, -2.3247],
-        [ 0.2299, -1.0859, -1.7688],
-        [-2.4930,  0.6805, -1.7098]])
-Epoch  3080 | Total: 18.6676 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.6676
- [Controller Params] fc.weight = tensor([[-2.3352, -0.7821, -2.3247],
-        [ 0.2305, -1.0864, -1.7693],
-        [-2.4932,  0.6805, -1.7103]])
-Epoch  3090 | Total: 18.6373 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 18.6373
- [Controller Params] fc.weight = tensor([[-2.3357, -0.7822, -2.3247],
-        [ 0.2311, -1.0869, -1.7698],
-        [-2.4934,  0.6804, -1.7109]])
-[Refine-Unsafe] Epoch 3100: Loss=0.023, 10 failing → refined 10 cells → 176 total
-[Refine-Generator] Epoch 3100: 1918 failing → refined 100 cells → 7340 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 235 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 235 cells...
-[SymbolicCROWNCache] Initialized for 235 cells - symbolic structure cached!
-    Rebuilding Phi cache with 7340 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 7340 cells...
-[SymbolicCROWNCache_Phi] Initialized for 7340 cells!
-  Caches rebuilt successfully!
-Epoch  3100 | Total: 19.3103 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.3103
- [Controller Params] fc.weight = tensor([[-2.3362, -0.7823, -2.3247],
-        [ 0.2317, -1.0875, -1.7703],
-        [-2.4935,  0.6804, -1.7114]])
-Epoch  3110 | Total: 19.3416 | Unsafe: 0.0000 | Init: 0.0004 | Outside: 0.0000 | Gen: 19.3411
- [Controller Params] fc.weight = tensor([[-2.3366, -0.7823, -2.3246],
-        [ 0.2324, -1.0880, -1.7710],
-        [-2.4937,  0.6805, -1.7120]])
-Epoch  3120 | Total: 19.2768 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.2768
- [Controller Params] fc.weight = tensor([[-2.3372, -0.7823, -2.3245],
-        [ 0.2332, -1.0885, -1.7719],
-        [-2.4938,  0.6805, -1.7128]])
-Epoch  3130 | Total: 19.2828 | Unsafe: 0.0000 | Init: 0.0029 | Outside: 0.0000 | Gen: 19.2798
- [Controller Params] fc.weight = tensor([[-2.3377, -0.7823, -2.3245],
-        [ 0.2340, -1.0890, -1.7729],
-        [-2.4939,  0.6805, -1.7136]])
-Epoch  3140 | Total: 19.3555 | Unsafe: 0.1877 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.1678
- [Controller Params] fc.weight = tensor([[-2.3383, -0.7823, -2.3244],
-        [ 0.2348, -1.0895, -1.7738],
-        [-2.4940,  0.6805, -1.7144]])
-Epoch  3150 | Total: 19.2179 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.2179
- [Controller Params] fc.weight = tensor([[-2.3388, -0.7822, -2.3242],
-        [ 0.2357, -1.0901, -1.7748],
-        [-2.4941,  0.6806, -1.7152]])
-Epoch  3160 | Total: 19.1466 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.1466
- [Controller Params] fc.weight = tensor([[-2.3393, -0.7822, -2.3241],
-        [ 0.2365, -1.0906, -1.7757],
-        [-2.4942,  0.6806, -1.7160]])
-Epoch  3170 | Total: 19.1362 | Unsafe: 0.0000 | Init: 0.0365 | Outside: 0.0000 | Gen: 19.0997
- [Controller Params] fc.weight = tensor([[-2.3399, -0.7822, -2.3240],
-        [ 0.2373, -1.0911, -1.7766],
-        [-2.4943,  0.6806, -1.7168]])
-Epoch  3180 | Total: 19.1082 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.1082
- [Controller Params] fc.weight = tensor([[-2.3404, -0.7821, -2.3238],
-        [ 0.2381, -1.0916, -1.7775],
-        [-2.4945,  0.6806, -1.7175]])
-Epoch  3190 | Total: 19.0897 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.0897
- [Controller Params] fc.weight = tensor([[-2.3410, -0.7821, -2.3237],
-        [ 0.2388, -1.0921, -1.7783],
-        [-2.4946,  0.6806, -1.7183]])
-[Refine-Unsafe] Epoch 3200: Loss=0.117, 23 failing → refined 23 cells → 337 total
-[Refine-Generator] Epoch 3200: 2305 failing → refined 100 cells → 8040 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 396 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 396 cells...
-[SymbolicCROWNCache] Initialized for 396 cells - symbolic structure cached!
-    Rebuilding Phi cache with 8040 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 8040 cells...
-[SymbolicCROWNCache_Phi] Initialized for 8040 cells!
-  Caches rebuilt successfully!
-Epoch  3200 | Total: 19.8270 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.8270
- [Controller Params] fc.weight = tensor([[-2.3416, -0.7821, -2.3235],
-        [ 0.2396, -1.0926, -1.7791],
-        [-2.4947,  0.6806, -1.7190]])
-Epoch  3210 | Total: 19.8217 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.8217
- [Controller Params] fc.weight = tensor([[-2.3421, -0.7820, -2.3234],
-        [ 0.2404, -1.0931, -1.7801],
-        [-2.4947,  0.6807, -1.7198]])
-Epoch  3220 | Total: 19.7440 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.7440
- [Controller Params] fc.weight = tensor([[-2.3427, -0.7820, -2.3232],
-        [ 0.2413, -1.0936, -1.7811],
-        [-2.4948,  0.6807, -1.7208]])
-Epoch  3230 | Total: 19.8498 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.8498
- [Controller Params] fc.weight = tensor([[-2.3433, -0.7820, -2.3230],
-        [ 0.2422, -1.0941, -1.7822],
-        [-2.4948,  0.6808, -1.7218]])
-Epoch  3240 | Total: 19.8593 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.8593
- [Controller Params] fc.weight = tensor([[-2.3439, -0.7820, -2.3228],
-        [ 0.2432, -1.0946, -1.7833],
-        [-2.4948,  0.6808, -1.7229]])
-Epoch  3250 | Total: 19.7054 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.7054
- [Controller Params] fc.weight = tensor([[-2.3445, -0.7820, -2.3226],
-        [ 0.2441, -1.0951, -1.7843],
-        [-2.4947,  0.6807, -1.7239]])
-Epoch  3260 | Total: 19.7011 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.7011
- [Controller Params] fc.weight = tensor([[-2.3451, -0.7821, -2.3225],
-        [ 0.2450, -1.0956, -1.7853],
-        [-2.4947,  0.6806, -1.7250]])
-Epoch  3270 | Total: 19.6701 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.6701
- [Controller Params] fc.weight = tensor([[-2.3457, -0.7821, -2.3223],
-        [ 0.2459, -1.0961, -1.7863],
-        [-2.4947,  0.6805, -1.7259]])
-Epoch  3280 | Total: 19.5208 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.5208
- [Controller Params] fc.weight = tensor([[-2.3463, -0.7822, -2.3221],
-        [ 0.2468, -1.0966, -1.7873],
-        [-2.4947,  0.6804, -1.7269]])
-Epoch  3290 | Total: 19.5896 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.5896
- [Controller Params] fc.weight = tensor([[-2.3467, -0.7821, -2.3218],
-        [ 0.2475, -1.0970, -1.7881],
-        [-2.4947,  0.6805, -1.7276]])
-[Refine-Generator] Epoch 3300: 2679 failing → refined 100 cells → 8740 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 396 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 396 cells...
-[SymbolicCROWNCache] Initialized for 396 cells - symbolic structure cached!
-    Rebuilding Phi cache with 8740 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 8740 cells...
-[SymbolicCROWNCache_Phi] Initialized for 8740 cells!
-  Caches rebuilt successfully!
-Epoch  3300 | Total: 20.3617 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.3617
- [Controller Params] fc.weight = tensor([[-2.3470, -0.7821, -2.3217],
-        [ 0.2479, -1.0972, -1.7885],
-        [-2.4947,  0.6805, -1.7280]])
-Epoch  3310 | Total: 20.2757 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.2757
- [Controller Params] fc.weight = tensor([[-2.3473, -0.7822, -2.3216],
-        [ 0.2483, -1.0974, -1.7890],
-        [-2.4947,  0.6805, -1.7285]])
-Epoch  3320 | Total: 20.1945 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.1945
- [Controller Params] fc.weight = tensor([[-2.3477, -0.7822, -2.3214],
-        [ 0.2488, -1.0977, -1.7896],
-        [-2.4946,  0.6805, -1.7290]])
-Epoch  3330 | Total: 20.2228 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.2228
- [Controller Params] fc.weight = tensor([[-2.3480, -0.7821, -2.3212],
-        [ 0.2493, -1.0979, -1.7901],
-        [-2.4945,  0.6806, -1.7295]])
-Epoch  3340 | Total: 20.1600 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.1600
- [Controller Params] fc.weight = tensor([[-2.3483, -0.7821, -2.3210],
-        [ 0.2498, -1.0982, -1.7907],
-        [-2.4944,  0.6806, -1.7301]])
-Epoch  3350 | Total: 20.0914 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.0914
- [Controller Params] fc.weight = tensor([[-2.3486, -0.7821, -2.3208],
-        [ 0.2503, -1.0984, -1.7912],
-        [-2.4943,  0.6806, -1.7306]])
-Epoch  3360 | Total: 20.0720 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.0720
- [Controller Params] fc.weight = tensor([[-2.3489, -0.7821, -2.3207],
-        [ 0.2507, -1.0986, -1.7917],
-        [-2.4942,  0.6806, -1.7311]])
-Epoch  3370 | Total: 20.0624 | Unsafe: 0.0000 | Init: 0.0077 | Outside: 0.0000 | Gen: 20.0547
- [Controller Params] fc.weight = tensor([[-2.3492, -0.7821, -2.3205],
-        [ 0.2512, -1.0989, -1.7922],
-        [-2.4941,  0.6806, -1.7316]])
-Epoch  3380 | Total: 20.0215 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.0215
- [Controller Params] fc.weight = tensor([[-2.3496, -0.7821, -2.3203],
-        [ 0.2516, -1.0991, -1.7927],
-        [-2.4940,  0.6806, -1.7321]])
-Epoch  3390 | Total: 19.9823 | Unsafe: 0.0004 | Init: 0.0000 | Outside: 0.0000 | Gen: 19.9819
- [Controller Params] fc.weight = tensor([[-2.3499, -0.7822, -2.3201],
-        [ 0.2520, -1.0993, -1.7932],
-        [-2.4939,  0.6806, -1.7326]])
-[Refine-Init] Epoch 3400: Loss=0.000, 1 failing → refined 1 cells → 64 total
-[Refine-Generator] Epoch 3400: 3027 failing → refined 100 cells → 9440 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 403 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 403 cells...
-[SymbolicCROWNCache] Initialized for 403 cells - symbolic structure cached!
-    Rebuilding Phi cache with 9440 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 9440 cells...
-[SymbolicCROWNCache_Phi] Initialized for 9440 cells!
-  Caches rebuilt successfully!
-Epoch  3400 | Total: 21.2324 | Unsafe: 0.0000 | Init: 0.0002 | Outside: 0.0000 | Gen: 21.2322
- [Controller Params] fc.weight = tensor([[-2.3502, -0.7822, -2.3199],
-        [ 0.2525, -1.0996, -1.7936],
-        [-2.4938,  0.6805, -1.7331]])
-Epoch  3410 | Total: 21.2013 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.2013
- [Controller Params] fc.weight = tensor([[-2.3505, -0.7822, -2.3197],
-        [ 0.2529, -1.0998, -1.7941],
-        [-2.4937,  0.6805, -1.7336]])
-Epoch  3420 | Total: 21.1825 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.1824
- [Controller Params] fc.weight = tensor([[-2.3509, -0.7822, -2.3195],
-        [ 0.2534, -1.1000, -1.7947],
-        [-2.4935,  0.6805, -1.7342]])
-Epoch  3430 | Total: 21.1464 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.1464
- [Controller Params] fc.weight = tensor([[-2.3512, -0.7822, -2.3193],
-        [ 0.2539, -1.1002, -1.7952],
-        [-2.4933,  0.6805, -1.7347]])
-Epoch  3440 | Total: 21.0730 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.0730
- [Controller Params] fc.weight = tensor([[-2.3516, -0.7823, -2.3190],
-        [ 0.2544, -1.1005, -1.7958],
-        [-2.4931,  0.6805, -1.7353]])
-Epoch  3450 | Total: 21.0829 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.0829
- [Controller Params] fc.weight = tensor([[-2.3519, -0.7823, -2.3188],
-        [ 0.2548, -1.1007, -1.7963],
-        [-2.4929,  0.6805, -1.7359]])
-Epoch  3460 | Total: 21.0045 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.0045
- [Controller Params] fc.weight = tensor([[-2.3522, -0.7823, -2.3186],
-        [ 0.2553, -1.1009, -1.7968],
-        [-2.4926,  0.6806, -1.7364]])
-Epoch  3470 | Total: 21.0045 | Unsafe: 0.0000 | Init: 0.0037 | Outside: 0.0000 | Gen: 21.0008
- [Controller Params] fc.weight = tensor([[-2.3526, -0.7823, -2.3183],
-        [ 0.2557, -1.1011, -1.7972],
-        [-2.4924,  0.6806, -1.7369]])
-Epoch  3480 | Total: 20.9450 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 20.9450
- [Controller Params] fc.weight = tensor([[-2.3529, -0.7824, -2.3181],
-        [ 0.2561, -1.1014, -1.7977],
-        [-2.4922,  0.6806, -1.7374]])
-Epoch  3490 | Total: 20.9214 | Unsafe: 0.0000 | Init: 0.0007 | Outside: 0.0000 | Gen: 20.9208
- [Controller Params] fc.weight = tensor([[-2.3532, -0.7824, -2.3178],
-        [ 0.2566, -1.1016, -1.7982],
-        [-2.4919,  0.6806, -1.7379]])
-[Refine-Generator] Epoch 3500: 3467 failing → refined 100 cells → 10140 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 403 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 403 cells...
-[SymbolicCROWNCache] Initialized for 403 cells - symbolic structure cached!
-    Rebuilding Phi cache with 10140 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 10140 cells...
-[SymbolicCROWNCache_Phi] Initialized for 10140 cells!
-  Caches rebuilt successfully!
-Epoch  3500 | Total: 22.1006 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.1006
- [Controller Params] fc.weight = tensor([[-2.3536, -0.7824, -2.3176],
-        [ 0.2570, -1.1018, -1.7986],
-        [-2.4917,  0.6806, -1.7384]])
-[Merge-Generator] Epoch 3507: merged 0 pairs → 10140 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 403 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 403 cells...
-[SymbolicCROWNCache] Initialized for 403 cells - symbolic structure cached!
-    Rebuilding Phi cache with 10140 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 10140 cells...
-[SymbolicCROWNCache_Phi] Initialized for 10140 cells!
-  Caches rebuilt successfully!
-Epoch  3510 | Total: 22.0506 | Unsafe: 0.0649 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.9856
- [Controller Params] fc.weight = tensor([[-2.3539, -0.7825, -2.3173],
-        [ 0.2575, -1.1020, -1.7991],
-        [-2.4914,  0.6806, -1.7390]])
-Epoch  3520 | Total: 21.9669 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.9669
- [Controller Params] fc.weight = tensor([[-2.3543, -0.7825, -2.3170],
-        [ 0.2579, -1.1023, -1.7996],
-        [-2.4911,  0.6807, -1.7395]])
-Epoch  3530 | Total: 21.8589 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.8589
- [Controller Params] fc.weight = tensor([[-2.3546, -0.7826, -2.3166],
-        [ 0.2584, -1.1025, -1.8001],
-        [-2.4908,  0.6807, -1.7401]])
-Epoch  3540 | Total: 21.8353 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.8353
- [Controller Params] fc.weight = tensor([[-2.3550, -0.7827, -2.3163],
-        [ 0.2589, -1.1027, -1.8006],
-        [-2.4904,  0.6808, -1.7406]])
-Epoch  3550 | Total: 21.7434 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.7434
- [Controller Params] fc.weight = tensor([[-2.3554, -0.7827, -2.3160],
-        [ 0.2594, -1.1030, -1.8011],
-        [-2.4900,  0.6809, -1.7411]])
-Epoch  3560 | Total: 21.7205 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.7205
- [Controller Params] fc.weight = tensor([[-2.3557, -0.7828, -2.3156],
-        [ 0.2598, -1.1032, -1.8016],
-        [-2.4897,  0.6810, -1.7417]])
-Epoch  3570 | Total: 21.6431 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.6431
- [Controller Params] fc.weight = tensor([[-2.3561, -0.7829, -2.3153],
-        [ 0.2603, -1.1035, -1.8021],
-        [-2.4893,  0.6811, -1.7422]])
-Epoch  3580 | Total: 21.5541 | Unsafe: 0.0000 | Init: 0.0005 | Outside: 0.0000 | Gen: 21.5536
- [Controller Params] fc.weight = tensor([[-2.3565, -0.7830, -2.3149],
-        [ 0.2608, -1.1037, -1.8026],
-        [-2.4889,  0.6812, -1.7427]])
-Epoch  3590 | Total: 21.5032 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 21.5032
- [Controller Params] fc.weight = tensor([[-2.3568, -0.7831, -2.3146],
-        [ 0.2611, -1.1039, -1.8030],
-        [-2.4886,  0.6813, -1.7431]])
-[Refine-Generator] Epoch 3600: 4024 failing → refined 100 cells → 10840 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 403 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 403 cells...
-[SymbolicCROWNCache] Initialized for 403 cells - symbolic structure cached!
-    Rebuilding Phi cache with 10840 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 10840 cells...
-[SymbolicCROWNCache_Phi] Initialized for 10840 cells!
-  Caches rebuilt successfully!
-Epoch  3600 | Total: 22.4277 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.4277
- [Controller Params] fc.weight = tensor([[-2.3570, -0.7832, -2.3145],
-        [ 0.2614, -1.1040, -1.8032],
-        [-2.4884,  0.6814, -1.7434]])
-Epoch  3610 | Total: 22.3763 | Unsafe: 0.0007 | Init: 0.0001 | Outside: 0.0000 | Gen: 22.3756
- [Controller Params] fc.weight = tensor([[-2.3572, -0.7833, -2.3143],
-        [ 0.2616, -1.1041, -1.8035],
-        [-2.4882,  0.6814, -1.7437]])
-Epoch  3620 | Total: 22.3281 | Unsafe: 0.0031 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.3249
- [Controller Params] fc.weight = tensor([[-2.3574, -0.7834, -2.3141],
-        [ 0.2618, -1.1043, -1.8037],
-        [-2.4880,  0.6815, -1.7439]])
-Epoch  3630 | Total: 22.2775 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.2775
- [Controller Params] fc.weight = tensor([[-2.3575, -0.7835, -2.3139],
-        [ 0.2621, -1.1044, -1.8040],
-        [-2.4877,  0.6816, -1.7442]])
-Epoch  3640 | Total: 22.2282 | Unsafe: 0.0012 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.2270
- [Controller Params] fc.weight = tensor([[-2.3577, -0.7835, -2.3137],
-        [ 0.2623, -1.1045, -1.8042],
-        [-2.4875,  0.6817, -1.7445]])
-Epoch  3650 | Total: 22.1844 | Unsafe: 0.0000 | Init: 0.0004 | Outside: 0.0000 | Gen: 22.1840
- [Controller Params] fc.weight = tensor([[-2.3579, -0.7836, -2.3135],
-        [ 0.2625, -1.1046, -1.8045],
-        [-2.4873,  0.6818, -1.7447]])
-Epoch  3660 | Total: 22.1394 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.1394
- [Controller Params] fc.weight = tensor([[-2.3581, -0.7837, -2.3133],
-        [ 0.2627, -1.1047, -1.8047],
-        [-2.4871,  0.6820, -1.7450]])
-Epoch  3670 | Total: 22.0931 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.0931
- [Controller Params] fc.weight = tensor([[-2.3583, -0.7839, -2.3131],
-        [ 0.2630, -1.1049, -1.8049],
-        [-2.4868,  0.6821, -1.7452]])
-Epoch  3680 | Total: 22.0549 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.0549
- [Controller Params] fc.weight = tensor([[-2.3585, -0.7840, -2.3129],
-        [ 0.2632, -1.1050, -1.8051],
-        [-2.4866,  0.6822, -1.7455]])
-Epoch  3690 | Total: 22.0124 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.0124
- [Controller Params] fc.weight = tensor([[-2.3587, -0.7841, -2.3127],
-        [ 0.2634, -1.1051, -1.8054],
-        [-2.4864,  0.6823, -1.7457]])
-[Refine-Init] Epoch 3700: Loss=0.000, 2 failing → refined 2 cells → 78 total
-[Refine-Generator] Epoch 3700: 4561 failing → refined 100 cells → 11540 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 417 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 417 cells...
-[SymbolicCROWNCache] Initialized for 417 cells - symbolic structure cached!
-    Rebuilding Phi cache with 11540 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 11540 cells...
-[SymbolicCROWNCache_Phi] Initialized for 11540 cells!
-  Caches rebuilt successfully!
-Epoch  3700 | Total: 22.8453 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.8453
- [Controller Params] fc.weight = tensor([[-2.3588, -0.7842, -2.3125],
-        [ 0.2636, -1.1052, -1.8056],
-        [-2.4862,  0.6825, -1.7460]])
-Epoch  3710 | Total: 22.7799 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 22.7798
- [Controller Params] fc.weight = tensor([[-2.3590, -0.7843, -2.3123],
-        [ 0.2638, -1.1053, -1.8058],
-        [-2.4859,  0.6826, -1.7462]])
-Epoch  3720 | Total: 22.7170 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.7170
- [Controller Params] fc.weight = tensor([[-2.3592, -0.7844, -2.3121],
-        [ 0.2640, -1.1055, -1.8060],
-        [-2.4857,  0.6828, -1.7465]])
-Epoch  3730 | Total: 22.6571 | Unsafe: 0.0075 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.6496
- [Controller Params] fc.weight = tensor([[-2.3594, -0.7846, -2.3119],
-        [ 0.2642, -1.1056, -1.8062],
-        [-2.4854,  0.6829, -1.7467]])
-Epoch  3740 | Total: 22.5984 | Unsafe: 0.0058 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.5926
- [Controller Params] fc.weight = tensor([[-2.3596, -0.7847, -2.3117],
-        [ 0.2644, -1.1057, -1.8065],
-        [-2.4852,  0.6831, -1.7470]])
-Epoch  3750 | Total: 22.5393 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.5393
- [Controller Params] fc.weight = tensor([[-2.3598, -0.7848, -2.3115],
-        [ 0.2647, -1.1058, -1.8067],
-        [-2.4849,  0.6833, -1.7472]])
-Epoch  3760 | Total: 22.4908 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 22.4907
- [Controller Params] fc.weight = tensor([[-2.3600, -0.7850, -2.3113],
-        [ 0.2649, -1.1059, -1.8069],
-        [-2.4847,  0.6835, -1.7475]])
-Epoch  3770 | Total: 22.4342 | Unsafe: 0.0000 | Init: 0.0002 | Outside: 0.0000 | Gen: 22.4340
- [Controller Params] fc.weight = tensor([[-2.3601, -0.7851, -2.3111],
-        [ 0.2651, -1.1061, -1.8071],
-        [-2.4845,  0.6837, -1.7477]])
-Epoch  3780 | Total: 22.3847 | Unsafe: 0.0021 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.3827
- [Controller Params] fc.weight = tensor([[-2.3603, -0.7853, -2.3109],
-        [ 0.2652, -1.1062, -1.8073],
-        [-2.4842,  0.6839, -1.7479]])
-Epoch  3790 | Total: 22.3402 | Unsafe: 0.0000 | Init: 0.0008 | Outside: 0.0000 | Gen: 22.3395
- [Controller Params] fc.weight = tensor([[-2.3605, -0.7854, -2.3107],
-        [ 0.2654, -1.1063, -1.8075],
-        [-2.4840,  0.6841, -1.7481]])
-[Refine-Generator] Epoch 3800: 4991 failing → refined 100 cells → 12240 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 417 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 417 cells...
-[SymbolicCROWNCache] Initialized for 417 cells - symbolic structure cached!
-    Rebuilding Phi cache with 12240 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 12240 cells...
-[SymbolicCROWNCache_Phi] Initialized for 12240 cells!
-  Caches rebuilt successfully!
-Epoch  3800 | Total: 23.0178 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.0178
- [Controller Params] fc.weight = tensor([[-2.3607, -0.7855, -2.3105],
-        [ 0.2656, -1.1064, -1.8077],
-        [-2.4838,  0.6842, -1.7484]])
-Epoch  3810 | Total: 22.9533 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.9533
- [Controller Params] fc.weight = tensor([[-2.3609, -0.7857, -2.3103],
-        [ 0.2658, -1.1065, -1.8079],
-        [-2.4836,  0.6844, -1.7486]])
-Epoch  3820 | Total: 22.8932 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.8932
- [Controller Params] fc.weight = tensor([[-2.3610, -0.7858, -2.3101],
-        [ 0.2660, -1.1067, -1.8080],
-        [-2.4833,  0.6846, -1.7488]])
-Epoch  3830 | Total: 22.8316 | Unsafe: 0.0000 | Init: 0.0008 | Outside: 0.0000 | Gen: 22.8308
- [Controller Params] fc.weight = tensor([[-2.3612, -0.7860, -2.3099],
-        [ 0.2661, -1.1068, -1.8082],
-        [-2.4831,  0.6849, -1.7491]])
-Epoch  3840 | Total: 22.7685 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.7685
- [Controller Params] fc.weight = tensor([[-2.3614, -0.7861, -2.3098],
-        [ 0.2663, -1.1069, -1.8084],
-        [-2.4829,  0.6851, -1.7493]])
-Epoch  3850 | Total: 22.7150 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.7150
- [Controller Params] fc.weight = tensor([[-2.3616, -0.7863, -2.3096],
-        [ 0.2665, -1.1070, -1.8086],
-        [-2.4826,  0.6853, -1.7495]])
-Epoch  3860 | Total: 22.6650 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.6650
- [Controller Params] fc.weight = tensor([[-2.3618, -0.7864, -2.3094],
-        [ 0.2666, -1.1072, -1.8087],
-        [-2.4824,  0.6855, -1.7497]])
-Epoch  3870 | Total: 22.6141 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.6140
- [Controller Params] fc.weight = tensor([[-2.3619, -0.7866, -2.3092],
-        [ 0.2668, -1.1073, -1.8089],
-        [-2.4822,  0.6857, -1.7500]])
-Epoch  3880 | Total: 22.5682 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.5682
- [Controller Params] fc.weight = tensor([[-2.3621, -0.7867, -2.3090],
-        [ 0.2669, -1.1074, -1.8090],
-        [-2.4820,  0.6859, -1.7502]])
-Epoch  3890 | Total: 22.5276 | Unsafe: 0.0016 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.5260
- [Controller Params] fc.weight = tensor([[-2.3623, -0.7869, -2.3088],
-        [ 0.2671, -1.1075, -1.8091],
-        [-2.4818,  0.6861, -1.7504]])
-[Refine-Generator] Epoch 3900: 5248 failing → refined 100 cells → 12940 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 417 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 417 cells...
-[SymbolicCROWNCache] Initialized for 417 cells - symbolic structure cached!
-    Rebuilding Phi cache with 12940 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 12940 cells...
-[SymbolicCROWNCache_Phi] Initialized for 12940 cells!
-  Caches rebuilt successfully!
-Epoch  3900 | Total: 23.1477 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.1477
- [Controller Params] fc.weight = tensor([[-2.3623, -0.7870, -2.3087],
-        [ 0.2671, -1.1076, -1.8092],
-        [-2.4817,  0.6862, -1.7505]])
-Epoch  3910 | Total: 23.1170 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.1169
- [Controller Params] fc.weight = tensor([[-2.3624, -0.7870, -2.3087],
-        [ 0.2672, -1.1076, -1.8093],
-        [-2.4816,  0.6863, -1.7506]])
-Epoch  3920 | Total: 23.0861 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.0861
- [Controller Params] fc.weight = tensor([[-2.3625, -0.7871, -2.3086],
-        [ 0.2673, -1.1077, -1.8094],
-        [-2.4815,  0.6864, -1.7507]])
-Epoch  3930 | Total: 23.0533 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.0533
- [Controller Params] fc.weight = tensor([[-2.3626, -0.7872, -2.3085],
-        [ 0.2674, -1.1078, -1.8094],
-        [-2.4814,  0.6865, -1.7508]])
-Epoch  3940 | Total: 23.0228 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.0227
- [Controller Params] fc.weight = tensor([[-2.3627, -0.7873, -2.3084],
-        [ 0.2674, -1.1078, -1.8095],
-        [-2.4812,  0.6866, -1.7509]])
-Epoch  3950 | Total: 22.9946 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 22.9945
- [Controller Params] fc.weight = tensor([[-2.3628, -0.7874, -2.3083],
-        [ 0.2675, -1.1079, -1.8096],
-        [-2.4811,  0.6867, -1.7510]])
-Epoch  3960 | Total: 22.9672 | Unsafe: 0.0000 | Init: 0.0002 | Outside: 0.0000 | Gen: 22.9669
- [Controller Params] fc.weight = tensor([[-2.3629, -0.7875, -2.3082],
-        [ 0.2676, -1.1079, -1.8097],
-        [-2.4810,  0.6868, -1.7511]])
-Epoch  3970 | Total: 22.9420 | Unsafe: 0.0029 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.9391
- [Controller Params] fc.weight = tensor([[-2.3629, -0.7875, -2.3081],
-        [ 0.2677, -1.1080, -1.8097],
-        [-2.4809,  0.6869, -1.7512]])
-Epoch  3980 | Total: 22.9143 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 22.9142
- [Controller Params] fc.weight = tensor([[-2.3630, -0.7876, -2.3080],
-        [ 0.2677, -1.1081, -1.8098],
-        [-2.4808,  0.6870, -1.7513]])
-Epoch  3990 | Total: 22.8895 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 22.8895
- [Controller Params] fc.weight = tensor([[-2.3631, -0.7877, -2.3079],
-        [ 0.2678, -1.1081, -1.8099],
-        [-2.4807,  0.6871, -1.7514]])
-[Refine-Init] Epoch 4000: Loss=0.000, 1 failing → refined 1 cells → 85 total
-[Refine-Generator] Epoch 4000: 5586 failing → refined 100 cells → 13640 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 424 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 424 cells...
-[SymbolicCROWNCache] Initialized for 424 cells - symbolic structure cached!
-    Rebuilding Phi cache with 13640 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 13640 cells...
-[SymbolicCROWNCache_Phi] Initialized for 13640 cells!
-  Caches rebuilt successfully!
-Epoch  4000 | Total: 23.5269 | Unsafe: 0.0030 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.5240
- [Controller Params] fc.weight = tensor([[-2.3632, -0.7878, -2.3078],
-        [ 0.2679, -1.1082, -1.8099],
-        [-2.4806,  0.6872, -1.7515]])
-
-Epoch 4000 - Detailed Evaluation:
-  Constraint Satisfaction:
-    Unsafe:    ✗ (V_min=20.000, V_max=61.328)
-    Init:      ✓ (V_min=0.987, V_max=1.000)
-    Outside:   ✓ (V_min=0.827, V_max=61.576)
-    Generator: ✗ (Phi_upper_min=-123.399, Phi_upper_max=0.752, failing=6137)
-  Goal bounds: V ∈ [0.911, 1.077]
-  Unsafe bounds: V ∈ [20.000, 61.328]
-  Generator bounds: Φ ∈ [-2132.491, 0.752]
-  Generator failing cells: 6137/13640 (45.0%)
-[Merge-Generator] Epoch 4008: merged 0 pairs → 13640 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 424 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 424 cells...
-[SymbolicCROWNCache] Initialized for 424 cells - symbolic structure cached!
-    Rebuilding Phi cache with 13640 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 13640 cells...
-[SymbolicCROWNCache_Phi] Initialized for 13640 cells!
-  Caches rebuilt successfully!
-Epoch  4010 | Total: 23.4939 | Unsafe: 0.0020 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.4918
- [Controller Params] fc.weight = tensor([[-2.3633, -0.7879, -2.3077],
-        [ 0.2679, -1.1083, -1.8100],
-        [-2.4805,  0.6873, -1.7516]])
-Epoch  4020 | Total: 23.4597 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.4597
- [Controller Params] fc.weight = tensor([[-2.3634, -0.7880, -2.3076],
-        [ 0.2680, -1.1083, -1.8100],
-        [-2.4804,  0.6874, -1.7517]])
-Epoch  4030 | Total: 23.4284 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.4284
- [Controller Params] fc.weight = tensor([[-2.3634, -0.7881, -2.3075],
-        [ 0.2681, -1.1084, -1.8101],
-        [-2.4803,  0.6876, -1.7518]])
-Epoch  4040 | Total: 23.3970 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.3970
- [Controller Params] fc.weight = tensor([[-2.3635, -0.7881, -2.3075],
-        [ 0.2681, -1.1084, -1.8102],
-        [-2.4802,  0.6877, -1.7519]])
-Epoch  4050 | Total: 23.3672 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.3672
- [Controller Params] fc.weight = tensor([[-2.3636, -0.7882, -2.3074],
-        [ 0.2682, -1.1085, -1.8102],
-        [-2.4801,  0.6878, -1.7520]])
-Epoch  4060 | Total: 23.3398 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 23.3397
- [Controller Params] fc.weight = tensor([[-2.3637, -0.7883, -2.3073],
-        [ 0.2682, -1.1086, -1.8103],
-        [-2.4800,  0.6879, -1.7521]])
-Epoch  4070 | Total: 23.3118 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 23.3118
- [Controller Params] fc.weight = tensor([[-2.3638, -0.7884, -2.3072],
-        [ 0.2683, -1.1086, -1.8103],
-        [-2.4799,  0.6880, -1.7522]])
-Epoch  4080 | Total: 23.2860 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 23.2859
- [Controller Params] fc.weight = tensor([[-2.3639, -0.7885, -2.3071],
-        [ 0.2684, -1.1087, -1.8104],
-        [-2.4799,  0.6881, -1.7522]])
-Epoch  4090 | Total: 23.2599 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.2599
- [Controller Params] fc.weight = tensor([[-2.3639, -0.7886, -2.3070],
-        [ 0.2684, -1.1088, -1.8104],
-        [-2.4798,  0.6882, -1.7523]])
-[Refine-Unsafe] Epoch 4100: Loss=0.000, 6 failing → refined 6 cells → 379 total
-[Refine-Generator] Epoch 4100: 5932 failing → refined 100 cells → 14340 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 466 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 466 cells...
-[SymbolicCROWNCache] Initialized for 466 cells - symbolic structure cached!
-    Rebuilding Phi cache with 14340 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 14340 cells...
-[SymbolicCROWNCache_Phi] Initialized for 14340 cells!
-  Caches rebuilt successfully!
-Epoch  4100 | Total: 23.8637 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 23.8636
- [Controller Params] fc.weight = tensor([[-2.3640, -0.7886, -2.3069],
-        [ 0.2685, -1.1088, -1.8105],
-        [-2.4797,  0.6883, -1.7524]])
-Epoch  4110 | Total: 23.8305 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 23.8304
- [Controller Params] fc.weight = tensor([[-2.3641, -0.7887, -2.3068],
-        [ 0.2685, -1.1089, -1.8105],
-        [-2.4796,  0.6884, -1.7525]])
-Epoch  4120 | Total: 23.7967 | Unsafe: 0.0013 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.7954
- [Controller Params] fc.weight = tensor([[-2.3642, -0.7888, -2.3068],
-        [ 0.2686, -1.1089, -1.8106],
-        [-2.4795,  0.6885, -1.7526]])
-Epoch  4130 | Total: 23.7644 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.7644
- [Controller Params] fc.weight = tensor([[-2.3643, -0.7889, -2.3067],
-        [ 0.2686, -1.1090, -1.8106],
-        [-2.4794,  0.6886, -1.7527]])
-Epoch  4140 | Total: 23.7332 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.7332
- [Controller Params] fc.weight = tensor([[-2.3643, -0.7890, -2.3066],
-        [ 0.2687, -1.1091, -1.8107],
-        [-2.4793,  0.6887, -1.7528]])
-Epoch  4150 | Total: 23.7031 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.7031
- [Controller Params] fc.weight = tensor([[-2.3644, -0.7891, -2.3065],
-        [ 0.2687, -1.1091, -1.8107],
-        [-2.4792,  0.6888, -1.7529]])
-Epoch  4160 | Total: 23.6755 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.6755
- [Controller Params] fc.weight = tensor([[-2.3645, -0.7892, -2.3064],
-        [ 0.2688, -1.1092, -1.8108],
-        [-2.4791,  0.6889, -1.7530]])
-Epoch  4170 | Total: 23.6434 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.6434
- [Controller Params] fc.weight = tensor([[-2.3646, -0.7892, -2.3063],
-        [ 0.2688, -1.1093, -1.8108],
-        [-2.4790,  0.6890, -1.7531]])
-Epoch  4180 | Total: 23.6154 | Unsafe: 0.0000 | Init: 0.0019 | Outside: 0.0000 | Gen: 23.6135
- [Controller Params] fc.weight = tensor([[-2.3647, -0.7893, -2.3062],
-        [ 0.2689, -1.1093, -1.8109],
-        [-2.4789,  0.6891, -1.7531]])
-Epoch  4190 | Total: 23.5856 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.5855
- [Controller Params] fc.weight = tensor([[-2.3647, -0.7894, -2.3061],
-        [ 0.2689, -1.1094, -1.8109],
-        [-2.4788,  0.6891, -1.7532]])
-[Refine-Generator] Epoch 4200: 6368 failing → refined 100 cells → 15040 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 466 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 466 cells...
-[SymbolicCROWNCache] Initialized for 466 cells - symbolic structure cached!
-    Rebuilding Phi cache with 15040 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 15040 cells...
-[SymbolicCROWNCache_Phi] Initialized for 15040 cells!
-  Caches rebuilt successfully!
-Epoch  4200 | Total: 23.9174 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.9174
- [Controller Params] fc.weight = tensor([[-2.3648, -0.7895, -2.3061],
-        [ 0.2690, -1.1094, -1.8109],
-        [-2.4788,  0.6892, -1.7533]])
-Epoch  4210 | Total: 23.8984 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.8984
- [Controller Params] fc.weight = tensor([[-2.3648, -0.7895, -2.3061],
-        [ 0.2690, -1.1095, -1.8110],
-        [-2.4788,  0.6892, -1.7533]])
-Epoch  4220 | Total: 23.8793 | Unsafe: 0.0000 | Init: 0.0005 | Outside: 0.0000 | Gen: 23.8788
- [Controller Params] fc.weight = tensor([[-2.3649, -0.7895, -2.3060],
-        [ 0.2690, -1.1095, -1.8110],
-        [-2.4787,  0.6893, -1.7534]])
-Epoch  4230 | Total: 23.8582 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.8582
- [Controller Params] fc.weight = tensor([[-2.3649, -0.7896, -2.3060],
-        [ 0.2690, -1.1095, -1.8110],
-        [-2.4787,  0.6893, -1.7534]])
-Epoch  4240 | Total: 23.8393 | Unsafe: 0.0024 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.8369
- [Controller Params] fc.weight = tensor([[-2.3649, -0.7896, -2.3059],
-        [ 0.2691, -1.1096, -1.8110],
-        [-2.4786,  0.6894, -1.7535]])
-Epoch  4250 | Total: 23.8190 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.8190
- [Controller Params] fc.weight = tensor([[-2.3650, -0.7897, -2.3059],
-        [ 0.2691, -1.1096, -1.8110],
-        [-2.4786,  0.6894, -1.7535]])
-Epoch  4260 | Total: 23.8005 | Unsafe: 0.0007 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.7998
- [Controller Params] fc.weight = tensor([[-2.3650, -0.7897, -2.3058],
-        [ 0.2691, -1.1096, -1.8111],
-        [-2.4785,  0.6895, -1.7535]])
-Epoch  4270 | Total: 23.7826 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.7826
- [Controller Params] fc.weight = tensor([[-2.3651, -0.7898, -2.3058],
-        [ 0.2691, -1.1096, -1.8111],
-        [-2.4785,  0.6895, -1.7536]])
-Epoch  4280 | Total: 23.7639 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.7638
- [Controller Params] fc.weight = tensor([[-2.3651, -0.7898, -2.3057],
-        [ 0.2692, -1.1097, -1.8111],
-        [-2.4784,  0.6896, -1.7536]])
-Epoch  4290 | Total: 23.7469 | Unsafe: 0.0008 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.7461
- [Controller Params] fc.weight = tensor([[-2.3651, -0.7899, -2.3057],
-        [ 0.2692, -1.1097, -1.8111],
-        [-2.4784,  0.6896, -1.7537]])
-[Refine-Unsafe] Epoch 4300: Loss=0.001, 5 failing → refined 5 cells → 414 total
-[Refine-Generator] Epoch 4300: 6846 failing → refined 100 cells → 15740 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 501 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 501 cells...
-[SymbolicCROWNCache] Initialized for 501 cells - symbolic structure cached!
-    Rebuilding Phi cache with 15740 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 15740 cells...
-[SymbolicCROWNCache_Phi] Initialized for 15740 cells!
-  Caches rebuilt successfully!
-Epoch  4300 | Total: 24.2451 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 24.2450
- [Controller Params] fc.weight = tensor([[-2.3652, -0.7899, -2.3057],
-        [ 0.2692, -1.1097, -1.8112],
-        [-2.4783,  0.6897, -1.7537]])
-Epoch  4310 | Total: 24.2222 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.2222
- [Controller Params] fc.weight = tensor([[-2.3652, -0.7899, -2.3056],
-        [ 0.2692, -1.1098, -1.8112],
-        [-2.4783,  0.6897, -1.7538]])
-Epoch  4320 | Total: 24.1979 | Unsafe: 0.0000 | Init: 0.0002 | Outside: 0.0000 | Gen: 24.1977
- [Controller Params] fc.weight = tensor([[-2.3653, -0.7900, -2.3056],
-        [ 0.2693, -1.1098, -1.8112],
-        [-2.4783,  0.6898, -1.7538]])
-Epoch  4330 | Total: 24.1744 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.1744
- [Controller Params] fc.weight = tensor([[-2.3653, -0.7900, -2.3055],
-        [ 0.2693, -1.1098, -1.8112],
-        [-2.4782,  0.6898, -1.7538]])
-Epoch  4340 | Total: 24.1528 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.1528
- [Controller Params] fc.weight = tensor([[-2.3653, -0.7901, -2.3055],
-        [ 0.2693, -1.1099, -1.8113],
-        [-2.4782,  0.6899, -1.7539]])
-Epoch  4350 | Total: 24.1309 | Unsafe: 0.0000 | Init: 0.0002 | Outside: 0.0000 | Gen: 24.1307
- [Controller Params] fc.weight = tensor([[-2.3654, -0.7901, -2.3054],
-        [ 0.2694, -1.1099, -1.8113],
-        [-2.4781,  0.6899, -1.7539]])
-Epoch  4360 | Total: 24.1118 | Unsafe: 0.0000 | Init: 0.0003 | Outside: 0.0000 | Gen: 24.1115
- [Controller Params] fc.weight = tensor([[-2.3654, -0.7902, -2.3054],
-        [ 0.2694, -1.1099, -1.8113],
-        [-2.4781,  0.6900, -1.7540]])
-Epoch  4370 | Total: 24.0875 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.0875
- [Controller Params] fc.weight = tensor([[-2.3655, -0.7902, -2.3054],
-        [ 0.2694, -1.1100, -1.8113],
-        [-2.4780,  0.6900, -1.7540]])
-Epoch  4380 | Total: 24.0679 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 24.0678
- [Controller Params] fc.weight = tensor([[-2.3655, -0.7903, -2.3053],
-        [ 0.2694, -1.1100, -1.8114],
-        [-2.4780,  0.6901, -1.7541]])
-Epoch  4390 | Total: 24.0504 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.0504
- [Controller Params] fc.weight = tensor([[-2.3655, -0.7903, -2.3053],
-        [ 0.2695, -1.1100, -1.8114],
-        [-2.4779,  0.6901, -1.7541]])
-[Refine-Init] Epoch 4400: Loss=0.000, 2 failing → refined 2 cells → 99 total
-[Refine-Generator] Epoch 4400: 7269 failing → refined 100 cells → 16440 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 515 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 515 cells...
-[SymbolicCROWNCache] Initialized for 515 cells - symbolic structure cached!
-    Rebuilding Phi cache with 16440 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 16440 cells...
-[SymbolicCROWNCache_Phi] Initialized for 16440 cells!
-  Caches rebuilt successfully!
-Epoch  4400 | Total: 24.2080 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.2080
- [Controller Params] fc.weight = tensor([[-2.3656, -0.7903, -2.3052],
-        [ 0.2695, -1.1101, -1.8114],
-        [-2.4779,  0.6902, -1.7541]])
-Epoch  4410 | Total: 24.1815 | Unsafe: 0.0000 | Init: 0.0002 | Outside: 0.0000 | Gen: 24.1813
- [Controller Params] fc.weight = tensor([[-2.3656, -0.7904, -2.3052],
-        [ 0.2695, -1.1101, -1.8114],
-        [-2.4779,  0.6902, -1.7542]])
-Epoch  4420 | Total: 24.1554 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.1553
- [Controller Params] fc.weight = tensor([[-2.3656, -0.7904, -2.3051],
-        [ 0.2695, -1.1101, -1.8114],
-        [-2.4778,  0.6902, -1.7542]])
-Epoch  4430 | Total: 24.1309 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 24.1308
- [Controller Params] fc.weight = tensor([[-2.3657, -0.7905, -2.3051],
-        [ 0.2696, -1.1101, -1.8115],
-        [-2.4778,  0.6903, -1.7543]])
-Epoch  4440 | Total: 24.1070 | Unsafe: 0.0000 | Init: 0.0002 | Outside: 0.0000 | Gen: 24.1069
- [Controller Params] fc.weight = tensor([[-2.3657, -0.7905, -2.3051],
-        [ 0.2696, -1.1102, -1.8115],
-        [-2.4777,  0.6903, -1.7543]])
-Epoch  4450 | Total: 24.0815 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.0815
- [Controller Params] fc.weight = tensor([[-2.3658, -0.7906, -2.3050],
-        [ 0.2696, -1.1102, -1.8115],
-        [-2.4777,  0.6904, -1.7544]])
-Epoch  4460 | Total: 24.0595 | Unsafe: 0.0000 | Init: 0.0006 | Outside: 0.0000 | Gen: 24.0589
- [Controller Params] fc.weight = tensor([[-2.3658, -0.7906, -2.3050],
-        [ 0.2696, -1.1102, -1.8115],
-        [-2.4776,  0.6904, -1.7544]])
-Epoch  4470 | Total: 24.0352 | Unsafe: 0.0017 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.0335
- [Controller Params] fc.weight = tensor([[-2.3658, -0.7907, -2.3049],
-        [ 0.2697, -1.1103, -1.8116],
-        [-2.4776,  0.6905, -1.7544]])
-Epoch  4480 | Total: 24.0123 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.0123
- [Controller Params] fc.weight = tensor([[-2.3659, -0.7907, -2.3049],
-        [ 0.2697, -1.1103, -1.8116],
-        [-2.4776,  0.6905, -1.7545]])
-Epoch  4490 | Total: 23.9898 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 23.9898
- [Controller Params] fc.weight = tensor([[-2.3659, -0.7908, -2.3048],
-        [ 0.2697, -1.1103, -1.8116],
-        [-2.4775,  0.6906, -1.7545]])
-[Refine-Init] Epoch 4500: Loss=0.000, 1 failing → refined 1 cells → 106 total
-[Refine-Generator] Epoch 4500: 7732 failing → refined 100 cells → 17140 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 522 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 522 cells...
-[SymbolicCROWNCache] Initialized for 522 cells - symbolic structure cached!
-    Rebuilding Phi cache with 17140 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 17140 cells...
-[SymbolicCROWNCache_Phi] Initialized for 17140 cells!
-  Caches rebuilt successfully!
-Epoch  4500 | Total: 24.4206 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4206
- [Controller Params] fc.weight = tensor([[-2.3659, -0.7908, -2.3048],
-        [ 0.2697, -1.1104, -1.8116],
-        [-2.4775,  0.6906, -1.7545]])
-[Merge-Generator] Epoch 4509: merged 0 pairs → 17140 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 522 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 522 cells...
-[SymbolicCROWNCache] Initialized for 522 cells - symbolic structure cached!
-    Rebuilding Phi cache with 17140 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 17140 cells...
-[SymbolicCROWNCache_Phi] Initialized for 17140 cells!
-  Caches rebuilt successfully!
-Epoch  4510 | Total: 24.4069 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4069
- [Controller Params] fc.weight = tensor([[-2.3660, -0.7908, -2.3048],
-        [ 0.2697, -1.1104, -1.8116],
-        [-2.4775,  0.6906, -1.7546]])
-Epoch  4520 | Total: 24.3930 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3930
- [Controller Params] fc.weight = tensor([[-2.3660, -0.7908, -2.3048],
-        [ 0.2697, -1.1104, -1.8116],
-        [-2.4774,  0.6906, -1.7546]])
-Epoch  4530 | Total: 24.3786 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3786
- [Controller Params] fc.weight = tensor([[-2.3660, -0.7909, -2.3048],
-        [ 0.2698, -1.1104, -1.8117],
-        [-2.4774,  0.6907, -1.7546]])
-Epoch  4540 | Total: 24.3646 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3646
- [Controller Params] fc.weight = tensor([[-2.3660, -0.7909, -2.3047],
-        [ 0.2698, -1.1104, -1.8117],
-        [-2.4774,  0.6907, -1.7546]])
-Epoch  4550 | Total: 24.3510 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3509
- [Controller Params] fc.weight = tensor([[-2.3660, -0.7909, -2.3047],
-        [ 0.2698, -1.1104, -1.8117],
-        [-2.4774,  0.6907, -1.7546]])
-Epoch  4560 | Total: 24.3379 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3379
- [Controller Params] fc.weight = tensor([[-2.3661, -0.7909, -2.3047],
-        [ 0.2698, -1.1104, -1.8117],
-        [-2.4774,  0.6907, -1.7547]])
-Epoch  4570 | Total: 24.3246 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3246
- [Controller Params] fc.weight = tensor([[-2.3661, -0.7910, -2.3047],
-        [ 0.2698, -1.1105, -1.8117],
-        [-2.4773,  0.6907, -1.7547]])
-Epoch  4580 | Total: 24.3117 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3117
- [Controller Params] fc.weight = tensor([[-2.3661, -0.7910, -2.3047],
-        [ 0.2698, -1.1105, -1.8117],
-        [-2.4773,  0.6908, -1.7547]])
-Epoch  4590 | Total: 24.2991 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.2991
- [Controller Params] fc.weight = tensor([[-2.3661, -0.7910, -2.3046],
-        [ 0.2698, -1.1105, -1.8117],
-        [-2.4773,  0.6908, -1.7547]])
-[Refine-Init] Epoch 4600: Loss=0.000, 3 failing → refined 3 cells → 127 total
-[Refine-Generator] Epoch 4600: 8188 failing → refined 100 cells → 17840 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 543 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 543 cells...
-[SymbolicCROWNCache] Initialized for 543 cells - symbolic structure cached!
-    Rebuilding Phi cache with 17840 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 17840 cells...
-[SymbolicCROWNCache_Phi] Initialized for 17840 cells!
-  Caches rebuilt successfully!
-Epoch  4600 | Total: 24.4872 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4872
- [Controller Params] fc.weight = tensor([[-2.3661, -0.7910, -2.3046],
-        [ 0.2698, -1.1105, -1.8117],
-        [-2.4773,  0.6908, -1.7547]])
-Epoch  4610 | Total: 24.4709 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4709
- [Controller Params] fc.weight = tensor([[-2.3662, -0.7910, -2.3046],
-        [ 0.2699, -1.1105, -1.8117],
-        [-2.4773,  0.6908, -1.7548]])
-Epoch  4620 | Total: 24.4543 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4543
- [Controller Params] fc.weight = tensor([[-2.3662, -0.7911, -2.3046],
-        [ 0.2699, -1.1105, -1.8118],
-        [-2.4772,  0.6909, -1.7548]])
-Epoch  4630 | Total: 24.4374 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4374
- [Controller Params] fc.weight = tensor([[-2.3662, -0.7911, -2.3045],
-        [ 0.2699, -1.1106, -1.8118],
-        [-2.4772,  0.6909, -1.7548]])
-Epoch  4640 | Total: 24.4207 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4207
- [Controller Params] fc.weight = tensor([[-2.3662, -0.7911, -2.3045],
-        [ 0.2699, -1.1106, -1.8118],
-        [-2.4772,  0.6909, -1.7548]])
-Epoch  4650 | Total: 24.4049 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4048
- [Controller Params] fc.weight = tensor([[-2.3662, -0.7911, -2.3045],
-        [ 0.2699, -1.1106, -1.8118],
-        [-2.4772,  0.6909, -1.7548]])
-Epoch  4660 | Total: 24.3886 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3886
- [Controller Params] fc.weight = tensor([[-2.3662, -0.7911, -2.3045],
-        [ 0.2699, -1.1106, -1.8118],
-        [-2.4771,  0.6910, -1.7549]])
-Epoch  4670 | Total: 24.3729 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3729
- [Controller Params] fc.weight = tensor([[-2.3663, -0.7911, -2.3045],
-        [ 0.2699, -1.1106, -1.8118],
-        [-2.4771,  0.6910, -1.7549]])
-Epoch  4680 | Total: 24.3575 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3575
- [Controller Params] fc.weight = tensor([[-2.3663, -0.7912, -2.3044],
-        [ 0.2700, -1.1106, -1.8118],
-        [-2.4771,  0.6910, -1.7549]])
-Epoch  4690 | Total: 24.3426 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 24.3425
- [Controller Params] fc.weight = tensor([[-2.3663, -0.7912, -2.3044],
-        [ 0.2700, -1.1107, -1.8118],
-        [-2.4771,  0.6910, -1.7549]])
-[Refine-Unsafe] Epoch 4700: Loss=0.000, 6 failing → refined 6 cells → 456 total
-[Refine-Generator] Epoch 4700: 8641 failing → refined 100 cells → 18540 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 585 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 585 cells...
-[SymbolicCROWNCache] Initialized for 585 cells - symbolic structure cached!
-    Rebuilding Phi cache with 18540 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 18540 cells...
-[SymbolicCROWNCache_Phi] Initialized for 18540 cells!
-  Caches rebuilt successfully!
-Epoch  4700 | Total: 24.2937 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.2936
- [Controller Params] fc.weight = tensor([[-2.3663, -0.7912, -2.3044],
-        [ 0.2700, -1.1107, -1.8119],
-        [-2.4771,  0.6911, -1.7549]])
-Epoch  4710 | Total: 24.2747 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.2747
- [Controller Params] fc.weight = tensor([[-2.3663, -0.7912, -2.3044],
-        [ 0.2700, -1.1107, -1.8119],
-        [-2.4770,  0.6911, -1.7550]])
-Epoch  4720 | Total: 24.2549 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.2549
- [Controller Params] fc.weight = tensor([[-2.3664, -0.7912, -2.3044],
-        [ 0.2700, -1.1107, -1.8119],
-        [-2.4770,  0.6911, -1.7550]])
-Epoch  4730 | Total: 24.2355 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.2354
- [Controller Params] fc.weight = tensor([[-2.3664, -0.7912, -2.3043],
-        [ 0.2700, -1.1107, -1.8119],
-        [-2.4770,  0.6912, -1.7550]])
-Epoch  4740 | Total: 24.2167 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.2167
- [Controller Params] fc.weight = tensor([[-2.3664, -0.7913, -2.3043],
-        [ 0.2700, -1.1107, -1.8119],
-        [-2.4770,  0.6912, -1.7550]])
-Epoch  4750 | Total: 24.1987 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.1986
- [Controller Params] fc.weight = tensor([[-2.3664, -0.7913, -2.3043],
-        [ 0.2700, -1.1107, -1.8119],
-        [-2.4770,  0.6912, -1.7550]])
-Epoch  4760 | Total: 24.1812 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.1811
- [Controller Params] fc.weight = tensor([[-2.3664, -0.7913, -2.3043],
-        [ 0.2701, -1.1108, -1.8119],
-        [-2.4769,  0.6912, -1.7551]])
-Epoch  4770 | Total: 24.1643 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.1643
- [Controller Params] fc.weight = tensor([[-2.3665, -0.7913, -2.3042],
-        [ 0.2701, -1.1108, -1.8119],
-        [-2.4769,  0.6913, -1.7551]])
-Epoch  4780 | Total: 24.1482 | Unsafe: 0.0000 | Init: 0.0001 | Outside: 0.0000 | Gen: 24.1481
- [Controller Params] fc.weight = tensor([[-2.3665, -0.7913, -2.3042],
-        [ 0.2701, -1.1108, -1.8120],
-        [-2.4769,  0.6913, -1.7551]])
-Epoch  4790 | Total: 24.1319 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.1319
- [Controller Params] fc.weight = tensor([[-2.3665, -0.7913, -2.3042],
-        [ 0.2701, -1.1108, -1.8120],
-        [-2.4769,  0.6913, -1.7551]])
-[Refine-Unsafe] Epoch 4800: Loss=0.000, 7 failing → refined 7 cells → 505 total
-[Refine-Generator] Epoch 4800: 8987 failing → refined 100 cells → 19240 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 634 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 634 cells...
-[SymbolicCROWNCache] Initialized for 634 cells - symbolic structure cached!
-    Rebuilding Phi cache with 19240 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 19240 cells...
-[SymbolicCROWNCache_Phi] Initialized for 19240 cells!
-  Caches rebuilt successfully!
-Epoch  4800 | Total: 24.4515 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4515
- [Controller Params] fc.weight = tensor([[-2.3665, -0.7913, -2.3042],
-        [ 0.2701, -1.1108, -1.8120],
-        [-2.4769,  0.6913, -1.7551]])
-Epoch  4810 | Total: 24.4357 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4355
- [Controller Params] fc.weight = tensor([[-2.3665, -0.7914, -2.3042],
-        [ 0.2701, -1.1108, -1.8120],
-        [-2.4768,  0.6913, -1.7551]])
-Epoch  4820 | Total: 24.4195 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4194
- [Controller Params] fc.weight = tensor([[-2.3665, -0.7914, -2.3042],
-        [ 0.2701, -1.1108, -1.8120],
-        [-2.4768,  0.6914, -1.7552]])
-Epoch  4830 | Total: 24.4037 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4037
- [Controller Params] fc.weight = tensor([[-2.3665, -0.7914, -2.3041],
-        [ 0.2701, -1.1109, -1.8120],
-        [-2.4768,  0.6914, -1.7552]])
-Epoch  4840 | Total: 24.3883 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3881
- [Controller Params] fc.weight = tensor([[-2.3666, -0.7914, -2.3041],
-        [ 0.2702, -1.1109, -1.8120],
-        [-2.4768,  0.6914, -1.7552]])
-Epoch  4850 | Total: 24.3733 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3732
- [Controller Params] fc.weight = tensor([[-2.3666, -0.7914, -2.3041],
-        [ 0.2702, -1.1109, -1.8120],
-        [-2.4768,  0.6914, -1.7552]])
-Epoch  4860 | Total: 24.3588 | Unsafe: 0.0002 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3586
- [Controller Params] fc.weight = tensor([[-2.3666, -0.7914, -2.3041],
-        [ 0.2702, -1.1109, -1.8120],
-        [-2.4768,  0.6914, -1.7552]])
-Epoch  4870 | Total: 24.3447 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3446
- [Controller Params] fc.weight = tensor([[-2.3666, -0.7914, -2.3041],
-        [ 0.2702, -1.1109, -1.8121],
-        [-2.4767,  0.6915, -1.7552]])
-Epoch  4880 | Total: 24.3314 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3314
- [Controller Params] fc.weight = tensor([[-2.3666, -0.7915, -2.3041],
-        [ 0.2702, -1.1109, -1.8121],
-        [-2.4767,  0.6915, -1.7553]])
-Epoch  4890 | Total: 24.3182 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.3182
- [Controller Params] fc.weight = tensor([[-2.3666, -0.7915, -2.3040],
-        [ 0.2702, -1.1109, -1.8121],
-        [-2.4767,  0.6915, -1.7553]])
-[Refine-Unsafe] Epoch 4900: Loss=0.000, 3 failing → refined 3 cells → 526 total
-[Refine-Generator] Epoch 4900: 9294 failing → refined 100 cells → 19940 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 655 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 655 cells...
-[SymbolicCROWNCache] Initialized for 655 cells - symbolic structure cached!
-    Rebuilding Phi cache with 19940 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 19940 cells...
-[SymbolicCROWNCache_Phi] Initialized for 19940 cells!
-  Caches rebuilt successfully!
-Epoch  4900 | Total: 24.5706 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.5706
- [Controller Params] fc.weight = tensor([[-2.3666, -0.7915, -2.3040],
-        [ 0.2702, -1.1109, -1.8121],
-        [-2.4767,  0.6915, -1.7553]])
-Epoch  4910 | Total: 24.5558 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.5557
- [Controller Params] fc.weight = tensor([[-2.3667, -0.7915, -2.3040],
-        [ 0.2702, -1.1109, -1.8121],
-        [-2.4767,  0.6915, -1.7553]])
-Epoch  4920 | Total: 24.5406 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.5406
- [Controller Params] fc.weight = tensor([[-2.3667, -0.7915, -2.3040],
-        [ 0.2702, -1.1110, -1.8121],
-        [-2.4767,  0.6915, -1.7553]])
-Epoch  4930 | Total: 24.5257 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.5257
- [Controller Params] fc.weight = tensor([[-2.3667, -0.7915, -2.3040],
-        [ 0.2702, -1.1110, -1.8121],
-        [-2.4767,  0.6916, -1.7553]])
-Epoch  4940 | Total: 24.5115 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.5115
- [Controller Params] fc.weight = tensor([[-2.3667, -0.7915, -2.3040],
-        [ 0.2703, -1.1110, -1.8121],
-        [-2.4766,  0.6916, -1.7553]])
-Epoch  4950 | Total: 24.4976 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4976
- [Controller Params] fc.weight = tensor([[-2.3667, -0.7916, -2.3039],
-        [ 0.2703, -1.1110, -1.8121],
-        [-2.4766,  0.6916, -1.7554]])
-Epoch  4960 | Total: 24.4841 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4839
- [Controller Params] fc.weight = tensor([[-2.3667, -0.7916, -2.3039],
-        [ 0.2703, -1.1110, -1.8122],
-        [-2.4766,  0.6916, -1.7554]])
-Epoch  4970 | Total: 24.4709 | Unsafe: 0.0001 | Init: 0.0000 | Outside: 0.0000 | Gen: 24.4708
- [Controller Params] fc.weight = tensor([[-2.3667, -0.7916, -2.3039],
-        [ 0.2703, -1.1110, -1.8122],
-        [-2.4766,  0.6916, -1.7554]])
+  constraint_largest_counts: {'generator': 0, 'unsafe': 0}
+Epoch   520 | Total: 137.4805 | Unsafe: 135.3969 | Init: 2.0697 | Outside: 0.0000 | Gen: 0.0140 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[ 0.0034, -0.0747,  0.0237],
+        [-0.0207, -0.3146, -0.2692],
+        [ 0.0112,  0.1179, -0.0144]])
+Epoch   530 | Total: 105.5671 | Unsafe: 98.3087 | Init: 5.1209 | Outside: 0.0000 | Gen: 2.1374 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.0399, -0.1172, -0.0196],
+        [ 0.0225, -0.2714, -0.2280],
+        [-0.0323,  0.1607, -0.0575]])
+Epoch   540 | Total: 39.2989 | Unsafe: 0.0000 | Init: 7.8318 | Outside: 0.0000 | Gen: 31.4671 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.0881, -0.1650, -0.0682],
+        [ 0.0675, -0.2226, -0.1820],
+        [-0.0798,  0.2078, -0.1058]])
+Epoch   550 | Total: 19.2531 | Unsafe: 0.0000 | Init: 8.0811 | Outside: 0.0000 | Gen: 11.1720 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.1468, -0.2240, -0.1278],
+        [ 0.1053, -0.1638, -0.1772],
+        [-0.1389,  0.2665, -0.1640]])
+Epoch   560 | Total: 17.3014 | Unsafe: 0.0000 | Init: 8.1202 | Outside: 0.0000 | Gen: 9.1811 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.1953, -0.2723, -0.1783],
+        [ 0.0928, -0.1190, -0.2174],
+        [-0.1869,  0.3104, -0.2151]])
+Epoch   570 | Total: 14.7614 | Unsafe: 1.5329 | Init: 7.9982 | Outside: 0.0000 | Gen: 5.2304 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.2334, -0.3089, -0.2195],
+        [ 0.0653, -0.0887, -0.2630],
+        [-0.2271,  0.3409, -0.2596]])
+Epoch   580 | Total: 13.2503 | Unsafe: 0.0000 | Init: 7.9196 | Outside: 0.0000 | Gen: 5.3307 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.2620, -0.3344, -0.2520],
+        [ 0.0476, -0.0684, -0.2905],
+        [-0.2612,  0.3682, -0.2986]])
+Epoch   590 | Total: 12.7487 | Unsafe: 0.0000 | Init: 7.7206 | Outside: 0.0000 | Gen: 5.0282 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.2847, -0.3516, -0.2805],
+        [ 0.0407, -0.0548, -0.3033],
+        [-0.2921,  0.3952, -0.3342]])
+Epoch   600 | Total: 12.2061 | Unsafe: 0.6031 | Init: 7.4213 | Outside: 0.0000 | Gen: 4.1817 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.3033, -0.3626, -0.3070],
+        [ 0.0372, -0.0449, -0.3108],
+        [-0.3221,  0.4248, -0.3689]])
+Epoch   610 | Total: 11.2896 | Unsafe: 0.1125 | Init: 7.1122 | Outside: 0.0000 | Gen: 4.0649 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.3205, -0.3702, -0.3328],
+        [ 0.0360, -0.0372, -0.3147],
+        [-0.3520,  0.4569, -0.4027]])
+Epoch   620 | Total: 10.9509 | Unsafe: 0.0000 | Init: 6.7755 | Outside: 0.0000 | Gen: 4.1754 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.3382, -0.3758, -0.3594],
+        [ 0.0337, -0.0309, -0.3195],
+        [-0.3827,  0.4904, -0.4369]])
+Epoch   630 | Total: 10.2461 | Unsafe: 0.0000 | Init: 6.3806 | Outside: 0.0000 | Gen: 3.8655 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.3564, -0.3800, -0.3869],
+        [ 0.0307, -0.0256, -0.3252],
+        [-0.4131,  0.5184, -0.4702]])
+Epoch   640 | Total: 10.2478 | Unsafe: 0.0000 | Init: 5.9913 | Outside: 0.0000 | Gen: 4.2565 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.3746, -0.3851, -0.4149],
+        [ 0.0278, -0.0211, -0.3306],
+        [-0.4419,  0.5390, -0.4970]])
+Epoch   650 | Total: 9.3731 | Unsafe: 0.0000 | Init: 5.5358 | Outside: 0.0000 | Gen: 3.8373 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.3926, -0.3903, -0.4448],
+        [ 0.0249, -0.0171, -0.3360],
+        [-0.4701,  0.5539, -0.5195]])
+Epoch   660 | Total: 8.8109 | Unsafe: 0.0000 | Init: 5.0632 | Outside: 0.0000 | Gen: 3.7477 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.4100, -0.3966, -0.4751],
+        [ 0.0236, -0.0135, -0.3390],
+        [-0.4966,  0.5610, -0.5385]])
+Epoch   670 | Total: 8.2054 | Unsafe: 0.0131 | Init: 4.5598 | Outside: 0.0000 | Gen: 3.6325 | Focus: unsafe
+ [Controller Params] fc.weight = tensor([[-0.4252, -0.4048, -0.5028],
+        [ 0.0215, -0.0104, -0.3425],
+        [-0.5214,  0.5639, -0.5561]])
+Traceback (most recent call last):
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/gbm3d_syn/main.py", line 1189, in <module>
+    main()
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/gbm3d_syn/main.py", line 1038, in main
+    loss_history, final_beta_s, refinement_epochs = train_network_bounds(
+                                                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/gbm3d_syn/main.py", line 435, in train_network_bounds
+    phi_lowers, phi_uppers = crown_cache_phi.compute_bounds(input_lowers_gen, input_uppers_gen)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/src/crown_bounds.py", line 214, in compute_bounds
+    lb, ub = self.lirpa_model.compute_bounds(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/auto_LiRPA/bound_general.py", line 1314, in compute_bounds
+    self.set_input(*x, interm_bounds=interm_bounds, cache_bounds=cache_bounds)
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/auto_LiRPA/bound_general.py", line 650, in set_input
+    self._clear_and_set_new(
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/auto_LiRPA/bound_general.py", line 615, in _clear_and_set_new
+    if hasattr(l, attr):
+       ^^^^^^^^^^^^^^^^
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1709, in __getattr__
+    raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

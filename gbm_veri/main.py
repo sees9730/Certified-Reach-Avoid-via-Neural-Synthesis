@@ -675,7 +675,9 @@ def train_network_bounds(
             if learnable_beta_s is not None:
                 beta_s_log = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
                 print(f"Epoch [{epoch}/{params.training.num_epochs}]: Loss={total_loss.item():.4f}, β_s={beta_s_log:.4f}")
-            print_loss_summary(epoch, loss_dict, compute_V=params.compute_V, compute_GV=params.compute_GV)
+            if locked_to_all_sum:
+                current_sum_constraint = 'all'
+            print_loss_summary(epoch, loss_dict, compute_V=params.compute_V, compute_GV=params.compute_GV, focus=current_sum_constraint)
             if control_net is not None:
                 for name, param in control_net.named_parameters():
                     if param.requires_grad:

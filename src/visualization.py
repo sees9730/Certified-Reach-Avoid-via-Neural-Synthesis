@@ -12,6 +12,8 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
+from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from typing import Optional, List, Tuple
 
 # Set up directories
@@ -414,6 +416,22 @@ def visualize_training_progress(
         filename=f"{output_dir}/generator_epoch_{epoch}.png"
     )
 
+    # Add 3D plot for 3D systems
+    if regions.full.bounds.shape[0] == 3:
+        # We need beta_s and beta_ra - try to infer reasonable values
+        # or pass them as parameters (better approach would be to add them to function signature)
+        # For now, use simple defaults
+        beta_s_default = 0.0
+        beta_ra_default = 5.0
+        plot_3d_value_function(
+            V_net=V_net,
+            regions=regions,
+            beta_s=beta_s_default,
+            beta_ra=beta_ra_default,
+            filename=f"{output_dir}/value_function_3d_epoch_{epoch}.png",
+            n_samples=2000  # Fewer samples for faster rendering during training
+        )
+
 
 def plot_constraint_regions(
     V_net,
@@ -446,12 +464,20 @@ def plot_constraint_regions(
     for p, (x_dim, y_dim) in enumerate(pairs):
         ax = axes[p]
 
+        # Slice through unsafe region so we can see actual V values there
         slice_point = make_slice_point_for_region(
-            regions.full,   # or regions.goal / regions.init / regions.full
+            regions.unsafe,  # Slice through unsafe to see actual constraint
             full_bounds,
             x_dim=x_dim,
             y_dim=y_dim,
         )
+
+        # Add text showing what the fixed dimension value is
+        fixed_dims = [d for d in range(D) if d != x_dim and d != y_dim]
+        if fixed_dims:
+            slice_info = ", ".join([f"{_format_dim_label(d)}={slice_point[d]:.1f}" for d in fixed_dims])
+        else:
+            slice_info = ""
 
         X, Y, grid_np = _make_slice_grid(full_bounds, x_dim, y_dim, resolution, slice_point=slice_point)
         x_grid = torch.tensor(grid_np, dtype=torch.float32, device=net_device)
@@ -470,8 +496,10 @@ def plot_constraint_regions(
 
         ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
         ax.set_ylabel(_format_dim_label(y_dim), fontsize=12)
-        ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}",
-                     fontsize=12, fontweight='bold')
+        title_text = f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}"
+        if slice_info:
+            title_text += f"\n({slice_info})"
+        ax.set_title(title_text, fontsize=12, fontweight='bold')
 
         # regions projected
         lab_init  = "Init" if p == 0 else None
@@ -683,4 +711,136 @@ def create_summary_plots(
             filename=f"{output_dir}/loss_history.png"
         )
 
+    # 3D plot for D=3 systems
+    if regions.full.bounds.shape[0] == 3:
+        print("\n5. 3D value function visualization...")
+        plot_3d_value_function(
+            V_net, regions, beta_s, beta_ra,
+            filename=f"{output_dir}/value_function_3d.png"
+        )
+
     print(f"\nAll plots saved to '{output_dir}/'")
+
+
+def plot_3d_value_function(
+    V_net,
+    regions: Regions,
+    beta_s: float,
+    beta_ra: float,
+    filename: Optional[str] = None,
+    n_samples: int = 5000
+):
+    """
+    Create a 3D scatter plot showing V values sampled from different regions.
+
+    Args:
+        V_net: Value network
+        regions: Region definitions
+        beta_s: Lower threshold
+        beta_ra: Unsafe threshold
+        filename: Output filename
+        n_samples: Number of points to sample per region
+    """
+    V_net.eval()
+
+    try:
+        device = next(V_net.parameters()).device
+    except StopIteration:
+        device = torch.device("cpu")
+
+    fig = plt.figure(figsize=(16, 5))
+
+    # Helper to sample from a region
+    def sample_region(bounds, n):
+        lower = torch.tensor(bounds[:, 0], device=device, dtype=torch.float32)
+        upper = torch.tensor(bounds[:, 1], device=device, dtype=torch.float32)
+        samples = lower + torch.rand(n, 3, device=device) * (upper - lower)
+        return samples
+
+    # Sample from each region
+    regions_to_plot = [
+        ('Init', regions.init.bounds, 'green', n_samples),
+        ('Goal', regions.goal.bounds, 'blue', n_samples),
+        ('Unsafe', regions.unsafe.bounds, 'red', n_samples),
+    ]
+
+    # Create 3 subplots for different views
+    angles = [(30, 45), (30, 135), (60, 45)]
+    titles = ['View 1', 'View 2', 'View 3']
+
+    for idx, (elev, azim) in enumerate(angles):
+        ax = fig.add_subplot(1, 3, idx+1, projection='3d')
+
+        for region_name, bounds, color, n in regions_to_plot:
+            x_samples = sample_region(bounds, n)
+
+            with torch.no_grad():
+                v_vals = V_net(x_samples).squeeze().cpu().numpy()
+
+            x_np = x_samples.cpu().numpy()
+
+            # Color by V value
+            scatter = ax.scatter(
+                x_np[:, 0], x_np[:, 1], x_np[:, 2],
+                c=v_vals, cmap='viridis', s=5, alpha=0.6,
+                vmin=0, vmax=max(beta_ra, 2.0)
+            )
+
+            # Draw region boxes
+            _draw_3d_box(ax, bounds, color, region_name if idx == 0 else None)
+
+        # Add colorbar
+        if idx == 2:
+            cbar = fig.colorbar(scatter, ax=ax, shrink=0.6, label='V(x)')
+            cbar.ax.axhline(y=beta_s, color='yellow', linewidth=2, label=f'β_s={beta_s}')
+            cbar.ax.axhline(y=1.0, color='green', linewidth=2, label='1.0')
+            cbar.ax.axhline(y=beta_ra, color='orange', linewidth=2, label=f'β_ra={beta_ra}')
+
+        ax.set_xlabel('x₁')
+        ax.set_ylabel('x₂')
+        ax.set_zlabel('x₃')
+        ax.set_title(titles[idx])
+        ax.view_init(elev=elev, azim=azim)
+
+        if idx == 0:
+            ax.legend(loc='upper right', fontsize=8)
+
+    fig.suptitle('3D Value Function V(x) - Sampled Points Colored by V', fontsize=14, fontweight='bold')
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
+
+    if filename is None:
+        filename = "value_function_3d.png"
+    fig.savefig(filename, dpi=150, bbox_inches='tight')
+    print(f"  → Saved 3D plot to '{filename}'")
+    plt.close(fig)
+
+
+def _draw_3d_box(ax, bounds, color, label):
+    """Draw a 3D wireframe box for a region."""
+    # bounds is (3, 2)
+    x_range = bounds[0]
+    y_range = bounds[1]
+    z_range = bounds[2]
+
+    # Define 8 corners of the box
+    corners = np.array([
+        [x_range[0], y_range[0], z_range[0]],
+        [x_range[1], y_range[0], z_range[0]],
+        [x_range[1], y_range[1], z_range[0]],
+        [x_range[0], y_range[1], z_range[0]],
+        [x_range[0], y_range[0], z_range[1]],
+        [x_range[1], y_range[0], z_range[1]],
+        [x_range[1], y_range[1], z_range[1]],
+        [x_range[0], y_range[1], z_range[1]],
+    ])
+
+    # Define the 12 edges
+    edges = [
+        [0, 1], [1, 2], [2, 3], [3, 0],  # bottom face
+        [4, 5], [5, 6], [6, 7], [7, 4],  # top face
+        [0, 4], [1, 5], [2, 6], [3, 7],  # vertical edges
+    ]
+
+    for edge in edges:
+        points = corners[edge]
+        ax.plot3D(*points.T, color=color, linewidth=2, label=label if edge == [0, 1] else None)

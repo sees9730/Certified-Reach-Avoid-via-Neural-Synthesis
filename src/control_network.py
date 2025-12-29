@@ -92,3 +92,51 @@ class WrapperConterlNN(nn.Module):
         zeros = torch.zeros_like(u2)     # same shape as u1
         u = torch.cat([zeros, self.M_mLsquare*u2], dim=-1)  # (N, 2)
         return u
+
+
+# class NonlinearControlNN(nn.Module):
+#     def __init__(self, input_dim=3, hidden_dim=8, output_dim=3):
+#         super().__init__()
+#         # Fully connected layers
+#         self.fc1 = nn.Linear(input_dim, hidden_dim, bias=True)   # input -> hidden
+#         self.fc2 = nn.Linear(hidden_dim, output_dim, bias=False)  # hidden -> output
+
+#     def forward(self, x: torch.Tensor) -> torch.Tensor:
+#         h1 = F.tanh(self.fc1(x))
+#         out = F.tanh(self.fc2(h1))
+#         return out
+
+class NonlinearControlNN(nn.Module):
+    def __init__(self, input_dim=3, hidden_dim=8, output_dim=3):
+        super().__init__()
+        # Fully connected layers
+        self.fc1 = nn.Linear(input_dim, hidden_dim, bias=True)    # input -> hidden1
+        self.fc2 = nn.Linear(hidden_dim, hidden_dim, bias=True)   # hidden1 -> hidden2
+        self.fc3 = nn.Linear(hidden_dim, hidden_dim, bias=True)  # hidden2 -> hidden3
+        self.fc4 = nn.Linear(hidden_dim, hidden_dim, bias=True)  # hidden2 -> hidden3
+        self.fc5 = nn.Linear(hidden_dim, hidden_dim, bias=True)  # hidden2 -> hidden3
+        self.fc6 = nn.Linear(hidden_dim, hidden_dim, bias=True)  # hidden2 -> hidden3
+        self.fc7 = nn.Linear(hidden_dim, output_dim, bias=False)  # hidden3 -> output
+
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        h1 = F.tanh(self.fc1(x))
+        h2 = F.tanh(self.fc2(h1))
+        h3 = F.tanh(self.fc3(h2))
+        h4 = F.tanh(self.fc4(h3))
+        h5 = F.tanh(self.fc5(h4))
+        h6 = F.tanh(self.fc6(h5))
+        out = F.tanh(self.fc7(h6))
+        return out
+
+# class NonlinearControlNN(nn.Module):
+#     def __init__(self, input_dim=3, hidden_dim=8, output_dim=3):
+#         super().__init__()
+#         # Fully connected layers
+#         self.fc1 = nn.Linear(input_dim, hidden_dim, bias=True)   # input -> hidden
+#         self.fc2 = nn.Linear(hidden_dim, output_dim, bias=False)  # hidden -> output
+
+#     def forward(self, x: torch.Tensor) -> torch.Tensor:
+#         h1 = F.sigmoid(self.fc1(x))
+#         out = 10.0 * F.sigmoid(self.fc2(h1))
+#         return out

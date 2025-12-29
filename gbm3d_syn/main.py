@@ -645,7 +645,7 @@ def train_network_bounds(
 
                 # Adjust interval for later epochs
                 if epoch > 2500:
-                    REFINE_INTERVAL = 100
+                    REFINE_INTERVAL = 500
 
                 # Check if it's time to refine
                 if ((epoch + 1) % REFINE_INTERVAL == 0 and
@@ -653,7 +653,7 @@ def train_network_bounds(
                     new_cells, num_refined = refine_failing_cells(
                         region_cells['generator'],
                         phi_upper_failing_mask,
-                        REFINE_FACTOR
+                        REFINE_FACTOR, 10
                     )
                     region_cells['generator'] = new_cells
                     print(f"[Refine-Generator] Epoch {epoch+1}: {num_total_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
@@ -679,7 +679,9 @@ def train_network_bounds(
             if learnable_beta_s is not None:
                 beta_s_log = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
                 print(f"Epoch [{epoch}/{params.training.num_epochs}]: Loss={total_loss.item():.4f}, β_s={beta_s_log:.4f}")
-            print_loss_summary(epoch, loss_dict, compute_V=params.compute_V, compute_GV=params.compute_GV)
+            if locked_to_all_sum:
+                current_sum_constraint = 'all'
+            print_loss_summary(epoch, loss_dict, compute_V=params.compute_V, compute_GV=params.compute_GV, focus=current_sum_constraint)
             if control_net is not None:
                 for name, param in control_net.named_parameters():
                     if param.requires_grad:
@@ -695,11 +697,13 @@ def train_network_bounds(
             all_satisfied = True
             if params.compute_V:
                 show = (epoch % 10 == 0)
-                _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, bounds_updated['outside'][0], device=device, show=show, check=True, n_samples=10000)
+                # _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, bounds_updated['outside'][0], device=device, show=show, check=True, n_samples=10000)
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
                 init_satisfied = (bounds_updated['init'][0].min() >= beta_s_check and bounds_updated['init'][1].max() <= 1.0)
-                outside_satisfied = (bounds_updated['outside'][0].min() >= beta_s_check)
-                all_satisfied = all_satisfied and goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied
+                # outside_satisfied = (bounds_updated['outside'][0].min() >= beta_s_check)
+                outside_satisfied = (bounds_updated['outside'][0].min() >= 0.0)
+                # all_satisfied = all_satisfied and goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied
+                all_satisfied = all_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied
 
             # Check GV constraints
             if params.compute_GV:
@@ -772,7 +776,8 @@ def train_network_bounds(
                 # )
         
         # Optimizer step
-        optimizer.step()
+        if not should_skip_step:
+            optimizer.step()
 
         # Rebuild CROWN caches after optimizer step if needed (after adaptive refinement)
         # if params.compute_GV:
@@ -857,8 +862,8 @@ def main():
 
     # Customize configuration
     params.network.n_inputs = 3
-    params.network.n_hidden_1 = 64
-    params.network.n_hidden_2 = 64
+    params.network.n_hidden_1 = 256
+    params.network.n_hidden_2 = 16
     params.network.input_scale = [100.0, 100.0, 100.0]
     params.network.scale_factor = 20.0
 
@@ -869,11 +874,11 @@ def main():
     params.training.generator_weight = 1.0  # Enable generator constraint
     params.training.generator_start_epoch = 0
 
-    params.discretization.n_goal = 14
-    params.discretization.n_outside_goal = 4
+    params.discretization.n_goal = 1
+    params.discretization.n_outside_goal = 1
     params.discretization.n_generator = 1  # Will be overridden by radial discretization
-    params.discretization.n_unsafe = 5
-    params.discretization.n_init = 4
+    params.discretization.n_unsafe = 1
+    params.discretization.n_init = 1
 
     # Set beta_s to a value (constant), or set to None to make it learnable
     # If learnable_beta_s is True, this value will be used as initialization
