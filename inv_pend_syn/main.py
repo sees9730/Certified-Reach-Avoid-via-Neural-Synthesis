@@ -723,14 +723,14 @@ def train_network_bounds(
             all_satisfied = True
             if params.compute_V:
                 show = (epoch % 10 == 0)
-                # _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, 
-                #                                              bounds_updated['outside'][0], device=device, show=show, check=True, n_samples=10000)
+                _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, 
+                                                             bounds_updated['init'][0], device=device, show=show, check=True, n_samples=10000)
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
                 init_satisfied = (bounds_updated['init'][0].min() >= beta_s_check and bounds_updated['init'][1].max() <= 1.0)
                 # outside_satisfied = (bounds_updated['outside'][0].min() >= beta_s_check)
                 outside_satisfied = (bounds_updated['outside'][0].min() >= 0.0)
                 # all_satisfied = all_satisfied and goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied
-                all_satisfied = all_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied
+                all_satisfied = all_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied and goal_satisfied
 
             # Check GV constraints
             if params.compute_GV:

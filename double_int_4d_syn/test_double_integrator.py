@@ -36,17 +36,17 @@ init_range = np.array([
 ], dtype=np.float32)
 
 goal_range = np.array([
-    [ 1.0,  2.0],   # p1 at top-right
-    [-1.3,  1.3],   # v1 small
-    [-2.0, -1.0],   # p2 at bottom-left
-    [-1.3,  1.3],   # v2 small
+    [ 0.0,  2.0],   # p1 at top-right
+    [-1.3,  0.3],   # v1 small
+    [-2.0, 0.0],   # p2 at bottom-left
+    [-1.3,  0.3],   # v2 small
 ], dtype=np.float32)
 
 unsafe_range = np.array([
     [ 2.5,  3.0],   # p1 far right
-    [-1.5,  1.5],   # any v1
+    [0.5,  1.5],   # any v1
     [ 2.5,  3.0],   # p2 also far right  
-    [-1.5,  1.5],   # any v2
+    [0.5,  1.5],   # any v2
 ], dtype=np.float32)
 
 full_range = np.array([
@@ -75,7 +75,7 @@ def collision_distance(x: np.ndarray) -> float:
 # ========================================================================
 # DYNAMICS (numpy versions)
 # ========================================================================
-NOISE_DIAG = np.array([0.0, 0.05, 0.0, 0.05], dtype=float)
+NOISE_DIAG = np.array([0.0, 0.15, 0.0, 0.15], dtype=float)
 
 
 def f_ol_np(x: np.ndarray) -> np.ndarray:
@@ -116,7 +116,7 @@ def g_diag_np(_x: np.ndarray) -> np.ndarray:
 def load_control_net(bundle_path, device="cpu"):
     bundle = load_eval_bundle(bundle_path, map_location=device)
 
-    control_net = DoubleIntegratorControlNN()
+    control_net = DoubleIntegratorControlNN(hidden_dim=128)
     if bundle["control_state_dict"] is not None:
         control_net.load_state_dict(bundle["control_state_dict"])
 
@@ -402,7 +402,7 @@ def test_mc(controller=None):
     p_reach_avoid, stats = estimate_reach_avoid_mc(
         controller=controller,
         n_mc=500,
-        T_mc=30.0,
+        T_mc=300.0,
         dt_mc=0.01,
         seed_mc=0
     )

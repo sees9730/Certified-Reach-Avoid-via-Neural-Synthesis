@@ -99,7 +99,7 @@ def compute_loss_goal_bounds(
     V_lower: torch.Tensor,
     V_upper: torch.Tensor,
     beta_s: Union[float, torch.Tensor],
-    V_outside_lower,
+    V_init_lower,
     n_samples: int = 1000,
     device: str = 'cpu',
     check: bool = False,
@@ -110,60 +110,72 @@ def compute_loss_goal_bounds(
     bounds = goal_region.bounds  # (D, 2)
     D = bounds.shape[0]
 
-    # Compute center of goal region
+    # Compute center of goal region (1, D)
     center = torch.as_tensor(((bounds[:, 0] + bounds[:, 1]) / 2.0),
                              device=device, dtype=torch.float32).view(1, D)
 
     # Evaluate V at center point
     v_center = model(center).squeeze()
 
-    # Sample from an inner box (slightly smaller than the goal region)
+    # Strong loss on center point
+    margin = 0.0
+    # loss_center = F.relu(v_center - (beta_s - margin)) * 10.0
+
+    # Shrink the sampling bounds by a factor (inner box)
     shrink_factor = 0.1
-    lower = torch.as_tensor(bounds[:, 0], device=device, dtype=torch.float32)
-    upper = torch.as_tensor(bounds[:, 1], device=device, dtype=torch.float32)
-    span = upper - lower
+    lower = torch.as_tensor(bounds[:, 0], device=device, dtype=torch.float32)  # (D,)
+    upper = torch.as_tensor(bounds[:, 1], device=device, dtype=torch.float32)  # (D,)
+    span = upper - lower                                                      # (D,)
 
-    inner_lower = lower + span * (1.0 - shrink_factor) / 2.0
-    inner_upper = upper - span * (1.0 - shrink_factor) / 2.0
+    inner_lower = lower + span * (1.0 - shrink_factor) / 2.0                  # (D,)
+    inner_upper = upper - span * (1.0 - shrink_factor) / 2.0                  # (D,)
 
-    # Sample uniformly in the inner box
+    # Sample uniformly in the inner box: (n_samples, D)
+    # rand in [0,1) scaled to [inner_lower, inner_upper]
     r = torch.rand(n_samples, D, device=device, dtype=torch.float32)
     samples = r * (inner_upper - inner_lower).unsqueeze(0) + inner_lower.unsqueeze(0)
 
     v_samples = model(samples).squeeze()
 
-    # Use bottom 5% of samples for more stable gradient signal
-    threshold = V_outside_lower.min().item()
-    v_all = torch.cat([v_samples, v_center.unsqueeze(0)])
-    v_sorted = torch.sort(v_all)[0]
+    # Softer loss on minimum of sampled points
+    # threshold = V_outside_lower.min().item()
+    threshold = V_init_lower.min().item()
+    loss_rest = F.relu(v_samples.min() - threshold) * w_soft
 
-    k = max(1, len(v_all) // 50)
-    bottom_k = v_sorted[:k]
-
-    # Mean of bottom samples provides better gradient than using just the minimum
-    loss_soft = F.relu(bottom_k.mean() - threshold)
+    # Combined soft loss
+    loss_soft =  loss_rest
 
     # Encourage non-negativity of the certified lower bound inside goal
-    loss_nonneg = torch.relu(0.0 - V_lower).sum()
+    # (kept identical behavior, but note: min() here returns a scalar tensor)
+    # loss_nonneg = torch.relu(0.0 - V_lower).sum()
 
-    # Get minimum V inside goal region from samples, center, and lowest upper bound
+    # Obtain minimum V inside goal region: from samples, center, and lowest upper bound
     v_min = min(v_samples.min().item(), v_center.item(), V_upper.min().item())
 
-    # Check if constraint is satisfied
-    if (v_min < V_outside_lower.min()) and (V_lower.min() >= 0).item():
+    # When checking for success (passed), check the logic based on v_min
+    # Keep semantics identical to your original
+    # if (v_min < beta_s) and (V_lower.min() >= 0).item():
+    if (v_min < V_init_lower.min()) and (V_lower.min() >= 0).item():
         passed = True
         if show:
-            print(" ✓ Inside Goal passed, min V= {:.4f}, min V_outside_lower= {:.4f}, min V_lower={:.4f}".format(
-                v_min, V_outside_lower.min(), V_lower.min()
+            # print(" ✓ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
+            #     v_min, V_lower.min()
+            # ))
+            print(" ✓ Inside Goal passed, min V= {:.4f}, min V_init_lower= {:.4f}, min V_lower={:.4f}".format(
+                v_min, V_init_lower.min(), V_lower.min()
             ))
     else:
         passed = False
         if show:
-            print(" ✗ Inside Goal failed, min V= {:.4f}, min V_outside_lower= {:.4f}, min V_lower={:.4f}".format(
-                v_min, V_outside_lower.min(), V_lower.min()
+            # print(" ✗ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
+            #     v_min, V_lower.min()
+            # ))
+            print(" ✗ Inside Goal failed, min V= {:.4f}, min V_init_lower= {:.4f}, min V_lower={:.4f}".format(
+                v_min, V_init_lower.min(), V_lower.min()
             ))
 
-    return loss_soft + loss_nonneg, passed
+    # return loss_nonneg + loss_soft, passed
+    return loss_soft, passed
 
 
 def compute_loss_unsafe_bounds(
@@ -356,10 +368,12 @@ def compute_total_loss_bounds(
         violations_unsafe = F.relu(beta_ra - V_unsafe_lower)
         violations_init = F.relu(V_init_upper - 1.0)
         violations_outside = F.relu(0.0 - V_outside_lower)
+        violations_goal = F.relu(V_goal_upper - beta_s)
 
         loss_components['unsafe'] = violations_unsafe
         loss_components['init'] = violations_init
         loss_components['outside'] = violations_outside
+        loss_components['goal'] = violations_goal
 
     if compute_GV:
         if len(Phi_upper) > 0:
@@ -379,6 +393,7 @@ def compute_total_loss_bounds(
             loss_unsafe = violations_unsafe.sum()
             loss_init = violations_init.sum()
             loss_outside = violations_outside.sum()
+            loss_goal = violations_goal.sum()
         if compute_GV:
             loss_generator = violations_generator.sum() if len(violations_generator) > 0 else torch.tensor(0.0, device=device)
     else:
@@ -431,6 +446,7 @@ def compute_total_loss_bounds(
             loss_unsafe = violations_unsafe.sum() if largest_loss == 'unsafe' else violations_unsafe.mean()
             loss_init = violations_init.sum() if largest_loss == 'init' else violations_init.mean()
             loss_outside = violations_outside.sum() if largest_loss == 'outside' else violations_outside.mean()
+            loss_goal = violations_goal.sum() if largest_loss == 'goal' else violations_goal.mean()
 
         if compute_GV:
             if len(violations_generator) > 0:
@@ -444,6 +460,8 @@ def compute_total_loss_bounds(
             loss_weights['unsafe'] * loss_unsafe +
             loss_weights['init'] * loss_init +
             loss_weights['outside'] * loss_outside +
+            
+            loss_weights['goal'] * loss_goal + 
             generator_weight * loss_generator
         )
 
@@ -452,6 +470,7 @@ def compute_total_loss_bounds(
             'unsafe': loss_unsafe.item(),
             'init': loss_init.item(),
             'outside': loss_outside.item(),
+            'goal': violations_goal.mean().item(),
             'generator': loss_generator.item(),
             'largest_loss': largest_loss
         }
@@ -566,6 +585,24 @@ def evaluate_constraints(
             outside_satisfied = True
             v_outside_min = v_outside_max = 0.0
 
+        # Check goal constraint
+        if len(region_cells['goal']) > 0:
+            goal_satisfied = ((region_bounds['goal'][0].min().item() >= 0) and 
+                              (region_bounds['goal'][1].max().item() <= 1))
+            v_goal_min = region_bounds['goal'][0].min().item()
+            v_goal_max = region_bounds['goal'][1].max().item()
+            # x_goal = sample_from_cells(region_cells['goal'], n_samples, device)
+            # v_goal_samples = V_net(x_goal).squeeze(-1)
+            # goal_satisfied = ((v_goal_samples.min() < beta_s).item() and
+                            #   (region_bounds['goal'][0].min() >= 0).item())
+            # v_goal_min = v_goal_samples.min().item()
+            # v_goal_max = v_goal_samples.max().item()
+            # v_goal_mean = v_goal_samples.mean().item()
+        else:
+            goal_satisfied = True
+            # v_goal_min = v_goal_max = v_goal_mean = 0
+            v_goal_min = v_goal_max = 0.0
+
         # Check unsafe constraint
         if len(region_bounds['unsafe'][0]) > 0:
             unsafe_satisfied = (region_bounds['unsafe'][0] >= beta_ra).all().item()
@@ -622,6 +659,7 @@ def evaluate_constraints(
     results = {
         'unsafe_satisfied': unsafe_satisfied,
         'init_satisfied': init_satisfied,
+        'goal_satisfied': goal_satisfied,
         'outside_satisfied': outside_satisfied,
         'generator_satisfied': generator_satisfied,
 
@@ -631,6 +669,8 @@ def evaluate_constraints(
         'V_init_max': v_init_max,
         'V_outside_min': v_outside_min,
         'V_outside_max': v_outside_max,
+        'V_goal_min': v_goal_min,
+        'V_goal_max': v_goal_max,
         'Phi_min': phi_min,
         'Phi_max': phi_max,
         'Phi_mean': phi_mean,
@@ -649,13 +689,11 @@ def print_loss_summary(epoch: int, loss_dict: dict, prefix: str = "", compute_V:
         epoch: Current epoch
         loss_dict: Dictionary of losses
         prefix: Optional prefix for print
-        compute_V: Whether V network is being trained
-        compute_GV: Whether generator network is being trained
-        focus: Which constraint is currently focused on
     """
     if compute_V and compute_GV:
         print(f"{prefix}Epoch {epoch:5d} | "
             f"Total: {loss_dict['total']:.4f} | "
+            f"Goal: {loss_dict['goal']:.4f} | "
             f"Unsafe: {loss_dict['unsafe']:.4f} | "
             f"Init: {loss_dict['init']:.4f} | "
             f"Outside: {loss_dict['outside']:.4f} | "
@@ -664,6 +702,7 @@ def print_loss_summary(epoch: int, loss_dict: dict, prefix: str = "", compute_V:
     elif compute_V and not compute_GV:
         print(f"{prefix}Epoch {epoch:5d} | "
             f"Total: {loss_dict['total']:.4f} | "
+            f"Goal: {loss_dict['goal']:.4f} | "
             f"Unsafe: {loss_dict['unsafe']:.4f} | "
             f"Init: {loss_dict['init']:.4f} | "
             f"Outside: {loss_dict['outside']:.4f}")
@@ -684,6 +723,8 @@ def print_constraint_summary(results: dict, prefix: str = ""):
         return "✓" if satisfied else "✗"
 
     print(f"{prefix}Constraint Satisfaction:")
+    print(f"{prefix}  Goal:      {status_str(results['goal_satisfied'])} "
+          f"(V_min={results['V_goal_min']:.3f}, V_max={results['V_goal_max']:.3f})")
     print(f"{prefix}  Unsafe:    {status_str(results['unsafe_satisfied'])} "
           f"(V_min={results['V_unsafe_min']:.3f}, V_max={results['V_unsafe_max']:.3f})")
     print(f"{prefix}  Init:      {status_str(results['init_satisfied'])} "

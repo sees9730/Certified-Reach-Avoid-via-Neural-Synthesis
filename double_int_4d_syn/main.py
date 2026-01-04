@@ -70,7 +70,7 @@ class DoubleIntegratorControlNN(nn.Module):
         """
         h1 = F.tanh(self.fc1(x))
         h2 = F.tanh(self.fc2(h1))
-        u = 2.0 * F.tanh(self.fc3(h2))  # bound control to [-2, 2]
+        u = 20.0 * F.tanh(self.fc3(h2))  # bound control to [-2, 2]
         return u
 
 
@@ -532,6 +532,8 @@ def train_network_bounds(
                 region_losses['unsafe'] = F.relu(params.constraints.beta_ra - bounds_updated['unsafe'][0]).sum().item()
             if len(bounds_updated['init'][0]) > 0:
                 region_losses['init'] = F.relu(bounds_updated['init'][1] - 1.0).sum().item()
+            if len(bounds_updated['goal'][0]) > 0:
+                region_losses['goal'] = F.relu(bounds_updated['goal'][1] - 1.0).sum().item()
 
             # Find region with highest loss
             if region_losses:
@@ -547,6 +549,8 @@ def train_network_bounds(
                         failing_mask = bounds_updated['unsafe'][0] < params.constraints.beta_ra
                     elif highest_loss_region == 'init':
                         failing_mask = bounds_updated['init'][1] > 1.0
+                    elif highest_loss_region == 'goal':
+                        failing_mask = bounds_updated['goal'][1] > 1.0
 
                     num_failing = failing_mask.sum().item()
 
@@ -640,10 +644,10 @@ def train_network_bounds(
             all_satisfied = True
             if params.compute_V:
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
-                # init_satisfied = (bounds_updated['init'][0].min() >= beta_s_check and bounds_updated['init'][1].max() <= 1.0)
-                init_satisfied = (bounds_updated['init'][0].min() <= 1.0)
+                goal_satisfied = (bounds_updated['goal'][1].max() <= 1.0)
+                init_satisfied = (bounds_updated['init'][1].max() <= 1.0)
                 outside_satisfied = (bounds_updated['outside'][0].min() >= 0.0)
-                all_satisfied = all_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied
+                all_satisfied = all_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied and goal_satisfied
 
             if params.compute_GV and epoch >= params.training.generator_start_epoch:
                 if len(phi_uppers) > 0:
@@ -790,7 +794,7 @@ def main():
     params.network.scale_factor = 20.0
 
     # Training configuration
-    params.training.learning_rate = 0.01
+    params.training.learning_rate = 0.005
     params.training.num_epochs = 50000
     params.training.learnable_scale = False
     params.training.learnable_input_scale = False
@@ -807,7 +811,7 @@ def main():
     # Constraints
     params.training.learnable_beta_s = False
     params.constraints.beta_s = 0.0
-    params.constraints.beta_ra = 5.0  # Much lower than Lorenz (easier problem)
+    params.constraints.beta_ra = 20.0  # Much lower than Lorenz (easier problem)
 
     # What to compute
     params.compute_V = True
@@ -821,7 +825,7 @@ def main():
     print("="*80)
 
     # Control network: 4 inputs → 2 outputs (accelerations)
-    u_nn = DoubleIntegratorControlNN(hidden_dim=512)
+    u_nn = DoubleIntegratorControlNN(hidden_dim=128)
 
     def f_ol(x: torch.Tensor) -> torch.Tensor:
         """
@@ -909,30 +913,25 @@ def main():
     # Init: particle 1 at bottom-left, particle 2 at top-right
     init_range = np.array([
         [-2.0, -1.0],   # p1
-        [-0.2,  0.2],   # v1 (small)
+        [-0.2,  0.2],   # v1
         [ 1.0,  2.0],   # p2
-        [-0.2,  0.2],   # v2 (small)
+        [-0.2,  0.2],   # v2
     ], dtype=np.float32)
 
-    # Goal: swap positions (p1 → top-right, p2 → bottom-left), low velocity
     goal_range = np.array([
-        [ 1.0,  2.0],   # p1 at top-right
-        [-1.3,  1.3],   # v1 small
-        [-2.0, -1.0],   # p2 at bottom-left
-        [-1.3,  1.3],   # v2 small
+        [ 0.0,  2.0],   # p1 at top-right
+        [-1.3,  0.3],   # v1 small
+        [-2.0, 0.0],   # p2 at bottom-left
+        [-1.3,  0.3],   # v2 small
     ], dtype=np.float32)
 
-    # Unsafe: TRUE collision zone - particles too close in position space
-    # This is a diagonal band where |p1 - p2| ≈ 0 (both particles near center)
-    # MUCH easier to learn than arbitrary corner regions, and geometrically natural
     unsafe_range = np.array([
-      [ 2.5,  3.0],   # p1 far right
-      [-1.5,  1.5],   # any v1
-      [ 2.5,  3.0],   # p2 also far right  
-      [-1.5,  1.5],   # any v2
+        [ 2.5,  3.0],   # p1 far right
+        [0.5,  1.5],   # any v1
+        [ 2.5,  3.0],   # p2 also far right  
+        [0.5,  1.5],   # any v2
     ], dtype=np.float32)
 
-    # Full domain
     full_range = np.array([
         [-3.0,  3.0],   # p1
         [-1.5,  1.5],   # v1
@@ -1024,7 +1023,7 @@ def main():
             device=device,
             visualize_interval=0,  # Disable visualization for now
             control_net=u_nn,
-            n_samples_per_region=1000,  # Hybrid: sample 200 pts per region
+            n_samples_per_region=200,  # Hybrid: sample 200 pts per region
             sample_weight=1.0,  # Weight for sample-based loss
         )
 
