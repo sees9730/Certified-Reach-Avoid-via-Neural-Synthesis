@@ -346,11 +346,11 @@ def train_network_bounds(
     V_net = V_net.to(device)
     # GV_net = GV_net.to(device)
 
-    # Collect ALL cells in the same order as original (init, goal, unsafe, outside, generator)
+    # Collect ALL cells in the same order as original (init, goal, unsafe, outside, boundary, generator)
     print("\nCollecting all cells for V network...")
     all_cells_V = []
     cell_counts_V = {}
-    region_order_V = ['init', 'goal', 'unsafe', 'outside']  # Match original order
+    region_order_V = ['init', 'goal', 'unsafe', 'outside', 'boundary']  # Added boundary
 
     for name in region_order_V:
         cells = region_cells[name]
@@ -520,7 +520,9 @@ def train_network_bounds(
                 'V_init_lower': bounds['init'][0],
                 'V_init_upper': bounds['init'][1],
                 'V_outside_lower': bounds['outside'][0],
-                'V_outside_upper': bounds['outside'][1]
+                'V_outside_upper': bounds['outside'][1],
+                'V_boundary_lower': bounds['boundary'][0],
+                'V_boundary_upper': bounds['boundary'][1]
             })
 
         # Add GV bounds if computing GV
@@ -652,7 +654,12 @@ def train_network_bounds(
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
                 init_satisfied = (bounds_updated['init'][0].min() >= beta_s_check and bounds_updated['init'][1].max() <= 1.0)
                 outside_satisfied = (bounds_updated['outside'][0].min() >= beta_s_check)
-                all_satisfied = all_satisfied and goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied
+                # Boundary constraint: V >= 1.0
+                if len(bounds_updated['boundary'][0]) > 0:
+                    boundary_satisfied = (bounds_updated['boundary'][0].min() >= 1.0)
+                else:
+                    boundary_satisfied = True
+                all_satisfied = all_satisfied and goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied and boundary_satisfied
 
             # Check GV constraints
             if params.compute_GV:
@@ -669,7 +676,7 @@ def train_network_bounds(
                 # Print relevant losses
                 loss_parts = []
                 if params.compute_V:
-                    loss_parts.append(f"Goal={loss_dict['goal']:.4f}, Unsafe={loss_dict['unsafe']:.4f}, Init={loss_dict['init']:.4f}, Outside={loss_dict['outside']:.4f}")
+                    loss_parts.append(f"Goal={loss_dict['goal']:.4f}, Unsafe={loss_dict['unsafe']:.4f}, Init={loss_dict['init']:.4f}, Outside={loss_dict['outside']:.4f}, Boundary={loss_dict['boundary']:.4f}")
                 if params.compute_GV:
                     loss_parts.append(f"Gen={loss_dict['generator']:.4f}")
                 print(f"Final losses: {', '.join(loss_parts)}")
