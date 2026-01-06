@@ -147,7 +147,7 @@ def compute_loss_goal_bounds(
 
     # Encourage non-negativity of the certified lower bound inside goal
     # (kept identical behavior, but note: min() here returns a scalar tensor)
-    # loss_nonneg = torch.relu(0.0 - V_lower).sum()
+    loss_nonneg = torch.relu(0.0 - V_lower).sum()
 
     # Obtain minimum V inside goal region: from samples, center, and lowest upper bound
     v_min = min(v_samples.min().item(), v_center.item(), V_upper.min().item())
@@ -175,7 +175,8 @@ def compute_loss_goal_bounds(
             ))
 
     # return loss_nonneg + loss_soft, passed
-    return loss_soft, passed
+    # return loss_soft, passed
+    return loss_nonneg, passed
 
 
 def compute_loss_unsafe_bounds(
