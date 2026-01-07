@@ -261,6 +261,7 @@ def compute_loss_generator_bounds(
     """
     # Want Phi <= 0, so penalize Phi_upper > 0
     return F.relu(Phi_upper).sum()
+    # return torch.relu(torch.max(Phi_upper))
 
 
 def compute_loss_boundary_bounds(
@@ -366,7 +367,7 @@ def compute_total_loss_bounds(
             loss_weights['unsafe'] * loss_unsafe +
             loss_weights['init'] * loss_init +
             loss_weights['outside'] * loss_outside +
-            loss_weights['boundary'] * loss_boundary +
+            0.0 * loss_weights['boundary'] * loss_boundary +
             generator_weight * loss_generator #+ loss_generator_unsafe + loss_generator_goal
         )
 

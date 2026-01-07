@@ -92,3 +92,16 @@ class WrapperConterlNN(nn.Module):
         zeros = torch.zeros_like(u2)     # same shape as u1
         u = torch.cat([zeros, self.M_mLsquare*u2], dim=-1)  # (N, 2)
         return u
+
+
+class NonlinearControlNN(nn.Module):
+    def __init__(self, input_dim=3, hidden_dim=64, output_dim=3):
+        super().__init__()
+        # Fully connected layers
+        self.fc1 = nn.Linear(input_dim, hidden_dim, bias=True)   # input -> hidden
+        self.fc2 = nn.Linear(hidden_dim, output_dim, bias=False)  # hidden -> output
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        h1 = F.tanh(self.fc1(x))
+        out = (self.fc2(h1))
+        return out

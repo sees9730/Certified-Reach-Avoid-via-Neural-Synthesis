@@ -63,28 +63,9 @@ class Dynamics:
     def dynamics(
         cls,
         f: Union[np.ndarray, torch.Tensor, Callable, None] = None,
-        g: Union[np.ndarray, torch.Tensor, Callable, None] = None
+        g: Union[np.ndarray, torch.Tensor, Callable, None] = None,
+        state_dim=1
     ):
-        def infer_dim(obj) -> Optional[int]:
-            if isinstance(obj, (np.ndarray, torch.Tensor)):
-                # Works for (N,N), (N,m), (N,), etc.
-                return int(obj.shape[0])
-            return None
-
-        f_dim = infer_dim(f)
-        g_dim = infer_dim(g)
-
-        if f_dim is not None and g_dim is not None:
-            if f_dim != g_dim:
-                raise ValueError(f"State dimension mismatch between f ({f_dim}) and g ({g_dim})")
-            state_dim = f_dim
-        elif f_dim is not None:
-            state_dim = f_dim
-        elif g_dim is not None:
-            state_dim = g_dim
-        else:
-            state_dim = 2  # fallback when both are callables/None
-
         return cls(f=f, g=g, state_dim=state_dim)
 
 

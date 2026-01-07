@@ -440,7 +440,8 @@ def _subdivide_slab(
     return cells
 
 
-def discretize_regions(regions, discretization_config, use_radial_generator=True):
+def discretize_regions(regions, discretization_config, use_radial_generator=True,
+                       boundary_thickness=0.5, boundary_n_partitions=10):
     """
     Discretize all regions according to configuration.
 
@@ -531,8 +532,8 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
 
     # Boundary region (thin slabs on full_range boundary, excluding unsafe)
     print(f"\nBoundary region: Thin slabs on full_range boundary")
-    boundary_thickness = 0.5  # Adjust thickness as needed
-    boundary_n_partitions = 10  # Number of subdivisions per dimension (1 = single slab per face)
+    boundary_thickness = boundary_thickness  # Adjust thickness as needed
+    boundary_n_partitions = boundary_n_partitions  # Number of subdivisions per dimension (1 = single slab per face)
     region_cells['boundary'] = create_boundary_cells(
         regions.full,
         thickness=boundary_thickness,
