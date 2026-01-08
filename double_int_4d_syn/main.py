@@ -188,8 +188,8 @@ def pretrain_network_samples(
             v_loss_full
             + v_loss_init
             + v_loss_unsafe
-            + v_loss_inside_goal
-            + v_loss_others
+            # + v_loss_inside_goal
+            # + v_loss_others
         )
 
         # Phi loss on x_others -> enforce phi(x) <= 0
