@@ -29,7 +29,7 @@ from src.hyperparameters import Hyperparameters
 from src.dynamics import Dynamics, ClosedLoopDrift
 from src.regions import Regions, Region
 from src.network import create_V
-from src.control_network import LinearControlNN, NonlinearControlNN
+from src.control_network import LinearControlNN, NonlinearControlNN, InvertControlNN
 from src.phi_module import create_GV
 from src.discretization import discretize_regions
 from src.crown_bounds import SymbolicCROWNCache, SymbolicCROWNCache_Phi, prepare_cell_bounds
@@ -70,7 +70,7 @@ class DoubleIntegratorControlNN(nn.Module):
         """
         h1 = F.tanh(self.fc1(x))
         h2 = F.tanh(self.fc2(h1))
-        u = 20.0 * F.tanh(self.fc3(h2))  # bound control to [-2, 2]
+        u = 100.0 * F.tanh(self.fc3(h2))  # bound control to [-2, 2]
         return u
 
 
@@ -258,7 +258,8 @@ def train_network_bounds(
     visualize_interval: int = 5000,
     control_net: nn.Module = None,
     n_samples_per_region: int = 100,
-    sample_weight: float = 0.1
+    sample_weight: float = 0.1,
+    plot_pairs: list = None
 ):
     """Train the value network using CROWN bounds + hybrid sampling."""
     print("\n" + "="*80)
@@ -272,6 +273,7 @@ def train_network_bounds(
     print("\nCollecting all cells for V network...")
     all_cells_V = []
     cell_counts_V = {}
+    # region_order_V = ['init', 'goal', 'unsafe', 'outside', 'boundary']
     region_order_V = ['init', 'goal', 'unsafe', 'outside']
 
     for name in region_order_V:
@@ -439,7 +441,9 @@ def train_network_bounds(
                 'V_init_lower': bounds['init'][0],
                 'V_init_upper': bounds['init'][1],
                 'V_outside_lower': bounds['outside'][0],
-                'V_outside_upper': bounds['outside'][1]
+                'V_outside_upper': bounds['outside'][1]#,
+                # 'V_boundary_lower': bounds['boundary'][0],
+                # 'V_boundary_upper': bounds['boundary'][1]
             })
 
         if params.compute_GV:
@@ -521,74 +525,38 @@ def train_network_bounds(
 
         beta_s_check = current_beta_s if isinstance(current_beta_s, float) else current_beta_s.item()
 
-        # Adaptive refinement based on highest loss region
+        # Adaptive refinement for V regions using highest loss region from loss_dict
         needs_cache_rebuild = False
         if params.compute_V:
-            # Compute per-region losses
-            region_losses = {}
-            if len(bounds_updated['outside'][0]) > 0:
-                region_losses['outside'] = F.relu(beta_s_check - bounds_updated['outside'][0]).sum().item()
-            if len(bounds_updated['unsafe'][0]) > 0:
-                region_losses['unsafe'] = F.relu(params.constraints.beta_ra - bounds_updated['unsafe'][0]).sum().item()
-            if len(bounds_updated['init'][0]) > 0:
-                region_losses['init'] = F.relu(bounds_updated['init'][1] - 1.0).sum().item()
-            if len(bounds_updated['goal'][0]) > 0:
-                region_losses['goal'] = F.relu(bounds_updated['goal'][1] - 1.0).sum().item()
+            highest_region = loss_dict.get('highest_loss_region')
+            highest_mask = loss_dict.get('highest_loss_mask')
+            highest_value = loss_dict.get('highest_loss_value', 0.0)
 
-            # Find region with highest loss
-            if region_losses:
-                highest_loss_region = max(region_losses, key=region_losses.get)
-                highest_loss_value = region_losses[highest_loss_region]
+            if (highest_region and highest_mask is not None and
+                highest_value > 0 and highest_region != 'generator'):
+                num_failing = highest_mask.sum().item()
 
-                # Only refine if loss is significant
-                if highest_loss_value > 0:
-                    # Set up region-specific failing masks
-                    if highest_loss_region == 'outside':
-                        failing_mask = bounds_updated['outside'][0] < beta_s_check
-                    elif highest_loss_region == 'unsafe':
-                        failing_mask = bounds_updated['unsafe'][0] < params.constraints.beta_ra
-                    elif highest_loss_region == 'init':
-                        failing_mask = bounds_updated['init'][1] > 1.0
-                    elif highest_loss_region == 'goal':
-                        failing_mask = bounds_updated['goal'][1] > 1.0
+                if num_failing > 0 and len(highest_mask) == len(region_cells[highest_region]):
+                    REFINE_INTERVAL_V = 250
+                    REFINE_FACTOR = 2
+                    MAX_CELLS = 30000
 
-                    num_failing = failing_mask.sum().item()
+                    if epoch > 2500:
+                        REFINE_INTERVAL_V = 100
 
-                    if num_failing > 0 and len(failing_mask) == len(region_cells[highest_loss_region]):
-                        REFINE_INTERVAL_V = 500
-                        REFINE_FACTOR = 2
-                        MAX_CELLS = 10000
-
-                        if epoch > 2500:
-                            REFINE_INTERVAL_V = 100
-
-                        if ((epoch + 1) % REFINE_INTERVAL_V == 0 and
-                            len(region_cells[highest_loss_region]) < MAX_CELLS):
-                            new_cells, num_refined = refine_failing_cells(
-                                region_cells[highest_loss_region],
-                                failing_mask,
-                                REFINE_FACTOR
-                            )
-                            region_cells[highest_loss_region] = new_cells
-                            print(f"[Refine-{highest_loss_region.capitalize()}] Epoch {epoch+1}: Loss={highest_loss_value:.3f}, {num_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
-                            needs_cache_rebuild = True
-                            if highest_loss_region not in refinement_epochs:
-                                refinement_epochs[highest_loss_region] = []
-                            refinement_epochs[highest_loss_region].append(epoch + 1)
-
-
-            # if((epoch + 1) % 502 == 0):
-            #     merged_cells, num_merges = merge_passing_neighbor_cells(
-            #         region_cells['outside'],
-            #         outside_failing_mask_relax,
-            #         max_passes=8,
-            #         max_merges=None,
-            #         seed=0,
-            #         eps=1e-6,
-            #     )
-            #     region_cells['outside'] = merged_cells
-            #     print(f"[Merge-Outside] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
-            #     needs_cache_rebuild = True
+                    if ((epoch + 1) % REFINE_INTERVAL_V == 0 and
+                        len(region_cells[highest_region]) < MAX_CELLS):
+                        new_cells, num_refined = refine_failing_cells(
+                            region_cells[highest_region],
+                            highest_mask,
+                            REFINE_FACTOR
+                        )
+                        region_cells[highest_region] = new_cells
+                        print(f"[Refine-{highest_region.capitalize()}] Epoch {epoch+1}: Loss={highest_value:.3f}, {num_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
+                        needs_cache_rebuild = True
+                        if highest_region not in refinement_epochs:
+                            refinement_epochs[highest_region] = []
+                        refinement_epochs[highest_region].append(epoch + 1)
 
         # Adaptive refinement for generator
         if params.compute_GV and epoch >= params.training.generator_start_epoch:
@@ -711,6 +679,19 @@ def train_network_bounds(
                     print(f"  Generator failing cells: {failing_cells}/{len(phi_uppers)} ({100*failing_cells/len(phi_uppers):.1f}%)")
             print()
 
+        # Visualization
+        if visualize_interval > 0 and (epoch % visualize_interval == 0 or epoch == params.training.num_epochs - 1):
+            print(f"\nCreating visualization for epoch {epoch}...")
+            visualize_training_progress(
+                V_net=V_net,
+                GV_net=GV_net,
+                regions=regions,
+                region_cells=region_cells,
+                epoch=epoch,
+                output_dir=str(HERE / "training_progress"),
+                plot_pairs=plot_pairs
+            )
+
         # Optimizer step
         if not should_skip_step:
             optimizer.step()
@@ -788,7 +769,7 @@ def main():
 
     # Network configuration
     params.network.n_inputs = 4  # [p1, v1, p2, v2]
-    params.network.n_hidden_1 = 64
+    params.network.n_hidden_1 = 128
     params.network.n_hidden_2 = 16
     params.network.input_scale = [6.0, 3.0, 6.0, 3.0]  # scale positions more than velocities
     params.network.scale_factor = 20.0
@@ -825,7 +806,9 @@ def main():
     print("="*80)
 
     # Control network: 4 inputs → 2 outputs (accelerations)
-    u_nn = DoubleIntegratorControlNN(hidden_dim=128)
+    # u_nn = DoubleIntegratorControlNN(hidden_dim=64)
+    # u_nn = LinearControlNN(prior_knowledge=True, input_dim=4)
+    u_nn = InvertControlNN(input_dim=4, hidden_dim=8, output_dim=2)
 
     def f_ol(x: torch.Tensor) -> torch.Tensor:
         """
@@ -847,13 +830,14 @@ def main():
         # dv2/dt = -0.5*v2 (light damping)
         return torch.stack([
             v1,
-            torch.zeros_like(v1),
+            # torch.zeros_like(v1),
+            -0.3 * v1,
             v2,
             -0.5 * v2
         ], dim=1)
 
     # Constant diagonal diffusion
-    g_coeffs = torch.tensor([0.0, 0.15, 0.0, 0.15], dtype=torch.float32)
+    g_coeffs = torch.tensor([0.1, 0.0, 0.1, 0.0], dtype=torch.float32)
 
     def g(x: torch.Tensor) -> torch.Tensor:
         """
@@ -910,28 +894,32 @@ def main():
     print("SPATIAL REGIONS")
     print("="*80)
 
-    # Init: particle 1 at bottom-left, particle 2 at top-right
+    # Init: particles start with some initial positions and velocities
     init_range = np.array([
-        [-2.0, -1.0],   # p1
-        [-0.2,  0.2],   # v1
-        [ 1.0,  2.0],   # p2
-        [-0.2,  0.2],   # v2
+        [ 0.2,  0.7],   # p1 (right side)
+        [ 0.2,  0.5],   # v1 (small velocity)
+        [ 0.2,  0.7],   # p2 (right side)
+        [ 0.2,  0.5],   # v2 (small velocity)
     ], dtype=np.float32)
 
+    # Goal: equilibrium at origin with zero velocities
+    # Dynamics naturally drive velocities to zero (v2 has damping, v1 maintained by control)
     goal_range = np.array([
-        [ 0.0,  2.0],   # p1 at top-right
-        [-1.3,  0.3],   # v1 small
-        [-2.0, 0.0],   # p2 at bottom-left
-        [-1.3,  0.3],   # v2 small
+        [-0.5,   0.5],   # p1 near origin
+        [-1.2,   0.2],   # v1 near zero
+        [-0.5,   0.5],   # p2 near origin
+        [-1.2,   0.2],   # v2 near zero
     ], dtype=np.float32)
 
+    # Unsafe: far from origin (representing collision or out-of-bounds)
     unsafe_range = np.array([
-        [ 2.5,  3.0],   # p1 far right
-        [0.5,  1.5],   # any v1
-        [ 2.5,  3.0],   # p2 also far right  
-        [0.5,  1.5],   # any v2
+        [ 2.0,  3.0],   # p1 far right
+        [ 1.2,  1.5],   # any v1
+        [ 2.0,  3.0],   # p2 also far right
+        [ 1.2,  1.5],   # any v2
     ], dtype=np.float32)
 
+    # Full range: symmetric around origin
     full_range = np.array([
         [-3.0,  3.0],   # p1
         [-1.5,  1.5],   # v1
@@ -1021,10 +1009,11 @@ def main():
             regions=regions,
             params=params,
             device=device,
-            visualize_interval=0,  # Disable visualization for now
+            visualize_interval=1000,  # Visualize every 1000 epochs
             control_net=u_nn,
-            n_samples_per_region=200,  # Hybrid: sample 200 pts per region
+            n_samples_per_region=500,  # Hybrid: sample 200 pts per region
             sample_weight=1.0,  # Weight for sample-based loss
+            plot_pairs=[(0, 2), (1, 3)]  # (p1 vs p2), (v1 vs v2) for double integrator
         )
 
         # Final evaluation

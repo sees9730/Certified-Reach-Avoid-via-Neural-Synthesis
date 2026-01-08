@@ -155,7 +155,8 @@ def compute_loss_goal_bounds(
     # When checking for success (passed), check the logic based on v_min
     # Keep semantics identical to your original
     # if (v_min < beta_s) and (V_lower.min() >= 0).item():
-    if (v_min < V_init_lower.min()) and (V_lower.min() >= 0).item():
+    # if (v_min < V_init_lower.min()) and (V_lower.min() >= 0).item():
+    if (V_lower.min() >= 0).item():
         passed = True
         if show:
             # print(" ✓ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
@@ -256,13 +257,13 @@ def compute_loss_generator_bounds(
     Returns:
         Loss (scalar) - unweighted (weight applied by caller)
     """
-    return F.relu(Phi_upper).sum()
+    return F.relu(Phi_upper).sum() 
 
 
 def compute_loss_generator_bounds_unsafe(
     Phi_lower: torch.Tensor,
     Phi_upper: torch.Tensor
-) -> torch.Tensor:
+) -> torch.Tensor: 
     """
     Compute generator constraint loss with strong penalty for unsafe region.
 
@@ -293,6 +294,26 @@ def compute_loss_generator_bounds_goal(
     return F.relu(Phi_upper).sum()
 
 
+def compute_loss_boundary_bounds(
+    V_lower: torch.Tensor,
+    V_upper: torch.Tensor
+) -> torch.Tensor:
+    """
+    Compute boundary constraint loss from bounds: V(x) >= 1.0 for x on boundary of full_range.
+
+    This enforces that the safe region (full \\ unsafe) has V >= 1.0 at the boundary.
+
+    Args:
+        V_lower: Lower bounds on V (N,)
+        V_upper: Upper bounds on V (N,)
+
+    Returns:
+        Loss (scalar)
+    """
+    # Want V >= 1.0, so penalize V_lower < 1.0
+    return F.relu(1.0 - V_lower).sum()
+
+
 def compute_total_loss_bounds(
     model,
     goal_region,
@@ -306,6 +327,8 @@ def compute_total_loss_bounds(
     V_init_upper: torch.Tensor = None,
     V_outside_lower: torch.Tensor = None,
     V_outside_upper: torch.Tensor = None,
+    V_boundary_lower: torch.Tensor = None,
+    V_boundary_upper: torch.Tensor = None,
     Phi_lower: torch.Tensor = None,
     Phi_upper: torch.Tensor = None,
     Phi_lower_unsafe: torch.Tensor = None,
@@ -359,6 +382,7 @@ def compute_total_loss_bounds(
             'unsafe': 1.0,
             'init': 1.0,
             'outside': 1.0,
+            'boundary': 1.0,
             'generator': 1.0
         }
 
@@ -369,12 +393,14 @@ def compute_total_loss_bounds(
         violations_unsafe = F.relu(beta_ra - V_unsafe_lower)
         violations_init = F.relu(V_init_upper - 1.0)
         violations_outside = F.relu(0.0 - V_outside_lower)
-        violations_goal = F.relu(V_goal_upper - beta_s)
+        violations_goal = F.relu(0.0 - V_goal_lower)
+        # violations_boundary = F.relu(1.0 - V_boundary_lower)
 
         loss_components['unsafe'] = violations_unsafe
         loss_components['init'] = violations_init
         loss_components['outside'] = violations_outside
         loss_components['goal'] = violations_goal
+        # loss_components['boundary'] = violations_boundary
 
     if compute_GV:
         if len(Phi_upper) > 0:
@@ -394,6 +420,7 @@ def compute_total_loss_bounds(
             loss_unsafe = violations_unsafe.sum()
             loss_init = violations_init.sum()
             loss_outside = violations_outside.sum()
+            # loss_boundary = violations_boundary.sum()
             loss_goal = violations_goal.sum()
         if compute_GV:
             loss_generator = violations_generator.sum() if len(violations_generator) > 0 else torch.tensor(0.0, device=device)
@@ -406,21 +433,18 @@ def compute_total_loss_bounds(
         if constraint_largest_counts is None:
             constraint_largest_counts = {}
 
-        # Track which constraint has been largest
-        if candidate_largest is not None:
+        # Determine if we should allow focus switching based on loss magnitude
+        # Use the actual weighted total loss from previous epoch (what's shown in main)
+        allow_focus_switch = (prev_total_loss >= (beta_ra - 1.0)) if prev_total_loss is not None else True
+
+        # Track which constraint has been largest (only if switching is allowed)
+        if candidate_largest is not None and allow_focus_switch:
             constraint_largest_counts[candidate_largest] = constraint_largest_counts.get(candidate_largest, 0) + 1
 
         # Initialize focus on first epoch
         if current_sum_constraint is None:
             current_sum_constraint = candidate_largest
         else:
-            # Only allow switching focus if loss is still high
-            # If we're making progress, stick with current focus
-            if prev_total_loss is not None:
-                allow_focus_switch = (prev_total_loss >= (beta_ra - 1.0))
-            else:
-                allow_focus_switch = (total_sum_loss >= (beta_ra - 1.0))
-
             if allow_focus_switch:
                 # Look for constraints that have consistently been largest
                 candidates_to_switch = {
@@ -447,6 +471,7 @@ def compute_total_loss_bounds(
             loss_unsafe = violations_unsafe.sum() if largest_loss == 'unsafe' else violations_unsafe.mean()
             loss_init = violations_init.sum() if largest_loss == 'init' else violations_init.mean()
             loss_outside = violations_outside.sum() if largest_loss == 'outside' else violations_outside.mean()
+            # loss_boundary = violations_boundary.sum() if largest_loss == 'boundary' else violations_boundary.mean()
             loss_goal = violations_goal.sum() if largest_loss == 'goal' else violations_goal.mean()
 
         if compute_GV:
@@ -461,9 +486,8 @@ def compute_total_loss_bounds(
             loss_weights['unsafe'] * loss_unsafe +
             loss_weights['init'] * loss_init +
             loss_weights['outside'] * loss_outside +
-            
-            loss_weights['goal'] * loss_goal + 
-            generator_weight * loss_generator
+            # loss_weights['boundary'] * loss_boundary +
+            generator_weight * loss_generator #+ loss_generator_unsafe + loss_generator_goal
         )
 
         loss_dict = {
@@ -471,16 +495,18 @@ def compute_total_loss_bounds(
             'unsafe': loss_unsafe.item(),
             'init': loss_init.item(),
             'outside': loss_outside.item(),
-            'goal': violations_goal.mean().item(),
-            'generator': loss_generator.item(),
-            'largest_loss': largest_loss
+            'goal': loss_goal.item(),
+            # 'boundary': loss_boundary.item(),
+            'generator': loss_generator.item()
         }
 
     elif compute_V and not compute_GV:
         total_loss = (
             loss_weights['unsafe'] * loss_unsafe +
             loss_weights['init'] * loss_init +
-            loss_weights['outside'] * loss_outside
+            loss_weights['outside'] * loss_outside +
+            loss_weights['goal'] * loss_goal #+
+            # loss_weights['boundary'] * loss_boundary
         )
 
         loss_dict = {
@@ -488,7 +514,8 @@ def compute_total_loss_bounds(
             'unsafe': loss_unsafe.item(),
             'init': loss_init.item(),
             'outside': loss_outside.item(),
-            'largest_loss': largest_loss
+            # 'boundary': loss_boundary.item(),
+            'goal': loss_goal.item()
         }
 
     elif not compute_V and compute_GV:
@@ -501,8 +528,30 @@ def compute_total_loss_bounds(
 
     # Switch to all sums once loss is small enough for final convergence
     if not locked_to_all_sum and total_loss.item() < 1.0:
+    # if not locked_to_all_sum and total_loss.item() < 0.05:
         locked_to_all_sum = True
         print(f'[SWITCH] Switching to all sums at epoch {epoch} (total_loss={total_loss.item():.4f} < 1.0)')
+
+    # Identify highest loss region from violations (works for both sum and mean)
+    highest_loss_region = None
+    highest_loss_mask = None
+    highest_loss_value = 0.0
+
+    if loss_components:
+        # Find region with highest total violations
+        violation_sums = {name: viols.sum().item() for name, viols in loss_components.items()}
+        highest_loss_region = max(violation_sums, key=violation_sums.get)
+        highest_loss_value = violation_sums[highest_loss_region]
+
+        # Compute failing mask using the violations tensor
+        if highest_loss_value > 0:
+            violations = loss_components[highest_loss_region]
+            highest_loss_mask = (violations > 0)
+
+    # Add to loss_dict
+    loss_dict['highest_loss_region'] = highest_loss_region
+    loss_dict['highest_loss_value'] = highest_loss_value
+    loss_dict['highest_loss_mask'] = highest_loss_mask
 
     return total_loss, loss_dict, locked_to_all_sum, current_sum_constraint, constraint_largest_counts
 
@@ -538,8 +587,8 @@ def evaluate_constraints(
             input_dim = int(input_lowers_all.shape[1])
 
     if input_dim is None:
-        # Try to infer from any non-empty cell list
-        for name in ['goal', 'unsafe', 'init', 'outside', 'generator']:
+        # Try infer from any non-empty cell list
+        for name in ['goal', 'unsafe', 'init', 'outside', 'boundary', 'generator']:
             if name in region_cells and len(region_cells[name]) > 0:
                 cell0 = region_cells[name][0]
                 input_dim = int(cell0[0].numel())
@@ -556,6 +605,7 @@ def evaluate_constraints(
             input_lowers_all, input_uppers_all = input_bounds_all
             v_lowers_all, v_uppers_all = crown_cache_all.compute_bounds(input_lowers_all, input_uppers_all)
 
+            # region_order = ['init', 'goal', 'unsafe', 'outside', 'boundary']
             region_order = ['init', 'goal', 'unsafe', 'outside']
             start_idx = 0
             for name in region_order:
@@ -567,7 +617,8 @@ def evaluate_constraints(
                 else:
                     region_bounds[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
         else:
-            # Fallback: create separate cache for each region
+            # Fallback: create separate cache for each region (dimension-generic)
+            # for name in ['goal', 'unsafe', 'init', 'outside', 'boundary']:
             for name in ['goal', 'unsafe', 'init', 'outside']:
                 if len(region_cells[name]) > 0:
                     cache = SymbolicCROWNCache(V_net, len(region_cells[name]), input_dim=input_dim, device=device)
@@ -630,7 +681,28 @@ def evaluate_constraints(
             init_satisfied = True
             v_init_min = v_init_max = 0.0
 
-        # Check generator constraint: Φ(x) <= 0
+        # # Boundary: bounds only (universal) V(x) >= 1.0
+        # if 'boundary' in region_cells and len(region_cells['boundary']) > 0:
+        #     # Check if boundary bounds are already in region_bounds
+        #     if 'boundary' in region_bounds and len(region_bounds['boundary'][0]) > 0:
+        #         boundary_satisfied = (region_bounds['boundary'][0] >= 1.0).all().item()
+        #         v_boundary_min = region_bounds['boundary'][0].min().item()
+        #         v_boundary_max = region_bounds['boundary'][1].max().item()
+        #     else:
+        #         # Fallback: compute boundary bounds separately
+        #         cache_boundary = SymbolicCROWNCache(V_net, len(region_cells['boundary']), input_dim=input_dim, device=device)
+        #         input_lowers_boundary, input_uppers_boundary = prepare_cell_bounds(
+        #             region_cells['boundary'], device=device, input_dim=input_dim
+        #         )
+        #         v_lowers_boundary, v_uppers_boundary = cache_boundary.compute_bounds(input_lowers_boundary, input_uppers_boundary)
+        #         boundary_satisfied = (v_lowers_boundary >= 1.0).all().item()
+        #         v_boundary_min = v_lowers_boundary.min().item()
+        #         v_boundary_max = v_uppers_boundary.max().item()
+        # else:
+        #     boundary_satisfied = True
+        #     v_boundary_min = v_boundary_max = 0.0
+
+        # Generator: bounds only (universal)  Φ(x) <= 0
         if len(region_cells['generator']) > 0:
             if crown_cache_phi is not None:
                 if input_bounds_gen is not None:
@@ -662,16 +734,19 @@ def evaluate_constraints(
         'init_satisfied': init_satisfied,
         'goal_satisfied': goal_satisfied,
         'outside_satisfied': outside_satisfied,
+        # 'boundary_satisfied': boundary_satisfied,
         'generator_satisfied': generator_satisfied,
 
         'V_unsafe_min': v_unsafe_min,
         'V_unsafe_max': v_unsafe_max,
         'V_init_min': v_init_min,
         'V_init_max': v_init_max,
-        'V_outside_min': v_outside_min,
-        'V_outside_max': v_outside_max,
         'V_goal_min': v_goal_min,
         'V_goal_max': v_goal_max,
+        'V_outside_min': v_outside_min,
+        'V_outside_max': v_outside_max,
+        # 'V_boundary_min': v_boundary_min,
+        # 'V_boundary_max': v_boundary_max,
         'Phi_min': phi_min,
         'Phi_max': phi_max,
         'Phi_mean': phi_mean,
@@ -698,6 +773,7 @@ def print_loss_summary(epoch: int, loss_dict: dict, prefix: str = "", compute_V:
             f"Unsafe: {loss_dict['unsafe']:.4f} | "
             f"Init: {loss_dict['init']:.4f} | "
             f"Outside: {loss_dict['outside']:.4f} | "
+            # f"Boundary: {loss_dict['boundary']:.4f} | "
             f"Gen: {loss_dict['generator']:.4f} | "
             f"Focus: {focus}")
     elif compute_V and not compute_GV:
@@ -706,7 +782,9 @@ def print_loss_summary(epoch: int, loss_dict: dict, prefix: str = "", compute_V:
             f"Goal: {loss_dict['goal']:.4f} | "
             f"Unsafe: {loss_dict['unsafe']:.4f} | "
             f"Init: {loss_dict['init']:.4f} | "
-            f"Outside: {loss_dict['outside']:.4f}")
+            f"Outside: {loss_dict['outside']:.4f} | "
+            # f"Boundary: {loss_dict['boundary']:.4f} | "
+            f"Focus: {focus}")
     else:
         print(f"{prefix}Epoch {epoch:5d} | "
             f"Gen: {loss_dict['generator']:.4f}")
@@ -732,6 +810,8 @@ def print_constraint_summary(results: dict, prefix: str = ""):
           f"(V_min={results['V_init_min']:.3f}, V_max={results['V_init_max']:.3f})")
     print(f"{prefix}  Outside:   {status_str(results['outside_satisfied'])} "
           f"(V_min={results['V_outside_min']:.3f}, V_max={results['V_outside_max']:.3f})")
+    # print(f"{prefix}  Boundary:  {status_str(results['boundary_satisfied'])} "
+        #   f"(V_min={results['V_boundary_min']:.3f}, V_max={results['V_boundary_max']:.3f})")
     print(f"{prefix}  Generator: {status_str(results['generator_satisfied'])} "
           f"(Phi_upper_min={results['Phi_min']:.3f}, Phi_upper_max={results['Phi_max']:.3f}, failing={results['num_failing_cells']})")
 

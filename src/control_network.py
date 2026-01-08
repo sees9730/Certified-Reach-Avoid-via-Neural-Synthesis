@@ -18,6 +18,10 @@ class LinearControlNN(nn.Module):
                 #Initialize as diag(0, 0)
                 with torch.no_grad():
                     self.fc.weight.copy_(torch.diag(torch.tensor([0.0, 0.0, 0.0])))
+            if(input_dim == 4):
+                #Initialize as diag(0, 0)
+                with torch.no_grad():
+                    self.fc.weight.copy_(torch.diag(torch.tensor([0.0, 0.0, 0.0, 0.0])))
                 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.fc(x)

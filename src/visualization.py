@@ -178,13 +178,14 @@ def visualize_value_function(
     training_cells: Optional[List] = None,
     filename: Optional[str] = None,
     resolution: int = 100,
-    figsize: Tuple[int, int] = (10, 8)
+    figsize: Tuple[int, int] = (10, 8),
+    plot_pairs: Optional[List[Tuple[int, int]]] = None
 ):
     V_net.eval()
 
     full_bounds = regions.full.bounds
     D = full_bounds.shape[0]
-    pairs = _get_plot_pairs(D)
+    pairs = plot_pairs if plot_pairs is not None else _get_plot_pairs(D)
 
     # device for eval
     try:
@@ -268,6 +269,7 @@ def visualize_generator(
     results=None,
     filename: Optional[str] = None,
     resolution: int = 100,
+    plot_pairs: Optional[List[Tuple[int, int]]] = None,
     figsize: Tuple[int, int] = (10, 8)
 ):
     V_net.eval()
@@ -275,7 +277,7 @@ def visualize_generator(
 
     full_bounds = regions.full.bounds
     D = full_bounds.shape[0]
-    pairs = _get_plot_pairs(D)
+    pairs = plot_pairs if plot_pairs is not None else _get_plot_pairs(D)
 
     try:
         net_device = next(GV_net.parameters()).device
@@ -368,7 +370,8 @@ def visualize_training_progress(
     regions: Regions,
     region_cells: dict,
     epoch: int,
-    output_dir: str = "."
+    output_dir: str = ".",
+    plot_pairs: Optional[List[Tuple[int, int]]] = None
 ):
     """
     Visualize training progress (both V and Φ) with discretization.
@@ -386,7 +389,7 @@ def visualize_training_progress(
 
     # Cells for V network (all regions except generator)
     v_cells = []
-    for region_name in ['init', 'goal', 'unsafe', 'outside']:
+    for region_name in ['init', 'goal', 'unsafe', 'outside', 'boundary']:
         if region_name in region_cells:
             v_cells.extend(region_cells[region_name])
 
@@ -401,7 +404,8 @@ def visualize_training_progress(
         show_regions=True,
         show_discretization=True,
         training_cells=v_cells,
-        filename=f"{output_dir}/value_function_epoch_{epoch}.png"
+        filename=f"{output_dir}/value_function_epoch_{epoch}.png",
+        plot_pairs=plot_pairs
     )
 
     # Plot generator with GV discretization
@@ -413,7 +417,8 @@ def visualize_training_progress(
         show_regions=True,
         show_discretization=True,
         training_cells=gv_cells,
-        filename=f"{output_dir}/generator_epoch_{epoch}.png"
+        filename=f"{output_dir}/generator_epoch_{epoch}.png",
+        plot_pairs=plot_pairs
     )
 
     # Add 3D plot for 3D systems
@@ -665,7 +670,7 @@ def create_summary_plots(
 
     # Cells for V network (all regions except generator)
     v_cells = []
-    for region_name in ['init', 'goal', 'unsafe', 'outside']:
+    for region_name in ['init', 'goal', 'unsafe', 'outside', 'boundary']:
         if region_name in region_cells:
             v_cells.extend(region_cells[region_name])
 

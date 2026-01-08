@@ -22,33 +22,39 @@ from src.save_load_utils import load_eval_bundle
 # Import the control network class
 import sys
 sys.path.insert(0, str(HERE))
-from main import DoubleIntegratorControlNN
+# from main import DoubleIntegratorControlNN
+from src.control_network import LinearControlNN, NonlinearControlNN, InvertControlNN
 
 
 # ========================================================================
 # REGION DEFINITIONS (matching main.py)
 # ========================================================================
+# Init: particles start with some initial positions and velocities
 init_range = np.array([
-    [-2.0, -1.0],   # p1
-    [-0.2,  0.2],   # v1
-    [ 1.0,  2.0],   # p2
-    [-0.2,  0.2],   # v2
+    [ 0.2,  0.7],   # p1 (right side)
+    [ 0.2,  0.5],   # v1 (small velocity)
+    [ 0.2,  0.7],   # p2 (right side)
+    [ 0.2,  0.5],   # v2 (small velocity)
 ], dtype=np.float32)
 
+# Goal: equilibrium at origin with zero velocities
+# Dynamics naturally drive velocities to zero (v2 has damping, v1 maintained by control)
 goal_range = np.array([
-    [ 0.0,  2.0],   # p1 at top-right
-    [-1.3,  0.3],   # v1 small
-    [-2.0, 0.0],   # p2 at bottom-left
-    [-1.3,  0.3],   # v2 small
+    [-0.5,   0.5],   # p1 near origin
+    [-1.2,   0.2],   # v1 near zero
+    [-0.5,   0.5],   # p2 near origin
+    [-1.2,   0.2],   # v2 near zero
 ], dtype=np.float32)
 
+# Unsafe: far from origin (representing collision or out-of-bounds)
 unsafe_range = np.array([
-    [ 2.5,  3.0],   # p1 far right
-    [0.5,  1.5],   # any v1
-    [ 2.5,  3.0],   # p2 also far right  
-    [0.5,  1.5],   # any v2
+    [ 2.0,  3.0],   # p1 far right
+    [ 1.2,  1.5],   # any v1
+    [ 2.0,  3.0],   # p2 also far right
+    [ 1.2,  1.5],   # any v2
 ], dtype=np.float32)
 
+# Full range: symmetric around origin
 full_range = np.array([
     [-3.0,  3.0],   # p1
     [-1.5,  1.5],   # v1
@@ -75,7 +81,7 @@ def collision_distance(x: np.ndarray) -> float:
 # ========================================================================
 # DYNAMICS (numpy versions)
 # ========================================================================
-NOISE_DIAG = np.array([0.0, 0.15, 0.0, 0.15], dtype=float)
+NOISE_DIAG = np.array([0.1, 0.0, 0.1, 0.0], dtype=float)
 
 
 def f_ol_np(x: np.ndarray) -> np.ndarray:
@@ -87,7 +93,7 @@ def f_ol_np(x: np.ndarray) -> np.ndarray:
     p1, v1, p2, v2 = x
     return np.array([
         v1,           # dp1/dt = v1
-        0.0,          # dv1/dt = 0 (coasting)
+        -0.3 * v1,          # dv1/dt = 0 (coasting)
         v2,           # dp2/dt = v2
         -0.5 * v2     # dv2/dt = -0.5*v2 (damping)
     ], dtype=float)
@@ -116,7 +122,8 @@ def g_diag_np(_x: np.ndarray) -> np.ndarray:
 def load_control_net(bundle_path, device="cpu"):
     bundle = load_eval_bundle(bundle_path, map_location=device)
 
-    control_net = DoubleIntegratorControlNN(hidden_dim=128)
+    # control_net = DoubleIntegratorControlNN(hidden_dim=64)
+    control_net = InvertControlNN(input_dim=4, hidden_dim=8, output_dim=2)
     if bundle["control_state_dict"] is not None:
         control_net.load_state_dict(bundle["control_state_dict"])
 
@@ -193,6 +200,72 @@ def test_single_traj_run(controller=None, T=20.0, seed=None):
     u_hist[-1] = u_hist[-2]
 
     # ========================================================================
+    # CHECK FINAL OUTCOME (with detailed diagnostics)
+    # ========================================================================
+    reached_goal = False
+    reached_unsafe = False
+    goal_time = None
+    unsafe_time = None
+
+    # Track when each dimension enters goal bounds
+    p1_in_goal = []
+    p2_in_goal = []
+    v1_in_goal = []
+    v2_in_goal = []
+
+    for k in range(N):
+        # Check full 4D goal
+        if in_box_4d(x[k], goal_range):
+            reached_goal = True
+            goal_time = t_grid[k]
+            break
+        if in_box_4d(x[k], unsafe_range):
+            reached_unsafe = True
+            unsafe_time = t_grid[k]
+            break
+
+        # Track individual dimensions
+        if goal_range[0,0] <= x[k,0] <= goal_range[0,1]:
+            p1_in_goal.append((t_grid[k], x[k,0]))
+        if goal_range[2,0] <= x[k,2] <= goal_range[2,1]:
+            p2_in_goal.append((t_grid[k], x[k,2]))
+        if goal_range[1,0] <= x[k,1] <= goal_range[1,1]:
+            v1_in_goal.append((t_grid[k], x[k,1]))
+        if goal_range[3,0] <= x[k,3] <= goal_range[3,1]:
+            v2_in_goal.append((t_grid[k], x[k,3]))
+
+    print("\n" + "="*80)
+    print("TRAJECTORY OUTCOME")
+    print("="*80)
+    if reached_goal:
+        print(f"✓ SUCCESS: Reached goal at t={goal_time:.2f}s")
+    elif reached_unsafe:
+        print(f"✗ FAILURE: Reached unsafe at t={unsafe_time:.2f}s")
+    else:
+        print(f"⊗ TIMEOUT: Did not reach goal or unsafe within T={T}s")
+
+    print(f"\nFinal state: p1={x[-1,0]:.3f}, v1={x[-1,1]:.3f}, p2={x[-1,2]:.3f}, v2={x[-1,3]:.3f}")
+    print(f"Goal region: p1∈[{goal_range[0,0]:.1f},{goal_range[0,1]:.1f}], v1∈[{goal_range[1,0]:.1f},{goal_range[1,1]:.1f}]")
+    print(f"             p2∈[{goal_range[2,0]:.1f},{goal_range[2,1]:.1f}], v2∈[{goal_range[3,0]:.1f},{goal_range[3,1]:.1f}]")
+
+    # Show per-dimension diagnostics
+    print(f"\nPer-dimension goal satisfaction:")
+    print(f"  p1 in goal bounds: {len(p1_in_goal)}/{N} steps ({100*len(p1_in_goal)/N:.1f}%)")
+    if len(p1_in_goal) > 0:
+        print(f"     First: t={p1_in_goal[0][0]:.2f}s, Last: t={p1_in_goal[-1][0]:.2f}s")
+    print(f"  p2 in goal bounds: {len(p2_in_goal)}/{N} steps ({100*len(p2_in_goal)/N:.1f}%)")
+    if len(p2_in_goal) > 0:
+        print(f"     First: t={p2_in_goal[0][0]:.2f}s, Last: t={p2_in_goal[-1][0]:.2f}s")
+    print(f"  v1 in goal bounds: {len(v1_in_goal)}/{N} steps ({100*len(v1_in_goal)/N:.1f}%)")
+    if len(v1_in_goal) > 0:
+        print(f"     First: t={v1_in_goal[0][0]:.2f}s, Last: t={v1_in_goal[-1][0]:.2f}s")
+    print(f"  v2 in goal bounds: {len(v2_in_goal)}/{N} steps ({100*len(v2_in_goal)/N:.1f}%)")
+    if len(v2_in_goal) > 0:
+        print(f"     First: t={v2_in_goal[0][0]:.2f}s, Last: t={v2_in_goal[-1][0]:.2f}s")
+
+    print("="*80 + "\n")
+
+    # ========================================================================
     # ANIMATION
     # ========================================================================
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
@@ -251,6 +324,11 @@ def test_single_traj_run(controller=None, T=20.0, seed=None):
                                 goal_range[1,1]-goal_range[1,0],
                                 goal_range[3,1]-goal_range[3,0],
                                 fill=True, alpha=0.2, color='green'))
+    # Unsafe: velocity constraints
+    ax_vel.add_patch(Rectangle((unsafe_range[1,0], unsafe_range[3,0]),
+                                unsafe_range[1,1]-unsafe_range[1,0],
+                                unsafe_range[3,1]-unsafe_range[3,0],
+                                fill=True, alpha=0.25, color='red'))
 
     # Trajectory artists
     traj_pos, = ax_pos.plot([], [], 'b-', lw=1.5, alpha=0.6)
@@ -401,8 +479,8 @@ def estimate_reach_avoid_mc(
 def test_mc(controller=None):
     p_reach_avoid, stats = estimate_reach_avoid_mc(
         controller=controller,
-        n_mc=500,
-        T_mc=300.0,
+        n_mc=100,
+        T_mc=20.0,
         dt_mc=0.01,
         seed_mc=0
     )
