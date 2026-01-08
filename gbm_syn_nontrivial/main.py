@@ -194,7 +194,7 @@ def pretrain_network_samples(
         # ---------------------------------------------------------------------
         x_goal = _sample_in_box(goal_t, n_each)
         v_goal = model(x_goal).squeeze(-1)
-        v_loss_inside_goal = F.relu(v_goal - params.constraints.pretrain_goal_target).sum()
+        v_loss_inside_goal = F.relu(params.constraints.pretrain_goal_target- v_goal).sum()
 
         # ---------------------------------------------------------------------
         # Total V loss
@@ -203,8 +203,8 @@ def pretrain_network_samples(
             v_loss_full
             + v_loss_init
             + v_loss_unsafe
-            + v_loss_inside_goal
-            + v_loss_others
+            # + v_loss_inside_goal
+            # + v_loss_others
         )
 
         # ---------------------------------------------------------------------
@@ -219,12 +219,8 @@ def pretrain_network_samples(
 
         total_loss = loss_v + loss_phi
 
-        optimizer.zero_grad()
-        total_loss.backward()
-        optimizer.step()
-
         # Track best
-        if total_loss.item() < best_loss:
+        if total_loss.item() <= best_loss:
             best_loss = total_loss.item()
             best_model_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
             if control_net is not None:
@@ -249,6 +245,11 @@ def pretrain_network_samples(
                     f"unsafe={v_loss_unsafe.item():.3f}, goal={v_loss_inside_goal.item():.3f}, "
                     f"others={v_loss_others.item():.3f})"
                 )
+        
+        # Optimize/update networks
+        optimizer.zero_grad()
+        total_loss.backward()
+        optimizer.step()
 
     # Restore best model
     if best_model_state is not None:
@@ -436,7 +437,7 @@ def train_network_bounds(
                 # Track failing cells for adaptive refinement
                 phi_upper_failing_mask = phi_uppers > 0.0
                 num_total_failing = phi_upper_failing_mask.sum().item()
-                phi_upper_failing_mask_relax = phi_uppers > -20.0
+                phi_upper_failing_mask_relax = phi_uppers > -200.0
                 
             else:
                 phi_lowers = torch.tensor([], device=device)
@@ -532,7 +533,7 @@ def train_network_bounds(
             if len(outside_failing_mask) == len(region_cells['outside']) and num_outside_failing > 0:
                 REFINE_INTERVAL = 500
                 REFINE_FACTOR = 2
-                MAX_CELLS = 5000
+                MAX_CELLS = 10000
 
                 if epoch > 2500:
                     REFINE_INTERVAL = 100
@@ -542,25 +543,25 @@ def train_network_bounds(
                     new_cells, num_refined = refine_failing_cells(
                         region_cells['outside'],
                         outside_failing_mask,
-                        REFINE_FACTOR
+                        REFINE_FACTOR,
                     )
                     region_cells['outside'] = new_cells
                     print(f"[Refine-Outside] Epoch {epoch+1}: {num_outside_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['outside'].append(epoch + 1)
 
-            # if((epoch + 1) % 512 == 0):
-            #     merged_cells, num_merges = merge_passing_neighbor_cells(
-            #         region_cells['outside'],
-            #         outside_failing_mask_relax,
-            #         max_passes=8,
-            #         max_merges=None,   # cap work; set None for full greedy
-            #         seed=0,
-            #         eps=1e-6,
-            #     )
-            #     region_cells['outside'] = merged_cells
-            #     print(f"[Merge-Outside] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
-            #     needs_cache_rebuild = True
+            if((epoch + 1) % 502 == 0):
+                merged_cells, num_merges = merge_passing_neighbor_cells(
+                    region_cells['outside'],
+                    outside_failing_mask_relax,
+                    max_passes=8,
+                    max_merges=None,   # cap work; set None for full greedy
+                    seed=0,
+                    eps=1e-6,
+                )
+                region_cells['outside'] = merged_cells
+                print(f"[Merge-Outside] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+                needs_cache_rebuild = True
 
         # Adaptive refinement for generator cells (before optimizer step)
         if params.compute_GV:
@@ -585,25 +586,26 @@ def train_network_bounds(
                     new_cells, num_refined = refine_failing_cells(
                         region_cells['generator'],
                         phi_upper_failing_mask,
-                        REFINE_FACTOR
+                        REFINE_FACTOR,
+                        scores=phi_uppers
                     )
                     region_cells['generator'] = new_cells
                     print(f"[Refine-Generator] Epoch {epoch+1}: {num_total_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['generator'].append(epoch + 1)
 
-            # if((epoch + 1) % 512 == 0):
-            #     merged_cells, num_merges = merge_passing_neighbor_cells(
-            #         region_cells['generator'],
-            #         phi_upper_failing_mask_relax,
-            #         max_passes=8,
-            #         max_merges=None,   # cap work; set None for full greedy
-            #         seed=0,
-            #         eps=1e-6,
-            #     )
-            #     region_cells['generator'] = merged_cells
-            #     print(f"[Merge-Generator] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
-            #     needs_cache_rebuild = True
+            if((epoch + 1) % 502 == 0):
+                merged_cells, num_merges = merge_passing_neighbor_cells(
+                    region_cells['generator'],
+                    phi_upper_failing_mask_relax,
+                    max_passes=8,
+                    max_merges=None,   # cap work; set None for full greedy
+                    seed=0,
+                    eps=1e-6,
+                )
+                region_cells['generator'] = merged_cells
+                print(f"[Merge-Generator] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+                needs_cache_rebuild = True
 
         # Logging
         if epoch % 10 == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
@@ -627,21 +629,15 @@ def train_network_bounds(
             all_satisfied = True
             if params.compute_V:
                 show = (epoch % 10 == 0)
-                _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, bounds_updated['outside'][0], 
-                                                             device=device, show=show, check=True, n_samples=10000)
+                _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, bounds_updated['outside'][0], device=device, show=show, check=True, n_samples=10000)
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
-                init_satisfied = (bounds_updated['init'][0].min() >= beta_s_check and bounds_updated['init'][1].max() <= 1.0)
-                outside_satisfied = (bounds_updated['outside'][0].min() >= beta_s_check)
-                                # Boundary constraint: V >= 1.0
-                if len(bounds_updated['boundary'][0]) > 0:
-                    boundary_satisfied = (bounds_updated['boundary'][0].min() >= 1.0)
-                else:
-                    boundary_satisfied = True
-                all_satisfied = all_satisfied and goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied and boundary_satisfied
+                init_satisfied = (bounds_updated['init'][1].max() <= 1.0)
+                outside_satisfied = (bounds_updated['outside'][0].min() >= 0.0)
+                all_satisfied = all_satisfied and goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied
 
             # Check GV constraints
             if params.compute_GV:
-                generator_satisfied = (phi_uppers.max() <= 0.0)
+                generator_satisfied = (phi_uppers.max() < 0.0)
                 all_satisfied = all_satisfied and generator_satisfied
 
             # Early stop if all active constraints are satisfied
@@ -799,11 +795,11 @@ def main():
     params.training.generator_weight = 1.0  # Enable generator constraint
     params.training.generator_start_epoch = 0
 
-    params.discretization.n_goal = 15
-    params.discretization.n_outside_goal = 5
+    params.discretization.n_goal = 7
+    params.discretization.n_outside_goal = 4
     params.discretization.n_generator = 1  # Will be overridden by radial discretization
-    params.discretization.n_unsafe = 6
-    params.discretization.n_init = 6
+    params.discretization.n_unsafe = 7
+    params.discretization.n_init = 7
 
     # Set beta_s to a value (constant), or set to None to make it learnable
     # If learnable_beta_s is True, this value will be used as initialization
@@ -901,18 +897,18 @@ def main():
     region_cells = discretize_regions(
         regions,
         params.discretization,
-        use_radial_generator=True  # Use radial + clipping for generator
+        use_radial_generator=False,  # Use radial + clipping for generator
+        boundary_n_partitions=1
     )
 
     # ========================================================================
     # 6.0 Setup saving
     # ========================================================================
     device = params.training.device
-    delta = 0.1
-    params.constraints.pretrain_goal_target = params.constraints.beta_s - delta
+    params.constraints.pretrain_goal_target = params.constraints.beta_s
     params.constraints.pretrain_unsafe_target = params.constraints.beta_ra
-    params.constraints.pretrain_init_target = params.constraints.beta_s + delta
-    params.constraints.pretrain_phi_target = 1.0
+    params.constraints.pretrain_init_target = 1.0
+    params.constraints.pretrain_phi_target = 0.0
     # Path to bundle we will save/load
     bundle_path = OUTPUT_DIR / "eval_bundle.pth"
 

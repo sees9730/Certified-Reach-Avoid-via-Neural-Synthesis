@@ -24,7 +24,7 @@ class LinearControlNN(nn.Module):
     
 
 class GBMControlNN(nn.Module):
-    def __init__(self, input_dim=2, hidden_dim=4, output_dim=2):
+    def __init__(self, input_dim=2, hidden_dim=8, output_dim=2):
         super().__init__()
         # Fully connected layers
         self.fc1 = nn.Linear(input_dim, hidden_dim, bias=True)   # input -> hidden
