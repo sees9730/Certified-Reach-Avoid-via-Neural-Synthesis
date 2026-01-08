@@ -22,7 +22,7 @@ from src.hyperparameters import Hyperparameters
 from src.dynamics import Dynamics, ClosedLoopDrift
 from src.regions import Regions, Region
 from src.network import create_V
-from src.control_network import LinearControlNN, NonlinearControlNN # [control synthesis]
+from src.control_network import LinearControlNN, LorentzLinearControlNN, NonlinearControlNN # [control synthesis]
 from src.phi_module import create_GV
 from src.discretization import discretize_regions
 from src.crown_bounds import SymbolicCROWNCache, SymbolicCROWNCache_Phi, prepare_cell_bounds
@@ -566,13 +566,13 @@ def train_network_bounds(
                 num_total_failing > 0):
 
                 # Refinement parameters (matching testing_simple3.py)
-                REFINE_INTERVAL = 500  # Refine every 100k epochs
+                REFINE_INTERVAL = 1000  # Refine every 100k epochs
                 REFINE_FACTOR = 2  # Split into 2x2 subcells
-                MAX_CELLS = 30000  # Don't refine if we already have too many cells
+                MAX_CELLS = 60000  # Don't refine if we already have too many cells
 
                 # Adjust interval for later epochs
-                if epoch > 5000:
-                    REFINE_INTERVAL = 100
+                if epoch > 10000:
+                    REFINE_INTERVAL = 500
 
                 # Check if it's time to refine
                 if ((epoch + 1) % REFINE_INTERVAL == 0 and
@@ -580,7 +580,8 @@ def train_network_bounds(
                     new_cells, num_refined = refine_failing_cells(
                         region_cells['generator'],
                         phi_upper_failing_mask,
-                        REFINE_FACTOR
+                        REFINE_FACTOR,
+                        scores=phi_uppers,
                     )
                     region_cells['generator'] = new_cells
                     print(f"[Refine-Generator] Epoch {epoch+1}: {num_total_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
@@ -664,7 +665,7 @@ def train_network_bounds(
                 break
 
         # Detailed evaluation and visualization
-        if (epoch % 1000 == 0) or epoch == params.training.num_epochs - 1:
+        if (epoch % 500 == 0) or epoch == params.training.num_epochs - 1:
             print(f"\nEpoch {epoch} - Detailed Evaluation:")
             # For evaluation, we can just create temporary caches (not in the hot path)
             results = evaluate_constraints(
@@ -689,7 +690,7 @@ def train_network_bounds(
                     print(f"  Unsafe bounds: V ∈ [{bounds['unsafe'][0].min().item():.3f}, {bounds['unsafe'][1].max().item():.3f}]")
             if params.compute_GV:
                 if len(phi_uppers) > 0:
-                    print(f"  Generator bounds: Φ ∈ [{phi_lowers.min().item():.3f}, {phi_uppers.max().item():.3f}]")
+                    print(f"  Generator bounds: Φ ∈ [{phi_uppers.min().item():.6e}, {phi_uppers.max().item():.6e}]")
                     failing_cells = (phi_uppers > 0).sum().item()
                     print(f"  Generator failing cells: {failing_cells}/{len(phi_uppers)} ({100*failing_cells/len(phi_uppers):.1f}%)")
             print()
@@ -825,16 +826,18 @@ def main():
     print("="*80)
 
     # Option 2: Neural network control (implements same K @ x)
-    u_nn = LinearControlNN(prior_knowledge=True, 
-                           input_dim=params.network.n_inputs)
+    # u_nn = LinearControlNN(prior_knowledge=True, 
+    #                        input_dim=params.network.n_inputs)
     # u_nn = NonlinearControlNN()
+    u_nn = LorentzLinearControlNN()
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
         # Batch
         x1 = x[:, 0]
         x2 = x[:, 1]
         x3 = x[:, 2]
-        f1 = -33.71*x1 - 8.49*x2
+        # f1 = -33.71*x1 - 8.49*x2
+        f1 = -10.0*x1 + 10.0*x2
         f2 = -x1*x3 + 28.0*x1 - x2
         f3 =  x1*x2 - 8/3 *x3
         return torch.stack([f1, f2, f3], dim=1)
@@ -964,8 +967,8 @@ def main():
         print(f"\nUsing device: {device}")
 
         ENABLE_PRETRAINING = True  # Set to True to enable
-        PRETRAIN_EPOCHS = 20000
-        PRETRAIN_LR = 0.001
+        PRETRAIN_EPOCHS = 100
+        PRETRAIN_LR = 0.01
 
         if ENABLE_PRETRAINING:
             pretrain_network_samples(

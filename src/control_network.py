@@ -105,3 +105,83 @@ class NonlinearControlNN(nn.Module):
         h1 = F.tanh(self.fc1(x))
         out = (self.fc2(h1))
         return out
+    
+
+# class LorentzLinearControlNN(nn.Module):
+#     def __init__(self, prior_knowledge: bool = True, input_dim: int = 3):
+#         super().__init__()
+#         if input_dim != 3:
+#             raise ValueError(f"LinearControlNN here is specialized to input_dim=3, got {input_dim}")
+
+#         # Fully-connected: 3 inputs -> 3 outputs, no bias
+#         self.fc = nn.Linear(input_dim, input_dim, bias=False)
+
+#         if prior_knowledge:
+#             # Want: u1 = -23.71*x1 -18.49*x2 + 0*x3), u2 = 0, u3 = 0
+#             # So set first row = [-23.71, -18.49, 0], other rows = [0,0,0]
+#             W = torch.zeros((3, 3), dtype=torch.float32)
+#             W[0, 0] = -23.71
+#             W[0, 1] = -18.49
+#             # W[0, 2] = 0.0 already
+#             with torch.no_grad():
+#                 self.fc.weight.copy_(W)
+#         else:
+#             # default: all zeros (you can change this if desired)
+#             with torch.no_grad():
+#                 self.fc.weight.zero_()
+
+#     def forward(self, x: torch.Tensor) -> torch.Tensor:
+#         if x.shape[-1] != 3:
+#             raise ValueError(f"Expected x last-dim = 3, got shape {tuple(x.shape)}")
+#         return self.fc(x)
+    
+
+class LorentzLinearControlNN(nn.Module):
+    """
+    3D linear feedback u = K(x) x with a *base-offset* only on two weights:
+
+      u1 = (-23.71 + W[0,0]) * x1 + (-18.49 + W[0,1]) * x2 + W[0,2] * x3
+      u2 =  W[1,0] * x1 +  W[1,1] * x2 + W[1,2] * x3
+      u3 =  W[2,0] * x1 +  W[2,1] * x2 + W[2,2] * x3
+
+    Implemented as a standard nn.Linear(3,3,bias=False), but in forward we add a fixed
+    3x3 base-mask to the weight so only (0,0) and (0,1) get offsets.
+    """
+    def __init__(
+        self,
+        prior_knowledge: bool = True,
+        input_dim: int = 3,
+        k11_base: float = -23.71,
+        k12_base: float = -18.49,
+        device: torch.device | str = "cpu",
+        dtype: torch.dtype = torch.float32,
+    ):
+        super().__init__()
+        if input_dim != 3:
+            raise ValueError(f"LorentzLinearControlNN is specialized to input_dim=3, got {input_dim}")
+
+        self.fc = nn.Linear(3, 3, bias=False, device=device, dtype=dtype)
+
+        # Base-mask added to weights at forward-time: only affects W_eff[0,0], W_eff[0,1]
+        base = torch.zeros((3, 3), device=device, dtype=dtype)
+        base[0, 0] = k11_base
+        base[0, 1] = k12_base
+        self.register_buffer("W_base", base)
+
+        if prior_knowledge:
+            # Initialize *learnable* W to zeros so u1 starts at the base rule,
+            # and u2,u3 start as 0 (you can change these if you want).
+            with torch.no_grad():
+                self.fc.weight.zero_()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if x.shape[-1] != 3:
+            raise ValueError(f"Expected x last-dim = 3, got shape {tuple(x.shape)}")
+
+        W_eff = self.fc.weight + self.W_base  # grad flows to fc.weight
+        return F.linear(x, W_eff, bias=None)
+
+    @torch.no_grad()
+    def get_effective_weight(self) -> torch.Tensor:
+        """Return the effective 3x3 matrix (CPU) used in forward."""
+        return (self.fc.weight + self.W_base).detach().cpu().clone()

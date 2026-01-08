@@ -146,7 +146,8 @@ def compute_loss_goal_bounds(
 
     # Encourage non-negativity of the certified lower bound inside goal
     # (kept identical behavior, but note: min() here returns a scalar tensor)
-    loss_nonneg = torch.relu(0.0 - V_lower).sum()
+    # loss_nonneg = torch.relu(0.0 - V_lower).sum()
+    loss_nonneg = torch.relu(0.0 - torch.min(V_lower))
 
     # Obtain minimum V inside goal region: from samples, center, and lowest upper bound
     v_min = min(v_samples.min().item(), v_center.item(), V_upper.min().item())
@@ -242,7 +243,8 @@ def compute_loss_outside_bounds(
         Loss (scalar)
     """
     # Want V >= beta_s, so penalize V_lower < beta_s
-    return F.relu(beta_s - V_lower).sum()
+    # return F.relu(beta_s - V_lower).sum()
+    return F.relu(beta_s - torch.min(V_lower))
 
 
 def compute_loss_generator_bounds(
@@ -623,7 +625,7 @@ def print_loss_summary(epoch: int, loss_dict: dict, prefix: str = "", compute_V:
             f"Init: {loss_dict['init']:.4f} | "
             f"Outside: {loss_dict['outside']:.4f} | "
             f"Boundary: {loss_dict['boundary']:.4f} | "
-            f"Gen: {loss_dict['generator']:.4f}")
+            f"Gen: {loss_dict['generator']:.6e}")
     elif compute_V and not compute_GV:
         print(f"{prefix}Epoch {epoch:5d} | "
             f"Total: {loss_dict['total']:.4f} | "
@@ -661,8 +663,75 @@ def print_constraint_summary(results: dict, prefix: str = ""):
     print(f"{prefix}  Boundary:  {status_str(results['boundary_satisfied'])} "
           f"(V_min={results['V_boundary_min']:.3f}, V_max={results['V_boundary_max']:.3f})")
     print(f"{prefix}  Generator: {status_str(results['generator_satisfied'])} "
-          f"(Phi_upper_min={results['Phi_min']:.3f}, Phi_upper_max={results['Phi_max']:.3f}, failing={results['num_failing_cells']})")
+          f"(Phi_upper_min={results['Phi_min']:.6e}, Phi_upper_max={results['Phi_max']:.6e}, failing={results['num_failing_cells']})")
 
+
+# def refine_failing_cells(
+#     region_cells: List[Tuple[torch.Tensor, torch.Tensor]],
+#     failing_mask: torch.Tensor,
+#     refine_factor: int = 2,
+#     N_to_refine: int = 100,
+#     seed: Optional[int] = 0,
+# ) -> Tuple[List[Tuple[torch.Tensor, torch.Tensor]], int]:
+#     """
+#     Refine (split) only a random subset of failing cells.
+
+#     Args:
+#         region_cells: List of (lower, upper) cell bounds, each (D,)
+#         failing_mask: Boolean mask indicating which cells failed
+#         refine_factor: Factor to subdivide cells (2 = split into refine_factor^D subcells)
+#         N_to_refine: Max number of failing cells to refine (randomly selected)
+#         seed: Optional RNG seed for reproducibility
+
+#     Returns:
+#         Tuple of (new_cells, num_refined)
+#     """
+#     # Make sure mask is 1D on CPU for indexing
+#     failing_mask = failing_mask.reshape(-1).to(dtype=torch.bool).cpu()
+
+#     n_cells = len(region_cells)
+#     mask_len = min(len(failing_mask), n_cells)
+
+#     # indices of failing cells that are eligible (within mask range)
+#     failing_idxs = torch.nonzero(failing_mask[:mask_len], as_tuple=False).reshape(-1).tolist()
+
+#     # choose subset to refine
+#     if N_to_refine is None or N_to_refine <= 0 or len(failing_idxs) == 0:
+#         refine_set = set()
+#     else:
+#         rng = np.random.default_rng(seed)
+#         k = min(int(N_to_refine), len(failing_idxs))
+#         refine_set = set(rng.choice(failing_idxs, size=k, replace=False).tolist())
+
+#     new_cells: List[Tuple[torch.Tensor, torch.Tensor]] = []
+#     num_refined = 0
+
+#     for i, (cell_lower, cell_upper) in enumerate(region_cells):
+#         if i in refine_set:
+#             # --- build (D,2) bounds (dimension-generic) ---
+#             cell_lower = cell_lower.reshape(-1)
+#             cell_upper = cell_upper.reshape(-1)
+#             D = int(cell_lower.numel())
+
+#             cell_bounds = np.array(
+#                 [[cell_lower[d].item(), cell_upper[d].item()] for d in range(D)],
+#                 dtype=np.float32
+#             )
+#             # ------------------------------------------------
+
+#             cell_region = Region(cell_bounds)
+#             refined = discretize_region(cell_region, refine_factor)
+#             new_cells.extend(refined)
+#             num_refined += 1
+#         else:
+#             new_cells.append((cell_lower, cell_upper))
+
+#     return new_cells, num_refined
+
+
+from typing import List, Tuple, Optional
+import numpy as np
+import torch
 
 def refine_failing_cells(
     region_cells: List[Tuple[torch.Tensor, torch.Tensor]],
@@ -670,16 +739,21 @@ def refine_failing_cells(
     refine_factor: int = 2,
     N_to_refine: int = 100,
     seed: Optional[int] = 0,
+    scores: Optional[torch.Tensor] = None,   # <-- NEW (larger = refine first)
 ) -> Tuple[List[Tuple[torch.Tensor, torch.Tensor]], int]:
     """
-    Refine (split) only a random subset of failing cells.
+    Refine (split) only a subset of failing cells.
+
+    If scores is provided, refine the top-N_to_refine failing cells with the
+    largest scores (e.g., phi_uppers). Otherwise, refine a random subset.
 
     Args:
         region_cells: List of (lower, upper) cell bounds, each (D,)
         failing_mask: Boolean mask indicating which cells failed
         refine_factor: Factor to subdivide cells (2 = split into refine_factor^D subcells)
-        N_to_refine: Max number of failing cells to refine (randomly selected)
-        seed: Optional RNG seed for reproducibility
+        N_to_refine: Max number of failing cells to refine
+        seed: Optional RNG seed for reproducibility (only used when scores is None)
+        scores: Optional 1D tensor aligned with region_cells giving priority (higher = refine first)
 
     Returns:
         Tuple of (new_cells, num_refined)
@@ -691,15 +765,32 @@ def refine_failing_cells(
     mask_len = min(len(failing_mask), n_cells)
 
     # indices of failing cells that are eligible (within mask range)
-    failing_idxs = torch.nonzero(failing_mask[:mask_len], as_tuple=False).reshape(-1).tolist()
+    failing_idxs_t = torch.nonzero(failing_mask[:mask_len], as_tuple=False).reshape(-1)
 
     # choose subset to refine
-    if N_to_refine is None or N_to_refine <= 0 or len(failing_idxs) == 0:
+    if N_to_refine is None or N_to_refine <= 0 or failing_idxs_t.numel() == 0:
         refine_set = set()
     else:
-        rng = np.random.default_rng(seed)
-        k = min(int(N_to_refine), len(failing_idxs))
-        refine_set = set(rng.choice(failing_idxs, size=k, replace=False).tolist())
+        k = min(int(N_to_refine), int(failing_idxs_t.numel()))
+
+        if scores is not None:
+            # Top-k selection by score among failing cells (largest first)
+            scores_cpu = scores.reshape(-1).detach().cpu()
+            scores_cpu = scores_cpu[:mask_len]
+            print("[debug] use score")
+
+            failing_scores = scores_cpu[failing_idxs_t]
+            # Be safe with NaNs/Infs
+            failing_scores = torch.nan_to_num(failing_scores, nan=-float("inf"))
+
+            topk = torch.topk(failing_scores, k=k, largest=True).indices
+            refine_idxs = failing_idxs_t[topk].tolist()
+            refine_set = set(refine_idxs)
+        else:
+            # Random subset (original behavior)
+            rng = np.random.default_rng(seed)
+            refine_idxs = rng.choice(failing_idxs_t.tolist(), size=k, replace=False).tolist()
+            refine_set = set(refine_idxs)
 
     new_cells: List[Tuple[torch.Tensor, torch.Tensor]] = []
     num_refined = 0
