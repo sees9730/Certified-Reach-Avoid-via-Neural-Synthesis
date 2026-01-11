@@ -1029,7 +1029,29 @@ def main():
         )
         print_constraint_summary(results)
 
-        # Save bundle
+        # ========================================================================
+        # 8. FINAL VISUALIZATIONS
+        # ========================================================================
+        print("\n" + "="*80)
+        print("CREATING FINAL VISUALIZATIONS")
+        print("="*80)
+
+        create_summary_plots(
+            V_net=V_net,
+            GV_net=GV_net,
+            regions=regions,
+            region_cells=region_cells,
+            beta_s=final_beta_s,
+            beta_ra=params.constraints.beta_ra,
+            loss_history=loss_history,
+            refinement_epochs=refinement_epochs,
+            results=results,
+            output_dir="results"
+        )
+
+        # ========================================================================
+        # 9. SAVE BUNDLE
+        # ========================================================================
         print("\n" + "="*80)
         print("SAVING EVAL BUNDLE")
         print("="*80)
@@ -1098,6 +1120,24 @@ def main():
         print("FINAL EVALUATION (LOADED)")
         print("="*80)
         print_constraint_summary(results)
+
+        print("\n" + "="*80)
+        print("CREATING FINAL VISUALIZATIONS (LOADED)")
+        print("="*80)
+        log_loaded_training_epochs(loss_history)
+
+        create_summary_plots(
+            V_net=V_net,
+            GV_net=GV_net,
+            regions=regions,
+            region_cells=region_cells,
+            beta_s=final_beta_s,
+            beta_ra=params.constraints.beta_ra,
+            loss_history=loss_history,
+            refinement_epochs=refinement_epochs,
+            results=results,
+            output_dir="results"
+        )
 
 
 if __name__ == '__main__':

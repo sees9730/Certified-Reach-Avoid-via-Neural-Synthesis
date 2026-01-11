@@ -27,9 +27,53 @@ from src.control_network import LinearControlNN, InvertControlNN
 
 
 # ========================================================================
-# REGION DEFINITIONS (matching main.py)
+# LOAD REGIONS FROM BUNDLE (to ensure consistency with training)
 # ========================================================================
-# Init: particles start with some initial positions and velocities
+def load_regions_from_bundle(bundle_path):
+    """Load region definitions from saved bundle."""
+    bundle = load_eval_bundle(bundle_path, map_location="cpu")
+    regions_dict = bundle.get("regions", None)
+
+    if regions_dict is None:
+        # Fallback to hardcoded values if bundle doesn't have regions
+        print("Warning: Bundle doesn't contain regions, using hardcoded defaults")
+        init_range = np.array([
+            [ 0.2,  0.7],   # p1 (right side)
+            [ 0.2,  0.5],   # v1 (small velocity)
+            [ 0.2,  0.7],   # p2 (right side)
+            [ 0.2,  0.5],   # v2 (small velocity)
+        ], dtype=np.float32)
+
+        goal_range = np.array([
+            [-0.5,   0.5],   # p1 near origin
+            [-1.2,   0.2],   # v1 near zero
+            [-0.5,   0.5],   # p2 near origin
+            [-1.2,   0.2],   # v2 near zero
+        ], dtype=np.float32)
+
+        unsafe_range = np.array([
+            [ 2.0,  3.0],   # p1 far right
+            [ 1.2,  1.5],   # any v1
+            [ 2.0,  3.0],   # p2 also far right
+            [ 1.2,  1.5],   # any v2
+        ], dtype=np.float32)
+
+        full_range = np.array([
+            [-3.0,  3.0],   # p1
+            [-1.5,  1.5],   # v1
+            [-3.0,  3.0],   # p2
+            [-1.5,  1.5],   # v2
+        ], dtype=np.float32)
+    else:
+        # Extract ranges from regions dict
+        init_range = np.array(regions_dict["init"]["range"], dtype=np.float32)
+        goal_range = np.array(regions_dict["goal"]["range"], dtype=np.float32)
+        unsafe_range = np.array(regions_dict["unsafe"]["range"], dtype=np.float32)
+        full_range = np.array(regions_dict["full"]["range"], dtype=np.float32)
+
+    return init_range, goal_range, unsafe_range, full_range
+
+# Default regions (will be overridden when bundle is loaded)
 init_range = np.array([
     [ 0.2,  0.7],   # p1 (right side)
     [ 0.2,  0.5],   # v1 (small velocity)
@@ -37,8 +81,6 @@ init_range = np.array([
     [ 0.2,  0.5],   # v2 (small velocity)
 ], dtype=np.float32)
 
-# Goal: equilibrium at origin with zero velocities
-# Dynamics naturally drive velocities to zero (v2 has damping, v1 maintained by control)
 goal_range = np.array([
     [-0.5,   0.5],   # p1 near origin
     [-1.2,   0.2],   # v1 near zero
@@ -46,7 +88,6 @@ goal_range = np.array([
     [-1.2,   0.2],   # v2 near zero
 ], dtype=np.float32)
 
-# Unsafe: far from origin (representing collision or out-of-bounds)
 unsafe_range = np.array([
     [ 2.0,  3.0],   # p1 far right
     [ 1.2,  1.5],   # any v1
@@ -54,7 +95,6 @@ unsafe_range = np.array([
     [ 1.2,  1.5],   # any v2
 ], dtype=np.float32)
 
-# Full range: symmetric around origin
 full_range = np.array([
     [-3.0,  3.0],   # p1
     [-1.5,  1.5],   # v1
@@ -274,20 +314,66 @@ def test_single_traj_run(controller=None, T=20.0, seed=None):
     # ========================================================================
     # ANIMATION
     # ========================================================================
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-    ax_pos = axes[0]  # p1 vs p2
-    ax_vel = axes[1]  # v1 vs v2
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    ax_01 = axes[0, 0]  # p1 vs v1 (dims 0,1)
+    ax_23 = axes[0, 1]  # p2 vs v2 (dims 2,3)
+    ax_pos = axes[1, 0]  # p1 vs p2 (position space)
+    ax_vel = axes[1, 1]  # v1 vs v2 (velocity space)
 
     title = "4D Double Integrator (u=0)" if controller is None else "4D Double Integrator (controlled)"
-    fig.suptitle(title)
+    fig.suptitle(title + "\nTop row: consecutive pairs (matches results plots) | Bottom row: position/velocity spaces")
 
     # Text overlays
-    time_text = ax_pos.text(0.02, 0.95, "", transform=ax_pos.transAxes)
-    u_text = ax_pos.text(0.02, 0.88, "", transform=ax_pos.transAxes) if controller is not None else None
-    status_text = ax_pos.text(0.02, 0.81, "", transform=ax_pos.transAxes)
-    dist_text = ax_pos.text(0.02, 0.74, "", transform=ax_pos.transAxes)
+    time_text = ax_01.text(0.02, 0.95, "", transform=ax_01.transAxes)
+    u_text = ax_01.text(0.02, 0.88, "", transform=ax_01.transAxes) if controller is not None else None
+    status_text = ax_01.text(0.02, 0.81, "", transform=ax_01.transAxes)
+    dist_text = ax_01.text(0.02, 0.74, "", transform=ax_01.transAxes)
 
-    # Position space (p1 vs p2)
+    # First subplot: p1 vs v1 (dims 0 vs 1)
+    ax_01.set_xlim(full_range[0, 0], full_range[0, 1])
+    ax_01.set_ylim(full_range[1, 0], full_range[1, 1])
+    ax_01.set_xlabel(r"$x_1$ ($p_1$)")
+    ax_01.set_ylabel(r"$x_2$ ($v_1$)")
+    ax_01.set_title(r"$x_1$ vs $x_2$")
+    ax_01.grid(True, alpha=0.3)
+
+    # Draw regions (dims 0,1 projection)
+    ax_01.add_patch(Rectangle((init_range[0,0], init_range[1,0]),
+                               init_range[0,1]-init_range[0,0],
+                               init_range[1,1]-init_range[1,0],
+                               fill=True, alpha=0.2, color='green', label='Init'))
+    ax_01.add_patch(Rectangle((goal_range[0,0], goal_range[1,0]),
+                               goal_range[0,1]-goal_range[0,0],
+                               goal_range[1,1]-goal_range[1,0],
+                               fill=True, alpha=0.2, color='blue', label='Goal'))
+    ax_01.add_patch(Rectangle((unsafe_range[0,0], unsafe_range[1,0]),
+                               unsafe_range[0,1]-unsafe_range[0,0],
+                               unsafe_range[1,1]-unsafe_range[1,0],
+                               fill=True, alpha=0.25, color='red', label='Unsafe'))
+
+    # Second subplot: p2 vs v2 (dims 2 vs 3)
+    ax_23.set_xlim(full_range[2, 0], full_range[2, 1])
+    ax_23.set_ylim(full_range[3, 0], full_range[3, 1])
+    ax_23.set_xlabel(r"$x_3$ ($p_2$)")
+    ax_23.set_ylabel(r"$x_4$ ($v_2$)")
+    ax_23.set_title(r"$x_3$ vs $x_4$")
+    ax_23.grid(True, alpha=0.3)
+
+    # Draw regions (dims 2,3 projection)
+    ax_23.add_patch(Rectangle((init_range[2,0], init_range[3,0]),
+                               init_range[2,1]-init_range[2,0],
+                               init_range[3,1]-init_range[3,0],
+                               fill=True, alpha=0.2, color='green'))
+    ax_23.add_patch(Rectangle((goal_range[2,0], goal_range[3,0]),
+                               goal_range[2,1]-goal_range[2,0],
+                               goal_range[3,1]-goal_range[3,0],
+                               fill=True, alpha=0.2, color='blue'))
+    ax_23.add_patch(Rectangle((unsafe_range[2,0], unsafe_range[3,0]),
+                               unsafe_range[2,1]-unsafe_range[2,0],
+                               unsafe_range[3,1]-unsafe_range[3,0],
+                               fill=True, alpha=0.25, color='red'))
+
+    # Third subplot: Position space (p1 vs p2)
     ax_pos.set_xlim(full_range[0, 0], full_range[0, 1])
     ax_pos.set_ylim(full_range[2, 0], full_range[2, 1])
     ax_pos.set_xlabel(r"$p_1$ (particle 1 position)")
@@ -295,24 +381,21 @@ def test_single_traj_run(controller=None, T=20.0, seed=None):
     ax_pos.set_title("Position Space")
     ax_pos.grid(True, alpha=0.3)
 
-    # Draw regions in position space (projections)
-    # Init: p1 ∈ [-2,-1], p2 ∈ [1,2]
+    # Draw regions in position space (dims 0,2 projection)
     ax_pos.add_patch(Rectangle((init_range[0,0], init_range[2,0]),
                                 init_range[0,1]-init_range[0,0],
                                 init_range[2,1]-init_range[2,0],
-                                fill=True, alpha=0.2, color='blue', label='Init'))
-    # Goal: p1 ∈ [1,2], p2 ∈ [-2,-1]
+                                fill=True, alpha=0.2, color='green'))
     ax_pos.add_patch(Rectangle((goal_range[0,0], goal_range[2,0]),
                                 goal_range[0,1]-goal_range[0,0],
                                 goal_range[2,1]-goal_range[2,0],
-                                fill=True, alpha=0.2, color='green', label='Goal'))
-    # Unsafe: draw actual rectangle from unsafe_range
+                                fill=True, alpha=0.2, color='blue'))
     ax_pos.add_patch(Rectangle((unsafe_range[0,0], unsafe_range[2,0]),
                                 unsafe_range[0,1]-unsafe_range[0,0],
                                 unsafe_range[2,1]-unsafe_range[2,0],
-                                fill=True, alpha=0.25, color='red', label='Unsafe'))
+                                fill=True, alpha=0.25, color='red'))
 
-    # Velocity space (v1 vs v2)
+    # Fourth subplot: Velocity space (v1 vs v2)
     ax_vel.set_xlim(full_range[1, 0], full_range[1, 1])
     ax_vel.set_ylim(full_range[3, 0], full_range[3, 1])
     ax_vel.set_xlabel(r"$v_1$ (particle 1 velocity)")
@@ -320,32 +403,40 @@ def test_single_traj_run(controller=None, T=20.0, seed=None):
     ax_vel.set_title("Velocity Space")
     ax_vel.grid(True, alpha=0.3)
 
-    # Draw velocity constraints
-    # Init/Goal: low velocity
+    # Draw velocity constraints (dims 1,3 projection)
     ax_vel.add_patch(Rectangle((init_range[1,0], init_range[3,0]),
                                 init_range[1,1]-init_range[1,0],
                                 init_range[3,1]-init_range[3,0],
-                                fill=True, alpha=0.2, color='blue'))
+                                fill=True, alpha=0.2, color='green'))
     ax_vel.add_patch(Rectangle((goal_range[1,0], goal_range[3,0]),
                                 goal_range[1,1]-goal_range[1,0],
                                 goal_range[3,1]-goal_range[3,0],
-                                fill=True, alpha=0.2, color='green'))
-    # Unsafe: velocity constraints
+                                fill=True, alpha=0.2, color='blue'))
     ax_vel.add_patch(Rectangle((unsafe_range[1,0], unsafe_range[3,0]),
                                 unsafe_range[1,1]-unsafe_range[1,0],
                                 unsafe_range[3,1]-unsafe_range[3,0],
                                 fill=True, alpha=0.25, color='red'))
 
     # Trajectory artists
+    traj_01, = ax_01.plot([], [], 'b-', lw=1.5, alpha=0.6)
+    pt_01, = ax_01.plot([], [], 'ro', markersize=8)
+
+    traj_23, = ax_23.plot([], [], 'b-', lw=1.5, alpha=0.6)
+    pt_23, = ax_23.plot([], [], 'ro', markersize=8)
+
     traj_pos, = ax_pos.plot([], [], 'b-', lw=1.5, alpha=0.6)
     pt_pos, = ax_pos.plot([], [], 'ro', markersize=8)
 
     traj_vel, = ax_vel.plot([], [], 'b-', lw=1.5, alpha=0.6)
     pt_vel, = ax_vel.plot([], [], 'ro', markersize=8)
 
-    ax_pos.legend(loc='upper right')
+    ax_01.legend(loc='upper right')
 
     def init_anim():
+        traj_01.set_data([], [])
+        pt_01.set_data([], [])
+        traj_23.set_data([], [])
+        pt_23.set_data([], [])
         traj_pos.set_data([], [])
         pt_pos.set_data([], [])
         traj_vel.set_data([], [])
@@ -355,7 +446,8 @@ def test_single_traj_run(controller=None, T=20.0, seed=None):
         dist_text.set_text("")
         if u_text is not None:
             u_text.set_text("")
-        artists = [traj_pos, pt_pos, traj_vel, pt_vel, time_text, status_text, dist_text]
+        artists = [traj_01, pt_01, traj_23, pt_23, traj_pos, pt_pos, traj_vel, pt_vel,
+                   time_text, status_text, dist_text]
         if u_text is not None:
             artists.append(u_text)
         return artists
@@ -363,9 +455,19 @@ def test_single_traj_run(controller=None, T=20.0, seed=None):
     def update(frame):
         p1, v1, p2, v2 = x[frame]
 
+        # Plot dims (0,1): p1 vs v1
+        traj_01.set_data(x[:frame+1, 0], x[:frame+1, 1])
+        pt_01.set_data([p1], [v1])
+
+        # Plot dims (2,3): p2 vs v2
+        traj_23.set_data(x[:frame+1, 2], x[:frame+1, 3])
+        pt_23.set_data([p2], [v2])
+
+        # Plot position space: p1 vs p2
         traj_pos.set_data(x[:frame+1, 0], x[:frame+1, 2])
         pt_pos.set_data([p1], [p2])
 
+        # Plot velocity space: v1 vs v2
         traj_vel.set_data(x[:frame+1, 1], x[:frame+1, 3])
         pt_vel.set_data([v1], [v2])
 
@@ -385,7 +487,8 @@ def test_single_traj_run(controller=None, T=20.0, seed=None):
             u_vec = u_hist[frame]
             u_text.set_text(f"u = [{u_vec[0]:.2f}, {u_vec[1]:.2f}]")
 
-        artists = [traj_pos, pt_pos, traj_vel, pt_vel, time_text, status_text, dist_text]
+        artists = [traj_01, pt_01, traj_23, pt_23, traj_pos, pt_pos, traj_vel, pt_vel,
+                   time_text, status_text, dist_text]
         if u_text is not None:
             artists.append(u_text)
         return artists
