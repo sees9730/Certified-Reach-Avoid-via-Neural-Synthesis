@@ -114,36 +114,38 @@ class GV(nn.Module):
         # sum_over_k_all = S @ W0  -> (N,m1,D)   (broadcasted matmul; avoids expand + bmm)
         sum_over_k_all = torch.matmul(S, W0)  # (N,m1,D)
 
+        # Compute gradient and Hessian in one pass to reuse computations
+        # Pre-compute W2v * d1 once for both gradient and direct Hessian term
+        W2v_d1 = W2v.unsqueeze(0) * d1  # (N,m1)
+        W2v_d1_3d = W2v_d1.unsqueeze(2)  # (N,m1,1) for broadcasting
+
         # gradient wrt normalized coords:
         # dVdx_norm[n,d] = scale * sum_j W2[j] * d1[n,j] * sum_over_k_all[n,j,d]
-        tmp = d1.unsqueeze(2) * sum_over_k_all                      # (N,m1,D)
-        dVdx_norm = self.scale_factor * (tmp * W2v.view(1, -1, 1)).sum(dim=1)  # (N,D)
+        dVdx_norm = self.scale_factor * (W2v_d1_3d * sum_over_k_all).sum(dim=1)  # (N,D)
 
         # chain rule back to x: dVdx = dVdx_norm / input_scale = dVdx_norm * inv_scale
         dVdx = dVdx_norm * inv_scale
 
         # Hessian diagonal wrt normalized coords:
-        cross = q1.unsqueeze(2) * sum_over_k_all.square()            # (N,m1,D)
+        # cross term: W2v * q1 * sum_over_k_all^2
+        cross = (W2v.unsqueeze(0) * q1).unsqueeze(2) * sum_over_k_all.square()  # (N,m1,D)
 
-        # direct term: d1 * ( (W1 * q0) @ (W0^2) )
-        W1_q0 = W1.unsqueeze(0) * q0.unsqueeze(1)                    # (N,m1,m0)
-        W0_sq = W0.square()                                          # (m0,D)
-        direct = d1.unsqueeze(2) * torch.matmul(W1_q0, W0_sq)        # (N,m1,D)
+        # direct term: W2v * d1 * ( (W1 * q0) @ (W0^2) ) - reuses W2v_d1_3d
+        direct = W2v_d1_3d * torch.matmul(
+            W1.unsqueeze(0) * q0.unsqueeze(1),  # (N,m1,m0)
+            W0.square()                          # (m0,D)
+        )  # (N,m1,D)
 
-        Hdiag_norm = self.scale_factor * ((cross + direct) * W2v.view(1, -1, 1)).sum(dim=1)  # (N,D)
+        # Fuse final operations: scale * sum * inv_scale_sq
+        Hdiag = (self.scale_factor * inv_scale_sq) * (cross + direct).sum(dim=1)  # (N,D)
 
-        # chain rule: / input_scale^2  => * inv_scale_sq
-        Hdiag = Hdiag_norm * inv_scale_sq
-
-        # drift term
+        # drift and diffusion terms - compute and fuse in one pass
         fx = self._evaluate_f_fast(x)  # (N,D)
-        drift = (fx * dVdx).sum(dim=1, keepdim=True)  # (N,1)
+        g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
 
-        # diffusion term (diag(GG^T))
-        g_diag_sq = self._compute_gg_diag_fast(x)     # (N,D)
-        diff = 0.5 * (g_diag_sq * Hdiag).sum(dim=1, keepdim=True)  # (N,1)
+        # Fuse: out = (fx * dVdx).sum() + 0.5 * (g_diag_sq * Hdiag).sum()
+        out = ((fx * dVdx) + (0.5 * g_diag_sq * Hdiag)).sum(dim=1, keepdim=True)  # (N,1)
 
-        out = drift + diff
         return out.squeeze(0) if was_1d else out
 
     # -------------------------

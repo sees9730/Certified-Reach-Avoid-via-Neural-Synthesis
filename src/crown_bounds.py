@@ -40,7 +40,7 @@ class SymbolicCROWNCache:
 
         # Save original training mode
         self.was_training = model.training
-        model.eval()
+        # model.eval()
 
         # Create dummy batch input
         dummy_batch = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)
@@ -147,8 +147,8 @@ class SymbolicCROWNCache_Phi:
 
         # Save original training mode
         self.was_training_V = phi_module.V_net.training
-        phi_module.V_net.eval()
-        phi_module.eval()
+        # phi_module.V_net.eval()
+        # phi_module.eval()
 
         # Create dummy batch input
         dummy_batch = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)

@@ -192,7 +192,7 @@ def pretrain_network_samples(
         # ---------------------------------------------------------------------
         x_goal = _sample_in_box(goal_t, n_each)
         v_goal = model(x_goal).squeeze(-1)
-        v_loss_inside_goal = F.relu(v_goal - params.constraints.pretrain_goal_target).sum()
+        v_loss_inside_goal = F.relu(params.constraints.pretrain_goal_target - v_goal).sum()
 
         # ---------------------------------------------------------------------
         # Total V loss
@@ -201,8 +201,8 @@ def pretrain_network_samples(
             v_loss_full
             + v_loss_init
             + v_loss_unsafe
-            + v_loss_inside_goal
-            + v_loss_others
+            # + v_loss_inside_goal
+            # + v_loss_others
         )
 
         # ---------------------------------------------------------------------
@@ -217,12 +217,8 @@ def pretrain_network_samples(
 
         total_loss = loss_v + loss_phi
 
-        optimizer.zero_grad()
-        total_loss.backward()
-        optimizer.step()
-
         # Track best
-        if total_loss.item() < best_loss:
+        if total_loss.item() <= best_loss:
             best_loss = total_loss.item()
             best_model_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
             if control_net is not None:
@@ -247,6 +243,11 @@ def pretrain_network_samples(
                     f"unsafe={v_loss_unsafe.item():.3f}, goal={v_loss_inside_goal.item():.3f}, "
                     f"others={v_loss_others.item():.3f})"
                 )
+        
+        # Optimize/update networks
+        optimizer.zero_grad()
+        total_loss.backward()
+        optimizer.step()
 
     # Restore best model
     if best_model_state is not None:
@@ -300,7 +301,7 @@ def train_network_bounds(
     print("\nCollecting all cells for V network...")
     all_cells_V = []
     cell_counts_V = {}
-    region_order_V = ['init', 'goal', 'unsafe', 'outside']  # Match original order
+    region_order_V = ['init', 'goal', 'unsafe', 'outside', 'boundary']  # Added boundary
 
     for name in region_order_V:
         cells = region_cells[name]
@@ -434,7 +435,7 @@ def train_network_bounds(
                 # Track failing cells for adaptive refinement
                 phi_upper_failing_mask = phi_uppers > 0.0
                 num_total_failing = phi_upper_failing_mask.sum().item()
-                phi_upper_failing_mask_relax = phi_uppers > -20.0
+                phi_upper_failing_mask_relax = phi_uppers > -200.0
                 
             else:
                 phi_lowers = torch.tensor([], device=device)
@@ -471,7 +472,9 @@ def train_network_bounds(
                 'V_init_lower': bounds['init'][0],
                 'V_init_upper': bounds['init'][1],
                 'V_outside_lower': bounds['outside'][0],
-                'V_outside_upper': bounds['outside'][1]
+                'V_outside_upper': bounds['outside'][1],
+                'V_boundary_lower': bounds['boundary'][0],
+                'V_boundary_upper': bounds['boundary'][1]
             })
 
         # Add GV bounds if computing GV
@@ -526,9 +529,9 @@ def train_network_bounds(
 
             # Ensure bounds match current cell count
             if len(outside_failing_mask) == len(region_cells['outside']) and num_outside_failing > 0:
-                REFINE_INTERVAL = 500
+                REFINE_INTERVAL = 200
                 REFINE_FACTOR = 2
-                MAX_CELLS = 2000
+                MAX_CELLS = 30000
 
                 if epoch > 2500:
                     REFINE_INTERVAL = 100
@@ -538,14 +541,14 @@ def train_network_bounds(
                     new_cells, num_refined = refine_failing_cells(
                         region_cells['outside'],
                         outside_failing_mask,
-                        REFINE_FACTOR
+                        REFINE_FACTOR,
                     )
                     region_cells['outside'] = new_cells
                     print(f"[Refine-Outside] Epoch {epoch+1}: {num_outside_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['outside'].append(epoch + 1)
 
-            if((epoch + 1) % 512 == 0):
+            if((epoch + 1) % 502 == 0):
                 merged_cells, num_merges = merge_passing_neighbor_cells(
                     region_cells['outside'],
                     outside_failing_mask_relax,
@@ -566,9 +569,9 @@ def train_network_bounds(
                 num_total_failing > 0):
 
                 # Refinement parameters (matching testing_simple3.py)
-                REFINE_INTERVAL = 500  # Refine every 100k epochs
+                REFINE_INTERVAL = 200  # Refine every 100k epochs
                 REFINE_FACTOR = 2  # Split into 2x2 subcells
-                MAX_CELLS = 1500  # Don't refine if we already have too many cells
+                MAX_CELLS = 30000  # Don't refine if we already have too many cells
 
                 # Adjust interval for later epochs
                 if epoch > 2500:
@@ -581,14 +584,15 @@ def train_network_bounds(
                     new_cells, num_refined = refine_failing_cells(
                         region_cells['generator'],
                         phi_upper_failing_mask,
-                        REFINE_FACTOR
+                        REFINE_FACTOR,
+                        scores=phi_uppers
                     )
                     region_cells['generator'] = new_cells
                     print(f"[Refine-Generator] Epoch {epoch+1}: {num_total_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['generator'].append(epoch + 1)
 
-            if((epoch + 1) % 512 == 0):
+            if((epoch + 1) % 502 == 0):
                 merged_cells, num_merges = merge_passing_neighbor_cells(
                     region_cells['generator'],
                     phi_upper_failing_mask_relax,
@@ -623,16 +627,15 @@ def train_network_bounds(
             all_satisfied = True
             if params.compute_V:
                 show = (epoch % 10 == 0)
-                _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, bounds_updated['outside'][0], 
-                                                             device=device, show=show, check=True, n_samples=10000)
+                _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, bounds_updated['outside'][0], device=device, show=show, check=True, n_samples=10000)
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
-                init_satisfied = (bounds_updated['init'][0].min() >= beta_s_check and bounds_updated['init'][1].max() <= 1.0)
-                outside_satisfied = (bounds_updated['outside'][0].min() >= beta_s_check)
+                init_satisfied = (bounds_updated['init'][1].max() <= 1.0)
+                outside_satisfied = (bounds_updated['outside'][0].min() >= 0.0)
                 all_satisfied = all_satisfied and goal_satisfied and unsafe_satisfied and init_satisfied and outside_satisfied
 
             # Check GV constraints
             if params.compute_GV:
-                generator_satisfied = (phi_uppers.max() <= 0.0)
+                generator_satisfied = (phi_uppers.max() < 0.0)
                 all_satisfied = all_satisfied and generator_satisfied
 
             # Early stop if all active constraints are satisfied
@@ -645,7 +648,7 @@ def train_network_bounds(
                 # Print relevant losses
                 loss_parts = []
                 if params.compute_V:
-                    loss_parts.append(f"Goal={loss_dict['goal']:.4f}, Unsafe={loss_dict['unsafe']:.4f}, Init={loss_dict['init']:.4f}, Outside={loss_dict['outside']:.4f}")
+                    loss_parts.append(f"Goal={loss_dict['goal']:.4f}, Unsafe={loss_dict['unsafe']:.4f}, Init={loss_dict['init']:.4f}, Outside={loss_dict['outside']:.4f}, Boundary={loss_dict['boundary']:.4f}")
                 if params.compute_GV:
                     loss_parts.append(f"Gen={loss_dict['generator']:.4f}")
                 print(f"Final losses: {', '.join(loss_parts)}")
@@ -779,8 +782,8 @@ def main():
     params = Hyperparameters.default()
 
     # Customize configuration
-    params.network.n_hidden_1 = 256
-    params.network.n_hidden_2 = 32
+    params.network.n_hidden_1 = 64
+    params.network.n_hidden_2 = 64
     params.network.input_scale = [100.0, 100.0]
     params.network.scale_factor = 20.0
 
@@ -792,15 +795,15 @@ def main():
     params.training.generator_start_epoch = 0
 
     params.discretization.n_goal = 7
-    params.discretization.n_outside_goal = 5
+    params.discretization.n_outside_goal = 4
     params.discretization.n_generator = 1  # Will be overridden by radial discretization
-    params.discretization.n_unsafe = 3
-    params.discretization.n_init = 2
+    params.discretization.n_unsafe = 7
+    params.discretization.n_init = 7
 
     # Set beta_s to a value (constant), or set to None to make it learnable
     # If learnable_beta_s is True, this value will be used as initialization
     params.training.learnable_beta_s = False  # Set to True to make beta_s learnable
-    params.constraints.beta_s = 0.1
+    params.constraints.beta_s = 0.0
     params.constraints.beta_ra = 20.0
 
     # Control what to compute during training
@@ -893,18 +896,18 @@ def main():
     region_cells = discretize_regions(
         regions,
         params.discretization,
-        use_radial_generator=True  # Use radial + clipping for generator
+        use_radial_generator=False,  # Use radial + clipping for generator
+        boundary_n_partitions=1
     )
 
     # ========================================================================
     # 6.0 Setup saving
     # ========================================================================
     device = params.training.device
-    delta = 0.1
-    params.constraints.pretrain_goal_target = params.constraints.beta_s - delta
+    params.constraints.pretrain_goal_target = params.constraints.beta_s
     params.constraints.pretrain_unsafe_target = params.constraints.beta_ra
-    params.constraints.pretrain_init_target = params.constraints.beta_s + delta
-    params.constraints.pretrain_phi_target = 1.0
+    params.constraints.pretrain_init_target = 1.0
+    params.constraints.pretrain_phi_target = 0.0
 
     # Path to bundle we will save/load
     bundle_path = OUTPUT_DIR / "eval_bundle.pth"
@@ -921,7 +924,7 @@ def main():
         print(f"\nUsing device: {device}")
 
         ENABLE_PRETRAINING = True  # Set to True to enable
-        PRETRAIN_EPOCHS = 1000
+        PRETRAIN_EPOCHS = 500
         PRETRAIN_LR = 0.01
         if ENABLE_PRETRAINING:
             pretrain_network_samples(
@@ -935,6 +938,7 @@ def main():
                 num_epochs=PRETRAIN_EPOCHS,
                 lr=PRETRAIN_LR,
                 device=params.training.device,
+                n_each=1000,
                 # control_net=u_nn
             )
 

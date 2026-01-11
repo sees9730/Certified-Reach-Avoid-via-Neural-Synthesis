@@ -61,8 +61,6 @@ def load_control_net(bundle_path, device="cpu"):
     control_net.eval()
     return control_net
 
-control_net = load_control_net(OUTPUT_DIR / "eval_bundle.pth")
-
 
 """Stochastic Inverted Pendulum Dynamics"""
 def f(x, u):
@@ -379,9 +377,7 @@ def test_mc(controller=None):
 
 def main():
     test_single_traj_run()
-    test_single_traj_run(controller=control_net)
     test_mc(controller=None)
-    test_mc(controller=control_net)
 
 
 if __name__ == "__main__":

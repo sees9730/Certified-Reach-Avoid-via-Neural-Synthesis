@@ -384,7 +384,7 @@ def visualize_training_progress(
 
     # Cells for V network (all regions except generator)
     v_cells = []
-    for region_name in ['init', 'goal', 'unsafe', 'outside']:
+    for region_name in ['init', 'goal', 'unsafe', 'outside', 'boundary']:
         if region_name in region_cells:
             v_cells.extend(region_cells[region_name])
 
@@ -637,7 +637,7 @@ def create_summary_plots(
 
     # Cells for V network (all regions except generator)
     v_cells = []
-    for region_name in ['init', 'goal', 'unsafe', 'outside']:
+    for region_name in ['init', 'goal', 'unsafe', 'outside', 'boundary']:
         if region_name in region_cells:
             v_cells.extend(region_cells[region_name])
 
