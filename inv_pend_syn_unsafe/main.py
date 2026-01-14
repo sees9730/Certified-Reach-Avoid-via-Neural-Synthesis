@@ -31,7 +31,8 @@ from src.training_utils import (
     evaluate_constraints,
     print_loss_summary,
     print_constraint_summary,
-    refine_failing_cells
+    refine_failing_cells,
+    merge_passing_neighbor_cells
 )
 from src.save_load_utils import save_eval_bundle, load_eval_bundle, log_loaded_training_epochs, enable_terminal_logging
 from src.utils import cleanup_and_setup_directories, print_training_config
@@ -77,6 +78,7 @@ def pretrain_network_samples(
     device='cpu',
     control_net=None,
     n_each: int = 400,   # samples per region per epoch
+    lambda_w = 1e-4,
     save_v_path=None,            # NEW
     save_control_path=None,      # NEW
 ):
@@ -92,8 +94,6 @@ def pretrain_network_samples(
       - full-range: enforce v(x) >= 0
       - init-range: enforce v(x) <= 1
       - unsafe-range: enforce v(x) >= pretrain_unsafe_target
-      - goal-range: enforce v(x) <= pretrain_goal_target
-      - others (outside goal ∪ unsafe): enforce v(x) >= pretrain_goal_target
       - optional phi loss on x_others: enforce phi(x) <= 0
     """
     print("\n" + "="*80)
@@ -174,27 +174,38 @@ def pretrain_network_samples(
 
     def _sample_in_unsafe_union(N: int) -> torch.Tensor:
         """
-        Sample N points from union of K unsafe boxes using torch only.
-        Picks a box index ~ Categorical(probs) where probs ∝ volume, then samples uniformly in that box.
+        Sample N points from EACH of the K unsafe boxes (torch only).
+
+        Returns:
+        x: (K_unsafe * N, D)
+
+        Notes:
+        - If K_unsafe == 1, this is just N samples from that box.
+        - Shuffles so the batch is not grouped by box.
         """
+        if N <= 0:
+            raise ValueError(f"N must be positive, got {N}")
+
         if K_unsafe == 1:
             return _sample_in_box(unsafe_boxes[0], N)
 
-        # probs ∝ volume
-        widths = (unsafe_boxes[:, :, 1] - unsafe_boxes[:, :, 0]).clamp_min(0.0)  # (K,D)
-        vols = widths.prod(dim=1)                                                # (K,)
-        probs = vols / vols.sum().clamp_min(1e-12)                               # safe normalize
+        xs = []
+        for k in range(K_unsafe):
+            xs.append(_sample_in_box(unsafe_boxes[k], N))  # (N, D) per box
 
-        # choose box for each sample (N,)
-        choices = torch.multinomial(probs, num_samples=N, replacement=True)      # (N,)
-
-        # gather bounds for chosen boxes: (N,D)
-        b_low  = unsafe_boxes[choices, :, 0]
-        b_high = unsafe_boxes[choices, :, 1]
-
-        # uniform in chosen box
-        u = torch.rand(N, D, device=device)
-        return u * (b_high - b_low) + b_low
+        x = torch.cat(xs, dim=0)  # (K_unsafe * N, D)
+        x = x[torch.randperm(x.shape[0], device=device)]  # shuffle
+        return x
+    
+    def _l2_weight_penalty(model: torch.nn.Module, exclude_bias: bool = True) -> torch.Tensor:
+        reg = 0.0
+        for name, p in model.named_parameters():
+            if not p.requires_grad:
+                continue
+            if exclude_bias and (p.dim() == 1 or name.endswith("bias")):
+                continue
+            reg = reg + (p ** 2).sum()
+        return reg
 
     # -----------------------------
     # Training loop
@@ -217,7 +228,7 @@ def pretrain_network_samples(
         v_loss_init = F.relu(v_init - 1.0).sum()
 
         # 3) unsafe-range samples -> enforce v(x) >= pretrain_unsafe_target
-        x_unsafe = _sample_in_unsafe_union(n_each)
+        x_unsafe = _sample_in_unsafe_union(int(n_each /6))
         v_unsafe = model(x_unsafe).squeeze(-1)
         v_loss_unsafe = F.relu(params.constraints.pretrain_unsafe_target - v_unsafe).sum()
 
@@ -226,7 +237,7 @@ def pretrain_network_samples(
         v_goal = model(x_goal).squeeze(-1)
         v_loss_inside_goal = F.relu(0.0 - v_goal).sum()
 
-        # 5) samples inside full-range but outside (goal ∪ unsafe) -> enforce v(x) >= pretrain_goal_target
+        # 5) samples inside full-range but outside (goal ∪ unsafe) -> enforce v(x) >= 0.0
         x_others_list = []
         need = n_each
         max_tries = 20
@@ -249,9 +260,9 @@ def pretrain_network_samples(
             x_others = torch.cat(x_others_list, dim=0)
 
         v_others = model(x_others).squeeze(-1)
-        v_loss_others = F.relu(params.constraints.pretrain_goal_target - v_others).sum()
+        v_loss_others = F.relu(0.0 - v_others).sum()
 
-        # Total V loss
+        # Total V loss (v_loss_inside_goal and v_loss_others are not used anymore)
         loss_v = (
             v_loss_full
             + v_loss_init
@@ -269,6 +280,11 @@ def pretrain_network_samples(
 
         total_loss = loss_v + loss_phi
 
+        # Add regularization for V network
+        reg_w = _l2_weight_penalty(model, exclude_bias=True)
+        # print(reg_w)
+        total_loss = total_loss + lambda_w * reg_w
+
         # Track best
         if total_loss.item() <= best_loss:
             best_loss = total_loss.item()
@@ -285,7 +301,7 @@ def pretrain_network_samples(
                     f"(full={v_loss_full.item():.3f}, init={v_loss_init.item():.3f}, "
                     f"unsafe={v_loss_unsafe.item():.3f}, goal={v_loss_inside_goal.item():.3f}, "
                     f"others={v_loss_others.item():.3f}), "
-                    f"Φ={loss_phi.item():.6f}, Total={total_loss.item():.6f}"
+                    f"Φ={loss_phi.item():.6f}, Total={total_loss.item():.5e}"
                 )
             else:
                 print(
@@ -440,15 +456,21 @@ def train_network_bounds(
     optimizer = torch.optim.Adam(opt_params, lr=params.training.learning_rate)
 
     # Scheduler (matching testing_simple3.py)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    #     optimizer,
+    #     mode='min',           # minimize the loss
+    #     factor=0.5,           # reduce LR by half when plateau detected
+    #     patience=300,         # wait 100 epochs of no improvement before reducing
+    #     verbose=True,         # print when LR changes
+    #     min_lr=1e-5,          # minimum learning rate
+    #     threshold=1e-3        # minimum change to qualify as improvement
+    # )
+    scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer,
-        mode='min',           # minimize the loss
-        factor=0.5,           # reduce LR by half when plateau detected
-        patience=300,         # wait 100 epochs of no improvement before reducing
-        verbose=True,         # print when LR changes
-        min_lr=1e-6,          # minimum learning rate
-        threshold=1e-3        # minimum change to qualify as improvement
+        step_size=2000,   # every 2000 epochs
+        gamma=0.95         # multiply lr by 0.5
     )
+
     final_beta_s = None
 
     # Training loop
@@ -573,7 +595,8 @@ def train_network_bounds(
                     bounds_updated[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
 
         # Update scheduler after bounds recomputation
-        scheduler.step(total_loss.item())
+        # scheduler.step(total_loss.item())
+        scheduler.step()
 
         # Get current beta_s value for constraint checks
         beta_s_check = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
@@ -589,7 +612,7 @@ def train_network_bounds(
             if len(outside_failing_mask) == len(region_cells['outside']) and num_outside_failing > 0:
                 REFINE_INTERVAL_V = 500
                 REFINE_FACTOR = 2
-                MAX_CELLS = 10000
+                MAX_CELLS = 50000
 
                 if epoch > 2500:
                     REFINE_INTERVAL_V = 100
@@ -600,11 +623,27 @@ def train_network_bounds(
                         region_cells['outside'],
                         outside_failing_mask,
                         REFINE_FACTOR,
+                        scores=-bounds_updated['outside'][0],
+                        N_to_refine=999999
                     )
                     region_cells['outside'] = new_cells
                     print(f"[Refine-Outside] Epoch {epoch+1}: {num_outside_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['outside'].append(epoch + 1)
+
+                if((epoch + 1) % 501 == 0):
+                    outside_failing_mask_relax = bounds_updated['outside'][0] < (0.0 + 0.5)
+                    merged_cells, num_merges = merge_passing_neighbor_cells(
+                        region_cells['outside'],
+                        outside_failing_mask_relax,
+                        max_passes=8,
+                        max_merges=None,   # cap work; set None for full greedy
+                        seed=0,
+                        eps=1e-6,
+                    )
+                    region_cells['outside'] = merged_cells
+                    print(f"[Merge-Outside] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+                    needs_cache_rebuild = True
 
         # Adaptive refinement for generator cells (before optimizer step)
         if params.compute_GV:
@@ -616,11 +655,11 @@ def train_network_bounds(
                 # Refinement parameters (matching testing_simple3.py)
                 REFINE_INTERVAL = 500
                 REFINE_FACTOR = 2  # Split into 2x2 subcells
-                MAX_CELLS = 10000  # Don't refine if we already have too many cells
+                MAX_CELLS = 50000  # Don't refine if we already have too many cells
 
                 # Adjust interval for later epochs
-                if epoch > 2500:
-                    REFINE_INTERVAL = 250
+                if epoch > 3500:
+                    REFINE_INTERVAL = 100
 
                 # Check if it's time to refine
                 if ((epoch + 1) % REFINE_INTERVAL == 0 and
@@ -629,14 +668,27 @@ def train_network_bounds(
                         region_cells['generator'],
                         phi_upper_failing_mask,
                         REFINE_FACTOR,
-                        scores=phi_uppers
+                        scores=phi_uppers,
+                        N_to_refine=999999
                     )
                     region_cells['generator'] = new_cells
                     print(f"[Refine-Generator] Epoch {epoch+1}: {num_total_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['generator'].append(epoch + 1)
-                    # REFINE_INTERVAL = REFINE_INTERVAL + REFINE_INTERVAL*2
-                    # print(REFINE_INTERVAL)
+                
+                if((epoch + 1) % 501 == 0):
+                    phi_upper_failing_mask_relax = phi_uppers > -500.0
+                    merged_cells, num_merges = merge_passing_neighbor_cells(
+                        region_cells['generator'],
+                        phi_upper_failing_mask_relax,
+                        max_passes=8,
+                        max_merges=None,   # cap work; set None for full greedy
+                        seed=0,
+                        eps=1e-6,
+                    )
+                    region_cells['generator'] = merged_cells
+                    print(f"[Merge-Generator] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+                    needs_cache_rebuild = True
 
         # Logging
         if epoch % 10 == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
@@ -834,11 +886,11 @@ def main():
     params.training.generator_weight = 1.0  # Enable generator constraint
     params.training.generator_start_epoch = 0
 
-    params.discretization.n_goal = 12
-    params.discretization.n_outside_goal = 12
-    params.discretization.n_generator = 1  # Will be overridden by radial discretization
-    params.discretization.n_unsafe = 8
-    params.discretization.n_init = 12 # 20^2 = 10^2 * 4
+    params.discretization.n_goal = 30
+    params.discretization.n_outside_goal = 4
+    params.discretization.n_generator = 4  # Will be overridden by radial discretization
+    params.discretization.n_unsafe = 15
+    params.discretization.n_init = 30 # 20^2 = 10^2 * 4
 
     # Set beta_s to a value (constant), or set to None to make it learnable
     # If learnable_beta_s is True, this value will be used as initialization
@@ -923,13 +975,14 @@ def main():
     goal_range = np.array([[-0.5*pi, 0.5*pi], [-4.0, 4.0]], dtype=np.float32)
 
     # Create unsafe region as union of two rectangles (matching paper exactly)
-    unsafe_down1 = np.array([[-2*pi, -(3/2)*pi], [-20.0, -10.0]], dtype=np.float32)
-    unsafe_down2 = np.array([[(3/2)*pi, 2*pi], [10.0, 20.0]], dtype=np.float32)
-    # unsafe_lb = np.array([[-2*pi, -2*pi+0.1], [-20.0, 20.0]], dtype=np.float32)
-    # unsafe_rb = np.array([[2*pi-0.1, 2*pi], [-20.0, 20.0]], dtype=np.float32)
+    unsafe_down1 = np.array([[-2*pi, -2*pi+0.5*pi], [-20.0, -10.0]], dtype=np.float32)
+    unsafe_down2 = np.array([[2*pi-0.5*pi, 2*pi], [10.0, 20.0]], dtype=np.float32)
+    unsafe_lb = np.array([[-2*pi, -2*pi+0.5], [-20.0, 20.0]], dtype=np.float32)
+    unsafe_rb = np.array([[2*pi-0.5, 2*pi], [-20.0, 20.0]], dtype=np.float32)
     unsafe_tb = np.array([[-2*pi, 2*pi], [20.0-0.5, 20.0]], dtype=np.float32)
     unsafe_bb = np.array([[-2*pi, 2*pi], [-20.0, -20.0+0.5]], dtype=np.float32)
-    unsafe_range = np.vstack((unsafe_down1, unsafe_down2, unsafe_tb, unsafe_bb))
+    unsafe_range = np.vstack((unsafe_down1, unsafe_down2, 
+                              unsafe_tb, unsafe_bb, unsafe_lb, unsafe_rb))
     full_range = np.array([[-2*pi, 2*pi], [-20.0, 20.0]], dtype=np.float32)
 
     init = Region(init_range)
@@ -938,7 +991,10 @@ def main():
     unsafe_down2 = Region(unsafe_down2)
     unsafe_tb = Region(unsafe_tb)
     unsafe_bb = Region(unsafe_bb)
-    unsafe = Region.union(unsafe_down1, unsafe_down2, unsafe_tb, unsafe_bb)
+    unsafe_lb = Region(unsafe_lb)
+    unsafe_rb = Region(unsafe_rb)
+    unsafe = Region.union(unsafe_down1, unsafe_down2, 
+                          unsafe_tb, unsafe_bb, unsafe_lb, unsafe_rb)
     full = Region(full_range)
 
     regions = Regions(init=init, goal=goal, unsafe=unsafe, full=full)
@@ -991,8 +1047,8 @@ def main():
         print(f"\nUsing device: {device}")
         
         ENABLE_PRETRAINING = True  # Set to True to enable
-        PRETRAIN_EPOCHS = 20000
-        PRETRAIN_LR = 0.001
+        PRETRAIN_EPOCHS = 5000
+        PRETRAIN_LR = 0.01
 
         if ENABLE_PRETRAINING:
             pretrain_network_samples(
@@ -1007,12 +1063,11 @@ def main():
                 lr=PRETRAIN_LR,
                 device=params.training.device,
                 control_net=u_nn,
-                n_each=1000,
+                n_each=1200,
                 save_v_path= OUTPUT_DIR / "V_pretrained.pth",
                 save_control_path= OUTPUT_DIR / "controller_pretrained.pth"
             )
             print(f"Pretraining completed!\n")
-
             # V_net.load_state_dict(torch.load(OUTPUT_DIR / "V_pretrained.pth", map_location=device))
             # u_nn.load_state_dict(torch.load(OUTPUT_DIR / "controller_pretrained.pth", map_location=device))
 
