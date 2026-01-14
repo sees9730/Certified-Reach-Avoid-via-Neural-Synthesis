@@ -54,267 +54,99 @@ def sample_from_cells(
 
     return torch.stack(samples).to(device)
 
-
-def sample_from_region_bounds(
-    lower: np.ndarray,
-    upper: np.ndarray,
-    n_samples: int,
-    device: str = 'cpu'
-) -> torch.Tensor:
-    """
-    Sample uniformly from rectangular region defined by bounds.
-
-    Args:
-        lower: Lower corner (state_dim,)
-        upper: Upper corner (state_dim,)
-        n_samples: Number of samples
-        device: Device for samples
-
-    Returns:
-        Samples of shape (n_samples, state_dim)
-    """
-    lower_t = torch.from_numpy(lower).float()
-    upper_t = torch.from_numpy(upper).float()
-
-    samples = lower_t + torch.rand(n_samples, len(lower)) * (upper_t - lower_t)
-    return samples.to(device)
-
 # ============================================================================
-# BOUND-BASED LOSS FUNCTIONS (for CROWN training)
+# BOUND-BASED LOSS FUNCTIONS
 # ============================================================================
-
-# Cache for fixed goal samples - prevents random sampling at each epoch for stability
-_goal_samples_cache = {}
-
-
-def clear_goal_samples_cache():
-    """Clear the goal samples cache. Useful when starting a new training run."""
-    global _goal_samples_cache
-    _goal_samples_cache = {}
-
 
 def compute_loss_goal_bounds(
-    model,
-    goal_region,
-    V_lower: torch.Tensor,
-    V_upper: torch.Tensor,
-    beta_s: Union[float, torch.Tensor],
-    V_outside_lower,
-    n_samples: int = 1000,
-    device: str = 'cpu',
-    check: bool = False,
-    show: bool = False,
-    w_soft = 2000
+    V_lower: torch.Tensor
 ) -> torch.Tensor:
+    # FIXME: Add function signature
 
-    bounds = goal_region.bounds  # (D, 2)
-    D = bounds.shape[0]
+    # Want V >= 0.0, so penalize V_lower < 0.0
+    loss = torch.relu(0.0 - V_lower).sum()
 
-    # Compute center of goal region (1, D)
-    center = torch.as_tensor(((bounds[:, 0] + bounds[:, 1]) / 2.0),
-                             device=device, dtype=torch.float32).view(1, D)
-
-    # Evaluate V at center point
-    v_center = model(center).squeeze()
-
-    # Strong loss on center point
-    margin = 0.0
-    # loss_center = F.relu(v_center - (beta_s - margin)) * 10.0
-
-    # Shrink the sampling bounds by a factor (inner box)
-    shrink_factor = 0.1
-    lower = torch.as_tensor(bounds[:, 0], device=device, dtype=torch.float32)  # (D,)
-    upper = torch.as_tensor(bounds[:, 1], device=device, dtype=torch.float32)  # (D,)
-    span = upper - lower                                                      # (D,)
-
-    inner_lower = lower + span * (1.0 - shrink_factor) / 2.0                  # (D,)
-    inner_upper = upper - span * (1.0 - shrink_factor) / 2.0                  # (D,)
-
-    # Sample uniformly in the inner box: (n_samples, D)
-    # rand in [0,1) scaled to [inner_lower, inner_upper]
-    r = torch.rand(n_samples, D, device=device, dtype=torch.float32)
-    samples = r * (inner_upper - inner_lower).unsqueeze(0) + inner_lower.unsqueeze(0)
-
-    v_samples = model(samples).squeeze()
-
-    # Softer loss on minimum of sampled points
-    threshold = V_outside_lower.min().item()
-    loss_rest = F.relu(v_samples.min() - threshold) * w_soft
-
-    # Combined soft loss
-    loss_soft =  loss_rest
-
-    # Encourage non-negativity of the certified lower bound inside goal
-    # (kept identical behavior, but note: min() here returns a scalar tensor)
-    loss_nonneg = torch.relu(0.0 - V_lower).sum()
-    # loss_nonneg = torch.relu(0.0 - torch.min(V_lower))
-
-    # Obtain minimum V inside goal region: from samples, center, and lowest upper bound
-    v_min = min(v_samples.min().item(), v_center.item(), V_upper.min().item())
-
-    # When checking for success (passed), check the logic based on v_min
-    # Keep semantics identical to your original
-    # if (v_min < beta_s) and (V_lower.min() >= 0).item():
-    # if (v_min < V_outside_lower.min()) and (V_lower.min() >= 0).item():
-    if (V_lower.min() >= 0):
-        passed = True
-        if show:
-            # print(" ✓ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
-            #     v_min, V_lower.min()
-            # ))
-            print(" ✓ Inside Goal passed, min V= {:.4f}, min V_outside_lower= {:.4f}, min V_lower={:.4f}".format(
-                v_min, V_outside_lower.min(), V_lower.min()
-            ))
+    # Check if goal is satisfied
+    if (loss <= 0.0):
+        sat = True
     else:
-        passed = False
-        if show:
-            # print(" ✗ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
-            #     v_min, V_lower.min()
-            # ))
-            print(" ✗ Inside Goal failed, min V= {:.4f}, min V_outside_lower= {:.4f}, min V_lower={:.4f}".format(
-                v_min, V_outside_lower.min(), V_lower.min()
-            ))
-
-    return loss_nonneg, passed
-
+        sat = False
+    return loss, sat
 
 def compute_loss_unsafe_bounds(
     V_lower: torch.Tensor,
-    V_upper: torch.Tensor,
     beta_ra: float
 ) -> torch.Tensor:
-    """
-    Compute unsafe constraint loss from bounds: V(x) >= beta_ra for x in Unsafe.
+    # FIXME: Add function signature
 
-    Args:
-        V_lower: Lower bounds on V (N,)
-        V_upper: Upper bounds on V (N,)
-        beta_ra: Target lower bound for unsafe
-
-    Returns:
-        Loss (scalar)
-    """
     # Want V >= beta_ra, so penalize V_lower < beta_ra
-    # Use .sum() to match original testing_simple3.py
-    # print(f' Num of violations in unsafe: {(V_lower < beta_ra).sum().item()}')
-    return F.relu(beta_ra - V_lower).sum()
+    loss = F.relu(beta_ra - V_lower).sum()
 
+    # Check if unsafe is satisfied
+    if (loss <= 0.0):
+        sat = True
+    else:
+        sat = False
+    return loss, sat
 
 def compute_loss_init_bounds(
-    V_lower: torch.Tensor,
-    V_upper: torch.Tensor,
-    beta_s: Union[float, torch.Tensor]
-) -> torch.Tensor:
-    """
-    Compute init constraint loss from bounds.
-
-    Init must satisfy TWO constraints:
-    1. V < 1.0 (its own upper bound)
-    2. V >= beta_s (general constraint that applies everywhere except goal)
-
-    Args:
-        V_lower: Lower bounds on V (N,)
-        V_upper: Upper bounds on V (N,)
-        beta_s: Target lower bound for init (float or torch.Tensor)
-
-    Returns:
-        Loss (scalar)
-    """
-    # Push V_upper <= 1.0 AND V_lower >= beta_s
-    loss_upper = F.relu(V_upper - 1.0).sum()
-    # loss_lower = F.relu(beta_s - V_lower).sum()
-    return loss_upper
-
-
-def compute_loss_outside_bounds(
-    V_lower: torch.Tensor,
-    V_upper: torch.Tensor,
-    beta_s: Union[float, torch.Tensor]
-) -> torch.Tensor:
-    """
-    Compute outside goal constraint loss from bounds: V(x) >= beta_s for x outside Goal.
-
-    Args:
-        V_lower: Lower bounds on V (N,)
-        V_upper: Upper bounds on V (N,)
-        beta_s: Target lower bound outside goal (float or torch.Tensor)
-
-    Returns:
-        Loss (scalar)
-    """
-    # Want V >= beta_s, so penalize V_lower < beta_s
-    return F.relu(beta_s - V_lower).sum()
-    # return F.relu(beta_s - torch.min(V_lower))
-
-
-def compute_loss_generator_bounds(
-    Phi_lower: torch.Tensor,
-    Phi_upper: torch.Tensor
-) -> torch.Tensor:
-    """
-    Compute generator constraint loss from bounds: Φ(x) <= 0 for x outside (Goal ∪ Unsafe).
-
-    Args:
-        Phi_lower: Lower bounds on Φ (N,)
-        Phi_upper: Upper bounds on Φ (N,)
-
-    Returns:
-        Loss (scalar) - unweighted (weight applied by caller)
-    """
-    # Want Phi < 0, so penalize Phi_upper > 0
-    delta = 1e-4
-    return F.relu(Phi_upper + delta).sum()
-    # return torch.relu(torch.max(Phi_upper))
-
-
-def compute_loss_boundary_bounds(
-    V_lower: torch.Tensor,
     V_upper: torch.Tensor
 ) -> torch.Tensor:
-    """
-    Compute boundary constraint loss from bounds: V(x) >= 1.0 for x on boundary of full_range.
+    # FIXME: Add function signature
 
-    This enforces that the safe region (full \\ unsafe) has V >= 1.0 at the boundary.
+    # Want V <= 1.0, so penalize V_upper > 1.0
+    loss = F.relu(V_upper - 1.0).sum()
 
-    Args:
-        V_lower: Lower bounds on V (N,)
-        V_upper: Upper bounds on V (N,)
+    # Check if init is satisfied
+    if (loss <= 0.0):
+        sat = True
+    else:
+        sat = False
+    return loss, sat
 
-    Returns:
-        Loss (scalar)
-    """
-    # Want V >= 1.0, so penalize V_lower < 1.0
-    return F.relu(1.0 - V_lower).sum()
+def compute_loss_outside_bounds(
+    V_lower: torch.Tensor
+) -> torch.Tensor:
+    # FIXME: Add function signature
 
+    # Want V >= 0.0, so penalize V_lower < 0.0
+    loss = F.relu(0.0 - V_lower).sum()
+
+    # Check if outside is satisfied
+    if (loss <= 0.0):
+        sat = True
+    else:
+        sat = False
+    return loss, sat
+
+def compute_loss_generator_bounds(
+    Phi_upper: torch.Tensor
+) -> torch.Tensor:
+    # FIXME: Add function signature
+
+    # Want Phi < 0, so penalize Phi_upper > 0
+    delta = 1e-4
+    loss = F.relu(Phi_upper + delta).sum() # Add delta to encourage extra push
+
+    # Check if generator is satisfied
+    if (loss <= 0.0):
+        sat = True
+    else:
+        sat = False
+    return loss, sat
 
 def compute_total_loss_bounds(
-    model,
-    goal_region,
-    beta_s: Union[float, torch.Tensor],
     beta_ra: float,
     V_goal_lower: torch.Tensor = None,
-    V_goal_upper: torch.Tensor = None,
     V_unsafe_lower: torch.Tensor = None,
-    V_unsafe_upper: torch.Tensor = None,
-    V_init_lower: torch.Tensor = None,
     V_init_upper: torch.Tensor = None,
     V_outside_lower: torch.Tensor = None,
-    V_outside_upper: torch.Tensor = None,
-    V_boundary_lower: torch.Tensor = None,
-    V_boundary_upper: torch.Tensor = None,
-    Phi_lower: torch.Tensor = None,
     Phi_upper: torch.Tensor = None,
-    Phi_lower_unsafe: torch.Tensor = None,
-    Phi_upper_unsafe: torch.Tensor = None,
-    Phi_lower_goal: torch.Tensor = None,
-    Phi_upper_goal: torch.Tensor = None,
     generator_weight: float = 0.0,
     loss_weights: dict = None,
     device: str = 'cpu',
     compute_V: bool = True,
     compute_GV: bool = True,
-    epoch: int = 0,
-    w_soft = 2000,
 ) -> Tuple[torch.Tensor, dict]:
     """
     Compute total training loss from CROWN bounds.
@@ -346,82 +178,55 @@ def compute_total_loss_bounds(
             'generator': 1.0
         }
 
-    # Compute individual losses
+    # Compute individual losses and satisfactions
     if compute_V:
-        loss_unsafe = compute_loss_unsafe_bounds(V_unsafe_lower, V_unsafe_upper, beta_ra)
-        loss_goal, _ = compute_loss_goal_bounds(model, goal_region, V_goal_lower, V_goal_upper, beta_s, V_outside_lower,
-                                                 device=device, n_samples=10000, show=False, w_soft=w_soft)
-        loss_init = compute_loss_init_bounds(V_init_lower, V_init_upper, beta_s)
-        loss_outside = compute_loss_outside_bounds(V_outside_lower, V_outside_upper, beta_s)
-        # Boundary loss (only if boundary bounds provided)
-        if V_boundary_lower is not None and V_boundary_upper is not None:
-            loss_boundary = compute_loss_boundary_bounds(V_boundary_lower, V_boundary_upper)
-        else:
-            loss_boundary = torch.tensor(0.0, device=device)
+        loss_unsafe, sat_unsafe = compute_loss_unsafe_bounds(V_unsafe_lower, beta_ra)
+        loss_goal, sat_goal = compute_loss_goal_bounds(V_goal_lower)
+        loss_init, sat_init = compute_loss_init_bounds(V_init_upper)
+        loss_outside, sat_outside = compute_loss_outside_bounds(V_outside_lower)
     if compute_GV:
-        loss_generator = compute_loss_generator_bounds(Phi_lower, Phi_upper)
+        loss_generator, sat_generator = compute_loss_generator_bounds(Phi_upper)
 
     # Combine losses
-    # Note: generator_weight is applied directly (no additional loss_weights multiplier for generator)
-    # This matches original: total_loss = total_loss + generator_weight * loss_gen
-    if compute_V and compute_GV:
-        total_loss = (
+    total_loss = torch.tensor(0.0, device=device)
+    loss_dict = {}
+    sat_dict = {}
+
+    if compute_V:
+        total_loss += (
             loss_weights['goal'] * loss_goal +
             loss_weights['unsafe'] * loss_unsafe +
             loss_weights['init'] * loss_init +
-            loss_weights['outside'] * loss_outside +
-            0.0 * loss_weights['boundary'] * loss_boundary +
-            generator_weight * loss_generator #+ loss_generator_unsafe + loss_generator_goal
+            loss_weights['outside'] * loss_outside
         )
-
-        loss_dict = {
-            'total': total_loss.item(),
+        loss_dict.update({
             'goal': loss_goal.item(),
             'unsafe': loss_unsafe.item(),
             'init': loss_init.item(),
-            'outside': loss_outside.item(),
-            'boundary': loss_boundary.item(),
-            'generator': loss_generator.item()
-        }
+            'outside': loss_outside.item()
+        })
+        sat_dict.update({
+            'goal': sat_goal,
+            'unsafe': sat_unsafe,
+            'init': sat_init,
+            'outside': sat_outside
+        })
 
-    elif compute_V and not compute_GV:
-        total_loss = (
-            loss_weights['goal'] * loss_goal +
-            loss_weights['unsafe'] * loss_unsafe +
-            loss_weights['init'] * loss_init +
-            loss_weights['outside'] * loss_outside +
-            loss_weights['boundary'] * loss_boundary
-        )
+    if compute_GV:
+        total_loss += generator_weight * loss_generator
+        loss_dict['generator'] = loss_generator.item()
+        sat_dict['generator'] = sat_generator
 
-        loss_dict = {
-            'total': total_loss.item(),
-            'goal': loss_goal.item(),
-            'unsafe': loss_unsafe.item(),
-            'init': loss_init.item(),
-            'outside': loss_outside.item(),
-            'boundary': loss_boundary.item()
-        }
+    loss_dict['total'] = total_loss.item()
 
-    elif not compute_V and compute_GV:
-        total_loss = (
-            generator_weight * loss_generator
-        )
-
-        loss_dict = {
-            'generator': loss_generator.item()
-        }
-
-    return total_loss, loss_dict
-
+    return total_loss, loss_dict, sat_dict
 
 def evaluate_constraints(
     V_net,
     GV_net,
     region_cells: dict,
-    beta_s: Union[float, torch.Tensor],
     beta_ra: float,
     device: str = 'cpu',
-    n_samples: int = 1000,
     crown_cache_all=None,
     crown_cache_phi=None,
     input_bounds_all=None,
@@ -464,7 +269,7 @@ def evaluate_constraints(
             input_lowers_all, input_uppers_all = input_bounds_all
             v_lowers_all, v_uppers_all = crown_cache_all.compute_bounds(input_lowers_all, input_uppers_all)
 
-            region_order = ['init', 'goal', 'unsafe', 'outside', 'boundary']
+            region_order = ['init', 'goal', 'unsafe', 'outside']
             start_idx = 0
             for name in region_order:
                 count = cell_counts_V[name]
@@ -476,7 +281,7 @@ def evaluate_constraints(
                     region_bounds[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
         else:
             # Fallback: create separate cache for each region (dimension-generic)
-            for name in ['goal', 'unsafe', 'init', 'outside', 'boundary']:
+            for name in ['goal', 'unsafe', 'init', 'outside']:
                 if len(region_cells[name]) > 0:
                     cache = SymbolicCROWNCache(V_net, len(region_cells[name]), input_dim=input_dim, device=device)
                     input_lowers, input_uppers = prepare_cell_bounds(region_cells[name], device=device, input_dim=input_dim)
@@ -485,22 +290,18 @@ def evaluate_constraints(
                 else:
                     region_bounds[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
 
-        # Goal: sample + bounds (existential)
-        if len(region_cells['goal']) > 0:
-            x_goal = sample_from_cells(region_cells['goal'], n_samples, device)
-            v_goal_samples = V_net(x_goal).squeeze(-1)
-            goal_satisfied = ((v_goal_samples.min() < beta_s).item() and
-                              (region_bounds['goal'][0].min() >= 0).item())
-            v_goal_min = v_goal_samples.min().item()
-            v_goal_max = v_goal_samples.max().item()
-            v_goal_mean = v_goal_samples.mean().item()
+        # Goal: bounds only (universal)
+        if len(region_bounds['goal'][0]) > 0:
+            goal_satisfied = (region_bounds['goal'][0] >= 0).all().item()
+            v_goal_min = region_bounds['goal'][0].min().item()
+            v_goal_max = region_bounds['goal'][1].max().item()
         else:
-            goal_satisfied = False
-            v_goal_min = v_goal_max = v_goal_mean = 0.0
+            goal_satisfied = True
+            v_goal_min = v_goal_max = 0.0
 
         # Outside: bounds only (universal)
         if len(region_bounds['outside'][0]) > 0:
-            outside_satisfied = (region_bounds['outside'][0] >= beta_s).all().item()
+            outside_satisfied = (region_bounds['outside'][0] >= 0.0).all().item()
             v_outside_min = region_bounds['outside'][0].min().item()
             v_outside_max = region_bounds['outside'][1].max().item()
         else:
@@ -512,18 +313,13 @@ def evaluate_constraints(
             unsafe_satisfied = (region_bounds['unsafe'][0] >= beta_ra).all().item()
             v_unsafe_min = region_bounds['unsafe'][0].min().item()
             v_unsafe_max = region_bounds['unsafe'][1].max().item()
-
-            # # debug
-            # x_unsafe = sample_from_cells(region_cells['unsafe'], n_samples, device)
-            # v_unsafe_samples = V_net(x_unsafe).squeeze(-1)
-            # print("[DEBUG] V samplesin UNSAFE", v_unsafe_samples.min(), v_unsafe_samples.max())
         else:
             unsafe_satisfied = True
             v_unsafe_min = v_unsafe_max = 0.0
 
         # Init: bounds only (universal)
         if len(region_bounds['init'][0]) > 0:
-            init_lower_ok = (region_bounds['init'][0] >= beta_s).all().item()
+            init_lower_ok = (region_bounds['init'][0] >= 0.0).all().item()
             init_upper_ok = (region_bounds['init'][1] <= 1.0).all().item()
             init_satisfied = init_lower_ok and init_upper_ok
             v_init_min = region_bounds['init'][0].min().item()
@@ -531,27 +327,6 @@ def evaluate_constraints(
         else:
             init_satisfied = True
             v_init_min = v_init_max = 0.0
-
-        # Boundary: bounds only (universal) V(x) >= 1.0
-        if 'boundary' in region_cells and len(region_cells['boundary']) > 0:
-            # Check if boundary bounds are already in region_bounds
-            if 'boundary' in region_bounds and len(region_bounds['boundary'][0]) > 0:
-                boundary_satisfied = (region_bounds['boundary'][0] >= 1.0).all().item()
-                v_boundary_min = region_bounds['boundary'][0].min().item()
-                v_boundary_max = region_bounds['boundary'][1].max().item()
-            else:
-                # Fallback: compute boundary bounds separately
-                cache_boundary = SymbolicCROWNCache(V_net, len(region_cells['boundary']), input_dim=input_dim, device=device)
-                input_lowers_boundary, input_uppers_boundary = prepare_cell_bounds(
-                    region_cells['boundary'], device=device, input_dim=input_dim
-                )
-                v_lowers_boundary, v_uppers_boundary = cache_boundary.compute_bounds(input_lowers_boundary, input_uppers_boundary)
-                boundary_satisfied = (v_lowers_boundary >= 1.0).all().item()
-                v_boundary_min = v_lowers_boundary.min().item()
-                v_boundary_max = v_uppers_boundary.max().item()
-        else:
-            boundary_satisfied = True
-            v_boundary_min = v_boundary_max = 0.0
 
         # Generator: bounds only (universal)  Φ(x) <= 0
         if len(region_cells['generator']) > 0:
@@ -585,20 +360,16 @@ def evaluate_constraints(
         'unsafe_satisfied': unsafe_satisfied,
         'init_satisfied': init_satisfied,
         'outside_satisfied': outside_satisfied,
-        'boundary_satisfied': boundary_satisfied,
         'generator_satisfied': generator_satisfied,
 
         'V_goal_min': v_goal_min,
         'V_goal_max': v_goal_max,
-        'V_goal_mean': v_goal_mean,
         'V_unsafe_min': v_unsafe_min,
         'V_unsafe_max': v_unsafe_max,
         'V_init_min': v_init_min,
         'V_init_max': v_init_max,
         'V_outside_min': v_outside_min,
         'V_outside_max': v_outside_max,
-        'V_boundary_min': v_boundary_min,
-        'V_boundary_max': v_boundary_max,
         'Phi_min': phi_min,
         'Phi_max': phi_max,
         'Phi_mean': phi_mean,
@@ -609,7 +380,7 @@ def evaluate_constraints(
     return results
 
 
-def print_loss_summary(epoch: int, loss_dict: dict, prefix: str = "", compute_V: bool = True, compute_GV: bool = True):
+def print_loss_summary(epoch: int, loss_dict: dict, prefix: str = "", compute_V: bool = True, compute_GV: bool = True, elapsed_time: float = None):
     """
     Print formatted loss summary.
 
@@ -617,118 +388,90 @@ def print_loss_summary(epoch: int, loss_dict: dict, prefix: str = "", compute_V:
         epoch: Current epoch
         loss_dict: Dictionary of losses
         prefix: Optional prefix for print
+        elapsed_time: Optional elapsed time in seconds
     """
+    time_str = f" | Time: {elapsed_time:.1f}s" if elapsed_time is not None else ""
+
     if compute_V and compute_GV:
         print(f"{prefix}Epoch {epoch:5d} | "
-            f"Total: {loss_dict['total']:.4f} | "
-            f"Goal: {loss_dict['goal']:.4f} | "
-            f"Unsafe: {loss_dict['unsafe']:.4f} | "
-            f"Init: {loss_dict['init']:.4f} | "
-            f"Outside: {loss_dict['outside']:.4f} | "
-            f"Boundary: {loss_dict['boundary']:.4f} | "
-            f"Gen: {loss_dict['generator']:.6e}")
+            f"Total: {loss_dict['total']:9.4f} | "
+            f"Goal: {loss_dict['goal']:8.4f} | "
+            f"Unsafe: {loss_dict['unsafe']:8.4f} | "
+            f"Init: {loss_dict['init']:8.4f} | "
+            f"Outside: {loss_dict['outside']:8.4f} | "
+            f"Gen: {loss_dict['generator']:8.4f}{time_str}")
     elif compute_V and not compute_GV:
         print(f"{prefix}Epoch {epoch:5d} | "
-            f"Total: {loss_dict['total']:.4f} | "
-            f"Goal: {loss_dict['goal']:.4f} | "
-            f"Unsafe: {loss_dict['unsafe']:.4f} | "
-            f"Init: {loss_dict['init']:.4f} | "
-            f"Outside: {loss_dict['outside']:.4f} | "
-            f"Boundary: {loss_dict['boundary']:.4f}")
+            f"Total: {loss_dict['total']:9.4f} | "
+            f"Goal: {loss_dict['goal']:8.4f} | "
+            f"Unsafe: {loss_dict['unsafe']:8.4f} | "
+            f"Init: {loss_dict['init']:8.4f} | "
+            f"Outside: {loss_dict['outside']:8.4f}{time_str}")
     else:
         print(f"{prefix}Epoch {epoch:5d} | "
-            f"Gen: {loss_dict['generator']:.4f}")
+            f"Gen: {loss_dict['generator']:8.4f}{time_str}")
 
 
-def print_constraint_summary(results: dict, prefix: str = ""):
+def print_constraint_summary(results: dict, prefix: str = "", bounds: dict = None, phi_uppers: torch.Tensor = None, region_cells: dict = None, beta_ra: float = 20.0):
     """
-    Print formatted constraint satisfaction summary.
+    Print formatted constraint satisfaction summary with cell pass/fail counts.
 
     Args:
         results: Dictionary from evaluate_constraints
         prefix: Optional prefix for print
+        bounds: Optional dict with bounds for each region (from training loop)
+        phi_uppers: Optional tensor of phi upper bounds (from training loop)
+        region_cells: Optional dict with cells for each region
+        beta_ra: Unsafe region threshold (default 20.0)
     """
-    # Helper to print checkmark or X
-    def status_str(satisfied):
-        return "✓" if satisfied else "✗"
+    def status(satisfied):
+        return "PASS" if satisfied else "FAIL"
 
-    print(f"{prefix}Constraint Satisfaction:")
-    print(f"{prefix}  Goal:      {status_str(results['goal_satisfied'])} "
-          f"(V_min={results['V_goal_min']:.3f}, V_mean={results['V_goal_mean']:.3f}, V_max={results['V_goal_max']:.3f})")
-    print(f"{prefix}  Unsafe:    {status_str(results['unsafe_satisfied'])} "
-          f"(V_min={results['V_unsafe_min']:.3f}, V_max={results['V_unsafe_max']:.3f})")
-    print(f"{prefix}  Init:      {status_str(results['init_satisfied'])} "
-          f"(V_min={results['V_init_min']:.3f}, V_max={results['V_init_max']:.3f})")
-    print(f"{prefix}  Outside:   {status_str(results['outside_satisfied'])} "
-          f"(V_min={results['V_outside_min']:.3f}, V_max={results['V_outside_max']:.3f})")
-    print(f"{prefix}  Boundary:  {status_str(results['boundary_satisfied'])} "
-          f"(V_min={results['V_boundary_min']:.3f}, V_max={results['V_boundary_max']:.3f})")
-    print(f"{prefix}  Generator: {status_str(results['generator_satisfied'])} "
-          f"(Phi_upper_min={results['Phi_min']:.6e}, Phi_upper_max={results['Phi_max']:.6e}, failing={results['num_failing_cells']})")
+    def cell_stats(region_name, constraint_fn, total_cells):
+        """Helper to compute passing/failing cell counts"""
+        if total_cells == 0:
+            return ""
+        passing = constraint_fn.sum().item()
+        failing = total_cells - passing
+        pct = 100 * failing / total_cells
+        return f" | {passing}/{total_cells} pass ({100 - pct:.1f}%)"
 
+    # Goal
+    stats = ""
+    if bounds and 'goal' in bounds and len(bounds['goal'][0]) > 0:
+        stats = cell_stats('goal', bounds['goal'][0] >= 0, len(bounds['goal'][0]))
+    print(f"{prefix}Goal:      {status(results['goal_satisfied']):4s}, V bounds: [{results['V_goal_min']:7.3f}, {results['V_goal_max']:7.3f}]{stats}")
 
-# def refine_failing_cells(
-#     region_cells: List[Tuple[torch.Tensor, torch.Tensor]],
-#     failing_mask: torch.Tensor,
-#     refine_factor: int = 2,
-#     N_to_refine: int = 100,
-#     seed: Optional[int] = 0,
-# ) -> Tuple[List[Tuple[torch.Tensor, torch.Tensor]], int]:
-#     """
-#     Refine (split) only a random subset of failing cells.
+    # Unsafe
+    stats = ""
+    if bounds and 'unsafe' in bounds and len(bounds['unsafe'][0]) > 0:
+        stats = cell_stats('unsafe', bounds['unsafe'][0] >= beta_ra, len(bounds['unsafe'][0]))
+    print(f"{prefix}Unsafe:    {status(results['unsafe_satisfied']):4s}, V bounds: [{results['V_unsafe_min']:7.3f}, {results['V_unsafe_max']:7.3f}]{stats}")
 
-#     Args:
-#         region_cells: List of (lower, upper) cell bounds, each (D,)
-#         failing_mask: Boolean mask indicating which cells failed
-#         refine_factor: Factor to subdivide cells (2 = split into refine_factor^D subcells)
-#         N_to_refine: Max number of failing cells to refine (randomly selected)
-#         seed: Optional RNG seed for reproducibility
+    # Init
+    stats = ""
+    if bounds and 'init' in bounds and len(bounds['init'][1]) > 0:
+        stats = cell_stats('init', bounds['init'][1] <= 1.0, len(bounds['init'][1]))
+    print(f"{prefix}Init:      {status(results['init_satisfied']):4s}, V bounds: [{results['V_init_min']:7.3f}, {results['V_init_max']:7.3f}]{stats}")
 
-#     Returns:
-#         Tuple of (new_cells, num_refined)
-#     """
-#     # Make sure mask is 1D on CPU for indexing
-#     failing_mask = failing_mask.reshape(-1).to(dtype=torch.bool).cpu()
+    # Outside
+    stats = ""
+    if bounds and 'outside' in bounds and len(bounds['outside'][0]) > 0:
+        stats = cell_stats('outside', bounds['outside'][0] >= 0.0, len(bounds['outside'][0]))
+    print(f"{prefix}Outside:   {status(results['outside_satisfied']):4s}, V bounds: [{results['V_outside_min']:7.3f}, {results['V_outside_max']:7.3f}]{stats}")
 
-#     n_cells = len(region_cells)
-#     mask_len = min(len(failing_mask), n_cells)
-
-#     # indices of failing cells that are eligible (within mask range)
-#     failing_idxs = torch.nonzero(failing_mask[:mask_len], as_tuple=False).reshape(-1).tolist()
-
-#     # choose subset to refine
-#     if N_to_refine is None or N_to_refine <= 0 or len(failing_idxs) == 0:
-#         refine_set = set()
-#     else:
-#         rng = np.random.default_rng(seed)
-#         k = min(int(N_to_refine), len(failing_idxs))
-#         refine_set = set(rng.choice(failing_idxs, size=k, replace=False).tolist())
-
-#     new_cells: List[Tuple[torch.Tensor, torch.Tensor]] = []
-#     num_refined = 0
-
-#     for i, (cell_lower, cell_upper) in enumerate(region_cells):
-#         if i in refine_set:
-#             # --- build (D,2) bounds (dimension-generic) ---
-#             cell_lower = cell_lower.reshape(-1)
-#             cell_upper = cell_upper.reshape(-1)
-#             D = int(cell_lower.numel())
-
-#             cell_bounds = np.array(
-#                 [[cell_lower[d].item(), cell_upper[d].item()] for d in range(D)],
-#                 dtype=np.float32
-#             )
-#             # ------------------------------------------------
-
-#             cell_region = Region(cell_bounds)
-#             refined = discretize_region(cell_region, refine_factor)
-#             new_cells.extend(refined)
-#             num_refined += 1
-#         else:
-#             new_cells.append((cell_lower, cell_upper))
-
-#     return new_cells, num_refined
-
+    # Generator
+    stats = ""
+    if phi_uppers is not None and len(phi_uppers) > 0:
+        stats = cell_stats('generator', phi_uppers <= 0.0, len(phi_uppers))
+    elif region_cells and 'generator' in region_cells:
+        total_gen = len(region_cells['generator'])
+        failing = results['num_failing_cells']
+        if total_gen > 0:
+            passing = total_gen - failing
+            pct = 100 * failing / total_gen
+            stats = f" | {passing}/{total_gen} pass ({failing} fail, {pct:.1f}%)"
+    print(f"{prefix}Generator: {status(results['generator_satisfied']):4s}, GV bounds: [{results['Phi_min']:7.3f}, {results['Phi_max']:7.3f}]{stats}")
 
 from typing import List, Tuple, Optional
 import numpy as np
@@ -778,9 +521,8 @@ def refine_failing_cells(
             # Top-k selection by score among failing cells (largest first)
             scores_cpu = scores.reshape(-1).detach().cpu()
             scores_cpu = scores_cpu[:mask_len]
-            print("[debug] use score")
-
             failing_scores = scores_cpu[failing_idxs_t]
+
             # Be safe with NaNs/Infs
             failing_scores = torch.nan_to_num(failing_scores, nan=-float("inf"))
 

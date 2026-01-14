@@ -46,7 +46,7 @@ class SymbolicCROWNCache:
         dummy_batch = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)
 
         # Create BoundedModule ONCE - this builds the symbolic computation graph
-        print(f"[SymbolicCROWNCache] Creating BoundedModule for {num_cells} cells...")
+        # print(f"[SymbolicCROWNCache] Creating BoundedModule for {num_cells} cells...")
         self.lirpa_model = BoundedModule(model, dummy_batch, device=device)
 
         # Initialize with dummy bounds
@@ -73,7 +73,7 @@ class SymbolicCROWNCache:
             bound_upper=True
         )
 
-        print(f"[SymbolicCROWNCache] Initialized for {num_cells} cells - symbolic structure cached!")
+        # print(f"[SymbolicCROWNCache] Initialized for {num_cells} cells - symbolic structure cached!")
 
     def compute_bounds(self, input_lowers, input_uppers):
         """
@@ -154,7 +154,7 @@ class SymbolicCROWNCache_Phi:
         dummy_batch = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)
 
         # Create BoundedModule ONCE
-        print(f"[SymbolicCROWNCache_Phi] Creating BoundedModule for {num_cells} cells...")
+        # print(f"[SymbolicCROWNCache_Phi] Creating BoundedModule for {num_cells} cells...")
         self.lirpa_model = BoundedModule(phi_module, dummy_batch, device=device)
 
         # Initialize with dummy bounds
@@ -181,7 +181,7 @@ class SymbolicCROWNCache_Phi:
             bound_upper=True
         )
 
-        print(f"[SymbolicCROWNCache_Phi] Initialized for {num_cells} cells!")
+        # print(f"[SymbolicCROWNCache_Phi] Initialized for {num_cells} cells!")
 
     def compute_bounds(self, input_lowers, input_uppers):
         """
