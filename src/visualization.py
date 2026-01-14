@@ -249,7 +249,6 @@ def visualize_value_function(
     if filename is None:
         filename = "value_function.png"
     fig.savefig(filename, dpi=150)
-    # print(f"  → Saved to '{filename}'")
     plt.close(fig)
 
     V_net.train()
@@ -353,7 +352,6 @@ def visualize_generator(
     if filename is None:
         filename = "generator.png"
     fig.savefig(filename, dpi=150)
-    # print(f"  → Saved to '{filename}'")
     plt.close(fig)
 
     V_net.train()
@@ -491,7 +489,6 @@ def plot_constraint_regions(
     if filename is None:
         filename = "constraint_regions.png"
     fig.savefig(filename, dpi=150)
-    # print(f"  → Saved to '{filename}'")
     plt.close(fig)
 
     V_net.train()
@@ -599,7 +596,6 @@ def plot_loss_history(
     if filename is None:
         filename = "loss_history.png"
     plt.savefig(filename, dpi=150)
-    # print(f"  → Saved to '{filename}'")
     plt.close()
 
 

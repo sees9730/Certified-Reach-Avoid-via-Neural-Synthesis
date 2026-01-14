@@ -253,8 +253,8 @@ def train_network_bounds(
     regions: Regions,
     params: Hyperparameters,
     device: str = 'cpu',
-    visualize_interval: int = 5000,
-    control_net: nn.Module = None
+    control_net: nn.Module = None,
+    create_scheduler = None
 ):
     """
     Train the value network using CROWN bounds.
@@ -332,16 +332,8 @@ def train_network_bounds(
 
     optimizer = torch.optim.Adam(opt_params, lr=params.training.learning_rate)
 
-    # Scheduler (matching testing_simple3.py)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer,
-        mode='min',           # minimize the loss
-        factor=0.5,           # reduce LR by half when plateau detected
-        patience=300,         # wait 100 epochs of no improvement before reducing
-        verbose=True,         # print when LR changes
-        min_lr=1e-6,          # minimum learning rate
-        threshold=1e-3        # minimum change to qualify as improvement
-    )
+    # Scheduler is optional and created via factory function from main.py
+    scheduler = create_scheduler(optimizer) if create_scheduler is not None else None
 
     # Training loop
     loss_history = []
@@ -388,8 +380,7 @@ def train_network_bounds(
                 # Track failing cells for adaptive refinement
                 phi_upper_failing_mask = phi_uppers > 0.0
                 num_total_failing = phi_upper_failing_mask.sum().item()
-                phi_upper_failing_mask_relax = phi_uppers > -200.0
-                
+
             else:
                 phi_uppers = torch.tensor([], device=device)
                 current_gen_weight = 0.0
@@ -447,78 +438,74 @@ def train_network_bounds(
                 else:
                     bounds_updated[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
 
-        # Update scheduler after bounds recomputation
-        scheduler.step(total_loss.item())
-
-        # Get current beta_s value for constraint checks
-        beta_s_check = 0.0
+        # Update scheduler after bounds recomputation (if provided)
+        if scheduler is not None:
+            scheduler.step(total_loss.item())
 
         # Adaptive refinement for V outside region cells
         needs_cache_rebuild = False
         if params.compute_V and len(bounds_updated['outside'][0]) > 0:
             # Track failing cells in outside region
-            outside_failing_mask = bounds_updated['outside'][0] < beta_s_check
+            v_cfg = params.refinement.v_outside
+            outside_failing_mask = bounds_updated['outside'][0] < 0.0
             num_outside_failing = outside_failing_mask.sum().item()
-            outside_failing_mask_relax = bounds_updated['outside'][0] < (beta_s_check + 0.3)
 
             # Ensure bounds match current cell count
             if len(outside_failing_mask) == len(region_cells['outside']) and num_outside_failing > 0:
-                REFINE_INTERVAL = 200
-                REFINE_FACTOR = 2
-                MAX_CELLS = 30000
+                refine_interval = (v_cfg.refine_interval_late
+                                 if epoch > v_cfg.late_epoch_threshold
+                                 else v_cfg.refine_interval)
 
-                if epoch > 2500:
-                    REFINE_INTERVAL = 100
-
-                if ((epoch + 1) % REFINE_INTERVAL == 0 and
-                    len(region_cells['outside']) < MAX_CELLS):
+                if (v_cfg.enable_refinement and
+                    (epoch + 1) % refine_interval == 0 and
+                    len(region_cells['outside']) < v_cfg.max_cells):
                     new_cells, num_refined = refine_failing_cells(
                         region_cells['outside'],
                         outside_failing_mask,
-                        REFINE_FACTOR,
+                        v_cfg.refine_factor,
+                        N_to_refine=v_cfg.N_to_refine
                     )
                     region_cells['outside'] = new_cells
                     print(f"Refining outside cells: {num_outside_failing} failing, refined {num_refined} cells, {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['outside'].append(epoch + 1)
 
-            if((epoch + 1) % 502 == 0):
+            if (v_cfg.enable_merging and
+                (epoch + 1) % v_cfg.merge_interval == 0):
+                outside_failing_mask_relax = bounds_updated['outside'][0] < (v_cfg.merge_relax_margin)
                 merged_cells, num_merges = merge_passing_neighbor_cells(
                     region_cells['outside'],
                     outside_failing_mask_relax,
-                    max_passes=8,
-                    max_merges=None,   # cap work; set None for full greedy
-                    seed=0,
-                    eps=1e-6,
+                    max_passes=v_cfg.merge_max_passes,
+                    max_merges=None,
                 )
                 region_cells['outside'] = merged_cells
                 print(f"Merging outside cells: merged {num_merges} pairs, {len(merged_cells)} total")
                 needs_cache_rebuild = True
 
-        # Adaptive refinement for generator cells (before optimizer step)
+        # Adaptive refinement for generator cells
         if params.compute_GV:
+            gv_cfg = params.refinement.gv_generator
             if (epoch >= params.training.generator_start_epoch and
                 params.training.generator_weight > 0 and
                 crown_cache_phi is not None and
                 num_total_failing > 0):
 
-                # Refinement parameters (matching testing_simple3.py)
-                REFINE_INTERVAL = 200  # Refine every 100k epochs
-                REFINE_FACTOR = 2  # Split into 2x2 subcells
-                MAX_CELLS = 30000  # Don't refine if we already have too many cells
-
-                # Adjust interval for later epochs
-                if epoch > 2500:
-                    REFINE_INTERVAL = 100
+                # Get refinement interval based on epoch
+                refine_interval = (gv_cfg.refine_interval_late
+                                 if epoch > gv_cfg.late_epoch_threshold
+                                 else gv_cfg.refine_interval)
 
                 # Check if it's time to refine
-                if ((epoch + 1) % REFINE_INTERVAL == 0 and
-                    len(region_cells['generator']) < MAX_CELLS):
+                if (gv_cfg.enable_refinement and
+                    (epoch + 1) % refine_interval == 0 and
+                    len(region_cells['generator']) < gv_cfg.max_cells):
 
                     new_cells, num_refined = refine_failing_cells(
                         region_cells['generator'],
                         phi_upper_failing_mask,
-                        REFINE_FACTOR,
+                        gv_cfg.refine_factor,
+                        N_to_refine=gv_cfg.N_to_refine,
                         scores=phi_uppers
                     )
                     region_cells['generator'] = new_cells
@@ -526,11 +513,13 @@ def train_network_bounds(
                     needs_cache_rebuild = True
                     refinement_epochs['generator'].append(epoch + 1)
 
-            if((epoch + 1) % 502 == 0):
+            if (gv_cfg.enable_merging and
+                (epoch + 1) % gv_cfg.merge_interval == 0):
+                phi_upper_failing_mask_relax = phi_uppers > gv_cfg.merge_relax_margin
                 merged_cells, num_merges = merge_passing_neighbor_cells(
                     region_cells['generator'],
                     phi_upper_failing_mask_relax,
-                    max_passes=8,
+                    max_passes=gv_cfg.merge_max_passes,
                     max_merges=None,   # cap work; set None for full greedy
                     seed=0,
                     eps=1e-6,
@@ -540,7 +529,7 @@ def train_network_bounds(
                 needs_cache_rebuild = True
 
         # Logging
-        if epoch % 10 == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
+        if epoch % params.logging.loss_log_interval == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
             elapsed = time.time() - start_time
             print_loss_summary(epoch, loss_dict, compute_V=params.compute_V, compute_GV=params.compute_GV, elapsed_time=elapsed)
             loss_dict['epoch'] = epoch
@@ -582,7 +571,7 @@ def train_network_bounds(
                 break
 
         # Detailed evaluation and visualization
-        if (epoch % 1000 == 0) or epoch == params.training.num_epochs - 1:
+        if (epoch % params.logging.detailed_eval_interval == 0) or epoch == params.training.num_epochs - 1:
             print(f"=== Detailed Evaluation ===")
             # For evaluation, we can just create temporary caches (not in the hot path)
             results = evaluate_constraints(
@@ -595,7 +584,7 @@ def train_network_bounds(
                 beta_ra=params.constraints.beta_ra,
                 device=device
             )
-            
+
             # Pass bounds and phi_uppers to show cell statistics
             print_constraint_summary(
                 results,
@@ -607,7 +596,7 @@ def train_network_bounds(
             )
 
             # Visualize progress
-            if visualize_interval > 0 and epoch % visualize_interval == 0:
+            if params.logging.visualize_interval > 0 and epoch % params.logging.visualize_interval == 0:
                 visualize_training_progress(
                     V_net, GV_net, regions, region_cells,
                     epoch=epoch,
@@ -675,38 +664,45 @@ def main():
     print("MODULAR RL VERIFICATION - BOUND-BASED TRAINING")
     print("="*80)
 
-    # ========================================================================
-    # 1. HYPERPARAMETERS
-    # ========================================================================
-    print("\n" + "="*80)
+    # === Hyperparameters ===
+    print("\n" + "="*20)
     print("HYPERPARAMETERS")
-    print("="*80)
+    print("="*20)
 
     params = Hyperparameters.default()
 
-    # Customize configuration
+    # Network architecture
     params.network.n_inputs = 2
     params.network.n_hidden_1 = 64
     params.network.n_hidden_2 = 64
     params.network.input_scale = [100.0, 100.0]
     params.network.scale_factor = 20.0
 
+    # Training
     params.training.learning_rate = 0.005
-    params.training.num_epochs = 200000  # Adjust as needed
-    params.training.learnable_scale = False
-    params.training.learnable_input_scale = False
-    params.training.generator_weight = 1.0  # Enable generator constraint
-    params.training.generator_start_epoch = 0
+    params.training.num_epochs = 200000
+    params.training.generator_weight = 1.0
 
+    # Initial region discretization
     params.discretization.n_goal = 7
     params.discretization.n_outside_goal = 4
-    params.discretization.n_generator = 1  # Will be overridden by radial discretization
+    params.discretization.n_generator = 1
     params.discretization.n_unsafe = 7
     params.discretization.n_init = 7
 
-    # Set beta_s to a value (constant), or set to None to make it learnable
-    # If learnable_beta_s is True, this value will be used as initialization
-    params.training.learnable_beta_s = False  # Set to True to make beta_s learnable
+    # Refinement
+    params.refinement.v_outside.enable_refinement = params.refinement.gv_generator.enable_refinement = True
+    params.refinement.v_outside.refine_factor = params.refinement.gv_generator.refine_factor = 2
+    params.refinement.v_outside.refine_interval = params.refinement.gv_generator.refine_interval = 200
+    params.refinement.v_outside.late_epoch_threshold = params.refinement.gv_generator.late_epoch_threshold = 2500
+    params.refinement.v_outside.refine_interval_late = params.refinement.gv_generator.refine_interval_late = 100
+    params.refinement.v_outside.max_cells = params.refinement.gv_generator.max_cells = 30000
+
+    # Merging
+    params.refinement.v_outside.enable_merging = params.refinement.gv_generator.enable_merging = True
+    params.refinement.v_outside.merge_max_passes = params.refinement.gv_generator.merge_max_passes = 8 
+
+    # Constraints
     params.constraints.beta_s = 0.0
     params.constraints.beta_ra = 20.0
 
@@ -714,14 +710,18 @@ def main():
     params.compute_V = True
     params.compute_GV = True
 
-    # ========================================================================
-    # 2. SYSTEM DYNAMICS
-    # ========================================================================
-    print("\n" + "="*80)
-    print("SYSTEM DYNAMICS")
-    print("="*80)
+    # Pretrain 
+    params.training.enable_pretraining = True
+    params.training.pretrain_epochs = 500
+    params.training.pretrain_lr = 0.01
+    params.training.pretrain_n_samples = 1000
 
-    # Option 2: Neural network control (implements same K @ x)
+    # === System dynamics ===
+    print("\n" + "="*20)
+    print("SYSTEM DYNAMICS")
+    print("="*20)
+
+    # Controller network for closed-loop dynamics
     u_nn = LinearControlNN(prior_knowledge=False)
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
@@ -732,7 +732,6 @@ def main():
         f2 = -1.0 * x1 + -0.5 * x2
         return torch.stack([f1, f2], dim=1)
 
-
     # Create diffusion coefficients as a persistent tensor to avoid TracerWarnings
     g_coeffs = torch.tensor([0.2, 0.2], dtype=torch.float32)
     def g(x: torch.Tensor) -> torch.Tensor:
@@ -740,51 +739,29 @@ def main():
 
     # Create closed-loop drift for control synthesis
     f_cl_module = ClosedLoopDrift(f_ol, u_nn).to(params.training.device)
-
     dynamics = Dynamics.dynamics(f=f_cl_module, g=g)
 
-    # ========================================================================
-    # 3. SPATIAL REGIONS
-    # ========================================================================
-    print("\n" + "="*80)
+    # === Spatial regions ===
+    print("\n" + "="*20)
     print("SPATIAL REGIONS")
-    print("="*80)
+    print("="*20)
 
     init_range = np.array([[45.0, 55.0], [-55.0, -45.0]], dtype=np.float32)
     goal_range = np.array([[-25.0, 25.0], [-25.0, 25.0]], dtype=np.float32)
     unsafe_range = np.array([[-100.0, -80.0], [-100.0, 100.0]], dtype=np.float32)
-    # Create unsafe region as union of two rectangles (matching paper exactly)
-    # unsafe_down1 = np.array([[-100.0, -80.0], [-100.0, -50.0]], dtype=np.float32)
-    # unsafe_down2 = np.array([[-100.0, -80.0], [-50.0, 0.0]], dtype=np.float32)
-    # unsafe_up = np.array([[-100.0, -80.0], [0.0, 100.0]], dtype=np.float32)
-
-    # unsafe_range = np.vstack((unsafe_up, unsafe_down))
     full_range = np.array([[-100.0, 100.0], [-100.0, 100.0]], dtype=np.float32)
-
-    # regions = Regions.from_numpy_ranges(
-    #     init_range=init_range,
-    #     goal_range=goal_range,
-    #     unsafe_range=unsafe_range,
-    #     full_range=full_range
-    # )
 
     init = Region(init_range)
     goal = Region(goal_range)
-    # unsafe_down1 = Region(unsafe_down1)
-    # unsafe_down2 = Region(unsafe_down2)
-    # unsafe_up = Region(unsafe_up)
-    # unsafe = Region.union(unsafe_down1, unsafe_down2, unsafe_up)
     unsafe = Region(unsafe_range)
     full = Region(full_range)
 
     regions = Regions(init=init, goal=goal, unsafe=unsafe, full=full)
 
-    # ========================================================================
-    # 4. CREATE NETWORKS
-    # ========================================================================
-    print("\n" + "="*80)
+    # === Networks ===
+    print("\n" + "="*20)
     print("NETWORKS")
-    print("="*80)
+    print("="*20)
 
     V_net = create_V(params.network)
     GV_net = create_GV(
@@ -794,9 +771,7 @@ def main():
         training_config=params.training
     )
 
-    # ========================================================================
-    # 5. DISCRETIZE REGIONS
-    # ========================================================================
+    # === Discretize regions ===
     region_cells = discretize_regions(
         regions,
         params.discretization,
@@ -804,9 +779,7 @@ def main():
         boundary_n_partitions=1
     )
 
-    # ========================================================================
-    # 6.0 Setup saving
-    # ========================================================================
+    # === Training / Evaluation ===
     device = params.training.device
     params.constraints.pretrain_goal_target = params.constraints.beta_s
     params.constraints.pretrain_unsafe_target = params.constraints.beta_ra
@@ -826,11 +799,7 @@ def main():
         print(f"V network: {V_net}")
         print(f"\nUsing device: {device}")
     
-        ENABLE_PRETRAINING = True  # Set to True to enable
-        PRETRAIN_EPOCHS = 500
-        PRETRAIN_LR = 0.01
-
-        if ENABLE_PRETRAINING:
+        if params.training.enable_pretraining:
             pretrain_network_samples(
                 model=V_net,
                 x_goal_range=goal_range,
@@ -839,10 +808,10 @@ def main():
                 x_range=full_range,
                 params=params,
                 GV_net=GV_net,  # Pass GV_net if you want GV loss, None otherwise
-                num_epochs=PRETRAIN_EPOCHS,
-                lr=PRETRAIN_LR,
+                num_epochs=params.training.pretrain_epochs,
+                lr=params.training.pretrain_lr,
                 device=params.training.device,
-                n_each=1000,
+                n_each=params.training.pretrain_n_samples,
                 control_net=u_nn
             )
 
@@ -854,6 +823,18 @@ def main():
         device = params.training.device
         print(f"\nUsing device: {device}")
 
+        # Create scheduler factory (each main.py can customize this)
+        def create_scheduler(optimizer):
+            return torch.optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer,
+                mode='min',
+                factor=0.5,
+                patience=300,
+                verbose=True,
+                min_lr=1e-6,
+                threshold=1e-3
+            )
+
         loss_history, final_beta_s, refinement_epochs = train_network_bounds(
             V_net=V_net,
             GV_net=GV_net,
@@ -861,8 +842,8 @@ def main():
             regions=regions,
             params=params,
             device=device,
-            visualize_interval=1000,
             control_net=u_nn,   # [control synthesis]
+            create_scheduler=create_scheduler  # Optional scheduler factory
         )
 
         # ========================================================================

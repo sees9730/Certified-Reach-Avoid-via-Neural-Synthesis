@@ -17,7 +17,6 @@ class GV(nn.Module):
       - caches callable signatures once
       - computes diag(GG^T) via sum of squares (no bmm, no eye mask)
       - avoids per-forward expand() + bmm(...) patterns by using matmul broadcasting
-      - caches expanded input scales when not learnable
     """
 
     def __init__(
@@ -25,8 +24,6 @@ class GV(nn.Module):
         V_net: nn.Module,
         dynamics: Dynamics,
         scale_factor: float = 1.0,
-        learnable_scale: bool = False,
-        learnable_input_scale: bool = False,
         input_scale_init: float = None
     ):
         super().__init__()
@@ -36,10 +33,7 @@ class GV(nn.Module):
         # -------------------------
         # scale factor
         # -------------------------
-        if learnable_scale:
-            self.scale_factor = nn.Parameter(torch.tensor(scale_factor, dtype=torch.float32))
-        else:
-            self.register_buffer("scale_factor", torch.tensor(scale_factor, dtype=torch.float32))
+        self.register_buffer("scale_factor", torch.tensor(scale_factor, dtype=torch.float32))
 
         # -------------------------
         # input scale
@@ -47,22 +41,14 @@ class GV(nn.Module):
         if input_scale_init is None:
             input_scale_init = V_net.input_scale
 
-        self.learnable_input_scale = learnable_input_scale
-        if learnable_input_scale:
-            self.input_scale = nn.Parameter(torch.tensor(input_scale_init, dtype=torch.float32))
-            # no caching when learnable
-            self._cached_scale_D = None
-            self._cached_inv_scale = None
-            self._cached_inv_scale_sq = None
-        else:
-            s = torch.tensor(input_scale_init, dtype=torch.float32)
-            self.register_buffer("input_scale", s)
-            self.register_buffer("input_scale_sq", s ** 2)
+        s = torch.tensor(input_scale_init, dtype=torch.float32)
+        self.register_buffer("input_scale", s)
+        self.register_buffer("input_scale_sq", s ** 2)
 
-            # cache expanded (D,) inverse scales for speed
-            self._cached_scale_D = None
-            self._cached_inv_scale = None
-            self._cached_inv_scale_sq = None
+        # cache expanded (D,) inverse scales for speed
+        self._cached_scale_D = None
+        self._cached_inv_scale = None
+        self._cached_inv_scale_sq = None
 
         # -------------------------
         # dynamics (cache dispatch decisions once)
@@ -157,14 +143,7 @@ class GV(nn.Module):
             inv_scale: (D,)
             inv_scale_sq: (D,)
         """
-        # learnable => recompute each call (cheap compared to rest, but avoids stale cache)
-        if self.learnable_input_scale:
-            s = self._expand_scale(self.input_scale.to(device=device, dtype=dtype), D)
-            inv = s.reciprocal()
-            inv_sq = (s * s).reciprocal()
-            return inv, inv_sq
-
-        # non-learnable => cache expanded vectors on the right device/dtype
+        # check cache
         cache_ok = (
             self._cached_scale_D == D
             and self._cached_inv_scale is not None
@@ -348,7 +327,5 @@ def create_GV(
         V_net=V_net,
         dynamics=dynamics,
         scale_factor=network_config.scale_factor,
-        learnable_scale=training_config.learnable_scale,
-        learnable_input_scale=training_config.learnable_input_scale,
         input_scale_init=network_config.input_scale
     )
