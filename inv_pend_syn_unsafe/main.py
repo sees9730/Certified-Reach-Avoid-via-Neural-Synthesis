@@ -972,7 +972,7 @@ def main():
     print("="*80)
 
     init_range = np.array([[(3/4)*pi, (5/4)*pi], [-1.0, 1.0]], dtype=np.float32)
-    goal_range = np.array([[-0.5*pi, 0.5*pi], [-4.0, 4.0]], dtype=np.float32)
+    goal_range = np.array([[-0.4*pi, 0.4*pi], [-4.0, 4.0]], dtype=np.float32)
 
     # Create unsafe region as union of two rectangles (matching paper exactly)
     unsafe_down1 = np.array([[-2*pi, -2*pi+0.5*pi], [-20.0, -10.0]], dtype=np.float32)
