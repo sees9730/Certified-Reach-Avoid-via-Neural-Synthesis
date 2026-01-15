@@ -294,10 +294,10 @@ def train_network_bounds(
 
     # Prepare all input bounds at once
     if total_cells_V > 0:
-        input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device)
+        input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device, input_dim=params.network.n_inputs)
     else:
-        input_lowers_all = torch.empty(0, 2, device=device)
-        input_uppers_all = torch.empty(0, 2, device=device)
+        input_lowers_all = torch.empty(0, params.network.n_inputs, device=device)
+        input_uppers_all = torch.empty(0, params.network.n_inputs, device=device)
 
     # Create CROWN cache for all V cells
     crown_cache_all = SymbolicCROWNCache(
@@ -321,7 +321,7 @@ def train_network_bounds(
         )
         print(f"Created {len(region_cells['generator'])} CROWN caches for GV")
         # Prepare generator input bounds
-        input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], device)
+        input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], device, input_dim=params.network.n_inputs)
 
     # Prepare optimizer with all trainable parameters
     opt_params = list(V_net.parameters())
@@ -520,9 +520,7 @@ def train_network_bounds(
                     region_cells['generator'],
                     phi_upper_failing_mask_relax,
                     max_passes=gv_cfg.merge_max_passes,
-                    max_merges=None,   # cap work; set None for full greedy
-                    seed=0,
-                    eps=1e-6,
+                    max_merges=None
                 )
                 region_cells['generator'] = merged_cells
                 print(f"Merging generator cells: merged {num_merges} pairs, {len(merged_cells)} total")
@@ -616,7 +614,7 @@ def train_network_bounds(
 
                 # Rebuild V CROWN cache
                 total_cells_V = len(all_cells_V)
-                input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device)
+                input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device, input_dim=params.network.n_inputs)
                 crown_cache_all = SymbolicCROWNCache(
                     model=V_net,
                     num_cells=total_cells_V,
@@ -633,12 +631,12 @@ def train_network_bounds(
                 all_cells_V = []
                 for name in region_order_V:
                     all_cells_V.extend(region_cells[name])
-                    input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device)
+                    input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device, input_dim=params.network.n_inputs)
 
             # Rebuild Phi CROWN cache (only for generator region)
             if params.compute_GV:
                 total_cells_GV = len(region_cells['generator'])
-                input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], device)
+                input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], device, input_dim=params.network.n_inputs)
                 crown_cache_phi = SymbolicCROWNCache_Phi(
                     phi_module=GV_net,
                     num_cells=total_cells_GV,
