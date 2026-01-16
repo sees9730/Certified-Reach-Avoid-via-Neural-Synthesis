@@ -1,0 +1,30 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop, refactor_utils ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run GV verification tests
+      run: |
+        python -m pytest tests/test_phi_module.py -v

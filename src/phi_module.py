@@ -317,15 +317,136 @@ class GV(nn.Module):
         raise ValueError(f"Unsupported g type: {type(self.g)}")
 
 
+def compute_GV_autograd(
+    V_net: nn.Module,
+    dynamics: Dynamics,
+    x: torch.Tensor,
+    scale_factor: float = 1.0
+) -> torch.Tensor:
+    """
+    Compute G[V] using PyTorch autograd for verification.
+
+    Args:
+        V_net: Value function network
+        dynamics: Dynamics with f and g
+        x: State tensor (N, D)
+        scale_factor: GV module's scale factor
+
+    Returns:
+        G[V](x): (N, 1)
+    """
+    x = x.detach().requires_grad_(True)
+
+    # Manually compute V (matching GV's analytical implementation)
+    x_norm = x / V_net.input_scale
+    h = torch.sigmoid(V_net.layer1(x_norm))
+    h = torch.sigmoid(V_net.layer2(h))
+    V = V_net.output(h)
+
+    # Compute gradient
+    dVdx_unscaled = torch.autograd.grad(V.sum(), x, create_graph=True)[0]
+
+    # Compute Hessian diagonal if diffusion exists
+    g_fn = dynamics.get_g()
+    if g_fn is not None:
+        H_diag = torch.zeros_like(x)
+        for i in range(x.shape[1]):
+            H_diag[:, i] = torch.autograd.grad(dVdx_unscaled[:, i].sum(), x, retain_graph=True)[0][:, i]
+        H_diag = scale_factor * H_diag
+
+    # Apply scale_factor to gradient
+    dVdx = scale_factor * dVdx_unscaled
+
+    # Drift term
+    f_fn = dynamics.get_f()
+    if callable(f_fn):
+        fx = f_fn(x)
+        if isinstance(fx, np.ndarray):
+            fx = torch.from_numpy(fx).to(x.device, x.dtype)
+    else:
+        if isinstance(f_fn, np.ndarray):
+            f_fn = torch.from_numpy(f_fn).to(x.device, x.dtype)
+        fx = x @ f_fn.T
+    drift_term = (dVdx * fx).sum(dim=1, keepdim=True)
+
+    if g_fn is None:
+        return drift_term
+
+    # Diffusion term
+    if callable(g_fn):
+        g_out = g_fn(x)
+        if isinstance(g_out, np.ndarray):
+            g_out = torch.from_numpy(g_out).to(x.device, x.dtype)
+        g_diag_sq = g_out.square() if g_out.dim() == 2 else g_out.square().sum(dim=2)
+    else:
+        if isinstance(g_fn, np.ndarray):
+            g_fn = torch.from_numpy(g_fn).to(x.device, x.dtype)
+        if isinstance(g_fn, torch.Tensor) and g_fn.dim() == 2:
+            g_diag_sq = g_fn.square().sum(dim=1).unsqueeze(0).expand_as(x)
+        else:
+            g_diag_sq = (g_fn ** 2) * torch.ones_like(x)
+
+    diffusion_term = (0.5 * g_diag_sq * H_diag).sum(dim=1, keepdim=True)
+    return drift_term + diffusion_term
+
+
+def verify_GV(
+    phi_module: GV,
+    dynamics: Dynamics,
+    x: torch.Tensor = None,
+    n_samples: int = 10,
+    tol: float = 1e-4,
+    verbose: bool = True
+) -> bool:
+    """
+    Verify analytical GV matches autograd G[V].
+
+    Args:
+        phi_module: Analytical GV module
+        dynamics: Dynamics object
+        x: Optional sample points (N, D). If None, random samples generated
+        n_samples: Number of random samples if x is None
+        tol: Numerical tolerance
+        verbose: Print detailed comparison info
+
+    Returns:
+        True if match within tolerance, False otherwise
+    """
+    if x is None:
+        D = phi_module.V_net.layer1.weight.shape[1]
+        x = torch.randn(n_samples, D, dtype=torch.float32) * 10.0
+
+    # Compute both versions
+    with torch.no_grad():
+        analytical = phi_module(x)
+    autograd = compute_GV_autograd(phi_module.V_net, dynamics, x, scale_factor=float(phi_module.scale_factor))
+
+    # Compare
+    with torch.no_grad():
+        diff = (analytical - autograd).abs()
+        max_diff = diff.max().item()
+
+    if verbose:
+        print(f"[VERIFY_GV] {'PASSED' if max_diff <= tol else 'FAILED'}: max diff = {max_diff:.6e}")
+
+    return max_diff <= tol
+
+
 def create_GV(
     V_net: nn.Module,
     dynamics: Dynamics,
     network_config,
-    training_config
+    training_config,
+    verify: bool = True
 ) -> GV:
-    return GV(
+    phi = GV(
         V_net=V_net,
         dynamics=dynamics,
         scale_factor=network_config.scale_factor,
         input_scale_init=network_config.input_scale
     )
+
+    if verify:
+        verify_GV(phi, dynamics)
+
+    return phi
