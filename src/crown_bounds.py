@@ -126,7 +126,7 @@ class SymbolicCROWNCache_Phi:
     """
     Cache for symbolic CROWN computation on Phi (GV) network.
 
-    Computes differentiable bounds on Φ(x) = f·∇V + 0.5·Tr(g·g^T·H_V)
+    Computes differentiable bounds on GV(x) = f·∇V + 0.5·Tr(g·g^T·H_V)
     that can be used in training loss!
     """
 
@@ -185,15 +185,15 @@ class SymbolicCROWNCache_Phi:
 
     def compute_bounds(self, input_lowers, input_uppers):
         """
-        Compute differentiable CROWN bounds on Φ(x).
+        Compute differentiable CROWN bounds on GV(x).
 
         Args:
             input_lowers: (N, D) lower bounds on inputs
             input_uppers: (N, D) upper bounds on inputs
 
         Returns:
-            phi_lowers: (N,) lower bounds on Φ(x)
-            phi_uppers: (N,) upper bounds on Φ(x)
+            phi_lowers: (N,) lower bounds on GV(x)
+            phi_uppers: (N,) upper bounds on GV(x)
         """
         # assert input_lowers.shape[0] == self.num_cells
 

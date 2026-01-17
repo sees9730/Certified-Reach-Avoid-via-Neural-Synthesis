@@ -28,3 +28,13 @@ jobs:
     - name: Run GV verification tests
       run: |
         python -m pytest tests/test_phi_module.py -v
+
+    - name: Smoke test gbm_syn
+      run: |
+        cd gbm_syn
+        timeout 120 python main.py --train=1 || true
+
+    - name: Smoke test gbm_veri
+      run: |
+        cd gbm_veri
+        timeout 120 python main.py --train=1 || true

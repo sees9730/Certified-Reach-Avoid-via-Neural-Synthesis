@@ -26,8 +26,8 @@ class NetworkConfig:
 class DiscretizationConfig:
     """Discretization parameters for different regions."""
     n_goal: int = 3
-    n_outside_goal: int = 3  # For V constraint: X \ Goal
-    n_generator: int = 1  # For Φ constraint: X \ (Goal ∪ Unsafe)
+    n_outside_goal: int = 3
+    n_generator: int = 1 
     n_unsafe: int = 3
     n_init: int = 3
 

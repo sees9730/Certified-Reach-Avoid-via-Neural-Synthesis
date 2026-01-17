@@ -305,151 +305,15 @@ def compute_rectangular_partition_outside_goal_and_unsafe(
 
     return rectangles
 
-
-def create_boundary_cells(
-    full_region: Region,
-    thickness: float = 0.1,
-    n_partitions: int = 1,
-    exclusion_regions: List[Region] = None
-) -> List[Tuple[torch.Tensor, torch.Tensor]]:
-    """
-    Create thin border cells around the boundary of full_region.
-
-    For D dimensions, creates 2*D thin slabs (one for each face).
-    Each slab has thickness `thickness` along one dimension and can be
-    subdivided into n_partitions^(D-1) smaller cells.
-
-    Args:
-        full_region: The full bounding region
-        thickness: Thickness of the boundary cells
-        n_partitions: Number of subdivisions per dimension (except the thickness dimension)
-                     If n_partitions=1, creates single slab per face (original behavior)
-                     If n_partitions>1, subdivides each slab into n_partitions^(D-1) cells
-        exclusion_regions: Optional list of regions to exclude (e.g., unsafe)
-
-    Returns:
-        List of (lower, upper) boundary cell tuples
-    """
-    bounds = full_region.bounds  # (D, 2)
-    D = bounds.shape[0]
-
-    boundary_cells = []
-
-    # Create 2*D slabs (min and max face for each dimension)
-    for d in range(D):
-        # Lower face along dimension d
-        lower_slab_lower = bounds[:, 0].copy()
-        lower_slab_upper = bounds[:, 1].copy()
-        lower_slab_upper[d] = bounds[d, 0] + thickness
-
-        # Upper face along dimension d
-        upper_slab_lower = bounds[:, 0].copy()
-        upper_slab_upper = bounds[:, 1].copy()
-        upper_slab_lower[d] = bounds[d, 1] - thickness
-
-        # Subdivide each slab if n_partitions > 1
-        if n_partitions > 1:
-            # Create partitions for all dimensions except d
-            lower_slab_cells = _subdivide_slab(lower_slab_lower, lower_slab_upper, d, n_partitions)
-            upper_slab_cells = _subdivide_slab(upper_slab_lower, upper_slab_upper, d, n_partitions)
-        else:
-            # Single cell per slab (original behavior)
-            lower_slab_cells = [(lower_slab_lower, lower_slab_upper)]
-            upper_slab_cells = [(upper_slab_lower, upper_slab_upper)]
-
-        # Process each subdivided cell (clip against exclusions if needed)
-        for cells in [lower_slab_cells, upper_slab_cells]:
-            for cell_lower, cell_upper in cells:
-                if exclusion_regions is not None:
-                    excl_bounds_list = []
-                    for excl_region in exclusion_regions:
-                        if excl_region.is_union:
-                            for comp in excl_region.components:
-                                excl_bounds_list.append(comp.bounds)
-                        else:
-                            excl_bounds_list.append(excl_region.bounds)
-
-                    # Clip cell against exclusions
-                    clipped_cells = clip_cell_against_exclusions(
-                        cell_lower, cell_upper, excl_bounds_list
-                    )
-                    for lower, upper in clipped_cells:
-                        boundary_cells.append((
-                            torch.tensor(lower, dtype=torch.float32),
-                            torch.tensor(upper, dtype=torch.float32)
-                        ))
-                else:
-                    boundary_cells.append((
-                        torch.tensor(cell_lower, dtype=torch.float32),
-                        torch.tensor(cell_upper, dtype=torch.float32)
-                    ))
-
-    return boundary_cells
-
-
-def _subdivide_slab(
-    slab_lower: np.ndarray,
-    slab_upper: np.ndarray,
-    fixed_dim: int,
-    n_partitions: int
-) -> List[Tuple[np.ndarray, np.ndarray]]:
-    """
-    Subdivide a slab into n_partitions^(D-1) smaller cells.
-
-    The slab is thin along dimension `fixed_dim` and is subdivided
-    along all other dimensions.
-
-    Args:
-        slab_lower: Lower corner of slab (D,)
-        slab_upper: Upper corner of slab (D,)
-        fixed_dim: Dimension that is thin (not subdivided)
-        n_partitions: Number of partitions per free dimension
-
-    Returns:
-        List of (lower, upper) tuples for subdivided cells
-    """
-    D = len(slab_lower)
-
-    # Get all dimensions except the fixed one
-    free_dims = [i for i in range(D) if i != fixed_dim]
-
-    # Create edge points for each free dimension
-    edges = {}
-    for dim in free_dims:
-        edges[dim] = np.linspace(slab_lower[dim], slab_upper[dim], n_partitions + 1, dtype=np.float32)
-
-    # Generate all combinations of subdivisions
-    cells = []
-    from itertools import product
-
-    # Create index ranges for each free dimension
-    index_ranges = [range(n_partitions) for _ in free_dims]
-
-    for indices in product(*index_ranges):
-        cell_lower = slab_lower.copy()
-        cell_upper = slab_upper.copy()
-
-        # Set bounds for each free dimension
-        for i, dim in enumerate(free_dims):
-            idx = indices[i]
-            cell_lower[dim] = edges[dim][idx]
-            cell_upper[dim] = edges[dim][idx + 1]
-
-        cells.append((cell_lower, cell_upper))
-
-    return cells
-
-
-def discretize_regions(regions, discretization_config, use_radial_generator=True,
-                       boundary_thickness=0.5, boundary_n_partitions=10):
+def discretize_regions(regions, discretization_config, use_radial_generator=True):
     """
     Discretize all regions according to configuration.
 
     NOTE: For D>2, cell counts grow as n^D. Keep n_* small.
     """
-    print("\n" + "="*80)
-    print("DISCRETIZING REGIONS")
-    print("="*80)
+    print("\n" + "="*20)
+    print("Region Discretization")
+    print("="*20)
 
     region_cells = {}
 
@@ -530,28 +394,9 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
             region_cells['generator'].extend(discretize_region(rect, discretization_config.n_generator))
         print(f"  → {len(region_cells['generator'])} cells")
 
-    # Boundary region (thin slabs on full_range boundary, excluding unsafe)
-    print(f"\nBoundary region: Thin slabs on full_range boundary")
-    boundary_thickness = boundary_thickness  # Adjust thickness as needed
-    boundary_n_partitions = boundary_n_partitions  # Number of subdivisions per dimension (1 = single slab per face)
-    region_cells['boundary'] = create_boundary_cells(
-        regions.full,
-        thickness=boundary_thickness,
-        n_partitions=boundary_n_partitions#,
-        # exclusion_regions=[regions.unsafe]  # Exclude unsafe region
-    )
-    D = regions.full.bounds.shape[0]
-    expected_cells_per_face = boundary_n_partitions ** (D - 1)
-    print(f"  → {len(region_cells['boundary'])} boundary cells "
-          f"(thickness={boundary_thickness}, {boundary_n_partitions} partitions/dim, "
-          f"~{expected_cells_per_face} cells/face × {2*D} faces)")
-    if len(region_cells['boundary']) > 0:
-        first_cell = region_cells['boundary'][0]
-        print(f'  First boundary cell: {first_cell[0].numpy()} to {first_cell[1].numpy()}')
-
     print(f"\nRegion definitions:")
-    print(f"  'outside': X \\ Goal (for V ≥ β_s constraint)")
-    print(f"  'generator': X \\ (Goal ∪ Unsafe) (for Φ ≤ 0 constraint)")
-    print(f"  'boundary': Thin slabs on ∂X \\ Unsafe (for V < 1.0 constraint)")
+    print(f"  'outside': X \\ Goal (for V >= 0 constraint)")
+    print(f"  'init': X \\ (Goal U Unsafe) (for V <= 1 constraint)")
+    print(f"  'generator': X \\ (Goal U Unsafe) (for generator <= 0 constraint)")
 
     return region_cells

@@ -129,7 +129,7 @@ def compute_loss_generator_bounds(
     loss = F.relu(Phi_upper + delta).sum() # Add delta to encourage extra push
 
     # Check if generator is satisfied
-    if (loss <= 0.0):
+    if (Phi_upper.max() < 0.0):
         sat = True
     else:
         sat = False
@@ -328,7 +328,7 @@ def evaluate_constraints(
             init_satisfied = True
             v_init_min = v_init_max = 0.0
 
-        # Generator: bounds only (universal)  Φ(x) <= 0
+        # Generator: bounds only (universal)  GV(x) <= 0
         if len(region_cells['generator']) > 0:
             if crown_cache_phi is not None:
                 if input_bounds_gen is not None:
@@ -463,7 +463,7 @@ def print_constraint_summary(results: dict, prefix: str = "", bounds: dict = Non
     # Generator
     stats = ""
     if phi_uppers is not None and len(phi_uppers) > 0:
-        stats = cell_stats('generator', phi_uppers <= 0.0, len(phi_uppers))
+        stats = cell_stats('generator', phi_uppers < 0.0, len(phi_uppers))
     elif region_cells and 'generator' in region_cells:
         total_gen = len(region_cells['generator'])
         failing = results['num_failing_cells']

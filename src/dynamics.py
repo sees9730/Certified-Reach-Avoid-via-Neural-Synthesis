@@ -10,7 +10,7 @@ where:
     - g(x) = G(x)   (potentially state-dependent diffusion)
 
 The infinitesimal generator for a value function V is:
-    Φ(x) = f(x) · ∇V + 0.5 * Tr(g(x)g(x)^T @ H_V)
+    GV(x) = f(x) · ∇V + 0.5 * Tr(g(x)g(x)^T @ H_V)
 
 where H_V is the Hessian of V.
 """

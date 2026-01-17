@@ -3,7 +3,7 @@ Visualization utilities for plotting value functions and generators.
 
 This module provides functions to:
 - Plot value function V(x) over the state space
-- Plot generator Φ(x) over the state space
+- Plot generator GV(x) over the state space
 - Overlay regions (init, goal, unsafe)
 - Show discretization cells
 """
@@ -258,7 +258,7 @@ def visualize_generator(
     V_net,
     GV_net,
     regions: Regions,
-    title: str = "Generator Φ(x)",
+    title: str = "Generator GV(x)",
     show_regions: bool = True,
     show_discretization: bool = False,
     training_cells: Optional[List] = None,
@@ -313,9 +313,9 @@ def visualize_generator(
         abs_max = max(abs(phi_min), abs(phi_max))
         contour = ax.contourf(X, Y, Phi_output, levels=20, cmap='RdBu_r',
                               vmin=-abs_max, vmax=abs_max)
-        fig.colorbar(contour, ax=ax, label=f"Φ({_format_dim_label(x_dim)}, {_format_dim_label(y_dim)})")
+        fig.colorbar(contour, ax=ax, label=f"GV({_format_dim_label(x_dim)}, {_format_dim_label(y_dim)})")
 
-        # Φ=0 contour
+        # GV=0 contour
         ax.contour(X, Y, Phi_output, levels=[0], colors='black', linewidths=2)
 
         ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
@@ -367,7 +367,7 @@ def visualize_training_progress(
     output_dir: str = "."
 ):
     """
-    Visualize training progress (both V and Φ) with discretization.
+    Visualize training progress (both V and GV) with discretization.
 
     Args:
         V_net: Value function network
@@ -405,7 +405,7 @@ def visualize_training_progress(
         V_net=V_net,
         GV_net=GV_net,
         regions=regions,
-        title=f"Generator Φ(x) - Epoch {epoch}",
+        title=f"Generator GV(x) - Epoch {epoch}",
         show_regions=True,
         show_discretization=True,
         training_cells=gv_cells,
@@ -628,10 +628,6 @@ def create_summary_plots(
     import os
     os.makedirs(output_dir, exist_ok=True)
 
-    print("\n" + "="*80)
-    print("CREATING SUMMARY PLOTS")
-    print("="*80)
-
     # Cells for V network (all regions except generator)
     v_cells = []
     for region_name in ['init', 'goal', 'unsafe', 'outside', 'boundary']:
@@ -642,7 +638,6 @@ def create_summary_plots(
     gv_cells = region_cells.get('generator', [])
 
     # Value function with V discretization
-    print("\n1. Value function with discretization...")
     visualize_value_function(
         V_net, regions,
         title="Value Function V(x)",
@@ -653,10 +648,9 @@ def create_summary_plots(
     )
 
     # Generator with GV discretization
-    print("\n2. Generator with discretization...")
     visualize_generator(
         V_net, GV_net, regions,
-        title="Generator Φ(x) outside goal and outside unsafe",
+        title="Generator GV(x) outside goal and outside unsafe",
         show_regions=True,
         show_discretization=True,
         training_cells=gv_cells,
@@ -665,7 +659,6 @@ def create_summary_plots(
     )
 
     # Constraint regions
-    print("\n3. Constraint regions...")
     plot_constraint_regions(
         V_net, regions, beta_s, beta_ra,
         filename=f"{output_dir}/constraint_regions.png"
@@ -673,11 +666,10 @@ def create_summary_plots(
 
     # Loss history
     if loss_history is not None and len(loss_history) > 0:
-        print("\n4. Loss history...")
         plot_loss_history(
             loss_history,
             refinement_epochs=refinement_epochs,
             filename=f"{output_dir}/loss_history.png"
         )
 
-    print(f"\nAll plots saved to '{output_dir}/'")
+    print(f"All plots saved to '{output_dir}/'")
