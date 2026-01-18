@@ -69,7 +69,7 @@ def _make_slice_grid(full_bounds: np.ndarray, x_dim: int, y_dim: int, resolution
     X, Y = np.meshgrid(x_vals, y_vals)
 
     if slice_point is None:
-        slice_point = 0.5 * (full_bounds[:, 0] + full_bounds[:, 1])  # (D,)
+        slice_point = 0.0 * (full_bounds[:, 0] + full_bounds[:, 1])  # (D,)
     else:
         slice_point = np.asarray(slice_point, dtype=np.float32)
         assert slice_point.shape == (D,), f"slice_point must be shape ({D},), got {slice_point.shape}"
@@ -176,7 +176,8 @@ def visualize_value_function(
     training_cells: Optional[List] = None,
     filename: Optional[str] = None,
     resolution: int = 100,
-    figsize: Tuple[int, int] = (10, 8)
+    figsize: Tuple[int, int] = (10, 8),
+    value_beta_ra = None
 ):
     V_net.eval()
 
@@ -211,6 +212,13 @@ def visualize_value_function(
 
         contour = ax.contourf(X, Y, V_output, levels=20, cmap='viridis')
         fig.colorbar(contour, ax=ax, label=f"V({_format_dim_label(x_dim)}, {_format_dim_label(y_dim)})")
+
+         # --- NEW: contour lines at V=1.0 and V=value_beta_ra (if provided) ---
+        if vmin <= 1.0 <= vmax:
+            ax.contour(X, Y, V_output, levels=[1.0], colors="green", linewidths=1.5)
+
+        if (value_beta_ra is not None) and (vmin <= float(value_beta_ra) <= vmax):
+            ax.contour(X, Y, V_output, levels=[float(value_beta_ra)], colors="red", linewidths=1.5, linestyles="--")
 
         ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
         ax.set_ylabel(_format_dim_label(y_dim), fontsize=12)
@@ -366,7 +374,8 @@ def visualize_training_progress(
     regions: Regions,
     region_cells: dict,
     epoch: int,
-    output_dir: str = "."
+    output_dir: str = ".",
+    value_beta_ra = None
 ):
     """
     Visualize training progress (both V and Φ) with discretization.
@@ -399,7 +408,8 @@ def visualize_training_progress(
         show_regions=True,
         show_discretization=True,
         training_cells=v_cells,
-        filename=f"{output_dir}/value_function_epoch_{epoch}.png"
+        filename=f"{output_dir}/value_function_epoch_{epoch}.png",
+        value_beta_ra=value_beta_ra
     )
 
     # Plot generator with GV discretization
