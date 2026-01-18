@@ -29,6 +29,10 @@ jobs:
       run: |
         python -m pytest tests/test_phi_module.py -v
 
+    - name: Check activation functions
+      run: |
+        python -m pytest tests/test_activation_functions.py -v
+
     - name: Smoke test gbm_syn
       run: |
         cd gbm_syn

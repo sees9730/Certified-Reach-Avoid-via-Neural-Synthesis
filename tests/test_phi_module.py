@@ -27,7 +27,8 @@ def test_GV_2d_diagonal_diffusion():
     V_net = create_V(net_cfg)
     phi = GV(V_net, dynamics, scale_factor=1.0)
 
-    assert verify_GV(phi, dynamics, n_samples=20, tol=1e-4)
+    assert verify_GV(phi, dynamics, n_samples=10000, tol=1e-4), \
+        f"GV verification failed for 2D GBM with diagonal diffusion"
 
 
 def test_GV_4d_chain_diffusion():
@@ -43,7 +44,8 @@ def test_GV_4d_chain_diffusion():
     V_net = create_V(net_cfg)
     phi = GV(V_net, dynamics, scale_factor=1.0)
 
-    assert verify_GV(phi, dynamics, n_samples=20, tol=1e-4)
+    assert verify_GV(phi, dynamics, n_samples=10000, tol=1e-4), \
+        f"GV verification failed for 4D chain diffusion"
 
 
 if __name__ == "__main__":

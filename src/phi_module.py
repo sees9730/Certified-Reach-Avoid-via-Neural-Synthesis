@@ -176,6 +176,20 @@ class GV(nn.Module):
     def _expand_scale(scale: torch.Tensor, D: int) -> torch.Tensor:
         return scale.expand(D) if scale.numel() == 1 else scale.view(-1)
 
+    def _activation_derivs(self, z: torch.Tensor):
+        """Compute activation, first derivative, and second derivative using autograd."""
+        with torch.enable_grad():
+            z_leaf = z.detach().requires_grad_(True)
+            h = self.V_net.activation_fn(z_leaf)
+
+            # First derivative
+            d = torch.autograd.grad(h.sum(), z_leaf, create_graph=True)[0]
+
+            # Second derivative
+            q = torch.autograd.grad(d.sum(), z_leaf)[0]
+
+        return h.detach(), d.detach(), q.detach()
+    
     @staticmethod
     def _sigmoid_derivs(z: torch.Tensor):
         h = torch.sigmoid(z)
@@ -337,10 +351,10 @@ def compute_GV_autograd(
     """
     x = x.detach().requires_grad_(True)
 
-    # Manually compute V (matching GV's analytical implementation)
+    # Compute V
     x_norm = x / V_net.input_scale
-    h = torch.sigmoid(V_net.layer1(x_norm))
-    h = torch.sigmoid(V_net.layer2(h))
+    h = V_net.activation_fn(V_net.layer1(x_norm))
+    h = V_net.activation_fn(V_net.layer2(h))
     V = V_net.output(h)
 
     # Compute gradient

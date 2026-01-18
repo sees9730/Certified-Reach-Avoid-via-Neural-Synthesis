@@ -1,6 +1,6 @@
 Network: 3 -> 64 -> 64 -> 1
 Training: 200000 epochs, LR=0.005
-Constraints: beta_s=0.0, beta_ra=20.0
+Constraints: beta_ra=20.0
 Generator: weight=1.0, start_epoch=0
 Training method: CROWN bounds (rigorous)
 
@@ -20,38 +20,38 @@ Using device: cpu
 PRE-TRAINING: Constraint-Structured Initialization (Sample-Based)
 ================================================================================
   GV (Φ) pre-training ENABLED (using provided GV_net)
-  Epoch [0/3000]: V=7666.736328 (full=0.000, init=2485.400, unsafe=5181.336, goal=2878.895, others=0.000), Φ=34.370743, Total=7701.106934
-  Epoch [100/3000]: V=85.516541 (full=85.517, init=0.000, unsafe=0.000, goal=4328.842, others=69.008), Φ=7.709222, Total=93.225761
-  Epoch [200/3000]: V=65.584686 (full=63.911, init=1.674, unsafe=0.000, goal=4440.379, others=47.379), Φ=1.863399, Total=67.448082
-  Epoch [300/3000]: V=60.771652 (full=60.727, init=0.016, unsafe=0.028, goal=3950.729, others=34.479), Φ=0.880891, Total=61.652542
-  Epoch [400/3000]: V=222.454651 (full=138.604, init=0.000, unsafe=83.851, goal=2892.828, others=171.012), Φ=0.937661, Total=223.392319
-  Epoch [500/3000]: V=29.049938 (full=28.242, init=0.090, unsafe=0.718, goal=3841.018, others=45.019), Φ=0.917837, Total=29.967775
-  Epoch [600/3000]: V=22.268770 (full=17.595, init=4.673, unsafe=0.000, goal=3689.975, others=29.426), Φ=0.672968, Total=22.941738
-  Epoch [700/3000]: V=22.907619 (full=22.803, init=0.000, unsafe=0.105, goal=3352.232, others=29.137), Φ=0.696926, Total=23.604546
-  Epoch [800/3000]: V=89.329872 (full=89.330, init=0.000, unsafe=0.000, goal=2544.856, others=104.686), Φ=0.873551, Total=90.203423
-  Epoch [900/3000]: V=9.849411 (full=9.721, init=0.128, unsafe=0.000, goal=2880.510, others=8.335), Φ=1.005267, Total=10.854677
-  Epoch [1000/3000]: V=6.111204 (full=6.111, init=0.000, unsafe=0.000, goal=2520.271, others=4.758), Φ=0.496013, Total=6.607217
-  Epoch [1100/3000]: V=0.420256 (full=0.420, init=0.000, unsafe=0.000, goal=2304.243, others=1.394), Φ=0.695222, Total=1.115479
-  Epoch [1200/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2243.601, others=0.056), Φ=0.796295, Total=0.796295
-  Epoch [1300/3000]: V=0.012867 (full=0.000, init=0.013, unsafe=0.000, goal=2190.767, others=0.000), Φ=0.421226, Total=0.434094
-  Epoch [1400/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2177.619, others=0.000), Φ=0.501783, Total=0.501783
-  Epoch [1500/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2119.435, others=0.000), Φ=0.452927, Total=0.452927
-  Epoch [1600/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2155.803, others=0.000), Φ=0.444795, Total=0.444795
-  Epoch [1700/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2160.890, others=0.000), Φ=0.247549, Total=0.247549
-  Epoch [1800/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2181.140, others=0.000), Φ=0.488954, Total=0.488954
-  Epoch [1900/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2137.535, others=0.000), Φ=0.266015, Total=0.266015
-  Epoch [2000/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2225.802, others=0.000), Φ=0.443585, Total=0.443585
-  Epoch [2100/3000]: V=0.212347 (full=0.000, init=0.000, unsafe=0.212, goal=2134.070, others=0.000), Φ=0.313262, Total=0.525609
-  Epoch [2200/3000]: V=0.015605 (full=0.000, init=0.016, unsafe=0.000, goal=2172.816, others=0.000), Φ=0.239725, Total=0.255331
-  Epoch [2300/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2130.879, others=0.000), Φ=0.172135, Total=0.172135
-  Epoch [2400/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2074.479, others=0.000), Φ=0.130962, Total=0.130962
-  Epoch [2500/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2119.847, others=0.000), Φ=0.251540, Total=0.251540
-  Epoch [2600/3000]: V=103.889076 (full=0.000, init=103.889, unsafe=0.000, goal=2327.030, others=0.000), Φ=0.114940, Total=104.004013
-  Epoch [2700/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=1659.366, others=0.000), Φ=0.358415, Total=0.358415
-  Epoch [2800/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=1704.827, others=0.000), Φ=0.162957, Total=0.162957
-  Epoch [2900/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=1688.471, others=0.000), Φ=0.307151, Total=0.307151
+  Epoch [0/3000]: V=7668.462402 (full=0.000, init=2485.202, unsafe=5183.261, goal=2876.912, others=0.000), Φ=34.826973, Total=7703.289551
+  Epoch [100/3000]: V=68.470497 (full=55.261, init=13.210, unsafe=0.000, goal=4996.477, others=63.131), Φ=4.045535, Total=72.516029
+  Epoch [200/3000]: V=54.037365 (full=53.475, init=0.302, unsafe=0.260, goal=4026.997, others=60.824), Φ=1.519819, Total=55.557186
+  Epoch [300/3000]: V=36.357613 (full=34.923, init=1.435, unsafe=0.000, goal=4207.144, others=32.915), Φ=1.020279, Total=37.377892
+  Epoch [400/3000]: V=45.928520 (full=41.467, init=0.000, unsafe=4.461, goal=3743.590, others=50.492), Φ=0.852718, Total=46.781239
+  Epoch [500/3000]: V=35.222366 (full=33.816, init=0.987, unsafe=0.419, goal=3786.732, others=16.386), Φ=0.746507, Total=35.968872
+  Epoch [600/3000]: V=52.883259 (full=52.883, init=0.000, unsafe=0.000, goal=3804.344, others=41.351), Φ=1.463496, Total=54.346756
+  Epoch [700/3000]: V=14.304854 (full=10.723, init=3.581, unsafe=0.000, goal=3414.392, others=18.927), Φ=0.785457, Total=15.090311
+  Epoch [800/3000]: V=17.569054 (full=6.119, init=11.451, unsafe=0.000, goal=3093.555, others=7.332), Φ=0.922683, Total=18.491737
+  Epoch [900/3000]: V=9.020147 (full=9.020, init=0.000, unsafe=0.000, goal=2619.723, others=9.403), Φ=0.798527, Total=9.818674
+  Epoch [1000/3000]: V=44.181835 (full=44.182, init=0.000, unsafe=0.000, goal=2183.653, others=47.658), Φ=1.371711, Total=45.553547
+  Epoch [1100/3000]: V=0.301127 (full=0.000, init=0.301, unsafe=0.000, goal=2392.448, others=0.073), Φ=1.304651, Total=1.605778
+  Epoch [1200/3000]: V=0.221954 (full=0.093, init=0.129, unsafe=0.000, goal=2276.807, others=0.102), Φ=0.733483, Total=0.955437
+  Epoch [1300/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2112.424, others=0.067), Φ=0.918262, Total=0.918262
+  Epoch [1400/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2108.614, others=0.000), Φ=0.436269, Total=0.436269
+  Epoch [1500/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2164.593, others=0.000), Φ=0.292347, Total=0.292347
+  Epoch [1600/3000]: V=0.005697 (full=0.006, init=0.000, unsafe=0.000, goal=2221.696, others=0.000), Φ=0.341948, Total=0.347645
+  Epoch [1700/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2178.286, others=0.002), Φ=0.432180, Total=0.432180
+  Epoch [1800/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2230.302, others=0.000), Φ=0.389018, Total=0.389018
+  Epoch [1900/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2153.397, others=0.000), Φ=0.496245, Total=0.496245
+  Epoch [2000/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2178.171, others=0.000), Φ=0.279746, Total=0.279746
+  Epoch [2100/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2141.316, others=0.000), Φ=0.209222, Total=0.209222
+  Epoch [2200/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2192.814, others=0.000), Φ=0.343332, Total=0.343332
+  Epoch [2300/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2132.263, others=0.000), Φ=0.150409, Total=0.150409
+  Epoch [2400/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2210.007, others=0.000), Φ=0.137492, Total=0.137492
+  Epoch [2500/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2201.450, others=0.000), Φ=0.236145, Total=0.236145
+  Epoch [2600/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2114.065, others=0.000), Φ=0.179283, Total=0.179283
+  Epoch [2700/3000]: V=0.106661 (full=0.107, init=0.000, unsafe=0.000, goal=2084.433, others=0.093), Φ=0.165280, Total=0.271941
+  Epoch [2800/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2067.088, others=0.000), Φ=0.450395, Total=0.450395
+  Epoch [2900/3000]: V=0.000000 (full=0.000, init=0.000, unsafe=0.000, goal=2046.309, others=0.000), Φ=0.184506, Total=0.184506
 
-  Best loss: 0.039300
+  Best loss: 0.023495
 ================================================================================
 Pre-training complete. V + GV (Φ) + Controller initialized.
 ================================================================================
@@ -61,1492 +61,370 @@ Pretraining completed!
 
 Using device: cpu
 
-================================================================================
-BOUND-BASED TRAINING (using CROWN)
-================================================================================
-
-Collecting all cells for V network...
-  init: 64 cells
-  goal: 2744 cells
-  unsafe: 125 cells
-  outside: 1664 cells
-  boundary: 6 cells
-  Total V cells: 4603
-
-Preparing concatenated input bounds for V network...
-
-Initializing CROWN cache for ALL 4603 V cells...
-[SymbolicCROWNCache] Creating BoundedModule for 4603 cells...
-[SymbolicCROWNCache] Initialized for 4603 cells - symbolic structure cached!
-
-Creating CROWN cache for 'generator' (Phi)...
-  generator: 44 cells
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 44 cells...
-/Users/chko1829/src/Projects/ML/Neural_Certificate/src/phi_module.py:169: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+====================
+Bound-based training
+====================
+=== Total cells per region for V ===
+init: 64 cells
+goal: 2744 cells
+unsafe: 125 cells
+outside: 1664 cells
+Total V cells: 4597
+Created CROWN cache for V with 4597 cells
+/Users/sebastianescobar/Desktop/Neural_Certificate/src/phi_module.py:148: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
   self._cached_scale_D == D
-[SymbolicCROWNCache_Phi] Initialized for 44 cells!
-
-Using CONSTANT beta_s = 0.0
-/Users/chko1829/src/Projects/ML/Neural_Certificate/.venv/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:28: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.
+Created 44 CROWN caches for GV
+/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:28: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.
   warnings.warn("The verbose parameter is deprecated. Please use get_last_lr() "
-Epoch     0 | Total: 2469.7554 | Goal: 0.0000 | Unsafe: 9.6702 | Init: 0.7524 | Outside: 44.2346 | Boundary: 22.4173 | Gen: 2.415098e+03
- [Controller Params] fc.weight = tensor([[ 0.0087, -0.1685,  0.2879],
-        [-0.1790, -0.2533, -0.9526],
-        [ 0.1710, -0.1074,  0.2040]])
- ✓ Inside Goal passed, min V= 2.7771, min V_outside_lower= -0.6105, min V_lower=2.0927
+Epoch     0 | Total: 2668.8655 | Goal:   0.0000 | Unsafe:   7.5270 | Init:   0.0000 | Outside:  25.5559 | Gen: 2635.7825 | Time: 0.0s
+=== Detailed Evaluation ===
+Goal:      PASS, V bounds: [  1.998,  10.379] | 2744/2744 pass (100.0%)
+Unsafe:    FAIL, V bounds: [ 18.191,  35.606] | 114/125 pass (91.2%)
+Init:      PASS, V bounds: [  0.501,   0.999] | 64/64 pass (100.0%)
+Outside:   FAIL, V bounds: [ -0.461,  35.188] | 1550/1664 pass (93.1%)
+Generator: FAIL, GV bounds: [ 18.642, 103.004] | 0/44 pass (0.0%)
+Saved visualization plots for epoch 0 to 'training_progress'
+Epoch    10 | Total: 1578.1055 | Goal:   0.0000 | Unsafe:  25.0436 | Init: 114.5098 | Outside:   0.0000 | Gen: 1438.5521 | Time: 3.6s
+Epoch    20 | Total: 1146.7004 | Goal:   0.0000 | Unsafe:   9.8318 | Init: 152.0999 | Outside:   0.0000 | Gen: 984.7688 | Time: 3.8s
+Epoch    30 | Total:  916.6279 | Goal:   0.0000 | Unsafe:  20.3630 | Init: 162.0632 | Outside:   0.0000 | Gen: 734.2017 | Time: 4.0s
+Epoch    40 | Total:  778.3314 | Goal:   0.0000 | Unsafe:  40.9224 | Init: 100.1392 | Outside:   0.0000 | Gen: 637.2698 | Time: 4.1s
+Epoch    50 | Total:  674.2430 | Goal:   0.0000 | Unsafe:  17.6941 | Init:  61.2921 | Outside:   6.5755 | Gen: 588.6812 | Time: 4.3s
+Epoch    60 | Total:  614.7145 | Goal:   0.0000 | Unsafe:  24.9108 | Init:  54.4565 | Outside:  10.6853 | Gen: 524.6620 | Time: 4.5s
+Epoch    70 | Total:  563.7070 | Goal:   0.0000 | Unsafe:  15.9039 | Init:  65.4992 | Outside:   5.5081 | Gen: 476.7957 | Time: 4.7s
+Epoch    80 | Total:  533.7889 | Goal:   0.0000 | Unsafe:   3.9127 | Init:  70.2094 | Outside:   5.3835 | Gen: 454.2832 | Time: 4.9s
+Epoch    90 | Total:  508.2071 | Goal:   0.0000 | Unsafe:   7.5675 | Init:  73.4365 | Outside:   3.7374 | Gen: 423.4657 | Time: 5.1s
+Epoch   100 | Total:  493.3706 | Goal:   0.0000 | Unsafe:   6.1054 | Init:  68.7597 | Outside:   5.7138 | Gen: 412.7917 | Time: 5.2s
+Epoch   110 | Total:  479.7218 | Goal:   0.0000 | Unsafe:   7.9297 | Init:  64.7514 | Outside:   7.5209 | Gen: 399.5198 | Time: 5.4s
+Epoch   120 | Total:  469.8001 | Goal:   0.0000 | Unsafe:  14.1864 | Init:  61.6375 | Outside:   8.2707 | Gen: 385.7056 | Time: 5.6s
+Epoch   130 | Total:  462.0723 | Goal:   0.0000 | Unsafe:   8.9926 | Init:  61.0001 | Outside:   9.1515 | Gen: 382.9281 | Time: 5.7s
+Epoch   140 | Total:  461.1017 | Goal:   0.0000 | Unsafe:   3.1516 | Init:  72.7704 | Outside:   4.4337 | Gen: 380.7460 | Time: 5.9s
+Epoch   150 | Total:  450.2652 | Goal:   0.0000 | Unsafe:   7.3959 | Init:  58.8382 | Outside:  10.1264 | Gen: 373.9047 | Time: 6.0s
+Epoch   160 | Total:  447.0044 | Goal:   0.0000 | Unsafe:   6.2704 | Init:  66.5973 | Outside:   6.0497 | Gen: 368.0871 | Time: 6.3s
+Epoch   170 | Total:  440.2908 | Goal:   0.0000 | Unsafe:  12.9745 | Init:  49.6375 | Outside:  14.3006 | Gen: 363.3783 | Time: 6.5s
+Epoch   180 | Total:  436.4440 | Goal:   0.0000 | Unsafe:  11.2625 | Init:  55.6197 | Outside:  10.6610 | Gen: 358.9008 | Time: 6.7s
+Epoch   190 | Total:  433.4818 | Goal:   0.0000 | Unsafe:   7.8233 | Init:  57.8807 | Outside:   9.6192 | Gen: 358.1584 | Time: 7.0s
+Epoch   200 | Total:  430.8446 | Goal:   0.0000 | Unsafe:  16.3471 | Init:  45.4003 | Outside:  16.2714 | Gen: 352.8259 | Time: 7.2s
+Epoch   210 | Total:  426.6660 | Goal:   0.0000 | Unsafe:  12.3125 | Init:  53.8306 | Outside:  10.2455 | Gen: 350.2774 | Time: 7.3s
+Epoch   220 | Total:  427.0186 | Goal:   0.0000 | Unsafe:   5.4603 | Init:  62.3640 | Outside:   6.8006 | Gen: 352.3938 | Time: 7.5s
+Epoch   230 | Total:  421.7326 | Goal:   0.0000 | Unsafe:  12.8814 | Init:  53.9740 | Outside:   9.0238 | Gen: 345.8535 | Time: 7.7s
+Epoch   240 | Total:  420.4874 | Goal:   0.0000 | Unsafe:  13.8572 | Init:  43.3009 | Outside:  16.1791 | Gen: 347.1501 | Time: 7.8s
+Refining outside cells: 24 failing, refined 24 cells, 1832 total
+Rebuilt V cache with 4765 cells
+Rebuilt Phi cache with 44 cells
+Epoch   250 | Total:  460.9009 | Goal:   0.0000 | Unsafe:  13.8080 | Init:  46.4567 | Outside:  55.9953 | Gen: 344.6409 | Time: 8.5s
+Epoch   260 | Total:  445.8988 | Goal:   0.0000 | Unsafe:   0.1839 | Init:  94.3913 | Outside:   0.0000 | Gen: 351.3235 | Time: 8.7s
+Epoch   270 | Total:  425.8841 | Goal:   0.0000 | Unsafe:  19.6947 | Init:  65.0593 | Outside:   6.3744 | Gen: 334.7557 | Time: 8.9s
+Epoch   280 | Total:  433.0235 | Goal:   0.0000 | Unsafe:  30.1853 | Init:  54.6617 | Outside:  16.4810 | Gen: 331.6955 | Time: 9.0s
+Epoch   290 | Total:  422.4763 | Goal:   0.0000 | Unsafe:   5.8363 | Init:  77.7192 | Outside:   0.0000 | Gen: 338.9208 | Time: 9.1s
+Epoch   300 | Total:  418.0491 | Goal:   0.0000 | Unsafe:  10.9486 | Init:  65.7128 | Outside:   4.6035 | Gen: 336.7842 | Time: 9.3s
+Epoch   310 | Total:  417.0895 | Goal:   0.0000 | Unsafe:   9.1665 | Init:  63.6144 | Outside:   5.6914 | Gen: 338.6172 | Time: 9.5s
+Epoch   320 | Total:  415.2103 | Goal:   0.0000 | Unsafe:  12.9384 | Init:  62.2341 | Outside:   5.3534 | Gen: 334.6845 | Time: 9.6s
+Epoch   330 | Total:  413.1712 | Goal:   0.0000 | Unsafe:  10.2739 | Init:  63.3393 | Outside:   4.4727 | Gen: 335.0854 | Time: 9.8s
+Epoch   340 | Total:  413.7523 | Goal:   0.0000 | Unsafe:   6.6812 | Init:  71.6744 | Outside:   0.1486 | Gen: 335.2481 | Time: 10.0s
+Epoch   350 | Total:  411.9163 | Goal:   0.0000 | Unsafe:  18.7093 | Init:  59.6382 | Outside:   4.8305 | Gen: 328.7384 | Time: 10.1s
+Epoch   360 | Total:  408.8108 | Goal:   0.0000 | Unsafe:   9.6481 | Init:  65.0587 | Outside:   1.5402 | Gen: 332.5638 | Time: 10.3s
+Epoch   370 | Total:  407.7697 | Goal:   0.0000 | Unsafe:   8.8442 | Init:  62.9715 | Outside:   2.3784 | Gen: 333.5757 | Time: 10.4s
+Epoch   380 | Total:  407.2025 | Goal:   0.0000 | Unsafe:  14.4164 | Init:  59.5822 | Outside:   3.2659 | Gen: 329.9379 | Time: 10.6s
+Epoch   390 | Total:  408.1979 | Goal:   0.0000 | Unsafe:  18.7466 | Init:  54.2106 | Outside:   6.2151 | Gen: 329.0257 | Time: 10.8s
+Epoch   400 | Total:  406.3259 | Goal:   0.0000 | Unsafe:   5.8582 | Init:  63.6478 | Outside:   0.6849 | Gen: 336.1350 | Time: 11.0s
+Epoch   410 | Total:  404.3591 | Goal:   0.0000 | Unsafe:  12.1752 | Init:  55.8254 | Outside:   3.3626 | Gen: 332.9960 | Time: 11.2s
+Epoch   420 | Total:  408.5832 | Goal:   0.0000 | Unsafe:  23.8134 | Init:  47.6856 | Outside:   8.5283 | Gen: 328.5559 | Time: 11.4s
+Epoch   430 | Total:  404.6506 | Goal:   0.0000 | Unsafe:   5.4437 | Init:  60.6769 | Outside:   0.3528 | Gen: 338.1772 | Time: 11.6s
+Epoch   440 | Total:  402.4052 | Goal:   0.0000 | Unsafe:   7.2294 | Init:  56.4793 | Outside:   1.3281 | Gen: 337.3683 | Time: 11.7s
+Epoch   450 | Total:  401.4111 | Goal:   0.0000 | Unsafe:  13.6646 | Init:  51.4706 | Outside:   3.1250 | Gen: 333.1508 | Time: 11.9s
+Epoch   460 | Total:  400.8614 | Goal:   0.0000 | Unsafe:  14.0110 | Init:  49.2787 | Outside:   3.8612 | Gen: 333.7104 | Time: 12.0s
+Epoch   470 | Total:  401.6663 | Goal:   0.0000 | Unsafe:   6.7904 | Init:  57.3716 | Outside:   0.0000 | Gen: 337.5044 | Time: 12.2s
+Epoch   480 | Total:  399.0884 | Goal:   0.0000 | Unsafe:   9.9772 | Init:  49.4211 | Outside:   2.7606 | Gen: 336.9294 | Time: 12.3s
+Epoch   490 | Total:  398.0219 | Goal:   0.0000 | Unsafe:  12.0964 | Init:  50.3319 | Outside:   1.2181 | Gen: 334.3755 | Time: 12.5s
+Refining outside cells: 48 failing, refined 48 cells, 2168 total
+Refining generator cells: 42 failing, refined 42 cells, 338 total
+Rebuilt V cache with 5101 cells
+Rebuilt Phi cache with 338 cells
+Merging outside cells: merged 2115 pairs, 53 total
+Merging generator cells: merged 0 pairs, 338 total
+Epoch   500 | Total: 1133.2623 | Goal:   0.0000 | Unsafe:  10.4151 | Init:  49.7691 | Outside:   3.3364 | Gen: 1069.7418 | Time: 13.3s
+Rebuilt V cache with 2986 cells
+Rebuilt Phi cache with 338 cells
+Epoch   510 | Total:  995.0424 | Goal:   0.0000 | Unsafe:  29.2332 | Init:  54.9693 | Outside:   0.0000 | Gen: 910.8398 | Time: 14.3s
+Epoch   520 | Total:  961.9818 | Goal:   0.0000 | Unsafe:  37.9011 | Init:  25.7544 | Outside:   2.1255 | Gen: 896.2008 | Time: 14.8s
+Epoch   530 | Total:  940.6096 | Goal:   0.0000 | Unsafe:  35.8322 | Init:  28.8194 | Outside:   0.4106 | Gen: 875.5475 | Time: 15.2s
+Epoch   540 | Total:  910.7606 | Goal:   0.0000 | Unsafe:  49.8388 | Init:  17.6502 | Outside:   1.2319 | Gen: 842.0397 | Time: 15.6s
+Epoch   550 | Total:  882.6596 | Goal:   0.0000 | Unsafe:  31.0703 | Init:  18.3261 | Outside:   0.4641 | Gen: 832.7990 | Time: 16.0s
+Epoch   560 | Total:  851.7973 | Goal:   0.0000 | Unsafe:  45.0278 | Init:  13.1384 | Outside:   0.3411 | Gen: 793.2900 | Time: 16.4s
+Epoch   570 | Total:  825.6539 | Goal:   0.0000 | Unsafe:  22.3948 | Init:  21.0845 | Outside:   0.0000 | Gen: 782.1746 | Time: 16.8s
+Epoch   580 | Total:  784.3504 | Goal:   0.0000 | Unsafe:  26.3152 | Init:  13.8469 | Outside:   0.0000 | Gen: 744.1883 | Time: 17.1s
+Epoch   590 | Total:  753.5482 | Goal:   0.0000 | Unsafe:  50.1488 | Init:   0.0000 | Outside:   1.9064 | Gen: 701.4929 | Time: 17.5s
+Epoch   600 | Total:  722.3983 | Goal:   0.0000 | Unsafe:  46.2908 | Init:   0.0000 | Outside:   0.3144 | Gen: 675.7932 | Time: 17.9s
+Epoch   610 | Total:  697.4031 | Goal:   0.0000 | Unsafe:  24.2735 | Init:   3.6132 | Outside:   0.0000 | Gen: 669.5164 | Time: 18.2s
+Epoch   620 | Total:  670.6230 | Goal:   0.0000 | Unsafe:  28.5090 | Init:   3.3000 | Outside:   0.0000 | Gen: 638.8141 | Time: 18.6s
+Epoch   630 | Total:  642.8243 | Goal:   0.0000 | Unsafe:  41.5255 | Init:   2.7226 | Outside:   0.0000 | Gen: 598.5762 | Time: 19.0s
+Epoch   640 | Total:  618.4158 | Goal:   0.0000 | Unsafe:  50.6642 | Init:   3.2703 | Outside:   0.0000 | Gen: 564.4813 | Time: 19.3s
+Epoch   650 | Total:  589.2727 | Goal:   0.0000 | Unsafe:  36.9181 | Init:   0.5734 | Outside:   0.0000 | Gen: 551.7811 | Time: 19.7s
+Epoch   660 | Total:  560.7249 | Goal:   0.0000 | Unsafe:  34.4043 | Init:   0.6077 | Outside:   0.0000 | Gen: 525.7128 | Time: 20.1s
+Epoch   670 | Total:  531.3270 | Goal:   0.0000 | Unsafe:  43.0292 | Init:   0.7132 | Outside:   0.0000 | Gen: 487.5846 | Time: 20.5s
+Epoch   680 | Total:  501.0578 | Goal:   0.0000 | Unsafe:  27.7236 | Init:   0.1920 | Outside:   0.0000 | Gen: 473.1422 | Time: 20.8s
+Epoch   690 | Total:  470.2084 | Goal:   0.0000 | Unsafe:  24.2929 | Init:   0.4599 | Outside:   0.0000 | Gen: 445.4556 | Time: 21.2s
+Epoch   700 | Total:  438.3060 | Goal:   0.0000 | Unsafe:  31.3111 | Init:   0.1244 | Outside:   0.0000 | Gen: 406.8705 | Time: 21.6s
+Epoch   710 | Total:  405.8179 | Goal:   0.0000 | Unsafe:  23.2408 | Init:   2.1068 | Outside:   0.0000 | Gen: 380.4703 | Time: 21.9s
+Epoch   720 | Total:  370.5558 | Goal:   0.0000 | Unsafe:  26.2963 | Init:   0.9322 | Outside:   0.0000 | Gen: 343.3274 | Time: 22.3s
+Epoch   730 | Total:  336.0355 | Goal:   0.0000 | Unsafe:  21.0742 | Init:   5.2976 | Outside:   0.0000 | Gen: 309.6637 | Time: 22.7s
+Epoch   740 | Total:  288.4293 | Goal:   0.0000 | Unsafe:  13.8129 | Init:   0.1405 | Outside:   0.0000 | Gen: 274.4758 | Time: 23.0s
+Epoch   750 | Total:  257.5584 | Goal:   0.0000 | Unsafe:  13.5031 | Init:   3.2243 | Outside:   0.0000 | Gen: 240.8310 | Time: 23.4s
+Epoch   760 | Total:  232.4476 | Goal:   0.0000 | Unsafe:  13.9621 | Init:   0.4923 | Outside:   0.0000 | Gen: 217.9931 | Time: 23.7s
+Epoch   770 | Total:  214.0871 | Goal:   0.0000 | Unsafe:  14.6187 | Init:   0.0000 | Outside:   0.0000 | Gen: 199.4684 | Time: 24.1s
+Epoch   780 | Total:  195.9859 | Goal:   0.0000 | Unsafe:  15.3410 | Init:   0.0000 | Outside:   0.0000 | Gen: 180.6449 | Time: 24.4s
+Epoch   790 | Total:  178.9227 | Goal:   0.0000 | Unsafe:  13.6291 | Init:   0.0000 | Outside:   0.0000 | Gen: 165.2936 | Time: 24.8s
+Epoch   800 | Total:  162.6966 | Goal:   0.0000 | Unsafe:  11.5059 | Init:   0.0000 | Outside:   0.0000 | Gen: 151.1906 | Time: 25.2s
+Epoch   810 | Total:  149.7090 | Goal:   0.0000 | Unsafe:   8.4669 | Init:   0.0000 | Outside:   0.0000 | Gen: 141.2421 | Time: 25.5s
+Epoch   820 | Total:  139.3925 | Goal:   0.0000 | Unsafe:   6.7980 | Init:   0.0000 | Outside:   0.0000 | Gen: 132.5945 | Time: 25.9s
+Epoch   830 | Total:  129.5655 | Goal:   0.0000 | Unsafe:   4.2350 | Init:   0.0000 | Outside:   0.0000 | Gen: 125.3305 | Time: 26.2s
+Epoch   840 | Total:  119.7078 | Goal:   0.0000 | Unsafe:   3.8271 | Init:   0.0000 | Outside:   0.0000 | Gen: 115.8806 | Time: 26.6s
+Epoch   850 | Total:  110.5424 | Goal:   0.0000 | Unsafe:   3.4927 | Init:   0.0000 | Outside:   0.0000 | Gen: 107.0497 | Time: 27.0s
+Epoch   860 | Total:  101.9361 | Goal:   0.0000 | Unsafe:   4.7981 | Init:   0.0000 | Outside:   0.0000 | Gen:  97.1380 | Time: 27.3s
+Epoch   870 | Total:   95.4368 | Goal:   0.0000 | Unsafe:   2.8967 | Init:   0.0000 | Outside:   0.0000 | Gen:  92.5401 | Time: 27.7s
+Epoch   880 | Total:   91.3554 | Goal:   0.0000 | Unsafe:   4.0613 | Init:   0.3459 | Outside:   0.0000 | Gen:  86.9482 | Time: 28.0s
+Epoch   890 | Total:   88.1359 | Goal:   0.0000 | Unsafe:   2.2941 | Init:   0.2351 | Outside:   0.0000 | Gen:  85.6068 | Time: 28.4s
+Epoch   900 | Total:   85.1267 | Goal:   0.0000 | Unsafe:   1.0493 | Init:   0.0000 | Outside:   0.0000 | Gen:  84.0774 | Time: 28.7s
+Epoch   910 | Total:   82.5352 | Goal:   0.0000 | Unsafe:   1.2748 | Init:   0.0317 | Outside:   0.0000 | Gen:  81.2287 | Time: 29.1s
+Epoch   920 | Total:   80.5072 | Goal:   0.0000 | Unsafe:   1.4622 | Init:   0.0000 | Outside:   0.0000 | Gen:  79.0450 | Time: 29.4s
+Epoch   930 | Total:   78.5578 | Goal:   0.0000 | Unsafe:   4.3639 | Init:   0.0000 | Outside:   0.0000 | Gen:  74.1939 | Time: 29.8s
+Epoch   940 | Total:   77.2649 | Goal:   0.0000 | Unsafe:   2.1489 | Init:   0.5010 | Outside:   0.0000 | Gen:  74.6149 | Time: 30.2s
+Epoch   950 | Total:   74.6332 | Goal:   0.0000 | Unsafe:   3.6688 | Init:   0.0053 | Outside:   0.0000 | Gen:  70.9591 | Time: 30.5s
+Epoch   960 | Total:   73.7593 | Goal:   0.0000 | Unsafe:   3.5525 | Init:   0.0000 | Outside:   0.0000 | Gen:  70.2068 | Time: 30.9s
+Epoch   970 | Total:   71.2747 | Goal:   0.0000 | Unsafe:   0.0375 | Init:   0.0000 | Outside:   0.0000 | Gen:  71.2372 | Time: 31.3s
+Epoch   980 | Total:   69.9563 | Goal:   0.0000 | Unsafe:   2.7483 | Init:   0.0000 | Outside:   0.0000 | Gen:  67.2079 | Time: 31.7s
+Epoch   990 | Total:   68.7855 | Goal:   0.0000 | Unsafe:   3.2515 | Init:   0.7314 | Outside:   0.0000 | Gen:  64.8027 | Time: 32.1s
+Refining generator cells: 103 failing, refined 100 cells, 1038 total
+Rebuilt V cache with 2986 cells
+Rebuilt Phi cache with 1038 cells
+Epoch  1000 | Total:   41.2135 | Goal:   0.0000 | Unsafe:   3.5297 | Init:   0.0000 | Outside:   0.0000 | Gen:  37.6838 | Time: 33.3s
+=== Detailed Evaluation ===
+Goal:      PASS, V bounds: [  0.497,   0.943] | 2744/2744 pass (100.0%)
+Unsafe:    FAIL, V bounds: [ 19.283,  45.040] | 120/125 pass (96.0%)
+Init:      PASS, V bounds: [  0.769,   0.868] | 64/64 pass (100.0%)
+Outside:   PASS, V bounds: [  0.190,  45.495] | 53/53 pass (100.0%)
+Generator: FAIL, GV bounds: [-110.425,   0.530] | 826/1038 pass (79.6%)
+Saved visualization plots for epoch 1000 to 'training_progress'
+Merging outside cells: merged 10 pairs, 43 total
+Merging generator cells: merged 2 pairs, 1036 total
+Rebuilt V cache with 2976 cells
+Rebuilt Phi cache with 1036 cells
+Epoch  1010 | Total:   36.7066 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  36.7066 | Time: 37.8s
+Epoch  1020 | Total:   32.6200 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  32.6200 | Time: 38.7s
+Epoch  1030 | Total:   28.8247 | Goal:   0.0000 | Unsafe:   1.0840 | Init:   0.0000 | Outside:   0.0000 | Gen:  27.7407 | Time: 39.5s
+Epoch  1040 | Total:   26.6466 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1518 | Outside:   0.0000 | Gen:  26.4948 | Time: 40.4s
+Epoch  1050 | Total:   24.9521 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  24.9521 | Time: 41.3s
+Epoch  1060 | Total:   23.2614 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  23.2614 | Time: 42.1s
+Epoch  1070 | Total:   22.8499 | Goal:   0.0000 | Unsafe:   1.1551 | Init:   0.0000 | Outside:   0.0000 | Gen:  21.6948 | Time: 43.0s
+Epoch  1080 | Total:   21.8556 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0007 | Outside:   0.0000 | Gen:  21.8549 | Time: 44.0s
+Epoch  1090 | Total:   21.1548 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2917 | Outside:   0.0000 | Gen:  20.8632 | Time: 44.9s
+Epoch  1100 | Total:   19.9397 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  19.9397 | Time: 45.8s
+Epoch  1110 | Total:   20.6663 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  20.6663 | Time: 46.6s
+Epoch  1120 | Total:   19.2216 | Goal:   0.0000 | Unsafe:   0.3739 | Init:   0.0000 | Outside:   0.0000 | Gen:  18.8477 | Time: 47.6s
+Epoch  1130 | Total:   19.5500 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  19.5500 | Time: 48.5s
+Epoch  1140 | Total:   18.1434 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  18.1434 | Time: 49.4s
+Epoch  1150 | Total:   18.5582 | Goal:   0.0000 | Unsafe:   1.2790 | Init:   0.0000 | Outside:   0.0000 | Gen:  17.2791 | Time: 50.4s
+Epoch  1160 | Total:   17.3680 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  17.3680 | Time: 51.3s
+Epoch  1170 | Total:   17.5262 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  17.5262 | Time: 52.1s
+Epoch  1180 | Total:   16.2780 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0177 | Outside:   0.0000 | Gen:  16.2603 | Time: 53.5s
+Epoch  1190 | Total:   16.4263 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  16.4263 | Time: 54.4s
+Epoch  1200 | Total:   16.6002 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  16.6002 | Time: 55.3s
+Epoch  1210 | Total:   16.1921 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  16.1921 | Time: 56.2s
+Epoch  1220 | Total:   15.0221 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  15.0221 | Time: 57.0s
+Epoch  1230 | Total:   16.3019 | Goal:   0.0000 | Unsafe:   1.9911 | Init:   0.0000 | Outside:   0.0000 | Gen:  14.3108 | Time: 57.8s
+Epoch  1240 | Total:   15.2847 | Goal:   0.0000 | Unsafe:   1.0228 | Init:   0.0523 | Outside:   0.0000 | Gen:  14.2097 | Time: 58.6s
+Epoch  1250 | Total:   14.3569 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  14.3569 | Time: 59.6s
+Epoch  1260 | Total:   15.1033 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  15.1033 | Time: 60.5s
+Epoch  1270 | Total:   14.1479 | Goal:   0.0000 | Unsafe:   0.6368 | Init:   0.0000 | Outside:   0.0000 | Gen:  13.5111 | Time: 61.4s
+Epoch  1280 | Total:   13.2929 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  13.2929 | Time: 62.4s
+Epoch  1290 | Total:   14.2517 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0082 | Outside:   0.0000 | Gen:  14.2435 | Time: 63.3s
+Epoch  1300 | Total:   13.9773 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  13.9773 | Time: 64.1s
+Epoch  1310 | Total:   12.5828 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  12.5828 | Time: 64.9s
+Epoch  1320 | Total:   12.4406 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  12.4406 | Time: 65.8s
+Epoch  1330 | Total:   12.9745 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  12.9745 | Time: 66.6s
+Epoch  1340 | Total:   13.8684 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  13.8684 | Time: 67.5s
+Epoch  1350 | Total:   13.8713 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  13.8713 | Time: 68.4s
+Epoch  1360 | Total:   12.1234 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  12.1234 | Time: 69.4s
+Epoch  1370 | Total:   11.5318 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  11.5318 | Time: 70.3s
+Epoch  1380 | Total:   11.6088 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  11.6088 | Time: 71.6s
+Epoch  1390 | Total:   11.4403 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  11.4403 | Time: 72.6s
+Epoch  1400 | Total:   10.9077 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  10.9077 | Time: 73.7s
+Epoch  1410 | Total:   11.0506 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  11.0506 | Time: 74.7s
+Epoch  1420 | Total:   11.4439 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  11.4439 | Time: 75.6s
+Epoch  1430 | Total:   10.7422 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  10.7422 | Time: 76.6s
+Epoch  1440 | Total:   11.5074 | Goal:   0.0000 | Unsafe:   0.9697 | Init:   0.0000 | Outside:   0.0207 | Gen:  10.5170 | Time: 77.7s
+Epoch  1450 | Total:   10.8608 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  10.8608 | Time: 78.6s
+Epoch  1460 | Total:   10.6244 | Goal:   0.0000 | Unsafe:   0.7927 | Init:   0.0000 | Outside:   0.0000 | Gen:   9.8317 | Time: 79.6s
+Epoch  1470 | Total:   10.2995 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  10.2995 | Time: 80.5s
+Epoch  1480 | Total:    9.7150 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   9.7150 | Time: 81.5s
+Epoch  1490 | Total:   10.2175 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  10.2175 | Time: 82.6s
+Refining generator cells: 112 failing, refined 100 cells, 1736 total
+Rebuilt V cache with 2976 cells
+Rebuilt Phi cache with 1736 cells
+Epoch  1500 | Total:    6.5818 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.5818 | Time: 84.3s
+Merging outside cells: merged 0 pairs, 43 total
+Merging generator cells: merged 47 pairs, 1689 total
+Rebuilt V cache with 2976 cells
+Rebuilt Phi cache with 1689 cells
+Epoch  1510 | Total:    8.2575 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   8.2575 | Time: 86.3s
+Epoch  1520 | Total:    7.8111 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.8111 | Time: 87.5s
+Epoch  1530 | Total:    7.4633 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.4633 | Time: 88.9s
+Epoch  1540 | Total:    7.3219 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.3219 | Time: 90.1s
+Epoch  1550 | Total:    7.3320 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.3320 | Time: 91.3s
+Epoch  1560 | Total:    6.9420 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.9420 | Time: 92.7s
+Epoch  1570 | Total:    6.9612 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.9612 | Time: 94.0s
+Epoch  1580 | Total:    7.3205 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.7221 | Outside:   0.0000 | Gen:   6.5983 | Time: 95.3s
+Epoch  1590 | Total:    8.5173 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0984 | Gen:   8.4189 | Time: 96.6s
+Epoch  1600 | Total:    6.8010 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.8010 | Time: 97.9s
+Epoch  1610 | Total:    6.2282 | Goal:   0.0000 | Unsafe:   0.0523 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.1759 | Time: 99.3s
+Epoch  1620 | Total:    6.3043 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.3043 | Time: 100.5s
+Epoch  1630 | Total:    6.0112 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.0112 | Time: 101.8s
+Epoch  1640 | Total:    5.9818 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.9818 | Time: 103.1s
+Epoch  1650 | Total:    6.0739 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.0739 | Time: 104.3s
+Epoch  1660 | Total:    7.8136 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   1.4628 | Gen:   6.3508 | Time: 105.5s
+Epoch  1670 | Total:    7.6261 | Goal:   0.0000 | Unsafe:   1.2333 | Init:   0.0000 | Outside:   0.2688 | Gen:   6.1241 | Time: 107.0s
+Epoch  1680 | Total:    5.5901 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.5901 | Time: 108.3s
+Epoch  1690 | Total:    8.6039 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   1.0960 | Gen:   7.5078 | Time: 109.6s
+Epoch  1700 | Total:    7.7415 | Goal:   0.0000 | Unsafe:   1.0754 | Init:   0.0000 | Outside:   0.8147 | Gen:   5.8514 | Time: 110.8s
+Epoch  1710 | Total:    5.2792 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.2792 | Time: 112.1s
+Epoch  1720 | Total:    4.4967 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.4967 | Time: 113.4s
+Epoch  1730 | Total:    4.2810 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.2810 | Time: 114.7s
+Epoch  1740 | Total:    4.2361 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.2361 | Time: 115.9s
+Epoch  1750 | Total:    4.0968 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.0968 | Time: 117.2s
+Epoch  1760 | Total:    4.2545 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.2545 | Time: 118.5s
+Epoch  1770 | Total:    3.6970 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.6970 | Time: 119.8s
+Epoch  1780 | Total:    3.6781 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.2529 | Gen:   3.4252 | Time: 121.0s
+Epoch  1790 | Total:    3.7944 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.7944 | Time: 122.4s
+Epoch  1800 | Total:    3.6719 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.6719 | Time: 124.0s
+Epoch  1810 | Total:    3.5787 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0511 | Outside:   0.0000 | Gen:   3.5276 | Time: 125.6s
+Epoch  1820 | Total:    3.2699 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.2699 | Time: 127.0s
+Epoch  1830 | Total:    2.9625 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.9625 | Time: 128.9s
+Epoch  1840 | Total:    3.1542 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.1542 | Time: 130.4s
+Epoch  1850 | Total:    2.7798 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.7798 | Time: 132.5s
+Epoch  1860 | Total:    3.4141 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.4141 | Time: 134.3s
+Epoch  1870 | Total:    2.8167 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.8167 | Time: 135.7s
+Epoch  1880 | Total:    2.9859 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.9859 | Time: 137.3s
+Epoch  1890 | Total:    2.6743 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.6743 | Time: 139.0s
+Epoch  1900 | Total:    3.3596 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.3184 | Gen:   3.0412 | Time: 140.8s
+Epoch  1910 | Total:    3.0999 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.0999 | Time: 142.4s
+Epoch  1920 | Total:    2.5088 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.5088 | Time: 143.9s
+Epoch  1930 | Total:    4.1178 | Goal:   0.0000 | Unsafe:   0.7080 | Init:   0.0000 | Outside:   0.8576 | Gen:   2.5522 | Time: 145.3s
+Epoch  1940 | Total:    4.2674 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   1.5826 | Gen:   2.6847 | Time: 146.7s
+Epoch  1950 | Total:    2.8549 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.8549 | Time: 148.0s
+Epoch  1960 | Total:    2.7968 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0019 | Outside:   0.0000 | Gen:   2.7949 | Time: 149.4s
+Epoch  1970 | Total:    2.3577 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.3577 | Time: 150.7s
+Epoch  1980 | Total:    2.3400 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.3400 | Time: 152.0s
+Epoch  1990 | Total:    2.7065 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.7065 | Time: 153.3s
+Refining generator cells: 77 failing, refined 77 cells, 2228 total
+Rebuilt V cache with 2976 cells
+Rebuilt Phi cache with 2228 cells
+Epoch  2000 | Total:    0.0178 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0178 | Time: 155.5s
+=== Detailed Evaluation ===
+Goal:      PASS, V bounds: [  0.516,   0.828] | 2744/2744 pass (100.0%)
+Unsafe:    PASS, V bounds: [ 20.896,  52.468] | 125/125 pass (100.0%)
+Init:      PASS, V bounds: [  0.819,   0.914] | 64/64 pass (100.0%)
+Outside:   PASS, V bounds: [  0.120,  53.228] | 43/43 pass (100.0%)
+Generator: FAIL, GV bounds: [-132.989,   0.004] | 2216/2228 pass (99.5%)
+Saved visualization plots for epoch 2000 to 'training_progress'
+Merging outside cells: merged 0 pairs, 43 total
+Merging generator cells: merged 38 pairs, 2190 total
+Rebuilt V cache with 2976 cells
+Rebuilt Phi cache with 2190 cells
+Epoch  2010 | Total:   52.3028 | Goal:   0.0000 | Unsafe:   0.3174 | Init:   0.0000 | Outside:   0.0000 | Gen:  51.9854 | Time: 163.1s
+Epoch  2020 | Total:   34.6319 | Goal:   0.0000 | Unsafe:   7.7820 | Init:   0.0000 | Outside:   1.3737 | Gen:  25.4762 | Time: 164.8s
+Epoch  2030 | Total:   20.3977 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.8501 | Gen:  19.5476 | Time: 166.6s
+Epoch  2040 | Total:   16.7489 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0376 | Outside:   0.6910 | Gen:  16.0203 | Time: 168.5s
+Epoch  2050 | Total:   15.3750 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3672 | Outside:   0.2223 | Gen:  14.7855 | Time: 170.4s
+Epoch  2060 | Total:   15.5307 | Goal:   0.0000 | Unsafe:   0.5592 | Init:   0.0000 | Outside:   0.8171 | Gen:  14.1543 | Time: 172.2s
+Epoch  2070 | Total:   16.8043 | Goal:   0.0000 | Unsafe:   1.8737 | Init:   0.0000 | Outside:   1.4141 | Gen:  13.5166 | Time: 174.1s
+Epoch  2080 | Total:   14.5767 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.7621 | Outside:   0.0000 | Gen:  13.8145 | Time: 175.9s
+Epoch  2090 | Total:   15.4052 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.7835 | Gen:  14.6217 | Time: 177.9s
+Epoch  2100 | Total:   16.5187 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   3.3603 | Outside:   0.0000 | Gen:  13.1585 | Time: 179.6s
+Epoch  2110 | Total:   14.9561 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   1.6153 | Gen:  13.3409 | Time: 181.3s
+Epoch  2120 | Total:   13.0589 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  13.0589 | Time: 183.1s
+Epoch  2130 | Total:   15.8784 | Goal:   0.0000 | Unsafe:   0.6702 | Init:   0.0000 | Outside:   2.2497 | Gen:  12.9585 | Time: 184.8s
+Epoch  2140 | Total:   14.5415 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.2983 | Gen:  14.2432 | Time: 186.8s
+Epoch  2150 | Total:   13.3498 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0448 | Gen:  13.3050 | Time: 188.6s
+Epoch  2160 | Total:   15.7849 | Goal:   0.0000 | Unsafe:   1.7617 | Init:   0.0000 | Outside:   1.7073 | Gen:  12.3159 | Time: 190.4s
+Epoch  2170 | Total:   16.8306 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   4.1108 | Outside:   0.0000 | Gen:  12.7198 | Time: 192.2s
+Epoch  2180 | Total:   15.3826 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   1.2121 | Gen:  14.1706 | Time: 194.1s
+Epoch  2190 | Total:   12.8636 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0843 | Outside:   0.0000 | Gen:  12.7792 | Time: 196.0s
+Epoch  2200 | Total:   14.3265 | Goal:   0.0000 | Unsafe:   1.5804 | Init:   0.0000 | Outside:   0.9162 | Gen:  11.8299 | Time: 197.9s
+Epoch  2210 | Total:   13.8304 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   1.0702 | Gen:  12.7602 | Time: 199.7s
+Epoch  2220 | Total:   13.3729 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.1634 | Gen:  13.2094 | Time: 201.5s
+Epoch  2230 | Total:   12.6959 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.4452 | Gen:  12.2507 | Time: 203.9s
+Epoch  2240 | Total:   14.7469 | Goal:   0.0000 | Unsafe:   0.3996 | Init:   3.0832 | Outside:   0.0000 | Gen:  11.2641 | Time: 206.1s
+Refining outside cells: 12 failing, refined 12 cells, 127 total
+Rebuilt V cache with 3060 cells
+Rebuilt Phi cache with 2190 cells
+Epoch  2250 | Total:   12.1006 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0180 | Gen:  12.0826 | Time: 208.8s
+Epoch  2260 | Total:   11.5490 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  11.5490 | Time: 210.7s
+Epoch  2270 | Total:   11.8333 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.4050 | Outside:   0.0000 | Gen:  11.4283 | Time: 212.5s
+Epoch  2280 | Total:   11.0085 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  11.0085 | Time: 214.3s
+Epoch  2290 | Total:   11.6264 | Goal:   0.0000 | Unsafe:   1.1941 | Init:   0.3715 | Outside:   0.0000 | Gen:  10.0608 | Time: 216.2s
+Epoch  2300 | Total:   10.1807 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0004 | Gen:  10.1802 | Time: 218.0s
+Epoch  2310 | Total:   10.0185 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0149 | Gen:  10.0036 | Time: 220.6s
+Epoch  2320 | Total:    9.7523 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0216 | Gen:   9.7306 | Time: 222.9s
+Epoch  2330 | Total:    9.6236 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0451 | Outside:   0.0173 | Gen:   9.5613 | Time: 224.8s
+Epoch  2340 | Total:    9.5055 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0657 | Gen:   9.4398 | Time: 226.6s
+Epoch  2350 | Total:    9.5728 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0711 | Outside:   0.0319 | Gen:   9.4698 | Time: 228.3s
+Epoch  2360 | Total:    9.5020 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0856 | Gen:   9.4164 | Time: 230.2s
+Epoch  2370 | Total:    9.4468 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0478 | Outside:   0.0947 | Gen:   9.3043 | Time: 232.4s
+Epoch  2380 | Total:    9.5049 | Goal:   0.0000 | Unsafe:   0.3984 | Init:   0.0200 | Outside:   0.1655 | Gen:   8.9211 | Time: 234.2s
+Epoch  2390 | Total:    9.2979 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.1590 | Gen:   9.1388 | Time: 236.3s
+Epoch  2400 | Total:    9.2144 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0321 | Outside:   0.1307 | Gen:   9.0516 | Time: 238.4s
+Epoch  2410 | Total:    9.1909 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0008 | Outside:   0.1664 | Gen:   9.0237 | Time: 240.2s
+Epoch  2420 | Total:    9.2055 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0512 | Outside:   0.1797 | Gen:   8.9747 | Time: 242.2s
+Epoch  2430 | Total:    9.1265 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0432 | Outside:   0.2418 | Gen:   8.8415 | Time: 244.2s
+Epoch  2440 | Total:    9.3283 | Goal:   0.0000 | Unsafe:   0.7293 | Init:   0.0694 | Outside:   0.2027 | Gen:   8.3269 | Time: 246.1s
+Epoch  2450 | Total:    8.7488 | Goal:   0.0000 | Unsafe:   0.0528 | Init:   0.0000 | Outside:   0.2603 | Gen:   8.4357 | Time: 247.9s
+Epoch  2460 | Total:    8.7340 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2110 | Outside:   0.1781 | Gen:   8.3450 | Time: 249.9s
+Epoch  2470 | Total:    8.5977 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1017 | Outside:   0.2033 | Gen:   8.2927 | Time: 251.7s
+Epoch  2480 | Total:    8.6512 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0144 | Outside:   0.2062 | Gen:   8.4306 | Time: 253.4s
+Epoch  2490 | Total:    8.8246 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.3251 | Gen:   8.4995 | Time: 255.0s
+Refining outside cells: 2 failing, refined 2 cells, 141 total
+Refining generator cells: 77 failing, refined 77 cells, 2729 total
+Rebuilt V cache with 3074 cells
+Rebuilt Phi cache with 2729 cells
+Epoch  2500 | Total:    0.0346 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0316 | Gen:   0.0030 | Time: 257.7s
+Merging outside cells: merged 52 pairs, 89 total
+Merging generator cells: merged 0 pairs, 2729 total
+Rebuilt V cache with 3022 cells
+Rebuilt Phi cache with 2729 cells
+Epoch  2510 | Total:    0.2466 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0220 | Outside:   0.2108 | Gen:   0.0137 | Time: 260.8s
+Epoch  2520 | Total:    0.2264 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0075 | Outside:   0.1792 | Gen:   0.0398 | Time: 263.2s
+Epoch  2530 | Total:    0.1840 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.1761 | Gen:   0.0080 | Time: 265.6s
+Epoch  2540 | Total:    0.1552 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0005 | Outside:   0.1519 | Gen:   0.0028 | Time: 267.9s
+Refining outside cells: 2 failing, refined 2 cells, 103 total
+Rebuilt V cache with 3036 cells
+Rebuilt Phi cache with 2729 cells
+Epoch  2550 | Total:    0.0080 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0065 | Outside:   0.0000 | Gen:   0.0016 | Time: 271.0s
+Epoch  2560 | Total:    0.0027 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0027 | Time: 273.1s
 
-Epoch 0 - Detailed Evaluation:
-  Constraint Satisfaction:
-    Goal:      ✗ (V_min=2.312, V_mean=5.307, V_max=9.070)
-    Unsafe:    ✗ (V_min=18.078, V_max=34.465)
-    Init:      ✗ (V_min=0.529, V_max=1.102)
-    Outside:   ✗ (V_min=-0.610, V_max=34.044)
-    Boundary:  ✗ (V_min=-3.878, V_max=46.370)
-    Generator: ✗ (Phi_upper_min=1.978292e+01, Phi_upper_max=9.252356e+01, failing=44)
-  Goal bounds: V ∈ [2.093, 10.321]
-  Unsafe bounds: V ∈ [18.078, 34.465]
-  Generator bounds: Φ ∈ [-91.992, 92.524]
-  Generator failing cells: 44/44 (100.0%)
+====================
+All constraints satisfied, early stopping!
+====================
+Training converged at epoch 2564
+Final losses: Goal=0.0000, Unsafe=0.0000, Init=0.0000, Outside=0.0000, Gen=0.0000
+Final beta_s: 0.0005
 
-  Creating visualization for epoch 0...
-Epoch    10 | Total: 1444.7672 | Goal: 0.0000 | Unsafe: 38.4968 | Init: 139.6597 | Outside: 0.0000 | Boundary: 4.0731 | Gen: 1.266611e+03
- [Controller Params] fc.weight = tensor([[-0.0108, -0.1217,  0.2396],
-        [-0.1310, -0.2055, -0.9052],
-        [ 0.1224, -0.0589,  0.1554]])
- ✓ Inside Goal passed, min V= 4.9361, min V_outside_lower= 1.5247, min V_lower=4.4617
-Epoch    20 | Total: 1051.7305 | Goal: 0.0000 | Unsafe: 77.5302 | Init: 112.2743 | Outside: 0.0000 | Boundary: 3.9178 | Gen: 8.619260e+02
- [Controller Params] fc.weight = tensor([[ 7.9809e-04, -7.8038e-02,  1.9471e-01],
-        [-8.8863e-02, -1.6495e-01, -8.6627e-01],
-        [ 7.6754e-02, -1.3663e-02,  1.1010e-01]])
- ✓ Inside Goal passed, min V= 4.7708, min V_outside_lower= 0.7176, min V_lower=4.3685
-Epoch    30 | Total: 847.5604 | Goal: 0.0000 | Unsafe: 17.5514 | Init: 102.6874 | Outside: 0.0000 | Boundary: 6.4898 | Gen: 7.273216e+02
- [Controller Params] fc.weight = tensor([[ 7.9845e-05, -3.7587e-02,  1.5297e-01],
-        [-5.5120e-02, -1.3230e-01, -8.3884e-01],
-        [ 3.4872e-02,  2.0021e-02,  6.8710e-02]])
- ✓ Inside Goal passed, min V= 4.9044, min V_outside_lower= 0.1434, min V_lower=4.4832
-Epoch    40 | Total: 721.6564 | Goal: 0.0000 | Unsafe: 23.4713 | Init: 75.8291 | Outside: 5.2539 | Boundary: 8.3704 | Gen: 6.171022e+02
- [Controller Params] fc.weight = tensor([[-1.1355e-03,  2.8867e-04,  1.1355e-01],
-        [-2.8975e-02, -1.0582e-01, -8.2133e-01],
-        [-4.8302e-03,  2.6265e-02,  2.9265e-02]])
- ✓ Inside Goal passed, min V= 4.5953, min V_outside_lower= -0.4452, min V_lower=4.1837
-Epoch    50 | Total: 643.5264 | Goal: 0.0000 | Unsafe: 11.7050 | Init: 75.4678 | Outside: 7.5598 | Boundary: 8.0122 | Gen: 5.487937e+02
- [Controller Params] fc.weight = tensor([[-0.0026, -0.0040,  0.0768],
-        [-0.0091, -0.0845, -0.8109],
-        [-0.0275,  0.0191, -0.0085]])
- ✓ Inside Goal passed, min V= 4.6688, min V_outside_lower= -0.5431, min V_lower=4.2704
-Epoch    60 | Total: 587.6788 | Goal: 0.0000 | Unsafe: 13.5620 | Init: 73.6590 | Outside: 8.7350 | Boundary: 7.5554 | Gen: 4.917228e+02
- [Controller Params] fc.weight = tensor([[ 7.8240e-04,  1.0703e-03,  4.1688e-02],
-        [ 5.3495e-03, -6.8049e-02, -8.0369e-01],
-        [-3.6346e-02,  5.4476e-03, -2.1227e-02]])
- ✓ Inside Goal passed, min V= 4.6307, min V_outside_lower= -0.5573, min V_lower=4.2509
-Epoch    70 | Total: 543.5651 | Goal: 0.0000 | Unsafe: 15.5299 | Init: 80.1804 | Outside: 4.6336 | Boundary: 6.5018 | Gen: 4.432211e+02
- [Controller Params] fc.weight = tensor([[-9.4088e-04, -2.7194e-03,  7.3099e-03],
-        [ 1.3111e-02, -5.5562e-02, -7.9885e-01],
-        [-3.9726e-02,  1.5064e-04, -1.7336e-02]])
- ✓ Inside Goal passed, min V= 4.6907, min V_outside_lower= -0.4020, min V_lower=4.3310
-Epoch    80 | Total: 515.7872 | Goal: 0.0000 | Unsafe: 11.1742 | Init: 73.9191 | Outside: 7.1673 | Boundary: 6.5624 | Gen: 4.235265e+02
- [Controller Params] fc.weight = tensor([[-3.1495e-03, -3.6437e-03, -1.9380e-02],
-        [ 1.7333e-02, -4.6241e-02, -7.9533e-01],
-        [-4.0935e-02, -2.7746e-04, -7.5056e-03]])
- ✓ Inside Goal passed, min V= 4.6036, min V_outside_lower= -0.4945, min V_lower=4.2519
-Epoch    90 | Total: 494.6863 | Goal: 0.0000 | Unsafe: 14.1369 | Init: 69.4214 | Outside: 8.2801 | Boundary: 6.4106 | Gen: 4.028479e+02
- [Controller Params] fc.weight = tensor([[-1.0075e-03,  1.7096e-04, -3.0202e-02],
-        [ 1.9893e-02, -3.9364e-02, -7.9230e-01],
-        [-4.1258e-02, -5.0842e-04,  6.0254e-04]])
- ✓ Inside Goal passed, min V= 4.4995, min V_outside_lower= -0.5129, min V_lower=4.1594
-Epoch   100 | Total: 479.4838 | Goal: 0.0000 | Unsafe: 8.0448 | Init: 69.2695 | Outside: 8.5226 | Boundary: 6.2984 | Gen: 3.936469e+02
- [Controller Params] fc.weight = tensor([[-1.3441e-03,  2.5012e-04, -3.4887e-02],
-        [ 2.1563e-02, -3.4361e-02, -7.8967e-01],
-        [-4.1186e-02, -2.8282e-04, -2.2288e-03]])
- ✓ Inside Goal passed, min V= 4.5042, min V_outside_lower= -0.5128, min V_lower=4.1671
-Epoch   110 | Total: 467.3102 | Goal: 0.0000 | Unsafe: 10.5893 | Init: 64.4099 | Outside: 10.1725 | Boundary: 6.3857 | Gen: 3.821385e+02
- [Controller Params] fc.weight = tensor([[-4.6311e-04,  3.2259e-04, -3.7503e-02],
-        [ 2.2702e-02, -3.0804e-02, -7.8763e-01],
-        [-4.0873e-02,  6.3966e-04, -1.3418e-03]])
- ✓ Inside Goal passed, min V= 4.4034, min V_outside_lower= -0.5538, min V_lower=4.0727
-Epoch   120 | Total: 457.8928 | Goal: 0.0000 | Unsafe: 10.6388 | Init: 62.2874 | Outside: 10.6073 | Boundary: 6.3739 | Gen: 3.743592e+02
- [Controller Params] fc.weight = tensor([[-1.2087e-03, -6.6102e-04, -3.9564e-02],
-        [ 2.3520e-02, -2.8238e-02, -7.8606e-01],
-        [-4.0325e-02,  5.3616e-04, -2.2936e-04]])
- ✓ Inside Goal passed, min V= 4.3545, min V_outside_lower= -0.5627, min V_lower=4.0280
-Epoch   130 | Total: 450.4048 | Goal: 0.0000 | Unsafe: 9.8191 | Init: 64.9907 | Outside: 8.2510 | Boundary: 6.0891 | Gen: 3.673440e+02
- [Controller Params] fc.weight = tensor([[-1.0289e-03, -4.9465e-04, -4.1645e-02],
-        [ 2.4129e-02, -2.6327e-02, -7.8491e-01],
-        [-3.9504e-02,  1.9643e-04, -8.1083e-04]])
- ✓ Inside Goal passed, min V= 4.3796, min V_outside_lower= -0.4949, min V_lower=4.0567
-Epoch   140 | Total: 444.2597 | Goal: 0.0000 | Unsafe: 9.0984 | Init: 63.6159 | Outside: 8.2930 | Boundary: 6.0634 | Gen: 3.632524e+02
- [Controller Params] fc.weight = tensor([[ 1.3829e-05, -2.5620e-04, -4.3647e-02],
-        [ 2.4601e-02, -2.4828e-02, -7.8401e-01],
-        [-3.8250e-02,  9.0004e-04,  1.4275e-04]])
- ✓ Inside Goal passed, min V= 4.3465, min V_outside_lower= -0.4940, min V_lower=4.0263
-Epoch   150 | Total: 438.1993 | Goal: 0.0000 | Unsafe: 9.2366 | Init: 61.1748 | Outside: 8.9030 | Boundary: 6.1069 | Gen: 3.588848e+02
- [Controller Params] fc.weight = tensor([[-7.2179e-04, -4.7842e-04, -4.4696e-02],
-        [ 2.4976e-02, -2.3615e-02, -7.8328e-01],
-        [-3.6240e-02,  2.2728e-04, -1.5395e-04]])
- ✓ Inside Goal passed, min V= 4.2958, min V_outside_lower= -0.5091, min V_lower=3.9783
-Epoch   160 | Total: 433.1203 | Goal: 0.0000 | Unsafe: 12.2920 | Init: 54.9440 | Outside: 11.3837 | Boundary: 6.3602 | Gen: 3.545005e+02
- [Controller Params] fc.weight = tensor([[-3.3212e-03, -1.9090e-03, -4.5477e-02],
-        [ 2.5276e-02, -2.2634e-02, -7.8269e-01],
-        [-3.3577e-02,  6.2657e-04, -1.1307e-03]])
- ✓ Inside Goal passed, min V= 4.1780, min V_outside_lower= -0.5749, min V_lower=3.8639
-Epoch   170 | Total: 430.2600 | Goal: 0.0000 | Unsafe: 8.0886 | Init: 60.8860 | Outside: 8.2775 | Boundary: 5.9619 | Gen: 3.530079e+02
- [Controller Params] fc.weight = tensor([[-3.8631e-04, -1.1213e-03, -4.6326e-02],
-        [ 2.5520e-02, -2.1798e-02, -7.8217e-01],
-        [-3.0281e-02,  1.3478e-03, -1.8379e-04]])
- ✓ Inside Goal passed, min V= 4.2739, min V_outside_lower= -0.4774, min V_lower=3.9602
-Epoch   180 | Total: 426.2125 | Goal: 0.0000 | Unsafe: 17.0869 | Init: 52.5823 | Outside: 11.2926 | Boundary: 6.2924 | Gen: 3.452507e+02
- [Controller Params] fc.weight = tensor([[ 4.6703e-05,  7.3903e-04, -4.7357e-02],
-        [ 2.5724e-02, -2.1029e-02, -7.8167e-01],
-        [-2.6342e-02,  4.1719e-04,  1.1930e-04]])
- ✓ Inside Goal passed, min V= 4.1036, min V_outside_lower= -0.5587, min V_lower=3.7957
-Epoch   190 | Total: 428.9944 | Goal: 0.0000 | Unsafe: 28.0084 | Init: 41.0470 | Outside: 18.6803 | Boundary: 6.8938 | Gen: 3.412588e+02
- [Controller Params] fc.weight = tensor([[-8.3826e-05, -5.6635e-04, -4.8583e-02],
-        [ 2.5904e-02, -2.0317e-02, -7.8123e-01],
-        [-2.1744e-02,  9.2415e-05, -1.4904e-03]])
- ✓ Inside Goal passed, min V= 3.8988, min V_outside_lower= -0.7061, min V_lower=3.5941
-Epoch   200 | Total: 420.3920 | Goal: 0.0000 | Unsafe: 13.3698 | Init: 48.6256 | Outside: 13.8562 | Boundary: 6.4624 | Gen: 3.445405e+02
- [Controller Params] fc.weight = tensor([[-2.7335e-05,  5.2382e-04, -5.0004e-02],
-        [ 2.6071e-02, -1.9630e-02, -7.8082e-01],
-        [-1.6483e-02, -3.3319e-04, -1.6901e-03]])
- ✓ Inside Goal passed, min V= 4.0427, min V_outside_lower= -0.6046, min V_lower=3.7353
-Epoch   210 | Total: 420.1271 | Goal: 0.0000 | Unsafe: 20.9195 | Init: 41.9126 | Outside: 17.7387 | Boundary: 6.7590 | Gen: 3.395564e+02
- [Controller Params] fc.weight = tensor([[-9.5919e-05, -8.1687e-04, -5.1629e-02],
-        [ 2.6224e-02, -1.8990e-02, -7.8045e-01],
-        [-1.0513e-02,  6.4649e-04, -1.6769e-03]])
- ✓ Inside Goal passed, min V= 3.9111, min V_outside_lower= -0.6776, min V_lower=3.6073
-Epoch   220 | Total: 424.2905 | Goal: 0.0000 | Unsafe: 1.3533 | Init: 68.3237 | Outside: 5.1724 | Boundary: 5.3726 | Gen: 3.494411e+02
- [Controller Params] fc.weight = tensor([[-1.4924e-03,  3.2830e-04, -5.3449e-02],
-        [ 2.6359e-02, -1.8360e-02, -7.8013e-01],
-        [-3.7848e-03,  1.1558e-03, -1.8910e-03]])
- ✓ Inside Goal passed, min V= 4.3939, min V_outside_lower= -0.3285, min V_lower=4.0810
-Epoch   230 | Total: 420.8331 | Goal: 0.0000 | Unsafe: 31.4585 | Init: 40.6384 | Outside: 16.6451 | Boundary: 6.6278 | Gen: 3.320911e+02
- [Controller Params] fc.weight = tensor([[-1.1674e-03, -1.6069e-03, -5.5456e-02],
-        [ 2.6493e-02, -1.7719e-02, -7.7982e-01],
-        [-2.7354e-03, -4.4252e-06, -3.9322e-03]])
- ✓ Inside Goal passed, min V= 3.8495, min V_outside_lower= -0.6411, min V_lower=3.5514
-Epoch   240 | Total: 415.5600 | Goal: 0.0000 | Unsafe: 3.5756 | Init: 63.4675 | Outside: 5.8498 | Boundary: 5.4538 | Gen: 3.426670e+02
- [Controller Params] fc.weight = tensor([[-1.6128e-03, -8.6835e-05, -5.7640e-02],
-        [ 2.6631e-02, -1.7087e-02, -7.7953e-01],
-        [-4.1637e-03, -1.0693e-04, -3.2771e-03]])
- ✓ Inside Goal passed, min V= 4.2777, min V_outside_lower= -0.3475, min V_lower=3.9707
-[Refine-Outside] Epoch 250: 36 failing → refined 36 cells → 1916 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 4855 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 4855 cells...
-[SymbolicCROWNCache] Initialized for 4855 cells - symbolic structure cached!
-    Rebuilding Phi cache with 44 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 44 cells...
-[SymbolicCROWNCache_Phi] Initialized for 44 cells!
-  Caches rebuilt successfully!
-Epoch   250 | Total: 480.8033 | Goal: 0.0000 | Unsafe: 25.0063 | Init: 38.0782 | Outside: 84.5543 | Boundary: 6.7048 | Gen: 3.331644e+02
- [Controller Params] fc.weight = tensor([[ 1.0891e-04, -4.4355e-04, -6.0003e-02],
-        [ 2.6757e-02, -1.6488e-02, -7.7927e-01],
-        [ 1.7738e-04,  4.2233e-04, -2.2965e-03]])
- ✓ Inside Goal passed, min V= 3.8143, min V_outside_lower= -0.6661, min V_lower=3.5166
-Epoch   260 | Total: 436.4290 | Goal: 0.0000 | Unsafe: 3.2414 | Init: 57.3472 | Outside: 25.7404 | Boundary: 5.6622 | Gen: 3.501000e+02
- [Controller Params] fc.weight = tensor([[-1.7684e-04, -1.3407e-03, -6.2377e-02],
-        [ 2.6898e-02, -1.5677e-02, -7.7893e-01],
-        [-4.9816e-03,  6.7071e-05, -1.4594e-03]])
- ✓ Inside Goal passed, min V= 4.1493, min V_outside_lower= -0.3821, min V_lower=3.8438
-Epoch   270 | Total: 431.0706 | Goal: 0.0000 | Unsafe: 20.9796 | Init: 52.1455 | Outside: 24.4459 | Boundary: 5.5451 | Gen: 3.334995e+02
- [Controller Params] fc.weight = tensor([[-3.1841e-04, -2.2951e-03, -6.5035e-02],
-        [ 2.7091e-02, -1.4593e-02, -7.7849e-01],
-        [-5.5927e-04,  8.6925e-05, -1.1585e-03]])
- ✓ Inside Goal passed, min V= 3.9739, min V_outside_lower= -0.3642, min V_lower=3.6825
-Epoch   280 | Total: 419.7672 | Goal: 0.0000 | Unsafe: 19.9761 | Init: 58.5192 | Outside: 11.6591 | Boundary: 5.0618 | Gen: 3.296128e+02
- [Controller Params] fc.weight = tensor([[-1.7363e-03, -6.1367e-04, -6.8004e-02],
-        [ 2.7277e-02, -1.3649e-02, -7.7813e-01],
-        [ 3.8086e-04,  8.9903e-04, -1.7426e-03]])
- ✓ Inside Goal passed, min V= 4.0642, min V_outside_lower= -0.2504, min V_lower=3.7751
-Epoch   290 | Total: 412.9235 | Goal: 0.0000 | Unsafe: 9.5796 | Init: 69.8998 | Outside: 2.4701 | Boundary: 4.4163 | Gen: 3.309740e+02
- [Controller Params] fc.weight = tensor([[ 7.2360e-05,  3.1827e-04, -7.0810e-02],
-        [ 2.7426e-02, -1.2875e-02, -7.7788e-01],
-        [-1.3040e-04,  2.7219e-03, -2.7483e-03]])
- ✓ Inside Goal passed, min V= 4.2652, min V_outside_lower= -0.0943, min V_lower=3.9735
-Epoch   300 | Total: 411.4219 | Goal: 0.0000 | Unsafe: 9.7696 | Init: 70.3478 | Outside: 1.7345 | Boundary: 4.3261 | Gen: 3.295700e+02
- [Controller Params] fc.weight = tensor([[-5.8140e-04, -8.6656e-06, -7.2305e-02],
-        [ 2.7542e-02, -1.2262e-02, -7.7768e-01],
-        [-2.9260e-04,  1.7997e-03, -2.1615e-03]])
- ✓ Inside Goal passed, min V= 4.2651, min V_outside_lower= -0.0727, min V_lower=3.9748
-Epoch   310 | Total: 410.8577 | Goal: 0.0000 | Unsafe: 13.7976 | Init: 65.6144 | Outside: 3.8642 | Boundary: 4.5091 | Gen: 3.275815e+02
- [Controller Params] fc.weight = tensor([[ 2.4557e-04, -2.6646e-04, -7.3267e-02],
-        [ 2.7641e-02, -1.1774e-02, -7.7753e-01],
-        [-7.4397e-04,  2.1018e-03, -1.2677e-03]])
- ✓ Inside Goal passed, min V= 4.1709, min V_outside_lower= -0.1201, min V_lower=3.8834
-Epoch   320 | Total: 409.6344 | Goal: 0.0000 | Unsafe: 13.2177 | Init: 65.2857 | Outside: 3.4830 | Boundary: 4.4695 | Gen: 3.276480e+02
- [Controller Params] fc.weight = tensor([[ 2.7857e-04, -7.0325e-04, -7.4095e-02],
-        [ 2.7731e-02, -1.1352e-02, -7.7739e-01],
-        [-1.4976e-03, -1.2534e-05, -6.8292e-04]])
- ✓ Inside Goal passed, min V= 4.1563, min V_outside_lower= -0.1119, min V_lower=3.8698
-Epoch   330 | Total: 409.8568 | Goal: 0.0000 | Unsafe: 5.7498 | Init: 69.9072 | Outside: 1.2202 | Boundary: 4.2365 | Gen: 3.329796e+02
- [Controller Params] fc.weight = tensor([[-6.8592e-05,  2.0207e-04, -7.4937e-02],
-        [ 2.7789e-02, -1.0928e-02, -7.7724e-01],
-        [-3.7260e-03,  1.2593e-03, -5.9335e-04]])
- ✓ Inside Goal passed, min V= 4.2500, min V_outside_lower= -0.0523, min V_lower=3.9604
-Epoch   340 | Total: 412.2583 | Goal: 0.0000 | Unsafe: 20.6421 | Init: 56.2733 | Outside: 9.0006 | Boundary: 4.8399 | Gen: 3.263423e+02
- [Controller Params] fc.weight = tensor([[ 2.7374e-04, -2.1225e-04, -7.5263e-02],
-        [ 2.7840e-02, -1.0508e-02, -7.7711e-01],
-        [-3.9612e-03, -5.4047e-04, -3.4440e-03]])
- ✓ Inside Goal passed, min V= 3.9779, min V_outside_lower= -0.2014, min V_lower=3.6958
-Epoch   350 | Total: 407.1800 | Goal: 0.0000 | Unsafe: 11.2474 | Init: 62.6622 | Outside: 3.5481 | Boundary: 4.4742 | Gen: 3.297223e+02
- [Controller Params] fc.weight = tensor([[-7.0632e-04, -2.7631e-04, -7.5709e-02],
-        [ 2.7885e-02, -1.0063e-02, -7.7696e-01],
-        [-2.5751e-03,  4.5579e-04, -9.8074e-03]])
- ✓ Inside Goal passed, min V= 4.0898, min V_outside_lower= -0.1120, min V_lower=3.8057
-Epoch   360 | Total: 406.4806 | Goal: 0.0000 | Unsafe: 9.5876 | Init: 61.4221 | Outside: 3.9283 | Boundary: 4.5016 | Gen: 3.315425e+02
- [Controller Params] fc.weight = tensor([[-1.2286e-03,  4.5185e-04, -7.5814e-02],
-        [ 2.7922e-02, -9.6128e-03, -7.7680e-01],
-        [-1.8876e-03,  1.7947e-03, -1.1450e-02]])
- ✓ Inside Goal passed, min V= 4.0666, min V_outside_lower= -0.1190, min V_lower=3.7830
-Epoch   370 | Total: 408.6416 | Goal: 0.0000 | Unsafe: 3.8337 | Init: 68.0786 | Outside: 0.6178 | Boundary: 4.1356 | Gen: 3.361115e+02
- [Controller Params] fc.weight = tensor([[-1.1886e-03, -3.4380e-05, -7.6393e-02],
-        [ 2.7983e-02, -9.1975e-03, -7.7668e-01],
-        [-1.3819e-03,  1.6728e-06, -1.2986e-02]])
- ✓ Inside Goal passed, min V= 4.1876, min V_outside_lower= -0.0266, min V_lower=3.9014
-Epoch   380 | Total: 406.7191 | Goal: 0.0000 | Unsafe: 16.1050 | Init: 55.5783 | Outside: 6.2226 | Boundary: 4.6688 | Gen: 3.288132e+02
- [Controller Params] fc.weight = tensor([[-1.6210e-03, -1.7224e-04, -7.7354e-02],
-        [ 2.8053e-02, -8.7599e-03, -7.7655e-01],
-        [ 6.5828e-04,  2.0741e-03, -1.5210e-02]])
- ✓ Inside Goal passed, min V= 3.9335, min V_outside_lower= -0.1596, min V_lower=3.6549
-Epoch   390 | Total: 404.8012 | Goal: 0.0000 | Unsafe: 13.4729 | Init: 58.7335 | Outside: 3.2275 | Boundary: 4.4372 | Gen: 3.293673e+02
- [Controller Params] fc.weight = tensor([[ 4.4597e-05, -1.6986e-03, -7.8373e-02],
-        [ 2.8111e-02, -8.3149e-03, -7.7640e-01],
-        [-5.2754e-03,  4.1599e-03, -1.7744e-02]])
- ✓ Inside Goal passed, min V= 3.9769, min V_outside_lower= -0.1031, min V_lower=3.6989
-Epoch   400 | Total: 404.8091 | Goal: 0.0000 | Unsafe: 5.8177 | Init: 64.6290 | Outside: 0.4857 | Boundary: 4.1094 | Gen: 3.338766e+02
- [Controller Params] fc.weight = tensor([[-4.9416e-05, -1.7665e-03, -7.9197e-02],
-        [ 2.8167e-02, -7.8780e-03, -7.7626e-01],
-        [-9.0620e-05,  4.6911e-04, -2.0157e-02]])
- ✓ Inside Goal passed, min V= 4.0873, min V_outside_lower= -0.0208, min V_lower=3.8067
-Epoch   410 | Total: 402.3441 | Goal: 0.0000 | Unsafe: 9.8295 | Init: 59.8275 | Outside: 1.5062 | Boundary: 4.2740 | Gen: 3.311808e+02
- [Controller Params] fc.weight = tensor([[-4.7557e-04, -7.7530e-04, -7.9831e-02],
-        [ 2.8232e-02, -7.4389e-03, -7.7613e-01],
-        [-2.1932e-03,  1.0922e-03, -2.2471e-02]])
- ✓ Inside Goal passed, min V= 3.9840, min V_outside_lower= -0.0635, min V_lower=3.7072
-Epoch   420 | Total: 404.6222 | Goal: 0.0000 | Unsafe: 18.6404 | Init: 50.6646 | Outside: 7.1905 | Boundary: 4.7083 | Gen: 3.281266e+02
- [Controller Params] fc.weight = tensor([[-2.3374e-03, -4.7379e-05, -8.0844e-02],
-        [ 2.8284e-02, -6.9715e-03, -7.7600e-01],
-        [-5.9890e-04, -3.4150e-04, -2.5994e-02]])
- ✓ Inside Goal passed, min V= 3.8071, min V_outside_lower= -0.1689, min V_lower=3.5343
-Epoch   430 | Total: 402.6816 | Goal: 0.0000 | Unsafe: 6.3269 | Init: 62.4885 | Outside: 0.0825 | Boundary: 4.0423 | Gen: 3.337838e+02
- [Controller Params] fc.weight = tensor([[-9.0079e-04,  1.2605e-04, -8.1860e-02],
-        [ 2.8324e-02, -6.4660e-03, -7.7584e-01],
-        [-1.7904e-03,  4.6193e-04, -2.9870e-02]])
- ✓ Inside Goal passed, min V= 4.0141, min V_outside_lower= -0.0045, min V_lower=3.7379
-Epoch   440 | Total: 401.0101 | Goal: 0.0000 | Unsafe: 14.8988 | Init: 53.4632 | Outside: 3.2394 | Boundary: 4.4298 | Gen: 3.294086e+02
- [Controller Params] fc.weight = tensor([[ 4.5135e-04, -1.5557e-04, -8.3178e-02],
-        [ 2.8349e-02, -5.9426e-03, -7.7565e-01],
-        [-1.0405e-03,  9.2562e-04, -3.4745e-02]])
- ✓ Inside Goal passed, min V= 3.8354, min V_outside_lower= -0.1010, min V_lower=3.5644
-Epoch   450 | Total: 399.7231 | Goal: 0.0000 | Unsafe: 11.2528 | Init: 54.2252 | Outside: 2.4540 | Boundary: 4.3604 | Gen: 3.317910e+02
- [Controller Params] fc.weight = tensor([[-1.6132e-03, -7.1877e-05, -8.4251e-02],
-        [ 2.8367e-02, -5.3991e-03, -7.7545e-01],
-        [-1.3295e-03, -6.1623e-04, -3.9409e-02]])
- ✓ Inside Goal passed, min V= 3.8466, min V_outside_lower= -0.0842, min V_lower=3.5752
-Epoch   460 | Total: 400.2394 | Goal: 0.0000 | Unsafe: 7.4950 | Init: 57.8470 | Outside: 0.6007 | Boundary: 4.1271 | Gen: 3.342968e+02
- [Controller Params] fc.weight = tensor([[-5.3073e-04, -1.6894e-04, -8.5366e-02],
-        [ 2.8357e-02, -4.8390e-03, -7.7524e-01],
-        [-8.0915e-04,  9.8371e-04, -4.4318e-02]])
- ✓ Inside Goal passed, min V= 3.9038, min V_outside_lower= -0.0260, min V_lower=3.6319
-Epoch   470 | Total: 398.3369 | Goal: 0.0000 | Unsafe: 11.9666 | Init: 52.9490 | Outside: 1.8171 | Boundary: 4.3028 | Gen: 3.316042e+02
- [Controller Params] fc.weight = tensor([[-4.2505e-04, -1.5011e-04, -8.6852e-02],
-        [ 2.8372e-02, -4.3117e-03, -7.7508e-01],
-        [-1.9730e-03, -1.5418e-04, -4.9930e-02]])
- ✓ Inside Goal passed, min V= 3.8018, min V_outside_lower= -0.0706, min V_lower=3.5335
-Epoch   480 | Total: 398.4287 | Goal: 0.0000 | Unsafe: 14.6348 | Init: 48.3951 | Outside: 4.2089 | Boundary: 4.4996 | Gen: 3.311899e+02
- [Controller Params] fc.weight = tensor([[-4.2645e-03, -3.5666e-04, -8.8322e-02],
-        [ 2.8410e-02, -3.8086e-03, -7.7493e-01],
-        [-1.5239e-03, -2.8893e-04, -5.5461e-02]])
- ✓ Inside Goal passed, min V= 3.7127, min V_outside_lower= -0.1194, min V_lower=3.4465
-Epoch   490 | Total: 398.7628 | Goal: 0.0000 | Unsafe: 6.9636 | Init: 56.1031 | Outside: 0.2009 | Boundary: 4.0575 | Gen: 3.354953e+02
- [Controller Params] fc.weight = tensor([[-0.0025, -0.0013, -0.0902],
-        [ 0.0284, -0.0033, -0.7748],
-        [-0.0010,  0.0015, -0.0620]])
- ✓ Inside Goal passed, min V= 3.8453, min V_outside_lower= -0.0094, min V_lower=3.5769
-[debug] use score
-[Refine-Generator] Epoch 500: 42 failing → refined 42 cells → 338 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 4855 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 4855 cells...
-[SymbolicCROWNCache] Initialized for 4855 cells - symbolic structure cached!
-    Rebuilding Phi cache with 338 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 338 cells...
-[SymbolicCROWNCache_Phi] Initialized for 338 cells!
-  Caches rebuilt successfully!
-[Merge-Outside] Epoch 501: merged 1869 pairs → 47 total
-[Merge-Generator] Epoch 501: merged 0 pairs → 338 total
-Epoch   500 | Total: 1127.4688 | Goal: 0.0000 | Unsafe: 7.5822 | Init: 55.1904 | Outside: 0.0868 | Boundary: 4.0463 | Gen: 1.064609e+03
- [Controller Params] fc.weight = tensor([[-2.0824e-03,  1.9925e-04, -9.2052e-02],
-        [ 2.8474e-02, -2.7771e-03, -7.7464e-01],
-        [ 1.0811e-04,  2.6767e-03, -6.8570e-02]])
- ✓ Inside Goal passed, min V= 3.8182, min V_outside_lower= -0.0037, min V_lower=3.5515
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 2986 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 2986 cells...
-[SymbolicCROWNCache] Initialized for 2986 cells - symbolic structure cached!
-    Rebuilding Phi cache with 338 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 338 cells...
-[SymbolicCROWNCache_Phi] Initialized for 338 cells!
-  Caches rebuilt successfully!
-Epoch   510 | Total: 988.9399 | Goal: 0.0000 | Unsafe: 18.2764 | Init: 31.5919 | Outside: 1.4476 | Boundary: 5.0169 | Gen: 9.376240e+02
- [Controller Params] fc.weight = tensor([[-0.0408,  0.0015, -0.0809],
-        [ 0.0287, -0.0014, -0.7746],
-        [-0.0426,  0.0352, -0.0970]])
- ✓ Inside Goal passed, min V= 3.2933, min V_outside_lower= -0.2494, min V_lower=3.0396
-Epoch   520 | Total: 940.9908 | Goal: 0.0000 | Unsafe: 32.3289 | Init: 21.4707 | Outside: 1.8407 | Boundary: 5.1429 | Gen: 8.853505e+02
- [Controller Params] fc.weight = tensor([[-1.0661e-01, -9.2596e-04, -5.8974e-02],
-        [ 2.9350e-02,  6.4469e-04, -7.7470e-01],
-        [-7.8006e-02,  5.7302e-02, -1.2386e-01]])
- ✓ Inside Goal passed, min V= 2.9989, min V_outside_lower= -0.2805, min V_lower=2.7598
-Epoch   530 | Total: 916.7396 | Goal: 0.0000 | Unsafe: 41.5796 | Init: 14.6356 | Outside: 1.9684 | Boundary: 5.1377 | Gen: 8.585560e+02
- [Controller Params] fc.weight = tensor([[-0.1723, -0.0056, -0.0330],
-        [ 0.0300,  0.0009, -0.7748],
-        [-0.0828,  0.0416, -0.1304]])
- ✓ Inside Goal passed, min V= 2.8073, min V_outside_lower= -0.2794, min V_lower=2.5792
-Epoch   540 | Total: 885.4937 | Goal: 0.0000 | Unsafe: 47.4338 | Init: 10.8868 | Outside: 1.6672 | Boundary: 5.0195 | Gen: 8.255059e+02
- [Controller Params] fc.weight = tensor([[-2.3106e-01, -1.4579e-03, -6.5862e-03],
-        [ 3.0411e-02,  4.7580e-04, -7.7481e-01],
-        [-6.7713e-02,  9.4074e-03, -1.3335e-01]])
- ✓ Inside Goal passed, min V= 2.6807, min V_outside_lower= -0.2493, min V_lower=2.4617
-Epoch   550 | Total: 855.2070 | Goal: 0.0000 | Unsafe: 34.7476 | Init: 8.4208 | Outside: 1.4371 | Boundary: 4.9137 | Gen: 8.106014e+02
- [Controller Params] fc.weight = tensor([[-2.7119e-01, -2.2897e-03, -7.4419e-03],
-        [ 3.0686e-02, -1.0253e-04, -7.7487e-01],
-        [-3.3720e-02,  5.2869e-03, -1.4548e-01]])
- ✓ Inside Goal passed, min V= 2.6004, min V_outside_lower= -0.2252, min V_lower=2.3870
-Epoch   560 | Total: 822.6758 | Goal: 0.0000 | Unsafe: 37.8332 | Init: 5.2785 | Outside: 1.2545 | Boundary: 4.8257 | Gen: 7.783097e+02
- [Controller Params] fc.weight = tensor([[-3.1495e-01, -1.1505e-02, -6.7716e-04],
-        [ 3.0889e-02,  9.3533e-05, -7.7489e-01],
-        [ 3.0794e-03, -1.1463e-03, -1.7125e-01]])
- ✓ Inside Goal passed, min V= 2.4834, min V_outside_lower= -0.2004, min V_lower=2.2782
-Epoch   570 | Total: 785.5989 | Goal: 0.0000 | Unsafe: 35.7668 | Init: 5.8059 | Outside: 0.5178 | Boundary: 4.4800 | Gen: 7.435084e+02
- [Controller Params] fc.weight = tensor([[-3.7068e-01, -5.2063e-03,  1.2072e-03],
-        [ 3.1077e-02,  2.5689e-05, -7.7496e-01],
-        [ 6.9929e-04,  8.8552e-04, -2.0841e-01]])
- ✓ Inside Goal passed, min V= 2.4318, min V_outside_lower= -0.1145, min V_lower=2.2349
-Epoch   580 | Total: 752.7033 | Goal: 0.0000 | Unsafe: 39.9687 | Init: 3.5202 | Outside: 0.2454 | Boundary: 4.3057 | Gen: 7.089689e+02
- [Controller Params] fc.weight = tensor([[-4.3363e-01, -4.4459e-03,  1.9686e-04],
-        [ 3.1297e-02,  3.2343e-05, -7.7506e-01],
-        [-1.3532e-04,  4.2569e-03, -2.5113e-01]])
- ✓ Inside Goal passed, min V= 2.3153, min V_outside_lower= -0.0691, min V_lower=2.1281
-Epoch   590 | Total: 724.4118 | Goal: 0.0000 | Unsafe: 32.6256 | Init: 3.3164 | Outside: 0.0000 | Boundary: 3.9584 | Gen: 6.884698e+02
- [Controller Params] fc.weight = tensor([[-4.8993e-01, -3.1269e-03, -1.1537e-03],
-        [ 3.1467e-02,  6.1756e-05, -7.7508e-01],
-        [ 1.0820e-03,  9.4384e-04, -2.9894e-01]])
- ✓ Inside Goal passed, min V= 2.2369, min V_outside_lower= 0.0169, min V_lower=2.0597
-Epoch   600 | Total: 700.6298 | Goal: 0.0000 | Unsafe: 32.2978 | Init: 3.0751 | Outside: 0.0000 | Boundary: 3.5715 | Gen: 6.652568e+02
- [Controller Params] fc.weight = tensor([[-5.3977e-01, -3.2009e-03, -2.3600e-03],
-        [ 3.1577e-02,  3.2506e-05, -7.7500e-01],
-        [-1.4755e-03,  4.1082e-03, -3.4895e-01]])
- ✓ Inside Goal passed, min V= 2.1464, min V_outside_lower= 0.1129, min V_lower=1.9811
-Epoch   610 | Total: 675.0145 | Goal: 0.0000 | Unsafe: 33.8722 | Init: 2.4536 | Outside: 0.0000 | Boundary: 3.2501 | Gen: 6.386888e+02
- [Controller Params] fc.weight = tensor([[-5.9044e-01, -9.6778e-03, -1.5002e-03],
-        [ 3.1653e-02,  1.0536e-04, -7.7497e-01],
-        [-2.1999e-03,  5.5216e-03, -3.9672e-01]])
- ✓ Inside Goal passed, min V= 2.0455, min V_outside_lower= 0.1968, min V_lower=1.8922
-Epoch   620 | Total: 650.7069 | Goal: 0.0000 | Unsafe: 46.0196 | Init: 0.1963 | Outside: 0.0000 | Boundary: 3.1729 | Gen: 6.044910e+02
- [Controller Params] fc.weight = tensor([[-6.4493e-01, -1.5595e-02, -5.8866e-05],
-        [ 3.1691e-02, -5.1000e-06, -7.7482e-01],
-        [-4.3379e-04,  5.8814e-03, -4.4268e-01]])
- ✓ Inside Goal passed, min V= 1.8682, min V_outside_lower= 0.2171, min V_lower=1.7286
-Epoch   630 | Total: 622.7753 | Goal: 0.0000 | Unsafe: 34.1544 | Init: 3.4985 | Outside: 0.0000 | Boundary: 2.4910 | Gen: 5.851223e+02
- [Controller Params] fc.weight = tensor([[-6.9735e-01, -1.9805e-02, -5.6634e-04],
-        [ 3.1701e-02,  1.2785e-04, -7.7462e-01],
-        [ 1.4511e-03,  1.0287e-02, -4.9305e-01]])
- ✓ Inside Goal passed, min V= 1.8970, min V_outside_lower= 0.3925, min V_lower=1.7669
-Epoch   640 | Total: 593.8164 | Goal: 0.0000 | Unsafe: 38.6909 | Init: 0.2633 | Outside: 0.0000 | Boundary: 2.4907 | Gen: 5.548622e+02
- [Controller Params] fc.weight = tensor([[-7.4436e-01, -2.5064e-02, -1.1922e-03],
-        [ 3.1762e-02,  2.2537e-05, -7.7454e-01],
-        [ 1.3431e-03,  1.5339e-02, -5.4595e-01]])
- ✓ Inside Goal passed, min V= 1.7306, min V_outside_lower= 0.3874, min V_lower=1.6122
-Epoch   650 | Total: 564.4490 | Goal: 0.0000 | Unsafe: 39.6296 | Init: 0.2486 | Outside: 0.0000 | Boundary: 2.1843 | Gen: 5.245708e+02
- [Controller Params] fc.weight = tensor([[-7.9113e-01, -3.5439e-02,  1.1246e-03],
-        [ 3.1843e-02,  3.4368e-05, -7.7452e-01],
-        [-4.6727e-05,  1.9369e-02, -5.9692e-01]])
- ✓ Inside Goal passed, min V= 1.6589, min V_outside_lower= 0.4634, min V_lower=1.5512
-Epoch   660 | Total: 533.7988 | Goal: 0.0000 | Unsafe: 38.3228 | Init: 0.6684 | Outside: 0.0000 | Boundary: 1.8326 | Gen: 4.948077e+02
- [Controller Params] fc.weight = tensor([[-8.4405e-01, -5.1836e-02, -1.6698e-03],
-        [ 3.1907e-02,  7.1507e-05, -7.7453e-01],
-        [-6.7936e-04,  2.4097e-02, -6.4759e-01]])
- ✓ Inside Goal passed, min V= 1.6140, min V_outside_lower= 0.5501, min V_lower=1.5161
-Epoch   670 | Total: 502.1822 | Goal: 0.0000 | Unsafe: 25.9618 | Init: 0.8144 | Outside: 0.0000 | Boundary: 1.6059 | Gen: 4.754060e+02
- [Controller Params] fc.weight = tensor([[-8.9867e-01, -6.9916e-02, -3.2898e-04],
-        [ 3.1964e-02,  9.9088e-05, -7.7455e-01],
-        [ 8.1339e-04,  3.2374e-02, -6.9997e-01]])
- ✓ Inside Goal passed, min V= 1.5657, min V_outside_lower= 0.6086, min V_lower=1.4753
-Epoch   680 | Total: 471.9091 | Goal: 0.0000 | Unsafe: 25.2545 | Init: 0.5573 | Outside: 0.0000 | Boundary: 1.4434 | Gen: 4.460973e+02
- [Controller Params] fc.weight = tensor([[-9.4930e-01, -8.8753e-02, -8.0529e-04],
-        [ 3.2022e-02,  1.0253e-04, -7.7455e-01],
-        [ 4.2556e-04,  4.2899e-02, -7.4616e-01]])
- ✓ Inside Goal passed, min V= 1.4937, min V_outside_lower= 0.6604, min V_lower=1.4126
-Epoch   690 | Total: 442.5379 | Goal: 0.0000 | Unsafe: 25.6573 | Init: 2.0530 | Outside: 0.0000 | Boundary: 1.1564 | Gen: 4.148276e+02
- [Controller Params] fc.weight = tensor([[-1.0048e+00, -1.1103e-01,  9.5320e-05],
-        [ 3.2069e-02,  8.9886e-05, -7.7455e-01],
-        [-6.3230e-04,  5.5261e-02, -7.9064e-01]])
- ✓ Inside Goal passed, min V= 1.4660, min V_outside_lower= 0.7437, min V_lower=1.3938
-Epoch   700 | Total: 411.3160 | Goal: 0.0000 | Unsafe: 25.0522 | Init: 0.0000 | Outside: 0.0000 | Boundary: 1.2664 | Gen: 3.862638e+02
- [Controller Params] fc.weight = tensor([[-1.0655e+00, -1.3818e-01, -3.3073e-04],
-        [ 3.2115e-02,  9.7853e-05, -7.7455e-01],
-        [-2.3419e-04,  7.0558e-02, -8.3893e-01]])
- ✓ Inside Goal passed, min V= 1.3461, min V_outside_lower= 0.7167, min V_lower=1.2816
-Epoch   710 | Total: 380.9529 | Goal: 0.0000 | Unsafe: 23.7805 | Init: 0.0000 | Outside: 0.0000 | Boundary: 1.1465 | Gen: 3.571724e+02
- [Controller Params] fc.weight = tensor([[-1.1322e+00, -1.7187e-01,  2.3554e-04],
-        [ 3.2170e-02,  8.3331e-05, -7.7457e-01],
-        [-1.1543e-04,  8.5442e-02, -8.8446e-01]])
- ✓ Inside Goal passed, min V= 1.3020, min V_outside_lower= 0.7531, min V_lower=1.2441
-Epoch   720 | Total: 352.2997 | Goal: 0.0000 | Unsafe: 26.4634 | Init: 0.1651 | Outside: 0.0000 | Boundary: 0.9243 | Gen: 3.256712e+02
- [Controller Params] fc.weight = tensor([[-1.1960e+00, -2.0444e-01, -9.9589e-04],
-        [ 3.2207e-02,  6.0019e-05, -7.7458e-01],
-        [-2.6130e-04,  1.0219e-01, -9.3259e-01]])
- ✓ Inside Goal passed, min V= 1.2863, min V_outside_lower= 0.8142, min V_lower=1.2352
-Epoch   730 | Total: 329.1368 | Goal: 0.0000 | Unsafe: 26.9676 | Init: 0.0794 | Outside: 0.0000 | Boundary: 0.8439 | Gen: 3.020898e+02
- [Controller Params] fc.weight = tensor([[-1.2425e+00, -2.2128e-01,  6.7656e-04],
-        [ 3.2252e-02,  4.3638e-05, -7.7455e-01],
-        [ 2.4182e-04,  1.2121e-01, -9.8361e-01]])
- ✓ Inside Goal passed, min V= 1.2468, min V_outside_lower= 0.8368, min V_lower=1.2011
-Epoch   740 | Total: 308.3227 | Goal: 0.0000 | Unsafe: 24.5589 | Init: 0.0000 | Outside: 0.0000 | Boundary: 0.8569 | Gen: 2.837638e+02
- [Controller Params] fc.weight = tensor([[-1.2821e+00, -2.3099e-01,  8.7584e-04],
-        [ 3.2295e-02,  2.1288e-05, -7.7449e-01],
-        [ 1.4535e-04,  1.4115e-01, -1.0335e+00]])
- ✓ Inside Goal passed, min V= 1.1900, min V_outside_lower= 0.8301, min V_lower=1.1491
-Epoch   750 | Total: 288.8630 | Goal: 0.0000 | Unsafe: 24.1811 | Init: 0.0000 | Outside: 0.0000 | Boundary: 0.7752 | Gen: 2.646819e+02
- [Controller Params] fc.weight = tensor([[-1.3211e+00, -2.4050e-01,  3.6690e-04],
-        [ 3.2321e-02,  8.2394e-06, -7.7443e-01],
-        [-1.1068e-03,  1.6288e-01, -1.0852e+00]])
- ✓ Inside Goal passed, min V= 1.1691, min V_outside_lower= 0.8535, min V_lower=1.1323
-Epoch   760 | Total: 269.5012 | Goal: 0.0000 | Unsafe: 17.5855 | Init: 0.0000 | Outside: 0.0000 | Boundary: 0.7435 | Gen: 2.519156e+02
- [Controller Params] fc.weight = tensor([[-1.3617e+00, -2.5171e-01,  2.5134e-04],
-        [ 3.2346e-02,  8.1895e-06, -7.7438e-01],
-        [-7.8644e-04,  1.8731e-01, -1.1406e+00]])
- ✓ Inside Goal passed, min V= 1.1494, min V_outside_lower= 0.8611, min V_lower=1.1151
-Epoch   770 | Total: 251.2599 | Goal: 0.0000 | Unsafe: 11.4277 | Init: 0.0000 | Outside: 0.0000 | Boundary: 0.7163 | Gen: 2.398322e+02
- [Controller Params] fc.weight = tensor([[-1.4034e+00, -2.6499e-01, -3.9526e-04],
-        [ 3.2355e-02,  6.6093e-05, -7.7428e-01],
-        [-4.2649e-04,  2.1056e-01, -1.1935e+00]])
- ✓ Inside Goal passed, min V= 1.1307, min V_outside_lower= 0.8705, min V_lower=1.0988
-Epoch   780 | Total: 235.9843 | Goal: 0.0000 | Unsafe: 14.2087 | Init: 0.0016 | Outside: 0.0000 | Boundary: 0.5821 | Gen: 2.217739e+02
- [Controller Params] fc.weight = tensor([[-1.4458e+00, -2.7929e-01, -1.8351e-04],
-        [ 3.2380e-02,  9.2911e-05, -7.7417e-01],
-        [-1.5090e-04,  2.2481e-01, -1.2336e+00]])
- ✓ Inside Goal passed, min V= 1.1396, min V_outside_lower= 0.9064, min V_lower=1.1103
-Epoch   790 | Total: 222.1593 | Goal: 0.0000 | Unsafe: 8.7195 | Init: 0.0000 | Outside: 0.0000 | Boundary: 0.6898 | Gen: 2.134397e+02
- [Controller Params] fc.weight = tensor([[-1.4866e+00, -2.9355e-01, -1.8968e-04],
-        [ 3.2414e-02,  1.3505e-04, -7.7407e-01],
-        [-6.3312e-05,  2.3600e-01, -1.2709e+00]])
- ✓ Inside Goal passed, min V= 1.0976, min V_outside_lower= 0.8848, min V_lower=1.0699
-Epoch   800 | Total: 209.5873 | Goal: 0.0000 | Unsafe: 9.3348 | Init: 0.0000 | Outside: 0.0000 | Boundary: 0.7313 | Gen: 2.002525e+02
- [Controller Params] fc.weight = tensor([[-1.5248e+00, -3.0713e-01,  4.8684e-05],
-        [ 3.2463e-02,  1.7884e-04, -7.7392e-01],
-        [ 5.2561e-04,  2.4834e-01, -1.3111e+00]])
- ✓ Inside Goal passed, min V= 1.0698, min V_outside_lower= 0.8806, min V_lower=1.0441
-Epoch   810 | Total: 202.9012 | Goal: 0.0000 | Unsafe: 6.9345 | Init: 3.8385 | Outside: 0.0000 | Boundary: 0.4074 | Gen: 1.921281e+02
- [Controller Params] fc.weight = tensor([[-1.5606e+00, -3.2005e-01, -1.1920e-05],
-        [ 3.2550e-02,  1.4496e-04, -7.7371e-01],
-        [-2.6167e-05,  2.6287e-01, -1.3538e+00]])
- ✓ Inside Goal passed, min V= 1.1629, min V_outside_lower= 0.9854, min V_lower=1.1371
-Epoch   820 | Total: 176.9637 | Goal: 0.0000 | Unsafe: 11.6062 | Init: 0.0000 | Outside: 0.0000 | Boundary: 1.7517 | Gen: 1.653575e+02
- [Controller Params] fc.weight = tensor([[-1.5941e+00, -3.3352e-01,  1.8725e-04],
-        [ 3.2702e-02, -1.8780e-05, -7.7344e-01],
-        [-2.3222e-04,  2.7870e-01, -1.3990e+00]])
- ✓ Inside Goal passed, min V= 0.9521, min V_outside_lower= 0.7011, min V_lower=0.9187
-Epoch   830 | Total: 160.3590 | Goal: 0.0000 | Unsafe: 13.1808 | Init: 0.2070 | Outside: 0.0000 | Boundary: 2.4283 | Gen: 1.469712e+02
- [Controller Params] fc.weight = tensor([[-1.6271e+00, -3.4790e-01, -3.5008e-04],
-        [ 3.2981e-02,  9.9637e-06, -7.7304e-01],
-        [-3.5980e-05,  2.9882e-01, -1.4486e+00]])
- ✓ Inside Goal passed, min V= 0.8510, min V_outside_lower= 0.4955, min V_lower=0.7956
-Epoch   840 | Total: 145.5730 | Goal: 0.0000 | Unsafe: 8.2968 | Init: 0.0000 | Outside: 0.0000 | Boundary: 2.1553 | Gen: 1.372762e+02
- [Controller Params] fc.weight = tensor([[-1.6590e+00, -3.5989e-01, -6.3636e-04],
-        [ 3.3281e-02,  8.5834e-07, -7.7270e-01],
-        [ 1.4289e-04,  3.2607e-01, -1.5005e+00]])
- ✓ Inside Goal passed, min V= 0.8470, min V_outside_lower= 0.5293, min V_lower=0.7980
-Epoch   850 | Total: 134.3630 | Goal: 0.0000 | Unsafe: 8.4352 | Init: 0.0000 | Outside: 0.0000 | Boundary: 2.3609 | Gen: 1.259278e+02
- [Controller Params] fc.weight = tensor([[-1.6867e+00, -3.6929e-01,  5.3013e-04],
-        [ 3.3541e-02, -5.4779e-06, -7.7250e-01],
-        [-5.9179e-06,  3.5548e-01, -1.5514e+00]])
- ✓ Inside Goal passed, min V= 0.7972, min V_outside_lower= 0.4733, min V_lower=0.7457
-Epoch   860 | Total: 123.5730 | Goal: 0.0000 | Unsafe: 9.1080 | Init: 0.0000 | Outside: 0.0000 | Boundary: 2.3973 | Gen: 1.144650e+02
- [Controller Params] fc.weight = tensor([[-1.7115e+00, -3.7693e-01,  7.5363e-05],
-        [ 3.3755e-02, -1.6174e-06, -7.7233e-01],
-        [ 2.1222e-04,  3.8636e-01, -1.6002e+00]])
- ✓ Inside Goal passed, min V= 0.7914, min V_outside_lower= 0.4698, min V_lower=0.7395
-Epoch   870 | Total: 116.2717 | Goal: 0.0000 | Unsafe: 11.8508 | Init: 0.4594 | Outside: 0.0000 | Boundary: 2.3673 | Gen: 1.039615e+02
- [Controller Params] fc.weight = tensor([[-1.7348e+00, -3.8445e-01,  2.9420e-06],
-        [ 3.3932e-02,  4.9443e-06, -7.7219e-01],
-        [-1.2301e-03,  4.1544e-01, -1.6427e+00]])
- ✓ Inside Goal passed, min V= 0.8105, min V_outside_lower= 0.4910, min V_lower=0.7586
-Epoch   880 | Total: 108.3189 | Goal: 0.0000 | Unsafe: 9.1125 | Init: 0.2505 | Outside: 0.0000 | Boundary: 2.5618 | Gen: 9.895585e+01
- [Controller Params] fc.weight = tensor([[-1.7578e+00, -3.9232e-01,  1.4536e-05],
-        [ 3.4065e-02,  7.9353e-06, -7.7208e-01],
-        [-8.3586e-04,  4.4027e-01, -1.6799e+00]])
- ✓ Inside Goal passed, min V= 0.7911, min V_outside_lower= 0.4654, min V_lower=0.7377
-Epoch   890 | Total: 101.0307 | Goal: 0.0000 | Unsafe: 8.7914 | Init: 0.2246 | Outside: 0.0000 | Boundary: 2.7404 | Gen: 9.201476e+01
- [Controller Params] fc.weight = tensor([[-1.7807e+00, -4.0009e-01, -1.5543e-04],
-        [ 3.4164e-02,  2.5851e-06, -7.7199e-01],
-        [-3.2006e-04,  4.6434e-01, -1.7151e+00]])
- ✓ Inside Goal passed, min V= 0.7812, min V_outside_lower= 0.4520, min V_lower=0.7264
-Epoch   900 | Total: 94.6310 | Goal: 0.0000 | Unsafe: 6.9955 | Init: 0.0000 | Outside: 0.0000 | Boundary: 3.2807 | Gen: 8.763551e+01
- [Controller Params] fc.weight = tensor([[-1.8034e+00, -4.0710e-01, -1.5625e-05],
-        [ 3.4241e-02,  8.8951e-06, -7.7191e-01],
-        [-2.2719e-04,  4.8843e-01, -1.7497e+00]])
- ✓ Inside Goal passed, min V= 0.6931, min V_outside_lower= 0.3517, min V_lower=0.6364
-Epoch   910 | Total: 87.4590 | Goal: 0.0000 | Unsafe: 8.2382 | Init: 0.0000 | Outside: 0.0000 | Boundary: 3.9509 | Gen: 7.922073e+01
- [Controller Params] fc.weight = tensor([[-1.8266e+00, -4.1402e-01,  1.8736e-04],
-        [ 3.4303e-02, -2.6912e-06, -7.7185e-01],
-        [ 3.6101e-05,  5.1182e-01, -1.7824e+00]])
- ✓ Inside Goal passed, min V= 0.5745, min V_outside_lower= 0.2125, min V_lower=0.5232
-Epoch   920 | Total: 80.5433 | Goal: 0.0000 | Unsafe: 9.2806 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5890 | Gen: 7.126277e+01
- [Controller Params] fc.weight = tensor([[-1.8496e+00, -4.2175e-01, -2.6490e-05],
-        [ 3.4370e-02,  3.5254e-06, -7.7179e-01],
-        [ 8.0712e-05,  5.3397e-01, -1.8150e+00]])
- ✓ Inside Goal passed, min V= 0.4882, min V_outside_lower= 0.0895, min V_lower=0.4444
-Epoch   930 | Total: 77.3982 | Goal: 0.0000 | Unsafe: 5.2605 | Init: 0.0000 | Outside: 0.2881 | Boundary: 5.3582 | Gen: 7.184962e+01
- [Controller Params] fc.weight = tensor([[-1.8730e+00, -4.3133e-01, -7.7003e-05],
-        [ 3.4444e-02,  2.3483e-06, -7.7171e-01],
-        [-2.9281e-04,  5.5673e-01, -1.8478e+00]])
- ✓ Inside Goal passed, min V= 0.2915, min V_outside_lower= -0.0961, min V_lower=0.2421
-Epoch   940 | Total: 68.3011 | Goal: 0.0000 | Unsafe: 4.1241 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7706 | Gen: 6.417700e+01
- [Controller Params] fc.weight = tensor([[-1.8959e+00, -4.4315e-01, -8.5208e-04],
-        [ 3.4520e-02,  1.0636e-05, -7.7163e-01],
-        [-3.4105e-04,  5.7729e-01, -1.8798e+00]])
- ✓ Inside Goal passed, min V= 0.5138, min V_outside_lower= 0.0801, min V_lower=0.4727
-Epoch   950 | Total: 70.1892 | Goal: 0.0000 | Unsafe: 0.1259 | Init: 7.4921 | Outside: 0.0000 | Boundary: 4.0700 | Gen: 6.257117e+01
- [Controller Params] fc.weight = tensor([[-1.9187e+00, -4.5613e-01, -3.2878e-04],
-        [ 3.4580e-02,  1.5539e-05, -7.7154e-01],
-        [ 9.1173e-05,  5.9583e-01, -1.9112e+00]])
- ✓ Inside Goal passed, min V= 0.7701, min V_outside_lower= 0.2917, min V_lower=0.7277
-Epoch   960 | Total: 59.6083 | Goal: 0.0000 | Unsafe: 2.5543 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8404 | Gen: 5.705405e+01
- [Controller Params] fc.weight = tensor([[-1.9415e+00, -4.6948e-01, -2.2184e-04],
-        [ 3.4647e-02, -2.6552e-06, -7.7145e-01],
-        [-2.0784e-04,  6.1328e-01, -1.9417e+00]])
- ✓ Inside Goal passed, min V= 0.5414, min V_outside_lower= 0.0849, min V_lower=0.4994
-Epoch   970 | Total: 60.2328 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.9769 | Boundary: 5.9198 | Gen: 5.925594e+01
- [Controller Params] fc.weight = tensor([[-1.9639e+00, -4.8334e-01, -1.8411e-04],
-        [ 3.4717e-02,  3.4476e-06, -7.7135e-01],
-        [-6.8537e-04,  6.2766e-01, -1.9689e+00]])
- ✓ Inside Goal passed, min V= 0.2441, min V_outside_lower= -0.1941, min V_lower=0.1977
-Epoch   980 | Total: 56.3259 | Goal: 0.0000 | Unsafe: 1.7816 | Init: 0.0000 | Outside: 0.1817 | Boundary: 5.5062 | Gen: 5.436264e+01
- [Controller Params] fc.weight = tensor([[-1.9857e+00, -4.9678e-01, -1.3007e-03],
-        [ 3.4777e-02,  1.1688e-05, -7.7125e-01],
-        [-4.9742e-04,  6.3215e-01, -1.9899e+00]])
- ✓ Inside Goal passed, min V= 0.3496, min V_outside_lower= -0.0912, min V_lower=0.3067
-Epoch   990 | Total: 52.3865 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6607 | Gen: 5.238649e+01
- [Controller Params] fc.weight = tensor([[-2.0073e+00, -5.0857e-01,  9.8244e-05],
-        [ 3.4828e-02, -3.1717e-05, -7.7116e-01],
-        [-5.4109e-05,  6.3456e-01, -2.0081e+00]])
- ✓ Inside Goal passed, min V= 0.5882, min V_outside_lower= 0.1334, min V_lower=0.5465
-[debug] use score
-[Refine-Generator] Epoch 1000: 96 failing → refined 96 cells → 1010 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 2986 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 2986 cells...
-[SymbolicCROWNCache] Initialized for 2986 cells - symbolic structure cached!
-    Rebuilding Phi cache with 1010 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 1010 cells...
-[SymbolicCROWNCache_Phi] Initialized for 1010 cells!
-  Caches rebuilt successfully!
-Epoch  1000 | Total: 26.9683 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6283 | Gen: 2.696833e+01
- [Controller Params] fc.weight = tensor([[-2.0284e+00, -5.1864e-01, -9.0210e-06],
-        [ 3.4870e-02,  4.9352e-05, -7.7108e-01],
-        [-1.9476e-04,  6.3721e-01, -2.0256e+00]])
- ✓ Inside Goal passed, min V= 0.5854, min V_outside_lower= 0.1377, min V_lower=0.5438
-
-Epoch 1000 - Detailed Evaluation:
-  Constraint Satisfaction:
-    Goal:      ✗ (V_min=0.581, V_mean=0.658, V_max=0.993)
-    Unsafe:    ✓ (V_min=20.091, V_max=50.981)
-    Init:      ✓ (V_min=0.822, V_max=0.932)
-    Outside:   ✓ (V_min=0.138, V_max=51.657)
-    Boundary:  ✗ (V_min=-0.520, V_max=53.311)
-    Generator: ✗ (Phi_upper_min=-8.704926e+01, Phi_upper_max=4.968538e-01, failing=144)
-  Goal bounds: V ∈ [0.544, 1.045]
-  Unsafe bounds: V ∈ [20.091, 50.981]
-  Generator bounds: Φ ∈ [-903.689, 0.497]
-  Generator failing cells: 144/1010 (14.3%)
-
-  Creating visualization for epoch 1000...
-[Merge-Outside] Epoch 1002: merged 0 pairs → 47 total
-[Merge-Generator] Epoch 1002: merged 0 pairs → 1010 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 2986 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 2986 cells...
-[SymbolicCROWNCache] Initialized for 2986 cells - symbolic structure cached!
-    Rebuilding Phi cache with 1010 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 1010 cells...
-[SymbolicCROWNCache_Phi] Initialized for 1010 cells!
-  Caches rebuilt successfully!
-Epoch  1010 | Total: 26.0023 | Goal: 0.0000 | Unsafe: 0.5799 | Init: 0.0000 | Outside: 2.5937 | Boundary: 6.1480 | Gen: 2.282874e+01
- [Controller Params] fc.weight = tensor([[-2.0443e+00, -5.3272e-01, -4.4463e-04],
-        [ 3.4903e-02, -2.9593e-05, -7.7105e-01],
-        [-1.2997e-03,  6.4214e-01, -2.0425e+00]])
- ✓ Inside Goal passed, min V= 0.1856, min V_outside_lower= -0.2563, min V_lower=0.1468
-Epoch  1020 | Total: 21.7556 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0021 | Boundary: 5.0800 | Gen: 2.175344e+01
- [Controller Params] fc.weight = tensor([[-2.0552e+00, -5.4912e-01, -1.2613e-04],
-        [ 3.4913e-02, -1.3161e-04, -7.7107e-01],
-        [-2.8356e-04,  6.5116e-01, -2.0572e+00]])
- ✓ Inside Goal passed, min V= 0.4279, min V_outside_lower= -0.0018, min V_lower=0.3900
-Epoch  1030 | Total: 20.1495 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4787 | Gen: 2.014949e+01
- [Controller Params] fc.weight = tensor([[-2.0645e+00, -5.6630e-01, -2.5560e-04],
-        [ 3.4936e-02, -6.5327e-05, -7.7112e-01],
-        [-1.0537e-04,  6.5949e-01, -2.0701e+00]])
- ✓ Inside Goal passed, min V= 0.5677, min V_outside_lower= 0.1461, min V_lower=0.5304
-Epoch  1040 | Total: 19.6660 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.1081 | Outside: 0.0000 | Boundary: 4.4038 | Gen: 1.955797e+01
- [Controller Params] fc.weight = tensor([[-2.0728e+00, -5.8288e-01, -1.1038e-03],
-        [ 3.4946e-02, -4.4400e-05, -7.7116e-01],
-        [-1.2638e-04,  6.6721e-01, -2.0827e+00]])
- ✓ Inside Goal passed, min V= 0.5952, min V_outside_lower= 0.1680, min V_lower=0.5573
-Epoch  1050 | Total: 18.6807 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.1478 | Outside: 0.0000 | Boundary: 4.4464 | Gen: 1.853296e+01
- [Controller Params] fc.weight = tensor([[-2.0806e+00, -5.9817e-01, -1.9315e-03],
-        [ 3.4952e-02, -5.6240e-05, -7.7120e-01],
-        [-4.1782e-05,  6.7542e-01, -2.0946e+00]])
- ✓ Inside Goal passed, min V= 0.5863, min V_outside_lower= 0.1572, min V_lower=0.5484
-Epoch  1060 | Total: 16.3404 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5837 | Gen: 1.634036e+01
- [Controller Params] fc.weight = tensor([[-2.0880e+00, -6.1251e-01, -2.4320e-03],
-        [ 3.4959e-02, -7.7720e-05, -7.7124e-01],
-        [-1.7807e-05,  6.8427e-01, -2.1058e+00]])
- ✓ Inside Goal passed, min V= 0.5340, min V_outside_lower= 0.1160, min V_lower=0.4966
-Epoch  1070 | Total: 15.6371 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5790 | Gen: 1.563715e+01
- [Controller Params] fc.weight = tensor([[-2.0947e+00, -6.2627e-01, -2.6811e-03],
-        [ 3.4968e-02, -1.1547e-04, -7.7127e-01],
-        [ 2.5185e-05,  6.9283e-01, -2.1158e+00]])
- ✓ Inside Goal passed, min V= 0.5340, min V_outside_lower= 0.1138, min V_lower=0.4968
-Epoch  1080 | Total: 15.2481 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5053 | Gen: 1.524809e+01
- [Controller Params] fc.weight = tensor([[-2.1013e+00, -6.3966e-01, -2.7126e-03],
-        [ 3.4976e-02, -1.4753e-04, -7.7130e-01],
-        [ 2.1549e-06,  7.0075e-01, -2.1252e+00]])
- ✓ Inside Goal passed, min V= 0.5544, min V_outside_lower= 0.1301, min V_lower=0.5172
-Epoch  1090 | Total: 14.7268 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5385 | Gen: 1.472685e+01
- [Controller Params] fc.weight = tensor([[-2.1077e+00, -6.5228e-01, -2.3620e-03],
-        [ 3.4982e-02, -1.9050e-04, -7.7131e-01],
-        [-2.7869e-04,  7.0869e-01, -2.1341e+00]])
- ✓ Inside Goal passed, min V= 0.5405, min V_outside_lower= 0.1265, min V_lower=0.5038
-Epoch  1100 | Total: 14.3906 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6012 | Gen: 1.439059e+01
- [Controller Params] fc.weight = tensor([[-2.1143e+00, -6.6456e-01, -2.0557e-03],
-        [ 3.4984e-02, -2.2301e-04, -7.7131e-01],
-        [-2.6787e-04,  7.1614e-01, -2.1429e+00]])
- ✓ Inside Goal passed, min V= 0.5336, min V_outside_lower= 0.1140, min V_lower=0.4961
-Epoch  1110 | Total: 14.1280 | Goal: 0.0000 | Unsafe: 0.4441 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.9698 | Gen: 1.368396e+01
- [Controller Params] fc.weight = tensor([[-2.1207e+00, -6.7659e-01, -1.8283e-03],
-        [ 3.4988e-02, -2.5518e-04, -7.7132e-01],
-        [-1.6730e-04,  7.2335e-01, -2.1514e+00]])
- ✓ Inside Goal passed, min V= 0.4320, min V_outside_lower= 0.0164, min V_lower=0.3949
-Epoch  1120 | Total: 13.4414 | Goal: 0.0000 | Unsafe: 0.2527 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6732 | Gen: 1.318869e+01
- [Controller Params] fc.weight = tensor([[-2.1268e+00, -6.8797e-01, -1.5720e-03],
-        [ 3.4994e-02, -2.8735e-04, -7.7132e-01],
-        [-3.6946e-05,  7.3055e-01, -2.1597e+00]])
- ✓ Inside Goal passed, min V= 0.5169, min V_outside_lower= 0.0901, min V_lower=0.4792
-Epoch  1130 | Total: 12.8997 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5284 | Gen: 1.289969e+01
- [Controller Params] fc.weight = tensor([[-2.1322e+00, -6.9837e-01, -1.1737e-03],
-        [ 3.5000e-02, -3.0978e-04, -7.7133e-01],
-        [-1.7898e-04,  7.3808e-01, -2.1674e+00]])
- ✓ Inside Goal passed, min V= 0.5500, min V_outside_lower= 0.1280, min V_lower=0.5127
-Epoch  1140 | Total: 12.8776 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0833 | Outside: 0.0000 | Boundary: 4.4131 | Gen: 1.279427e+01
- [Controller Params] fc.weight = tensor([[-2.1372e+00, -7.0832e-01, -7.2736e-04],
-        [ 3.5002e-02, -3.3963e-04, -7.7132e-01],
-        [-2.5122e-04,  7.4555e-01, -2.1750e+00]])
- ✓ Inside Goal passed, min V= 0.5818, min V_outside_lower= 0.1531, min V_lower=0.5444
-Epoch  1150 | Total: 12.2666 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4890 | Gen: 1.226663e+01
- [Controller Params] fc.weight = tensor([[-2.1424e+00, -7.1804e-01, -4.6854e-04],
-        [ 3.4999e-02, -3.4739e-04, -7.7131e-01],
-        [-2.2643e-04,  7.5238e-01, -2.1829e+00]])
- ✓ Inside Goal passed, min V= 0.5495, min V_outside_lower= 0.1325, min V_lower=0.5131
-Epoch  1160 | Total: 12.0188 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7180 | Gen: 1.201878e+01
- [Controller Params] fc.weight = tensor([[-2.1476e+00, -7.2724e-01, -9.3645e-05],
-        [ 3.4998e-02, -3.5372e-04, -7.7130e-01],
-        [-8.9419e-05,  7.5883e-01, -2.1904e+00]])
- ✓ Inside Goal passed, min V= 0.4924, min V_outside_lower= 0.0774, min V_lower=0.4559
-Epoch  1170 | Total: 14.0021 | Goal: 0.0000 | Unsafe: 0.2743 | Init: 0.0000 | Outside: 1.3686 | Boundary: 5.6956 | Gen: 1.235920e+01
- [Controller Params] fc.weight = tensor([[-2.1529e+00, -7.3595e-01, -3.8523e-04],
-        [ 3.4999e-02, -3.6768e-04, -7.7129e-01],
-        [-3.8904e-04,  7.6464e-01, -2.1976e+00]])
- ✓ Inside Goal passed, min V= 0.2199, min V_outside_lower= -0.1715, min V_lower=0.1851
-Epoch  1180 | Total: 12.9178 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.3376 | Boundary: 5.3024 | Gen: 1.258016e+01
- [Controller Params] fc.weight = tensor([[-2.1590e+00, -7.4440e-01, -8.2367e-04],
-        [ 3.5001e-02, -3.5789e-04, -7.7128e-01],
-        [-3.5961e-04,  7.6857e-01, -2.2050e+00]])
- ✓ Inside Goal passed, min V= 0.3178, min V_outside_lower= -0.0736, min V_lower=0.2834
-Epoch  1190 | Total: 12.5656 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.5582 | Outside: 0.0000 | Boundary: 4.2226 | Gen: 1.200741e+01
- [Controller Params] fc.weight = tensor([[-2.1652e+00, -7.5269e-01, -9.8166e-04],
-        [ 3.5003e-02, -3.2859e-04, -7.7127e-01],
-        [-1.9452e-04,  7.7124e-01, -2.2125e+00]])
- ✓ Inside Goal passed, min V= 0.6208, min V_outside_lower= 0.1986, min V_lower=0.5842
-Epoch  1200 | Total: 11.2154 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4688 | Gen: 1.121537e+01
- [Controller Params] fc.weight = tensor([[-2.1712e+00, -7.6121e-01, -1.2458e-03],
-        [ 3.5006e-02, -2.8024e-04, -7.7125e-01],
-        [-3.5828e-04,  7.7334e-01, -2.2202e+00]])
- ✓ Inside Goal passed, min V= 0.5550, min V_outside_lower= 0.1311, min V_lower=0.5178
-Epoch  1210 | Total: 10.8391 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6838 | Gen: 1.083915e+01
- [Controller Params] fc.weight = tensor([[-2.1764e+00, -7.6956e-01, -1.1395e-03],
-        [ 3.5007e-02, -2.2543e-04, -7.7124e-01],
-        [-1.0115e-04,  7.7664e-01, -2.2269e+00]])
- ✓ Inside Goal passed, min V= 0.4972, min V_outside_lower= 0.0769, min V_lower=0.4601
-Epoch  1220 | Total: 10.7264 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5531 | Gen: 1.072637e+01
- [Controller Params] fc.weight = tensor([[-2.1809e+00, -7.7725e-01, -1.0965e-03],
-        [ 3.4999e-02, -1.7246e-04, -7.7122e-01],
-        [-3.1215e-04,  7.8048e-01, -2.2334e+00]])
- ✓ Inside Goal passed, min V= 0.5333, min V_outside_lower= 0.1111, min V_lower=0.4963
-Epoch  1230 | Total: 10.5264 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8902 | Gen: 1.052635e+01
- [Controller Params] fc.weight = tensor([[-2.1849e+00, -7.8458e-01, -1.0521e-03],
-        [ 3.4989e-02, -1.2736e-04, -7.7120e-01],
-        [-9.5705e-05,  7.8464e-01, -2.2395e+00]])
- ✓ Inside Goal passed, min V= 0.4320, min V_outside_lower= 0.0267, min V_lower=0.3965
-Epoch  1240 | Total: 10.3540 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4513 | Gen: 1.035404e+01
- [Controller Params] fc.weight = tensor([[-2.1893e+00, -7.9175e-01, -1.2333e-03],
-        [ 3.4985e-02, -1.0465e-04, -7.7119e-01],
-        [-4.0576e-04,  7.8807e-01, -2.2460e+00]])
- ✓ Inside Goal passed, min V= 0.5589, min V_outside_lower= 0.1371, min V_lower=0.5221
-Epoch  1250 | Total: 9.8513 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5621 | Gen: 9.851295e+00
- [Controller Params] fc.weight = tensor([[-2.1933e+00, -7.9886e-01, -1.3651e-03],
-        [ 3.4988e-02, -9.9400e-05, -7.7118e-01],
-        [-2.1429e-04,  7.9136e-01, -2.2519e+00]])
- ✓ Inside Goal passed, min V= 0.5198, min V_outside_lower= 0.1009, min V_lower=0.4834
-Epoch  1260 | Total: 10.1310 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4777 | Gen: 1.013101e+01
- [Controller Params] fc.weight = tensor([[-2.1976e+00, -8.0600e-01, -1.5894e-03],
-        [ 3.4990e-02, -9.9872e-05, -7.7118e-01],
-        [-4.5150e-04,  7.9422e-01, -2.2576e+00]])
- ✓ Inside Goal passed, min V= 0.5504, min V_outside_lower= 0.1321, min V_lower=0.5138
-Epoch  1270 | Total: 11.2755 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4468 | Gen: 1.127545e+01
- [Controller Params] fc.weight = tensor([[-2.2022e+00, -8.1122e-01, -2.4648e-03],
-        [ 3.4988e-02, -7.8455e-05, -7.7119e-01],
-        [-7.7762e-04,  7.9771e-01, -2.2641e+00]])
- ✓ Inside Goal passed, min V= 0.5767, min V_outside_lower= 0.1575, min V_lower=0.5400
-Epoch  1280 | Total: 9.7190 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6908 | Gen: 9.718953e+00
- [Controller Params] fc.weight = tensor([[-2.2073e+00, -8.1534e-01, -3.6232e-03],
-        [ 3.4986e-02, -2.4996e-05, -7.7120e-01],
-        [-1.0929e-03,  8.0090e-01, -2.2712e+00]])
- ✓ Inside Goal passed, min V= 0.5136, min V_outside_lower= 0.0754, min V_lower=0.4758
-Epoch  1290 | Total: 9.6105 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0071 | Boundary: 4.9880 | Gen: 9.603343e+00
- [Controller Params] fc.weight = tensor([[-2.2111e+00, -8.1944e-01, -4.3959e-03],
-        [ 3.4984e-02,  1.2376e-05, -7.7120e-01],
-        [-9.0257e-04,  8.0455e-01, -2.2767e+00]])
- ✓ Inside Goal passed, min V= 0.4264, min V_outside_lower= -0.0030, min V_lower=0.3891
-Epoch  1300 | Total: 9.4082 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.9105 | Gen: 9.408211e+00
- [Controller Params] fc.weight = tensor([[-2.2149e+00, -8.2235e-01, -5.5488e-03],
-        [ 3.4973e-02, -2.5240e-05, -7.7120e-01],
-        [-1.2538e-03,  8.0711e-01, -2.2823e+00]])
- ✓ Inside Goal passed, min V= 0.4369, min V_outside_lower= 0.0146, min V_lower=0.4003
-Epoch  1310 | Total: 9.6746 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0750 | Outside: 0.0000 | Boundary: 4.4004 | Gen: 9.599606e+00
- [Controller Params] fc.weight = tensor([[-2.2185e+00, -8.2426e-01, -6.9557e-03],
-        [ 3.4957e-02, -4.1247e-05, -7.7119e-01],
-        [-1.9141e-03,  8.0920e-01, -2.2876e+00]])
- ✓ Inside Goal passed, min V= 0.5829, min V_outside_lower= 0.1504, min V_lower=0.5456
-Epoch  1320 | Total: 9.2269 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5359 | Gen: 9.226920e+00
- [Controller Params] fc.weight = tensor([[-2.2224e+00, -8.2597e-01, -8.4736e-03],
-        [ 3.4946e-02, -3.7236e-05, -7.7119e-01],
-        [-3.1192e-03,  8.1075e-01, -2.2927e+00]])
- ✓ Inside Goal passed, min V= 0.5401, min V_outside_lower= 0.1103, min V_lower=0.5029
-Epoch  1330 | Total: 9.6264 | Goal: 0.0000 | Unsafe: 0.7171 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6362 | Gen: 8.909246e+00
- [Controller Params] fc.weight = tensor([[-2.2262e+00, -8.2736e-01, -1.0074e-02],
-        [ 3.4931e-02,  6.8394e-06, -7.7118e-01],
-        [-4.4720e-03,  8.1227e-01, -2.2976e+00]])
- ✓ Inside Goal passed, min V= 0.4979, min V_outside_lower= 0.0778, min V_lower=0.4618
-Epoch  1340 | Total: 9.1770 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7713 | Gen: 9.176988e+00
- [Controller Params] fc.weight = tensor([[-2.2304e+00, -8.2863e-01, -1.1805e-02],
-        [ 3.4912e-02, -8.4031e-06, -7.7117e-01],
-        [-6.1812e-03,  8.1329e-01, -2.3027e+00]])
- ✓ Inside Goal passed, min V= 0.4688, min V_outside_lower= 0.0478, min V_lower=0.4327
-Epoch  1350 | Total: 9.3568 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5789 | Gen: 9.356771e+00
- [Controller Params] fc.weight = tensor([[-2.2343e+00, -8.3019e-01, -1.3461e-02],
-        [ 3.4890e-02, -8.0396e-06, -7.7114e-01],
-        [-7.5440e-03,  8.1434e-01, -2.3078e+00]])
- ✓ Inside Goal passed, min V= 0.5228, min V_outside_lower= 0.1006, min V_lower=0.4863
-Epoch  1360 | Total: 9.0385 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0038 | Outside: 0.0000 | Boundary: 4.3696 | Gen: 9.034721e+00
- [Controller Params] fc.weight = tensor([[-2.2381e+00, -8.3224e-01, -1.4965e-02],
-        [ 3.4865e-02,  3.5463e-06, -7.7111e-01],
-        [-8.6320e-03,  8.1517e-01, -2.3130e+00]])
- ✓ Inside Goal passed, min V= 0.5772, min V_outside_lower= 0.1480, min V_lower=0.5406
-Epoch  1370 | Total: 8.9583 | Goal: 0.0000 | Unsafe: 0.2814 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.3787 | Gen: 8.676841e+00
- [Controller Params] fc.weight = tensor([[-2.2417e+00, -8.3425e-01, -1.6360e-02],
-        [ 3.4839e-02, -9.6320e-06, -7.7109e-01],
-        [-9.5197e-03,  8.1617e-01, -2.3179e+00]])
- ✓ Inside Goal passed, min V= 0.5645, min V_outside_lower= 0.1368, min V_lower=0.5278
-Epoch  1380 | Total: 9.0443 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6352 | Gen: 9.044283e+00
- [Controller Params] fc.weight = tensor([[-2.2454e+00, -8.3568e-01, -1.8003e-02],
-        [ 3.4814e-02, -1.0955e-05, -7.7106e-01],
-        [-1.0505e-02,  8.1709e-01, -2.3232e+00]])
- ✓ Inside Goal passed, min V= 0.5082, min V_outside_lower= 0.0831, min V_lower=0.4720
-Epoch  1390 | Total: 8.8555 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4377 | Gen: 8.855459e+00
- [Controller Params] fc.weight = tensor([[-2.2492e+00, -8.3803e-01, -1.9346e-02],
-        [ 3.4801e-02,  1.9591e-06, -7.7106e-01],
-        [-1.1733e-02,  8.1769e-01, -2.3279e+00]])
- ✓ Inside Goal passed, min V= 0.5535, min V_outside_lower= 0.1307, min V_lower=0.5176
-Epoch  1400 | Total: 8.7440 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4246 | Gen: 8.743963e+00
- [Controller Params] fc.weight = tensor([[-2.2527e+00, -8.4003e-01, -2.0880e-02],
-        [ 3.4790e-02, -5.8290e-06, -7.7107e-01],
-        [-1.2906e-02,  8.1862e-01, -2.3326e+00]])
- ✓ Inside Goal passed, min V= 0.5445, min V_outside_lower= 0.1291, min V_lower=0.5094
-Epoch  1410 | Total: 8.4418 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.3893 | Gen: 8.441795e+00
- [Controller Params] fc.weight = tensor([[-2.2565e+00, -8.4184e-01, -2.2614e-02],
-        [ 3.4774e-02, -1.3362e-05, -7.7106e-01],
-        [-1.4372e-02,  8.1910e-01, -2.3376e+00]])
- ✓ Inside Goal passed, min V= 0.5561, min V_outside_lower= 0.1343, min V_lower=0.5205
-Epoch  1420 | Total: 8.5247 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0267 | Outside: 0.0000 | Boundary: 4.2454 | Gen: 8.497917e+00
- [Controller Params] fc.weight = tensor([[-2.2602e+00, -8.4349e-01, -2.4346e-02],
-        [ 3.4762e-02, -6.8182e-05, -7.7105e-01],
-        [-1.5617e-02,  8.1965e-01, -2.3427e+00]])
- ✓ Inside Goal passed, min V= 0.5927, min V_outside_lower= 0.1717, min V_lower=0.5570
-Epoch  1430 | Total: 8.7020 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0182 | Outside: 0.0000 | Boundary: 4.2289 | Gen: 8.683830e+00
- [Controller Params] fc.weight = tensor([[-2.2639e+00, -8.4448e-01, -2.6208e-02],
-        [ 3.4750e-02, -6.3425e-05, -7.7104e-01],
-        [-1.6754e-02,  8.2039e-01, -2.3480e+00]])
- ✓ Inside Goal passed, min V= 0.5993, min V_outside_lower= 0.1762, min V_lower=0.5634
-Epoch  1440 | Total: 8.8834 | Goal: 0.0000 | Unsafe: 0.7243 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.3608 | Gen: 8.159186e+00
- [Controller Params] fc.weight = tensor([[-2.2678e+00, -8.4599e-01, -2.7816e-02],
-        [ 3.4729e-02, -4.2193e-05, -7.7102e-01],
-        [-1.8025e-02,  8.2086e-01, -2.3530e+00]])
- ✓ Inside Goal passed, min V= 0.5570, min V_outside_lower= 0.1407, min V_lower=0.5219
-Epoch  1450 | Total: 8.5275 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8158 | Gen: 8.527493e+00
- [Controller Params] fc.weight = tensor([[-2.2717e+00, -8.4788e-01, -2.9341e-02],
-        [ 3.4717e-02, -4.0832e-05, -7.7102e-01],
-        [-1.9356e-02,  8.2109e-01, -2.3579e+00]])
- ✓ Inside Goal passed, min V= 0.4485, min V_outside_lower= 0.0304, min V_lower=0.4131
-Epoch  1460 | Total: 8.5221 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0057 | Outside: 0.0000 | Boundary: 4.3117 | Gen: 8.516442e+00
- [Controller Params] fc.weight = tensor([[-2.2756e+00, -8.4954e-01, -3.0778e-02],
-        [ 3.4708e-02,  4.5522e-06, -7.7102e-01],
-        [-2.0437e-02,  8.2171e-01, -2.3628e+00]])
- ✓ Inside Goal passed, min V= 0.5918, min V_outside_lower= 0.1640, min V_lower=0.5558
-Epoch  1470 | Total: 8.1706 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.3749 | Gen: 8.170593e+00
- [Controller Params] fc.weight = tensor([[-2.2796e+00, -8.5072e-01, -3.2516e-02],
-        [ 3.4704e-02,  3.2780e-06, -7.7101e-01],
-        [-2.1900e-02,  8.2234e-01, -2.3678e+00]])
- ✓ Inside Goal passed, min V= 0.5591, min V_outside_lower= 0.1410, min V_lower=0.5238
-Epoch  1480 | Total: 8.4246 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.2521 | Gen: 8.424554e+00
- [Controller Params] fc.weight = tensor([[-2.2833e+00, -8.5304e-01, -3.3780e-02],
-        [ 3.4698e-02, -7.9206e-06, -7.7101e-01],
-        [-2.2996e-02,  8.2285e-01, -2.3721e+00]])
- ✓ Inside Goal passed, min V= 0.5878, min V_outside_lower= 0.1747, min V_lower=0.5529
-Epoch  1490 | Total: 8.2022 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0427 | Outside: 0.0000 | Boundary: 4.2036 | Gen: 8.159531e+00
- [Controller Params] fc.weight = tensor([[-2.2872e+00, -8.5480e-01, -3.5540e-02],
-        [ 3.4689e-02,  2.1671e-06, -7.7101e-01],
-        [-2.4396e-02,  8.2316e-01, -2.3773e+00]])
- ✓ Inside Goal passed, min V= 0.6060, min V_outside_lower= 0.1810, min V_lower=0.5706
-[debug] use score
-[Refine-Generator] Epoch 1500: 105 failing → refined 100 cells → 1710 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 2986 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 2986 cells...
-[SymbolicCROWNCache] Initialized for 2986 cells - symbolic structure cached!
-    Rebuilding Phi cache with 1710 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 1710 cells...
-[SymbolicCROWNCache_Phi] Initialized for 1710 cells!
-  Caches rebuilt successfully!
-Epoch  1500 | Total: 5.4300 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.3130 | Gen: 5.430035e+00
- [Controller Params] fc.weight = tensor([[-2.2909e+00, -8.5624e-01, -3.7327e-02],
-        [ 3.4676e-02, -1.6301e-05, -7.7100e-01],
-        [-2.5690e-02,  8.2361e-01, -2.3823e+00]])
- ✓ Inside Goal passed, min V= 0.5777, min V_outside_lower= 0.1476, min V_lower=0.5415
-[Merge-Outside] Epoch 1503: merged 0 pairs → 47 total
-[Merge-Generator] Epoch 1503: merged 2 pairs → 1708 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 2986 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 2986 cells...
-[SymbolicCROWNCache] Initialized for 2986 cells - symbolic structure cached!
-    Rebuilding Phi cache with 1708 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 1708 cells...
-[SymbolicCROWNCache_Phi] Initialized for 1708 cells!
-  Caches rebuilt successfully!
-Epoch  1510 | Total: 5.3201 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.2920 | Gen: 5.320055e+00
- [Controller Params] fc.weight = tensor([[-2.2937e+00, -8.6098e-01, -3.8371e-02],
-        [ 3.4652e-02, -2.3273e-04, -7.7098e-01],
-        [-2.5671e-02,  8.2887e-01, -2.3869e+00]])
- ✓ Inside Goal passed, min V= 0.5883, min V_outside_lower= 0.1593, min V_lower=0.5525
-Epoch  1520 | Total: 5.6165 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.3001 | Outside: 0.0000 | Boundary: 4.1971 | Gen: 5.316407e+00
- [Controller Params] fc.weight = tensor([[-2.2962e+00, -8.6759e-01, -3.9007e-02],
-        [ 3.4628e-02, -1.3373e-03, -7.7094e-01],
-        [-2.4262e-02,  8.3885e-01, -2.3917e+00]])
- ✓ Inside Goal passed, min V= 0.6283, min V_outside_lower= 0.1964, min V_lower=0.5917
-Epoch  1530 | Total: 13.4961 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 4.6996 | Boundary: 6.3277 | Gen: 8.796479e+00
- [Controller Params] fc.weight = tensor([[-2.2997, -0.8746, -0.0395],
-        [ 0.0346, -0.0036, -0.7708],
-        [-0.0230,  0.8487, -2.3968]])
- ✓ Inside Goal passed, min V= 0.0592, min V_outside_lower= -0.3213, min V_lower=0.0251
-Epoch  1540 | Total: 13.3166 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 8.1997 | Outside: 0.0000 | Boundary: 3.9661 | Gen: 5.116938e+00
- [Controller Params] fc.weight = tensor([[-2.3040, -0.8810, -0.0403],
-        [ 0.0346, -0.0071, -0.7706],
-        [-0.0214,  0.8570, -2.4027]])
- ✓ Inside Goal passed, min V= 0.7253, min V_outside_lower= 0.2510, min V_lower=0.6854
-Epoch  1550 | Total: 8.5561 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 2.8451 | Boundary: 5.9220 | Gen: 5.711036e+00
- [Controller Params] fc.weight = tensor([[-2.3083, -0.8872, -0.0407],
-        [ 0.0345, -0.0110, -0.7704],
-        [-0.0200,  0.8647, -2.4076]])
- ✓ Inside Goal passed, min V= 0.1551, min V_outside_lower= -0.2294, min V_lower=0.1205
-Epoch  1560 | Total: 4.4322 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.3434 | Gen: 4.432199e+00
- [Controller Params] fc.weight = tensor([[-2.3128, -0.8919, -0.0413],
-        [ 0.0343, -0.0153, -0.7702],
-        [-0.0183,  0.8720, -2.4129]])
- ✓ Inside Goal passed, min V= 0.5720, min V_outside_lower= 0.1521, min V_lower=0.5365
-Epoch  1570 | Total: 4.1686 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6833 | Gen: 4.168648e+00
- [Controller Params] fc.weight = tensor([[-2.3163, -0.8973, -0.0420],
-        [ 0.0342, -0.0197, -0.7700],
-        [-0.0169,  0.8789, -2.4172]])
- ✓ Inside Goal passed, min V= 0.4874, min V_outside_lower= 0.0649, min V_lower=0.4507
-Epoch  1580 | Total: 4.1176 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4819 | Gen: 4.117632e+00
- [Controller Params] fc.weight = tensor([[-2.3192, -0.9019, -0.0423],
-        [ 0.0341, -0.0248, -0.7698],
-        [-0.0149,  0.8858, -2.4211]])
- ✓ Inside Goal passed, min V= 0.5565, min V_outside_lower= 0.1306, min V_lower=0.5199
-Epoch  1590 | Total: 3.6733 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4591 | Gen: 3.673342e+00
- [Controller Params] fc.weight = tensor([[-2.3222, -0.9064, -0.0430],
-        [ 0.0340, -0.0306, -0.7695],
-        [-0.0137,  0.8914, -2.4250]])
- ✓ Inside Goal passed, min V= 0.5657, min V_outside_lower= 0.1212, min V_lower=0.5276
-Epoch  1600 | Total: 3.6670 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4570 | Gen: 3.666976e+00
- [Controller Params] fc.weight = tensor([[-2.3248, -0.9094, -0.0435],
-        [ 0.0340, -0.0372, -0.7693],
-        [-0.0121,  0.8961, -2.4284]])
- ✓ Inside Goal passed, min V= 0.5730, min V_outside_lower= 0.1205, min V_lower=0.5337
-Epoch  1610 | Total: 3.6405 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8551 | Gen: 3.640453e+00
- [Controller Params] fc.weight = tensor([[-2.3273, -0.9122, -0.0441],
-        [ 0.0339, -0.0444, -0.7691],
-        [-0.0105,  0.8996, -2.4322]])
- ✓ Inside Goal passed, min V= 0.4818, min V_outside_lower= 0.0361, min V_lower=0.4429
-Epoch  1620 | Total: 3.2709 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5391 | Gen: 3.270894e+00
- [Controller Params] fc.weight = tensor([[-2.3297, -0.9152, -0.0443],
-        [ 0.0338, -0.0521, -0.7688],
-        [-0.0091,  0.9025, -2.4347]])
- ✓ Inside Goal passed, min V= 0.5544, min V_outside_lower= 0.1089, min V_lower=0.5168
-Epoch  1630 | Total: 3.5253 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0457 | Outside: 0.0000 | Boundary: 4.4067 | Gen: 3.479606e+00
- [Controller Params] fc.weight = tensor([[-2.3315, -0.9161, -0.0451],
-        [ 0.0338, -0.0602, -0.7686],
-        [-0.0074,  0.9056, -2.4379]])
- ✓ Inside Goal passed, min V= 0.5954, min V_outside_lower= 0.1437, min V_lower=0.5557
-Epoch  1640 | Total: 7.4280 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 3.0067 | Boundary: 5.9523 | Gen: 4.421352e+00
- [Controller Params] fc.weight = tensor([[-2.3349, -0.9163, -0.0454],
-        [ 0.0338, -0.0696, -0.7683],
-        [-0.0060,  0.9066, -2.4414]])
- ✓ Inside Goal passed, min V= 0.1523, min V_outside_lower= -0.2364, min V_lower=0.1166
-Epoch  1650 | Total: 3.4419 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.2507 | Gen: 3.441945e+00
- [Controller Params] fc.weight = tensor([[-2.3383, -0.9169, -0.0457],
-        [ 0.0337, -0.0800, -0.7680],
-        [-0.0045,  0.9061, -2.4451]])
- ✓ Inside Goal passed, min V= 0.6071, min V_outside_lower= 0.1729, min V_lower=0.5680
-Epoch  1660 | Total: 3.9445 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.9422 | Gen: 3.944480e+00
- [Controller Params] fc.weight = tensor([[-2.3425, -0.9166, -0.0462],
-        [ 0.0337, -0.0907, -0.7676],
-        [-0.0034,  0.9052, -2.4491]])
- ✓ Inside Goal passed, min V= 0.3929, min V_outside_lower= 0.0037, min V_lower=0.3578
-Epoch  1670 | Total: 4.3491 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.4018 | Boundary: 5.1665 | Gen: 3.947332e+00
- [Controller Params] fc.weight = tensor([[-2.3468e+00, -9.1540e-01, -4.6518e-02],
-        [ 3.3661e-02, -1.0158e-01, -7.6718e-01],
-        [-2.1059e-03,  9.0458e-01, -2.4530e+00]])
- ✓ Inside Goal passed, min V= 0.2996, min V_outside_lower= -0.0736, min V_lower=0.2654
-Epoch  1680 | Total: 3.4249 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.2425 | Gen: 3.424854e+00
- [Controller Params] fc.weight = tensor([[-2.3513e+00, -9.1441e-01, -4.7316e-02],
-        [ 3.3607e-02, -1.1271e-01, -7.6679e-01],
-        [-8.0248e-04,  9.0292e-01, -2.4582e+00]])
- ✓ Inside Goal passed, min V= 0.5869, min V_outside_lower= 0.1584, min V_lower=0.5488
-Epoch  1690 | Total: 3.1040 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6577 | Gen: 3.104040e+00
- [Controller Params] fc.weight = tensor([[-2.3559e+00, -9.1303e-01, -4.7898e-02],
-        [ 3.3554e-02, -1.2413e-01, -7.6637e-01],
-        [ 4.1335e-04,  9.0194e-01, -2.4632e+00]])
- ✓ Inside Goal passed, min V= 0.4602, min V_outside_lower= 0.0549, min V_lower=0.4234
-Epoch  1700 | Total: 5.7397 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.8859 | Boundary: 5.4641 | Gen: 4.853754e+00
- [Controller Params] fc.weight = tensor([[-2.3598e+00, -9.1195e-01, -4.8392e-02],
-        [ 3.3498e-02, -1.3567e-01, -7.6592e-01],
-        [-8.0353e-05,  9.0161e-01, -2.4678e+00]])
- ✓ Inside Goal passed, min V= 0.2220, min V_outside_lower= -0.1386, min V_lower=0.1884
-Epoch  1710 | Total: 7.2592 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 3.3001 | Boundary: 5.9313 | Gen: 3.959134e+00
- [Controller Params] fc.weight = tensor([[-2.3640e+00, -9.0994e-01, -4.9211e-02],
-        [ 3.3472e-02, -1.4797e-01, -7.6547e-01],
-        [-3.3029e-04,  9.0098e-01, -2.4738e+00]])
- ✓ Inside Goal passed, min V= 0.1195, min V_outside_lower= -0.2505, min V_lower=0.0849
-Epoch  1720 | Total: 2.8705 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7444 | Gen: 2.870503e+00
- [Controller Params] fc.weight = tensor([[-2.3674e+00, -9.0875e-01, -4.9631e-02],
-        [ 3.3460e-02, -1.6006e-01, -7.6504e-01],
-        [ 5.6258e-04,  9.0102e-01, -2.4780e+00]])
- ✓ Inside Goal passed, min V= 0.4205, min V_outside_lower= 0.0328, min V_lower=0.3849
-Epoch  1730 | Total: 2.8384 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0931 | Outside: 0.0000 | Boundary: 4.0185 | Gen: 2.745282e+00
- [Controller Params] fc.weight = tensor([[-2.3713e+00, -9.0774e-01, -5.0292e-02],
-        [ 3.3509e-02, -1.7229e-01, -7.6466e-01],
-        [-3.9625e-04,  9.0083e-01, -2.4826e+00]])
- ✓ Inside Goal passed, min V= 0.6238, min V_outside_lower= 0.2110, min V_lower=0.5867
-Epoch  1740 | Total: 2.6578 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.1130 | Gen: 2.657836e+00
- [Controller Params] fc.weight = tensor([[-2.3749e+00, -9.0737e-01, -5.0556e-02],
-        [ 3.3535e-02, -1.8546e-01, -7.6429e-01],
-        [-3.6428e-04,  9.0048e-01, -2.4868e+00]])
- ✓ Inside Goal passed, min V= 0.5866, min V_outside_lower= 0.1904, min V_lower=0.5497
-Epoch  1750 | Total: 3.1423 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.4080 | Outside: 0.0000 | Boundary: 3.9970 | Gen: 2.734287e+00
- [Controller Params] fc.weight = tensor([[-2.3784e+00, -9.0670e-01, -5.0954e-02],
-        [ 3.3556e-02, -1.9911e-01, -7.6384e-01],
-        [ 3.8130e-04,  8.9992e-01, -2.4916e+00]])
- ✓ Inside Goal passed, min V= 0.6339, min V_outside_lower= 0.2188, min V_lower=0.5966
-Epoch  1760 | Total: 2.4182 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8577 | Gen: 2.418210e+00
- [Controller Params] fc.weight = tensor([[-2.3812e+00, -9.0674e-01, -5.1068e-02],
-        [ 3.3599e-02, -2.1289e-01, -7.6343e-01],
-        [ 2.5856e-04,  9.0060e-01, -2.4952e+00]])
- ✓ Inside Goal passed, min V= 0.4039, min V_outside_lower= 0.0056, min V_lower=0.3687
-Epoch  1770 | Total: 2.4147 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6081 | Gen: 2.414677e+00
- [Controller Params] fc.weight = tensor([[-2.3838e+00, -9.0702e-01, -5.1310e-02],
-        [ 3.3684e-02, -2.2740e-01, -7.6310e-01],
-        [-1.1767e-04,  9.0248e-01, -2.4988e+00]])
- ✓ Inside Goal passed, min V= 0.4948, min V_outside_lower= 0.0821, min V_lower=0.4581
-Epoch  1780 | Total: 2.0461 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4803 | Gen: 2.046083e+00
- [Controller Params] fc.weight = tensor([[-2.3858e+00, -9.0859e-01, -5.0861e-02],
-        [ 3.3763e-02, -2.4333e-01, -7.6267e-01],
-        [ 3.4864e-04,  9.0489e-01, -2.5011e+00]])
- ✓ Inside Goal passed, min V= 0.5320, min V_outside_lower= 0.1162, min V_lower=0.4958
-Epoch  1790 | Total: 2.0465 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.3876 | Gen: 2.046489e+00
- [Controller Params] fc.weight = tensor([[-2.3881e+00, -9.1002e-01, -5.0771e-02],
-        [ 3.3876e-02, -2.5997e-01, -7.6223e-01],
-        [-2.4160e-04,  9.0643e-01, -2.5038e+00]])
- ✓ Inside Goal passed, min V= 0.5689, min V_outside_lower= 0.1414, min V_lower=0.5311
-Epoch  1800 | Total: 2.3373 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4418 | Gen: 2.337307e+00
- [Controller Params] fc.weight = tensor([[-2.3902e+00, -9.1107e-01, -5.0448e-02],
-        [ 3.4025e-02, -2.7670e-01, -7.6182e-01],
-        [ 1.2065e-04,  9.0784e-01, -2.5058e+00]])
- ✓ Inside Goal passed, min V= 0.5628, min V_outside_lower= 0.1388, min V_lower=0.5260
-Epoch  1810 | Total: 1.8746 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5654 | Gen: 1.874586e+00
- [Controller Params] fc.weight = tensor([[-2.3928e+00, -9.1169e-01, -5.0127e-02],
-        [ 3.4338e-02, -2.9394e-01, -7.6141e-01],
-        [ 3.7616e-05,  9.0772e-01, -2.5088e+00]])
- ✓ Inside Goal passed, min V= 0.5421, min V_outside_lower= 0.0963, min V_lower=0.5028
-Epoch  1820 | Total: 1.8219 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0027 | Outside: 0.0000 | Boundary: 4.3737 | Gen: 1.819256e+00
- [Controller Params] fc.weight = tensor([[-2.3949e+00, -9.1234e-01, -4.9471e-02],
-        [ 3.4624e-02, -3.1079e-01, -7.6108e-01],
-        [ 1.6200e-04,  9.0835e-01, -2.5107e+00]])
- ✓ Inside Goal passed, min V= 0.5995, min V_outside_lower= 0.1567, min V_lower=0.5614
-Epoch  1830 | Total: 2.0176 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.3780 | Outside: 0.0000 | Boundary: 4.2998 | Gen: 1.639519e+00
- [Controller Params] fc.weight = tensor([[-2.3973e+00, -9.1188e-01, -4.9225e-02],
-        [ 3.5061e-02, -3.2748e-01, -7.6081e-01],
-        [-1.3598e-04,  9.0822e-01, -2.5135e+00]])
- ✓ Inside Goal passed, min V= 0.6132, min V_outside_lower= 0.1592, min V_lower=0.5740
-Epoch  1840 | Total: 2.1008 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0778 | Boundary: 5.0679 | Gen: 2.023004e+00
- [Controller Params] fc.weight = tensor([[-2.3992e+00, -9.1140e-01, -4.8646e-02],
-        [ 3.5481e-02, -3.4365e-01, -7.6062e-01],
-        [ 4.8884e-04,  9.0853e-01, -2.5156e+00]])
- ✓ Inside Goal passed, min V= 0.3959, min V_outside_lower= -0.0239, min V_lower=0.3595
-Epoch  1850 | Total: 3.2709 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.9955 | Boundary: 5.5256 | Gen: 2.275337e+00
- [Controller Params] fc.weight = tensor([[-2.4020e+00, -9.1050e-01, -4.8148e-02],
-        [ 3.6040e-02, -3.6005e-01, -7.6043e-01],
-        [-8.9108e-05,  9.0723e-01, -2.5186e+00]])
- ✓ Inside Goal passed, min V= 0.2499, min V_outside_lower= -0.1463, min V_lower=0.2152
-Epoch  1860 | Total: 2.4538 | Goal: 0.0000 | Unsafe: 0.0539 | Init: 0.0000 | Outside: 0.7977 | Boundary: 5.3806 | Gen: 1.602256e+00
- [Controller Params] fc.weight = tensor([[-2.4048e+00, -9.0957e-01, -4.7323e-02],
-        [ 3.6664e-02, -3.7665e-01, -7.6038e-01],
-        [ 5.4393e-04,  9.0509e-01, -2.5218e+00]])
- ✓ Inside Goal passed, min V= 0.2744, min V_outside_lower= -0.1166, min V_lower=0.2399
-Epoch  1870 | Total: 1.7198 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4473 | Gen: 1.719760e+00
- [Controller Params] fc.weight = tensor([[-2.4079e+00, -9.0857e-01, -4.6826e-02],
-        [ 3.7278e-02, -3.9251e-01, -7.6025e-01],
-        [ 4.4316e-05,  9.0292e-01, -2.5250e+00]])
- ✓ Inside Goal passed, min V= 0.5097, min V_outside_lower= 0.1163, min V_lower=0.4748
-Epoch  1880 | Total: 3.8911 | Goal: 0.0000 | Unsafe: 0.5314 | Init: 1.8330 | Outside: 0.0000 | Boundary: 3.8704 | Gen: 1.526759e+00
- [Controller Params] fc.weight = tensor([[-2.4115e+00, -9.0674e-01, -4.6845e-02],
-        [ 3.7952e-02, -4.0828e-01, -7.6006e-01],
-        [-2.3439e-04,  8.9989e-01, -2.5291e+00]])
- ✓ Inside Goal passed, min V= 0.6700, min V_outside_lower= 0.2466, min V_lower=0.6333
-Epoch  1890 | Total: 4.5200 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 3.1464 | Outside: 0.0000 | Boundary: 3.7925 | Gen: 1.373605e+00
- [Controller Params] fc.weight = tensor([[-2.4150e+00, -9.0417e-01, -4.6588e-02],
-        [ 3.8605e-02, -4.2405e-01, -7.5982e-01],
-        [ 2.2446e-04,  8.9794e-01, -2.5326e+00]])
- ✓ Inside Goal passed, min V= 0.6926, min V_outside_lower= 0.2673, min V_lower=0.6563
-Epoch  1900 | Total: 1.7477 | Goal: 0.0000 | Unsafe: 0.4132 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8317 | Gen: 1.334426e+00
- [Controller Params] fc.weight = tensor([[-2.4185e+00, -9.0239e-01, -4.6449e-02],
-        [ 3.9215e-02, -4.3987e-01, -7.5954e-01],
-        [ 2.0425e-04,  8.9544e-01, -2.5366e+00]])
- ✓ Inside Goal passed, min V= 0.3923, min V_outside_lower= 0.0130, min V_lower=0.3582
-Epoch  1910 | Total: 1.3317 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5960 | Gen: 1.331730e+00
- [Controller Params] fc.weight = tensor([[-2.4218e+00, -9.0122e-01, -4.5986e-02],
-        [ 3.9852e-02, -4.5503e-01, -7.5934e-01],
-        [ 2.6138e-04,  8.9292e-01, -2.5404e+00]])
- ✓ Inside Goal passed, min V= 0.4734, min V_outside_lower= 0.0786, min V_lower=0.4382
-Epoch  1920 | Total: 3.2693 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 1.0329 | Boundary: 5.4707 | Gen: 2.236475e+00
- [Controller Params] fc.weight = tensor([[-2.4247e+00, -8.9975e-01, -4.5491e-02],
-        [ 4.0493e-02, -4.6935e-01, -7.5923e-01],
-        [ 3.5865e-04,  8.9146e-01, -2.5435e+00]])
- ✓ Inside Goal passed, min V= 0.2191, min V_outside_lower= -0.1529, min V_lower=0.1864
-Epoch  1930 | Total: 1.2240 | Goal: 0.0000 | Unsafe: 0.0104 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.2333 | Gen: 1.213570e+00
- [Controller Params] fc.weight = tensor([[-2.4281e+00, -8.9786e-01, -4.5897e-02],
-        [ 4.1167e-02, -4.8361e-01, -7.5903e-01],
-        [-4.2351e-04,  8.8904e-01, -2.5480e+00]])
- ✓ Inside Goal passed, min V= 0.5561, min V_outside_lower= 0.1625, min V_lower=0.5217
-Epoch  1940 | Total: 1.6438 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.1613 | Outside: 0.0000 | Boundary: 4.0719 | Gen: 1.482517e+00
- [Controller Params] fc.weight = tensor([[-2.4301e+00, -8.9689e-01, -4.5637e-02],
-        [ 4.1671e-02, -4.9638e-01, -7.5896e-01],
-        [ 4.0229e-04,  8.8869e-01, -2.5506e+00]])
- ✓ Inside Goal passed, min V= 0.6338, min V_outside_lower= 0.2133, min V_lower=0.5979
-Epoch  1950 | Total: 1.2179 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7740 | Gen: 1.217913e+00
- [Controller Params] fc.weight = tensor([[-2.4331e+00, -8.9613e-01, -4.5403e-02],
-        [ 4.2321e-02, -5.0968e-01, -7.5877e-01],
-        [ 7.7457e-05,  8.8773e-01, -2.5540e+00]])
- ✓ Inside Goal passed, min V= 0.4719, min V_outside_lower= 0.0316, min V_lower=0.4342
-Epoch  1960 | Total: 0.9989 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8081 | Gen: 9.988860e-01
- [Controller Params] fc.weight = tensor([[-2.4353e+00, -8.9564e-01, -4.5043e-02],
-        [ 4.2872e-02, -5.2273e-01, -7.5866e-01],
-        [ 7.2212e-05,  8.8781e-01, -2.5562e+00]])
- ✓ Inside Goal passed, min V= 0.4626, min V_outside_lower= 0.0288, min V_lower=0.4255
-Epoch  1970 | Total: 1.0044 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5340 | Gen: 1.004400e+00
- [Controller Params] fc.weight = tensor([[-2.4366e+00, -8.9559e-01, -4.4272e-02],
-        [ 4.3354e-02, -5.3477e-01, -7.5865e-01],
-        [ 8.3529e-04,  8.8856e-01, -2.5575e+00]])
- ✓ Inside Goal passed, min V= 0.5476, min V_outside_lower= 0.1031, min V_lower=0.5095
-Epoch  1980 | Total: 0.9152 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0039 | Boundary: 4.9224 | Gen: 9.112349e-01
- [Controller Params] fc.weight = tensor([[-2.4376e+00, -8.9535e-01, -4.3474e-02],
-        [ 4.3861e-02, -5.4638e-01, -7.5870e-01],
-        [ 1.5090e-03,  8.8939e-01, -2.5586e+00]])
- ✓ Inside Goal passed, min V= 0.4284, min V_outside_lower= -0.0023, min V_lower=0.3914
-Epoch  1990 | Total: 0.8091 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.5403 | Gen: 8.090633e-01
- [Controller Params] fc.weight = tensor([[-2.4386e+00, -8.9485e-01, -4.2688e-02],
-        [ 4.4398e-02, -5.5724e-01, -7.5883e-01],
-        [ 2.0869e-03,  8.9011e-01, -2.5593e+00]])
- ✓ Inside Goal passed, min V= 0.5199, min V_outside_lower= 0.0902, min V_lower=0.4832
-[debug] use score
-[Refine-Generator] Epoch 2000: 58 failing → refined 58 cells → 2114 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 2986 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 2986 cells...
-[SymbolicCROWNCache] Initialized for 2986 cells - symbolic structure cached!
-    Rebuilding Phi cache with 2114 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 2114 cells...
-[SymbolicCROWNCache_Phi] Initialized for 2114 cells!
-  Caches rebuilt successfully!
-Epoch  2000 | Total: 0.0293 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.4079 | Gen: 2.928717e-02
- [Controller Params] fc.weight = tensor([[-2.4397e+00, -8.9389e-01, -4.2183e-02],
-        [ 4.4977e-02, -5.6789e-01, -7.5901e-01],
-        [ 2.3722e-03,  8.9039e-01, -2.5607e+00]])
- ✓ Inside Goal passed, min V= 0.5722, min V_outside_lower= 0.1323, min V_lower=0.5346
-
-Epoch 2000 - Detailed Evaluation:
-  Constraint Satisfaction:
-    Goal:      ✗ (V_min=0.573, V_mean=0.625, V_max=0.830)
-    Unsafe:    ✓ (V_min=22.179, V_max=59.530)
-    Init:      ✓ (V_min=0.867, V_max=0.979)
-    Outside:   ✓ (V_min=0.132, V_max=60.272)
-    Boundary:  ✗ (V_min=-0.378, V_max=61.612)
-    Generator: ✗ (Phi_upper_min=-1.050178e+02, Phi_upper_max=5.855978e-03, failing=14)
-  Goal bounds: V ∈ [0.535, 0.893]
-  Unsafe bounds: V ∈ [22.179, 59.530]
-  Generator bounds: Φ ∈ [-1347.820, 0.006]
-  Generator failing cells: 14/2114 (0.7%)
-
-  Creating visualization for epoch 2000...
-[Merge-Outside] Epoch 2004: merged 0 pairs → 47 total
-[Merge-Generator] Epoch 2004: merged 2 pairs → 2112 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 2986 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 2986 cells...
-[SymbolicCROWNCache] Initialized for 2986 cells - symbolic structure cached!
-    Rebuilding Phi cache with 2112 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 2112 cells...
-[SymbolicCROWNCache_Phi] Initialized for 2112 cells!
-  Caches rebuilt successfully!
-Epoch  2010 | Total: 0.0383 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6817 | Gen: 3.826024e-02
- [Controller Params] fc.weight = tensor([[-2.4411e+00, -8.9298e-01, -4.2479e-02],
-        [ 4.5374e-02, -5.7477e-01, -7.5907e-01],
-        [ 1.5144e-03,  8.8987e-01, -2.5628e+00]])
- ✓ Inside Goal passed, min V= 0.5195, min V_outside_lower= 0.0592, min V_lower=0.4807
-Epoch  2020 | Total: 0.0267 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7878 | Gen: 2.670791e-02
- [Controller Params] fc.weight = tensor([[-2.4416e+00, -8.9265e-01, -4.2666e-02],
-        [ 4.5492e-02, -5.7803e-01, -7.5907e-01],
-        [ 1.1629e-03,  8.8981e-01, -2.5637e+00]])
- ✓ Inside Goal passed, min V= 0.4974, min V_outside_lower= 0.0460, min V_lower=0.4585
-Epoch  2030 | Total: 0.0244 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8272 | Gen: 2.442604e-02
- [Controller Params] fc.weight = tensor([[-2.4417e+00, -8.9269e-01, -4.2726e-02],
-        [ 4.5509e-02, -5.7989e-01, -7.5903e-01],
-        [ 1.0265e-03,  8.8988e-01, -2.5640e+00]])
- ✓ Inside Goal passed, min V= 0.4862, min V_outside_lower= 0.0348, min V_lower=0.4475
-Epoch  2040 | Total: 0.0220 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8188 | Gen: 2.200877e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9284e-01, -4.2738e-02],
-        [ 4.5493e-02, -5.8112e-01, -7.5898e-01],
-        [ 9.6954e-04,  8.9000e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4889, min V_outside_lower= 0.0357, min V_lower=0.4500
-Epoch  2050 | Total: 0.0207 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8074 | Gen: 2.074169e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9300e-01, -4.2733e-02],
-        [ 4.5468e-02, -5.8208e-01, -7.5892e-01],
-        [ 9.4115e-04,  8.9014e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4923, min V_outside_lower= 0.0378, min V_lower=0.4533
-Epoch  2060 | Total: 0.0198 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8047 | Gen: 1.984438e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9313e-01, -4.2724e-02],
-        [ 4.5442e-02, -5.8282e-01, -7.5886e-01],
-        [ 9.2507e-04,  8.9026e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4925, min V_outside_lower= 0.0388, min V_lower=0.4535
-Epoch  2070 | Total: 0.0191 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.8006 | Gen: 1.914431e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9326e-01, -4.2713e-02],
-        [ 4.5417e-02, -5.8346e-01, -7.5881e-01],
-        [ 9.1333e-04,  8.9038e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4925, min V_outside_lower= 0.0389, min V_lower=0.4536
-Epoch  2080 | Total: 0.0184 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7943 | Gen: 1.844853e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9338e-01, -4.2702e-02],
-        [ 4.5392e-02, -5.8408e-01, -7.5877e-01],
-        [ 9.0256e-04,  8.9049e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4933, min V_outside_lower= 0.0398, min V_lower=0.4545
-Epoch  2090 | Total: 0.0178 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7880 | Gen: 1.781924e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9351e-01, -4.2691e-02],
-        [ 4.5367e-02, -5.8469e-01, -7.5872e-01],
-        [ 8.9244e-04,  8.9061e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4941, min V_outside_lower= 0.0406, min V_lower=0.4552
-Epoch  2100 | Total: 0.0172 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7823 | Gen: 1.716064e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9364e-01, -4.2680e-02],
-        [ 4.5341e-02, -5.8530e-01, -7.5867e-01],
-        [ 8.8259e-04,  8.9072e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4946, min V_outside_lower= 0.0413, min V_lower=0.4558
-Epoch  2110 | Total: 0.0165 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7765 | Gen: 1.652189e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9376e-01, -4.2669e-02],
-        [ 4.5315e-02, -5.8592e-01, -7.5862e-01],
-        [ 8.7272e-04,  8.9083e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4953, min V_outside_lower= 0.0420, min V_lower=0.4565
-Epoch  2120 | Total: 0.0159 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7705 | Gen: 1.587764e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9389e-01, -4.2657e-02],
-        [ 4.5289e-02, -5.8655e-01, -7.5857e-01],
-        [ 8.6284e-04,  8.9095e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4960, min V_outside_lower= 0.0428, min V_lower=0.4573
-Epoch  2130 | Total: 0.0152 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7650 | Gen: 1.523021e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9402e-01, -4.2646e-02],
-        [ 4.5262e-02, -5.8718e-01, -7.5852e-01],
-        [ 8.5298e-04,  8.9106e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4967, min V_outside_lower= 0.0435, min V_lower=0.4580
-Epoch  2140 | Total: 0.0146 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7593 | Gen: 1.458319e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9415e-01, -4.2635e-02],
-        [ 4.5236e-02, -5.8782e-01, -7.5846e-01],
-        [ 8.4311e-04,  8.9117e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4974, min V_outside_lower= 0.0442, min V_lower=0.4587
-Epoch  2150 | Total: 0.0139 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7530 | Gen: 1.394582e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9427e-01, -4.2624e-02],
-        [ 4.5208e-02, -5.8847e-01, -7.5841e-01],
-        [ 8.3323e-04,  8.9129e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4982, min V_outside_lower= 0.0450, min V_lower=0.4596
-Epoch  2160 | Total: 0.0133 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7470 | Gen: 1.325907e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9440e-01, -4.2612e-02],
-        [ 4.5181e-02, -5.8913e-01, -7.5836e-01],
-        [ 8.2319e-04,  8.9140e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.4992, min V_outside_lower= 0.0459, min V_lower=0.4606
-Epoch  2170 | Total: 0.0127 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7407 | Gen: 1.265453e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9453e-01, -4.2601e-02],
-        [ 4.5154e-02, -5.8978e-01, -7.5831e-01],
-        [ 8.1359e-04,  8.9152e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5001, min V_outside_lower= 0.0469, min V_lower=0.4615
-Epoch  2180 | Total: 0.0120 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7316 | Gen: 1.201759e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9465e-01, -4.2589e-02],
-        [ 4.5128e-02, -5.9040e-01, -7.5825e-01],
-        [ 8.0558e-04,  8.9165e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5015, min V_outside_lower= 0.0488, min V_lower=0.4630
-Epoch  2190 | Total: 0.0114 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7233 | Gen: 1.139259e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9478e-01, -4.2578e-02],
-        [ 4.5102e-02, -5.9105e-01, -7.5820e-01],
-        [ 7.9662e-04,  8.9177e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5030, min V_outside_lower= 0.0505, min V_lower=0.4645
-Epoch  2200 | Total: 0.0108 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7143 | Gen: 1.079967e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9489e-01, -4.2566e-02],
-        [ 4.5075e-02, -5.9170e-01, -7.5814e-01],
-        [ 7.8846e-04,  8.9190e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5044, min V_outside_lower= 0.0524, min V_lower=0.4660
-Epoch  2210 | Total: 0.0102 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.7048 | Gen: 1.021103e-02
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9499e-01, -4.2555e-02],
-        [ 4.5049e-02, -5.9235e-01, -7.5809e-01],
-        [ 7.8012e-04,  8.9203e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5061, min V_outside_lower= 0.0545, min V_lower=0.4677
-Epoch  2220 | Total: 0.0097 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6976 | Gen: 9.696141e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9508e-01, -4.2544e-02],
-        [ 4.5022e-02, -5.9300e-01, -7.5803e-01],
-        [ 7.7135e-04,  8.9215e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5073, min V_outside_lower= 0.0557, min V_lower=0.4689
-Epoch  2230 | Total: 0.0092 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6917 | Gen: 9.223905e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9514e-01, -4.2533e-02],
-        [ 4.4999e-02, -5.9360e-01, -7.5798e-01],
-        [ 7.6333e-04,  8.9227e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5082, min V_outside_lower= 0.0567, min V_lower=0.4699
-Epoch  2240 | Total: 0.0088 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6859 | Gen: 8.789644e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9519e-01, -4.2523e-02],
-        [ 4.4977e-02, -5.9417e-01, -7.5793e-01],
-        [ 7.5596e-04,  8.9240e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5090, min V_outside_lower= 0.0576, min V_lower=0.4707
-Epoch  2250 | Total: 0.0084 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6802 | Gen: 8.404332e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9523e-01, -4.2513e-02],
-        [ 4.4956e-02, -5.9473e-01, -7.5788e-01],
-        [ 7.4879e-04,  8.9252e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5099, min V_outside_lower= 0.0586, min V_lower=0.4716
-Epoch  2260 | Total: 0.0081 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6744 | Gen: 8.149068e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9525e-01, -4.2505e-02],
-        [ 4.4938e-02, -5.9523e-01, -7.5783e-01],
-        [ 7.4169e-04,  8.9263e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5110, min V_outside_lower= 0.0599, min V_lower=0.4728
-Epoch  2270 | Total: 0.0079 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6690 | Gen: 7.914365e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9525e-01, -4.2498e-02],
-        [ 4.4924e-02, -5.9566e-01, -7.5779e-01],
-        [ 7.3460e-04,  8.9274e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5122, min V_outside_lower= 0.0613, min V_lower=0.4740
-Epoch  2280 | Total: 0.0077 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6641 | Gen: 7.684968e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9524e-01, -4.2491e-02],
-        [ 4.4910e-02, -5.9609e-01, -7.5775e-01],
-        [ 7.2749e-04,  8.9283e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5133, min V_outside_lower= 0.0625, min V_lower=0.4751
-Epoch  2290 | Total: 0.0075 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6604 | Gen: 7.481179e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9524e-01, -4.2484e-02],
-        [ 4.4896e-02, -5.9651e-01, -7.5771e-01],
-        [ 7.2037e-04,  8.9293e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5141, min V_outside_lower= 0.0634, min V_lower=0.4759
-Epoch  2300 | Total: 0.0072 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6558 | Gen: 7.249602e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9523e-01, -4.2477e-02],
-        [ 4.4883e-02, -5.9693e-01, -7.5767e-01],
-        [ 7.1323e-04,  8.9303e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5152, min V_outside_lower= 0.0646, min V_lower=0.4770
-Epoch  2310 | Total: 0.0070 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6528 | Gen: 7.048140e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9523e-01, -4.2470e-02],
-        [ 4.4868e-02, -5.9737e-01, -7.5762e-01],
-        [ 7.0606e-04,  8.9313e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5159, min V_outside_lower= 0.0653, min V_lower=0.4777
-Epoch  2320 | Total: 0.0068 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6480 | Gen: 6.831695e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9522e-01, -4.2464e-02],
-        [ 4.4855e-02, -5.9780e-01, -7.5758e-01],
-        [ 6.9886e-04,  8.9323e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5171, min V_outside_lower= 0.0666, min V_lower=0.4789
-Epoch  2330 | Total: 0.0066 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6461 | Gen: 6.619919e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9522e-01, -4.2457e-02],
-        [ 4.4840e-02, -5.9824e-01, -7.5754e-01],
-        [ 6.9165e-04,  8.9333e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5177, min V_outside_lower= 0.0671, min V_lower=0.4796
-Epoch  2340 | Total: 0.0064 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6416 | Gen: 6.400071e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9521e-01, -4.2450e-02],
-        [ 4.4827e-02, -5.9867e-01, -7.5750e-01],
-        [ 6.8440e-04,  8.9342e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5190, min V_outside_lower= 0.0684, min V_lower=0.4808
-Epoch  2350 | Total: 0.0062 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6399 | Gen: 6.181635e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9521e-01, -4.2443e-02],
-        [ 4.4812e-02, -5.9912e-01, -7.5746e-01],
-        [ 6.7714e-04,  8.9352e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5196, min V_outside_lower= 0.0690, min V_lower=0.4814
-Epoch  2360 | Total: 0.0060 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6367 | Gen: 5.961067e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9520e-01, -4.2436e-02],
-        [ 4.4797e-02, -5.9957e-01, -7.5741e-01],
-        [ 6.6985e-04,  8.9362e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5205, min V_outside_lower= 0.0699, min V_lower=0.4823
-Epoch  2370 | Total: 0.0058 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6349 | Gen: 5.833679e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9519e-01, -4.2406e-02],
-        [ 4.4787e-02, -6.0002e-01, -7.5737e-01],
-        [ 6.6443e-04,  8.9373e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5211, min V_outside_lower= 0.0701, min V_lower=0.4830
-Epoch  2380 | Total: 0.0056 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6293 | Gen: 5.602492e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9517e-01, -4.2386e-02],
-        [ 4.4775e-02, -6.0046e-01, -7.5734e-01],
-        [ 6.5822e-04,  8.9383e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5226, min V_outside_lower= 0.0715, min V_lower=0.4844
-Epoch  2390 | Total: 0.0054 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6245 | Gen: 5.401660e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9516e-01, -4.2374e-02],
-        [ 4.4762e-02, -6.0091e-01, -7.5729e-01],
-        [ 6.5125e-04,  8.9392e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5239, min V_outside_lower= 0.0729, min V_lower=0.4857
-Epoch  2400 | Total: 0.0052 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6238 | Gen: 5.166483e-03
- [Controller Params] fc.weight = tensor([[-2.4418e+00, -8.9515e-01, -4.2365e-02],
-        [ 4.4747e-02, -6.0138e-01, -7.5725e-01],
-        [ 6.4400e-04,  8.9403e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5244, min V_outside_lower= 0.0732, min V_lower=0.4862
-Epoch  2410 | Total: 0.0051 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6244 | Gen: 5.087629e-03
- [Controller Params] fc.weight = tensor([[-2.4419e+00, -8.9515e-01, -4.2333e-02],
-        [ 4.4736e-02, -6.0184e-01, -7.5722e-01],
-        [ 6.3701e-04,  8.9412e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5244, min V_outside_lower= 0.0728, min V_lower=0.4861
-Epoch  2420 | Total: 0.0049 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6218 | Gen: 4.879627e-03
- [Controller Params] fc.weight = tensor([[-2.4419e+00, -8.9514e-01, -4.2317e-02],
-        [ 4.4723e-02, -6.0229e-01, -7.5718e-01],
-        [ 6.2937e-04,  8.9421e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5252, min V_outside_lower= 0.0736, min V_lower=0.4870
-Epoch  2430 | Total: 0.0048 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6187 | Gen: 4.764926e-03
- [Controller Params] fc.weight = tensor([[-2.4419e+00, -8.9514e-01, -4.2285e-02],
-        [ 4.4713e-02, -6.0273e-01, -7.5715e-01],
-        [ 6.2201e-04,  8.9429e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5258, min V_outside_lower= 0.0741, min V_lower=0.4876
-Epoch  2440 | Total: 0.0046 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6174 | Gen: 4.592007e-03
- [Controller Params] fc.weight = tensor([[-2.4419e+00, -8.9514e-01, -4.2267e-02],
-        [ 4.4701e-02, -6.0317e-01, -7.5711e-01],
-        [ 6.1405e-04,  8.9438e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5263, min V_outside_lower= 0.0746, min V_lower=0.4881
-Epoch  2450 | Total: 0.0044 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6167 | Gen: 4.447066e-03
- [Controller Params] fc.weight = tensor([[-2.4419e+00, -8.9514e-01, -4.2257e-02],
-        [ 4.4688e-02, -6.0358e-01, -7.5708e-01],
-        [ 6.0753e-04,  8.9446e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5268, min V_outside_lower= 0.0749, min V_lower=0.4886
-Epoch  2460 | Total: 0.0043 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6134 | Gen: 4.341659e-03
- [Controller Params] fc.weight = tensor([[-2.4419e+00, -8.9514e-01, -4.2223e-02],
-        [ 4.4680e-02, -6.0396e-01, -7.5705e-01],
-        [ 6.0391e-04,  8.9454e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5276, min V_outside_lower= 0.0754, min V_lower=0.4894
-Epoch  2470 | Total: 0.0043 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6096 | Gen: 4.251833e-03
- [Controller Params] fc.weight = tensor([[-2.4419e+00, -8.9515e-01, -4.2204e-02],
-        [ 4.4669e-02, -6.0432e-01, -7.5702e-01],
-        [ 5.9999e-04,  8.9462e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5286, min V_outside_lower= 0.0763, min V_lower=0.4904
-Epoch  2480 | Total: 0.0042 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6088 | Gen: 4.183110e-03
- [Controller Params] fc.weight = tensor([[-2.4419e+00, -8.9519e-01, -4.2193e-02],
-        [ 4.4656e-02, -6.0462e-01, -7.5699e-01],
-        [ 5.9758e-04,  8.9469e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5289, min V_outside_lower= 0.0764, min V_lower=0.4907
-Epoch  2490 | Total: 0.0042 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6081 | Gen: 4.151538e-03
- [Controller Params] fc.weight = tensor([[-2.4419e+00, -8.9525e-01, -4.2167e-02],
-        [ 4.4645e-02, -6.0488e-01, -7.5697e-01],
-        [ 5.9746e-04,  8.9474e-01, -2.5641e+00]])
- ✓ Inside Goal passed, min V= 0.5291, min V_outside_lower= 0.0765, min V_lower=0.4908
-[debug] use score
-[Refine-Generator] Epoch 2500: 2 failing → refined 2 cells → 2126 total
-  Rebuilding CROWN caches with new generator cells...
-    Rebuilding V cache with 2986 cells...
-[SymbolicCROWNCache] Creating BoundedModule for 2986 cells...
-[SymbolicCROWNCache] Initialized for 2986 cells - symbolic structure cached!
-    Rebuilding Phi cache with 2126 cells...
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 2126 cells...
-[SymbolicCROWNCache_Phi] Initialized for 2126 cells!
-  Caches rebuilt successfully!
-Epoch  2500 | Total: 0.0000 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 0.0000 | Outside: 0.0000 | Boundary: 4.6074 | Gen: 0.000000e+00
- [Controller Params] fc.weight = tensor([[-2.4419e+00, -8.9532e-01, -4.2145e-02],
-        [ 4.4633e-02, -6.0514e-01, -7.5696e-01],
-        [ 5.9623e-04,  8.9478e-01, -2.5642e+00]])
- ✓ Inside Goal passed, min V= 0.5291, min V_outside_lower= 0.0765, min V_lower=0.4909
-
-================================================================================
-ALL CONSTRAINTS SATISFIED - EARLY STOPPING!
-================================================================================
-Training converged at epoch 2500
-Final losses: Goal=0.0000, Unsafe=0.0000, Init=0.0000, Outside=0.0000, Boundary=4.6074, Gen=0.0000
- [Controller Params] fc.weight = tensor([[-2.4419e+00, -8.9532e-01, -4.2145e-02],
-        [ 4.4633e-02, -6.0514e-01, -7.5696e-01],
-        [ 5.9623e-04,  8.9478e-01, -2.5642e+00]])
-final beta_s: 0.0765
-
-Training completed in 368.72 seconds (6.15 minutes)
+Training completed in 274.48 seconds (4.57 minutes)
 
 ================================================================================
 FINAL EVALUATION
 ================================================================================
-[SymbolicCROWNCache] Creating BoundedModule for 2744 cells...
-[SymbolicCROWNCache] Initialized for 2744 cells - symbolic structure cached!
-[SymbolicCROWNCache] Creating BoundedModule for 125 cells...
-[SymbolicCROWNCache] Initialized for 125 cells - symbolic structure cached!
-[SymbolicCROWNCache] Creating BoundedModule for 64 cells...
-[SymbolicCROWNCache] Initialized for 64 cells - symbolic structure cached!
-[SymbolicCROWNCache] Creating BoundedModule for 47 cells...
-[SymbolicCROWNCache] Initialized for 47 cells - symbolic structure cached!
-[SymbolicCROWNCache] Creating BoundedModule for 6 cells...
-[SymbolicCROWNCache] Initialized for 6 cells - symbolic structure cached!
-[SymbolicCROWNCache_Phi] Creating BoundedModule for 2126 cells...
-[SymbolicCROWNCache_Phi] Initialized for 2126 cells!
-Constraint Satisfaction:
-  Goal:      ✗ (V_min=0.529, V_mean=0.579, V_max=0.778)
-  Unsafe:    ✓ (V_min=20.281, V_max=56.814)
-  Init:      ✓ (V_min=0.824, V_max=0.937)
-  Outside:   ✗ (V_min=0.077, V_max=57.703)
-  Boundary:  ✗ (V_min=-0.398, V_max=59.141)
-  Generator: ✓ (Phi_upper_min=-9.748106e+01, Phi_upper_max=-1.191497e-04, failing=0)
+Goal:      PASS, V bounds: [  0.355,   0.935]
+Unsafe:    PASS, V bounds: [ 20.212,  49.018]
+Init:      PASS, V bounds: [  0.832,   0.994]
+Outside:   PASS, V bounds: [  0.001,  49.987]
+Generator: PASS, GV bounds: [-86.886,  -0.001]
 
 ================================================================================
 CREATING FINAL VISUALIZATIONS
 ================================================================================
-
-================================================================================
-CREATING SUMMARY PLOTS
-================================================================================
-
-1. Value function with discretization...
-  → Saved to 'results/value_function.png'
-
-2. Generator with discretization...
-  → Saved to 'results/generator.png'
-
-3. Constraint regions...
-  → Saved to 'results/constraint_regions.png'
-
-4. Loss history...
-  → Saved to 'results/loss_history.png'
-
 All plots saved to 'results/'
 
 ================================================================================
 SAVING EVAL BUNDLE
 ================================================================================
-[Saved] eval bundle -> /Users/chko1829/src/Projects/ML/Neural_Certificate/gbm3d_syn/outputs/eval_bundle.pth
+[Saved] eval bundle -> /Users/sebastianescobar/Desktop/Neural_Certificate/gbm3d_syn/outputs/eval_bundle.pth
