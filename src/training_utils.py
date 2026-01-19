@@ -94,85 +94,26 @@ def clear_goal_samples_cache():
 
 
 def compute_loss_goal_bounds(
-    model,
-    goal_region,
     V_lower: torch.Tensor,
     V_upper: torch.Tensor,
-    beta_s: Union[float, torch.Tensor],
     V_outside_lower,
-    n_samples: int = 1000,
-    device: str = 'cpu',
-    check: bool = False,
     show: bool = False,
-    w_soft = 2000
 ) -> torch.Tensor:
-
-    bounds = goal_region.bounds  # (D, 2)
-    D = bounds.shape[0]
-
-    # Compute center of goal region (1, D)
-    center = torch.as_tensor(((bounds[:, 0] + bounds[:, 1]) / 2.0),
-                             device=device, dtype=torch.float32).view(1, D)
-
-    # Evaluate V at center point
-    v_center = model(center).squeeze()
-
-    # Strong loss on center point
-    margin = 0.0
-    # loss_center = F.relu(v_center - (beta_s - margin)) * 10.0
-
-    # Shrink the sampling bounds by a factor (inner box)
-    shrink_factor = 0.1
-    lower = torch.as_tensor(bounds[:, 0], device=device, dtype=torch.float32)  # (D,)
-    upper = torch.as_tensor(bounds[:, 1], device=device, dtype=torch.float32)  # (D,)
-    span = upper - lower                                                      # (D,)
-
-    inner_lower = lower + span * (1.0 - shrink_factor) / 2.0                  # (D,)
-    inner_upper = upper - span * (1.0 - shrink_factor) / 2.0                  # (D,)
-
-    # Sample uniformly in the inner box: (n_samples, D)
-    # rand in [0,1) scaled to [inner_lower, inner_upper]
-    r = torch.rand(n_samples, D, device=device, dtype=torch.float32)
-    samples = r * (inner_upper - inner_lower).unsqueeze(0) + inner_lower.unsqueeze(0)
-
-    v_samples = model(samples).squeeze()
-
-    # Softer loss on minimum of sampled points
-    threshold = V_outside_lower.min().item()
-    loss_rest = F.relu(v_samples.min() - threshold) * w_soft
-
-    # Combined soft loss
-    loss_soft =  loss_rest
-
-    # Encourage non-negativity of the certified lower bound inside goal
-    # (kept identical behavior, but note: min() here returns a scalar tensor)
     loss_nonneg = torch.relu(0.0 - V_lower).sum()
-    # loss_nonneg = torch.relu(0.0 - torch.min(V_lower))
-
-    # Obtain minimum V inside goal region: from samples, center, and lowest upper bound
-    v_min = min(v_samples.min().item(), v_center.item(), V_upper.min().item())
-
-    # When checking for success (passed), check the logic based on v_min
-    # Keep semantics identical to your original
-    # if (v_min < beta_s) and (V_lower.min() >= 0).item():
-    # if (v_min < V_outside_lower.min()) and (V_lower.min() >= 0).item():
+    # w_guide = float(V_upper.numel())
+    # loss_guide = torch.relu(torch.min(V_upper) - 0.6) * w_guide
+    
     if (V_lower.min() >= 0):
         passed = True
         if show:
-            # print(" ✓ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
-            #     v_min, V_lower.min()
-            # ))
-            print(" ✓ Inside Goal passed, min V= {:.4f}, min V_outside_lower= {:.4f}, min V_lower={:.4f}".format(
-                v_min, V_outside_lower.min(), V_lower.min()
+            print(" ✓ Goal passed, min V_outside_lower= {:.4f}, min V_goal_upper={:.4f}".format(
+                V_outside_lower.min(), V_upper.min()
             ))
     else:
         passed = False
         if show:
-            # print(" ✗ Inside Goal passed, min V= {:.4f}, min V_lower={:.4f}".format(
-            #     v_min, V_lower.min()
-            # ))
-            print(" ✗ Inside Goal failed, min V= {:.4f}, min V_outside_lower= {:.4f}, min V_lower={:.4f}".format(
-                v_min, V_outside_lower.min(), V_lower.min()
+            print(" x Goal failed, min V_outside_lower= {:.4f}, min V_goal_upper={:.4f}".format(
+                V_outside_lower.min(), V_upper.min()
             ))
 
     return loss_nonneg, passed
@@ -221,7 +162,7 @@ def compute_loss_init_bounds(
         Loss (scalar)
     """
     # Push V_upper <= 1.0 AND V_lower >= beta_s
-    loss_upper = F.relu(V_upper - 1.0).sum()
+    loss_upper = F.relu(V_upper - 1.0).sum() + F.relu(beta_s - V_lower).sum()
     # loss_lower = F.relu(beta_s - V_lower).sum()
     return loss_upper
 
@@ -229,7 +170,8 @@ def compute_loss_init_bounds(
 def compute_loss_outside_bounds(
     V_lower: torch.Tensor,
     V_upper: torch.Tensor,
-    beta_s: Union[float, torch.Tensor]
+    beta_s: Union[float, torch.Tensor],
+    show: bool = False,
 ) -> torch.Tensor:
     """
     Compute outside goal constraint loss from bounds: V(x) >= beta_s for x outside Goal.
@@ -349,10 +291,12 @@ def compute_total_loss_bounds(
     # Compute individual losses
     if compute_V:
         loss_unsafe = compute_loss_unsafe_bounds(V_unsafe_lower, V_unsafe_upper, beta_ra)
-        loss_goal, _ = compute_loss_goal_bounds(model, goal_region, V_goal_lower, V_goal_upper, beta_s, V_outside_lower,
-                                                 device=device, n_samples=10000, show=False, w_soft=w_soft)
-        loss_init = compute_loss_init_bounds(V_init_lower, V_init_upper, beta_s)
-        loss_outside = compute_loss_outside_bounds(V_outside_lower, V_outside_upper, beta_s)
+        loss_goal, _ = compute_loss_goal_bounds(V_goal_lower, V_goal_upper, V_outside_lower, show=False)
+
+        v_eq = 0.1
+        loss_init = compute_loss_init_bounds(V_init_lower, V_init_upper, v_eq)
+        loss_outside = compute_loss_outside_bounds(V_outside_lower, V_outside_upper, 0.0)
+        
         # Boundary loss (only if boundary bounds provided)
         if V_boundary_lower is not None and V_boundary_upper is not None:
             loss_boundary = compute_loss_boundary_bounds(V_boundary_lower, V_boundary_upper)

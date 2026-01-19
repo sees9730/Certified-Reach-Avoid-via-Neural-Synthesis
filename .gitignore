@@ -9,3 +9,6 @@ __pycache__/
 .venv/
 venv/
 
+
+# Large files
+nonlinear4d_syn_unsafe/outputs/eval_bundle.pth

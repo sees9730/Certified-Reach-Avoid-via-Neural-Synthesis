@@ -23,6 +23,23 @@ class LinearControlNN(nn.Module):
         return self.fc(x)
     
 
+class LinearControl4DNN(nn.Module):
+    def __init__(self, hidden_dim=64):
+        super().__init__()
+        self.fc1 = nn.Linear(4, hidden_dim, bias=False)
+        self.fc2 = nn.Linear(hidden_dim, 2, bias=False)
+        A = torch.tensor([
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ])
+        self.register_buffer("A", A)
+
+    def forward(self, x):
+        h = torch.tanh(self.fc1(x))
+        u13 = torch.tanh(self.fc2(h))
+        u = u13 @ self.A
+        return u
+
 class GBMControlNN(nn.Module):
     def __init__(self, input_dim=2, hidden_dim=8, output_dim=2):
         super().__init__()

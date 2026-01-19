@@ -64,6 +64,17 @@ class GV(nn.Module):
             self._cached_inv_scale = None
             self._cached_inv_scale_sq = None
 
+        # NEW: input offset (use V_net's if present; otherwise zeros)
+        if hasattr(V_net, "input_offset"):
+            input_offset_init = V_net.input_offset
+        else:
+            input_offset_init = torch.zeros_like(torch.tensor(input_scale_init, dtype=torch.float32))
+        if isinstance(input_offset_init, torch.Tensor):
+            input_offset_buf = input_offset_init.detach().clone().to(dtype=torch.float32)
+        else:
+            input_offset_buf = torch.tensor(input_offset_init, dtype=torch.float32)
+        self.register_buffer("input_offset", input_offset_buf)
+
         # -------------------------
         # dynamics (cache dispatch decisions once)
         # -------------------------
@@ -98,7 +109,11 @@ class GV(nn.Module):
         inv_scale, inv_scale_sq = self._get_inv_scales(D, x.device, x.dtype)  # (D,), (D,)
 
         # normalize (multiplication is a bit cheaper than division)
-        x_norm = x * inv_scale
+        # x_norm = x * inv_scale
+        # NEW: match V normalization: (x - offset)/scale
+        offset = self._expand_scale(self.input_offset.to(device=x.device, dtype=x.dtype), D)  # (D,)
+        x_norm = (x - offset) * inv_scale
+
 
         # layer 1
         z0 = F.linear(x_norm, W0, b0)     # (N,m0)
