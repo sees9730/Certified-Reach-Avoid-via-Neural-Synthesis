@@ -1,0 +1,484 @@
+=== GBM Training Run ===
+Start time: 2026-01-18 20:06:47
+
+--- Seed 98540 ---
+epoch:   0.000, L0:   0.000, Lu: 1060.019, Lg:   0.000, Ld: 230.465, reg: 0.984
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.870.
+epoch: 1000.000, L0:   0.000, Lu: 233.610, Lg:   0.000, Ld:  13.615, reg: 9.506
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.827.
+epoch: 2000.000, L0:   0.000, Lu:   0.911, Lg:   0.000, Ld:   1.319, reg: 12.594
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.827.
+epoch: 3000.000, L0:   2.665, Lu:   0.000, Lg:   0.000, Ld:   0.360, reg: 10.532
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.845.
+epoch: 4000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 8.644
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.919.
+epoch: 5000.000, L0:   2.384, Lu:   0.000, Lg:   0.000, Ld:   5.551, reg: 7.311
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.950.
+Could not verify decrease at 6217 cells. Splitting further
+Could not verify decrease at 16953 cells. Splitting further
+Could not verify decrease at 31766 cells. Splitting further
+Could not verify decrease at 51689 cells. Splitting further
+Could not verify decrease at 65768 cells. Splitting further
+Found 65768 potential decrease condition violations. 
+epoch: 6000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   3.673, reg: 6.177
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.910.
+epoch: 7000.000, L0:   0.000, Lu:   0.381, Lg:   0.000, Ld:   0.692, reg: 5.412
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.947.
+epoch: 8000.000, L0:   0.903, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 4.505
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.952.
+Could not verify decrease at 5509 cells. Splitting further
+Could not verify decrease at 11032 cells. Splitting further
+Could not verify decrease at 14380 cells. Splitting further
+Could not verify decrease at 14161 cells. Splitting further
+Could not verify decrease at 14061 cells. Splitting further
+Found 14061 potential decrease condition violations. 
+epoch: 9000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 3.764
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.943.
+epoch: 10000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.297, reg: 3.025
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.964.
+Could not verify decrease at 4742 cells. Splitting further
+Could not verify decrease at 6522 cells. Splitting further
+Could not verify decrease at 7434 cells. Splitting further
+Could not verify decrease at 11172 cells. Splitting further
+Could not verify decrease at 8837 cells. Splitting further
+Found 8837 potential decrease condition violations. 
+epoch: 11000.000, L0:   0.243, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 2.167
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.938.
+epoch: 12000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 1.273
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.973.
+Could not verify decrease at 2639 cells. Splitting further
+Could not verify decrease at 5893 cells. Splitting further
+Could not verify decrease at 9925 cells. Splitting further
+Could not verify decrease at 8135 cells. Splitting further
+Could not verify decrease at 9543 cells. Splitting further
+Found 9543 potential decrease condition violations. 
+epoch: 13000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.151, reg: 0.689
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.965.
+Could not verify decrease at 3523 cells. Splitting further
+Could not verify decrease at 7146 cells. Splitting further
+Could not verify decrease at 5265 cells. Splitting further
+Could not verify decrease at 1630 cells. Splitting further
+Seed 98540 training time: 44.958 s
+Train returned: (True, 13999)
+
+--- Seed 77709 ---
+epoch:   0.000, L0:   0.000, Lu: 826.860, Lg:   0.000, Ld: 232.174, reg: 1.116
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.852.
+epoch: 1000.000, L0:   0.761, Lu: 684.185, Lg:   0.000, Ld:   6.336, reg: 7.481
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.866.
+epoch: 2000.000, L0:   2.972, Lu:   0.000, Lg:   0.000, Ld:   0.970, reg: 13.820
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.916.
+epoch: 3000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.598, reg: 10.517
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.928.
+epoch: 4000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 8.160
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.900.
+epoch: 5000.000, L0:   0.000, Lu:   1.778, Lg:   0.000, Ld:   0.000, reg: 6.385
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.951.
+Could not verify decrease at 5661 cells. Splitting further
+Could not verify decrease at 14554 cells. Splitting further
+Could not verify decrease at 26491 cells. Splitting further
+Could not verify decrease at 32217 cells. Splitting further
+Could not verify decrease at 8727 cells. Splitting further
+Found 8727 potential decrease condition violations. 
+epoch: 6000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.268, reg: 5.309
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.950.
+Could not verify decrease at 5461 cells. Splitting further
+Could not verify decrease at 12719 cells. Splitting further
+Could not verify decrease at 19970 cells. Splitting further
+Could not verify decrease at 25493 cells. Splitting further
+Could not verify decrease at 19150 cells. Splitting further
+Found 19150 potential decrease condition violations. 
+epoch: 7000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.146, reg: 4.406
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.948.
+epoch: 8000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.164, reg: 3.500
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.964.
+Could not verify decrease at 5062 cells. Splitting further
+Could not verify decrease at 9137 cells. Splitting further
+Could not verify decrease at 15113 cells. Splitting further
+Could not verify decrease at 13410 cells. Splitting further
+Could not verify decrease at 5892 cells. Splitting further
+Found 5892 potential decrease condition violations. 
+epoch: 9000.000, L0:   0.207, Lu:   0.000, Lg:   0.000, Ld:   0.596, reg: 2.660
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.967.
+Could not verify decrease at 4535 cells. Splitting further
+Could not verify decrease at 6973 cells. Splitting further
+Could not verify decrease at 12574 cells. Splitting further
+Could not verify decrease at 22037 cells. Splitting further
+Could not verify decrease at 13537 cells. Splitting further
+Found 13537 potential decrease condition violations. 
+epoch: 10000.000, L0:   0.172, Lu:   0.000, Lg:   0.000, Ld:   0.315, reg: 1.684
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.956.
+Could not verify decrease at 3454 cells. Splitting further
+Could not verify decrease at 6961 cells. Splitting further
+Could not verify decrease at 11163 cells. Splitting further
+Could not verify decrease at 8933 cells. Splitting further
+Could not verify decrease at 2973 cells. Splitting further
+Found 2973 potential decrease condition violations. 
+epoch: 11000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.831
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.963.
+Could not verify decrease at 2545 cells. Splitting further
+Could not verify decrease at 6250 cells. Splitting further
+Could not verify decrease at 10565 cells. Splitting further
+Could not verify decrease at 9410 cells. Splitting further
+Seed 77709 training time: 42.506 s
+Train returned: (True, 11999)
+
+--- Seed 5193 ---
+epoch:   0.000, L0:   0.000, Lu: 1295.160, Lg:   0.000, Ld: 210.488, reg: 1.618
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.599.
+epoch: 1000.000, L0:   9.151, Lu: 682.252, Lg:   0.000, Ld:  48.455, reg: 7.891
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.721.
+epoch: 2000.000, L0:   0.000, Lu:   0.075, Lg:   0.000, Ld:   0.287, reg: 16.110
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.814.
+epoch: 3000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.337, reg: 14.409
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.848.
+epoch: 4000.000, L0:   3.127, Lu:   0.105, Lg:   0.000, Ld:   2.116, reg: 12.785
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.909.
+epoch: 5000.000, L0:   0.554, Lu:   0.000, Lg:   0.000, Ld:   0.230, reg: 11.079
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.917.
+epoch: 6000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 8.899
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.942.
+epoch: 7000.000, L0:   0.481, Lu:   0.000, Lg:   0.000, Ld:   0.328, reg: 7.598
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.941.
+epoch: 8000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.038, reg: 6.507
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.928.
+epoch: 9000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 5.533
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.950.
+Could not verify decrease at 5674 cells. Splitting further
+Could not verify decrease at 14704 cells. Splitting further
+Could not verify decrease at 21604 cells. Splitting further
+Could not verify decrease at 23838 cells. Splitting further
+Could not verify decrease at 25199 cells. Splitting further
+Found 25199 potential decrease condition violations. 
+epoch: 10000.000, L0:   0.523, Lu:   0.000, Lg:   0.000, Ld:   0.027, reg: 4.861
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.960.
+Could not verify decrease at 6011 cells. Splitting further
+Could not verify decrease at 13213 cells. Splitting further
+Could not verify decrease at 16911 cells. Splitting further
+Could not verify decrease at 11187 cells. Splitting further
+Could not verify decrease at 5821 cells. Splitting further
+Found 5821 potential decrease condition violations. 
+epoch: 11000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.020, reg: 3.989
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.951.
+Could not verify decrease at 5403 cells. Splitting further
+Could not verify decrease at 10160 cells. Splitting further
+Could not verify decrease at 12460 cells. Splitting further
+Could not verify decrease at 11176 cells. Splitting further
+Could not verify decrease at 8479 cells. Splitting further
+Found 8479 potential decrease condition violations. 
+epoch: 12000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 3.188
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.966.
+Could not verify decrease at 5070 cells. Splitting further
+Could not verify decrease at 9092 cells. Splitting further
+Could not verify decrease at 7725 cells. Splitting further
+Could not verify decrease at 10261 cells. Splitting further
+Could not verify decrease at 11417 cells. Splitting further
+Found 11417 potential decrease condition violations. 
+epoch: 13000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.805, reg: 2.496
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.917.
+epoch: 14000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.388, reg: 1.866
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.931.
+epoch: 15000.000, L0:   1.034, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 1.268
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.945.
+epoch: 16000.000, L0:   0.934, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.683
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.964.
+Could not verify decrease at 2749 cells. Splitting further
+Could not verify decrease at 5747 cells. Splitting further
+Could not verify decrease at 4879 cells. Splitting further
+Could not verify decrease at 8254 cells. Splitting further
+Could not verify decrease at 12661 cells. Splitting further
+Found 12661 potential decrease condition violations. 
+epoch: 17000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.475
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.957.
+Could not verify decrease at 2936 cells. Splitting further
+Could not verify decrease at 6896 cells. Splitting further
+Could not verify decrease at 6498 cells. Splitting further
+Could not verify decrease at 6846 cells. Splitting further
+Could not verify decrease at 3633 cells. Splitting further
+Found 3633 potential decrease condition violations. 
+epoch: 18000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.424
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.966.
+Could not verify decrease at 2838 cells. Splitting further
+Could not verify decrease at 6720 cells. Splitting further
+Could not verify decrease at 8957 cells. Splitting further
+Could not verify decrease at 6699 cells. Splitting further
+Could not verify decrease at 6912 cells. Splitting further
+Found 6912 potential decrease condition violations. 
+epoch: 19000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.382
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.966.
+Could not verify decrease at 2639 cells. Splitting further
+Could not verify decrease at 6683 cells. Splitting further
+Could not verify decrease at 8423 cells. Splitting further
+Could not verify decrease at 11184 cells. Splitting further
+Could not verify decrease at 20288 cells. Splitting further
+Found 20288 potential decrease condition violations. 
+epoch: 20000.000, L0:   0.132, Lu:   0.000, Lg:   0.000, Ld:   0.172, reg: 0.410
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.945.
+epoch: 21000.000, L0:   1.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.437
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.970.
+Could not verify decrease at 3416 cells. Splitting further
+Could not verify decrease at 7393 cells. Splitting further
+Could not verify decrease at 8443 cells. Splitting further
+Could not verify decrease at 5161 cells. Splitting further
+Could not verify decrease at 2465 cells. Splitting further
+Found 2465 potential decrease condition violations. 
+epoch: 22000.000, L0:   0.018, Lu:   0.000, Lg:   0.000, Ld:   0.126, reg: 0.394
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.974.
+Could not verify decrease at 3181 cells. Splitting further
+Could not verify decrease at 7073 cells. Splitting further
+Could not verify decrease at 8435 cells. Splitting further
+Could not verify decrease at 4222 cells. Splitting further
+Could not verify decrease at 1535 cells. Splitting further
+Found 1535 potential decrease condition violations. 
+epoch: 23000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.514, reg: 0.375
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.971.
+Could not verify decrease at 3383 cells. Splitting further
+Could not verify decrease at 8503 cells. Splitting further
+Could not verify decrease at 4546 cells. Splitting further
+Could not verify decrease at 3321 cells. Splitting further
+Seed 5193 training time: 77.002 s
+Train returned: (True, 23999)
+
+--- Seed 98048 ---
+epoch:   0.000, L0:   0.000, Lu: 746.210, Lg:   0.000, Ld: 222.916, reg: 1.272
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.924.
+epoch: 1000.000, L0:   0.000, Lu: 220.806, Lg:   0.000, Ld:  50.005, reg: 11.202
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.839.
+epoch: 2000.000, L0:   6.688, Lu:   0.372, Lg:   0.000, Ld:   7.398, reg: 11.025
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 3000.000, L0:   2.904, Lu:   0.046, Lg:   0.000, Ld:   0.000, reg: 8.692
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.903.
+epoch: 4000.000, L0:   0.816, Lu:   0.000, Lg:   0.000, Ld:   1.001, reg: 6.999
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.930.
+epoch: 5000.000, L0:   1.072, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 5.871
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.923.
+epoch: 6000.000, L0:   4.053, Lu:   0.000, Lg:   0.000, Ld:   0.629, reg: 4.683
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.937.
+epoch: 7000.000, L0:   2.758, Lu:   0.000, Lg:   0.000, Ld:   0.744, reg: 3.493
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.934.
+epoch: 8000.000, L0:   1.112, Lu:   0.090, Lg:   0.000, Ld:   0.000, reg: 2.611
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.939.
+epoch: 9000.000, L0:   1.914, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 1.751
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.964.
+Could not verify decrease at 3473 cells. Splitting further
+Could not verify decrease at 6896 cells. Splitting further
+Could not verify decrease at 13858 cells. Splitting further
+Could not verify decrease at 15014 cells. Splitting further
+Could not verify decrease at 11535 cells. Splitting further
+Found 11535 potential decrease condition violations. 
+epoch: 10000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.701, reg: 0.966
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.951.
+Could not verify decrease at 3170 cells. Splitting further
+Could not verify decrease at 6117 cells. Splitting further
+Could not verify decrease at 6645 cells. Splitting further
+Could not verify decrease at 2450 cells. Splitting further
+Seed 98048 training time: 38.066 s
+Train returned: (True, 10999)
+
+--- Seed 50058 ---
+epoch:   0.000, L0:   0.000, Lu: 984.594, Lg:   0.000, Ld: 223.503, reg: 1.270
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.935.
+epoch: 1000.000, L0:   0.000, Lu: 289.135, Lg:   0.000, Ld:  38.816, reg: 10.267
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.817.
+epoch: 2000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   3.217, reg: 13.151
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.880.
+epoch: 3000.000, L0:   0.000, Lu:   0.731, Lg:   0.000, Ld:   0.000, reg: 10.424
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.905.
+epoch: 4000.000, L0:   1.100, Lu:   0.000, Lg:   0.000, Ld:   0.257, reg: 8.429
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.871.
+epoch: 5000.000, L0:   5.700, Lu:   0.378, Lg:   0.000, Ld:   0.000, reg: 6.865
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.928.
+epoch: 6000.000, L0:   1.066, Lu:   0.000, Lg:   0.000, Ld:   0.514, reg: 5.500
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.948.
+epoch: 7000.000, L0:   0.432, Lu:   0.000, Lg:   0.000, Ld:   0.268, reg: 4.753
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.948.
+epoch: 8000.000, L0:   0.829, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 3.753
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.922.
+epoch: 9000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 3.037
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.964.
+Could not verify decrease at 4482 cells. Splitting further
+Could not verify decrease at 7290 cells. Splitting further
+Could not verify decrease at 7472 cells. Splitting further
+Could not verify decrease at 9891 cells. Splitting further
+Could not verify decrease at 11489 cells. Splitting further
+Found 11489 potential decrease condition violations. 
+epoch: 10000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.017, reg: 2.279
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.960.
+Could not verify decrease at 3864 cells. Splitting further
+Could not verify decrease at 5028 cells. Splitting further
+Could not verify decrease at 6282 cells. Splitting further
+Could not verify decrease at 7334 cells. Splitting further
+Could not verify decrease at 3212 cells. Splitting further
+Found 3212 potential decrease condition violations. 
+epoch: 11000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 1.540
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.967.
+Could not verify decrease at 3044 cells. Splitting further
+Could not verify decrease at 5215 cells. Splitting further
+Could not verify decrease at 10088 cells. Splitting further
+Could not verify decrease at 17133 cells. Splitting further
+Could not verify decrease at 18606 cells. Splitting further
+Found 18606 potential decrease condition violations. 
+epoch: 12000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.812
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.970.
+Could not verify decrease at 3449 cells. Splitting further
+Could not verify decrease at 5901 cells. Splitting further
+Could not verify decrease at 7239 cells. Splitting further
+Could not verify decrease at 6630 cells. Splitting further
+Could not verify decrease at 1249 cells. Splitting further
+Found 1249 potential decrease condition violations. 
+epoch: 13000.000, L0:   0.017, Lu:   0.000, Lg:   0.000, Ld:   0.099, reg: 0.447
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.944.
+epoch: 14000.000, L0:   0.883, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.391
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.927.
+epoch: 15000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.191, reg: 0.400
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.971.
+Could not verify decrease at 3379 cells. Splitting further
+Could not verify decrease at 6733 cells. Splitting further
+Could not verify decrease at 8444 cells. Splitting further
+Could not verify decrease at 13507 cells. Splitting further
+Could not verify decrease at 16318 cells. Splitting further
+Found 16318 potential decrease condition violations. 
+epoch: 16000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.472, reg: 0.374
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.968.
+Could not verify decrease at 3119 cells. Splitting further
+Could not verify decrease at 6109 cells. Splitting further
+Could not verify decrease at 9616 cells. Splitting further
+Could not verify decrease at 20215 cells. Splitting further
+Could not verify decrease at 23655 cells. Splitting further
+Found 23655 potential decrease condition violations. 
+epoch: 17000.000, L0:   0.125, Lu:   0.000, Lg:   0.000, Ld:   0.240, reg: 0.385
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.959.
+Could not verify decrease at 3065 cells. Splitting further
+Could not verify decrease at 5117 cells. Splitting further
+Could not verify decrease at 5389 cells. Splitting further
+Could not verify decrease at 9435 cells. Splitting further
+Could not verify decrease at 7458 cells. Splitting further
+Found 7458 potential decrease condition violations. 
+epoch: 18000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.348
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.960.
+Could not verify decrease at 3309 cells. Splitting further
+Could not verify decrease at 5909 cells. Splitting further
+Could not verify decrease at 6584 cells. Splitting further
+Could not verify decrease at 11173 cells. Splitting further
+Could not verify decrease at 12226 cells. Splitting further
+Found 12226 potential decrease condition violations. 
+epoch: 19000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.361
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.973.
+Could not verify decrease at 2979 cells. Splitting further
+Could not verify decrease at 5455 cells. Splitting further
+Could not verify decrease at 6669 cells. Splitting further
+Could not verify decrease at 11301 cells. Splitting further
+Could not verify decrease at 8157 cells. Splitting further
+Found 8157 potential decrease condition violations. 
+epoch: 20000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.001, reg: 0.355
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.975.
+Could not verify decrease at 3218 cells. Splitting further
+Could not verify decrease at 5948 cells. Splitting further
+Could not verify decrease at 7961 cells. Splitting further
+Could not verify decrease at 17281 cells. Splitting further
+Could not verify decrease at 31398 cells. Splitting further
+Found 31398 potential decrease condition violations. 
+epoch: 21000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.366
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.962.
+Could not verify decrease at 3081 cells. Splitting further
+Could not verify decrease at 5279 cells. Splitting further
+Could not verify decrease at 5977 cells. Splitting further
+Could not verify decrease at 10739 cells. Splitting further
+Could not verify decrease at 5297 cells. Splitting further
+Found 5297 potential decrease condition violations. 
+epoch: 22000.000, L0:   0.277, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.349
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.964.
+Could not verify decrease at 3454 cells. Splitting further
+Could not verify decrease at 6753 cells. Splitting further
+Could not verify decrease at 7641 cells. Splitting further
+Could not verify decrease at 6852 cells. Splitting further
+Seed 50058 training time: 70.196 s
+Train returned: (True, 22999)
+
+=== Done ===
+Total wall time: 276.687 s
+End time: 2026-01-18 20:11:24

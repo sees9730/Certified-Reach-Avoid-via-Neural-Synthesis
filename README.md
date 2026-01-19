@@ -7,3 +7,7 @@ Each example/ has results/ that summarize the last epoch of the training
 
 ## Notes
 The inv_pend_veri has not been SAT yet.
+
+## Comparison
+To run the comparison, go into third_party/sumi-lab, run pip install -r requirements.txt, then run: python run_gbm.py or run_gbm3d.py. The results would be saved as a .txt file in the sumi-lab/ folder.
+The code may be killed (a sudden interuption in the .txt) if too many cells are being refined.
