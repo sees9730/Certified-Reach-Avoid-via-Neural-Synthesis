@@ -10,6 +10,37 @@ import controlled_sde
 from rl_agent import TanhPolicy
 import stochastic_rsa as rsa
 
+import os
+import sys
+from contextlib import contextmanager
+
+class Tee:
+    """Write to both terminal and a file."""
+    def __init__(self, *files):
+        self.files = files
+
+    def write(self, data):
+        for f in self.files:
+            f.write(data)
+            f.flush()
+
+    def flush(self):
+        for f in self.files:
+            f.flush()
+
+@contextmanager
+def tee_stdout_stderr(log_path: str, mode: str = "a"):
+    os.makedirs(os.path.dirname(log_path) or ".", exist_ok=True)
+    with open(log_path, mode) as log_f:
+        old_out, old_err = sys.stdout, sys.stderr
+        sys.stdout = Tee(old_out, log_f)
+        sys.stderr = Tee(old_err, log_f)
+        try:
+            yield
+        finally:
+            sys.stdout = old_out
+            sys.stderr = old_err
+
 torch.set_default_dtype(torch.float32)
 torch.use_deterministic_algorithms(True)
 
@@ -57,7 +88,7 @@ interest_set = rsa.AABBSet(global_bounds, device)
 initial_set = rsa.AABBSet(initial_bounds, device)
 target_set = rsa.AABBSet(target_bounds, device)
 unsafe_set = rsa.AABBSet(unsafe_bounds, device)
-reach_avoid_probability, stay_probability = 0.9, 0.9
+reach_avoid_probability = 0.95
 
 # create the specification
 spec = rsa.Specification(
@@ -65,97 +96,113 @@ spec = rsa.Specification(
     initial_set,
     unsafe_set,
     target_set,
-    0.9,
-    0.9
+    reach_avoid_probability=reach_avoid_probability,
+    stay_probability=None,
+    require_stay=False
 )
 
-npr.seed(0)
-seeds = npr.randint(1, 1e5, size=(5,))
-for seed in seeds:
-    torch.manual_seed(seed)
-    npr.seed(seed)
-    # create the certificate
-    net = rsa.CertificateModule(device=device)
-    certificate = rsa.SupermartingaleCertificate(sde, spec, net, device)
+log_file = "run_pendulum_log.txt"
+N_trials = 5
+# Note: verifier_mesh_size = 200, all passed 248 seconds (on average)
+# Note: verifier_mesh_size = 400, killed due to running out of memory
 
-    # train the certificate
-    t = time.time()
-    result = certificate.train(verify_every_n=1000,
-                               verifier_mesh_size=400,
-                               zeta=1.0,
-                               regularizer_lambda=1e-1,
-                               verification_slack=4,
-                               )
-    t = time.time() - t
-    result = (seed, t, result[0], result[1])
-    with open('pendulum.csv', 'a') as file:
-        writer = csv.writer(file, dialect='excel')
-        writer.writerow(result)
+with tee_stdout_stderr(log_file, mode="w"):
+    print("=== GBM Training Run ===")
+    print("Start time:", time.strftime("%Y-%m-%d %H:%M:%S"))
 
-# Initialize the batch of starting states
-x0 = torch.tile(torch.tensor([[STARTING_SPEED, STARTING_ANGLE]],
-                             device=device), dims=(4, 1))
-ts = torch.linspace(0, 0.1*DURATION, T_SIZE, device=device)
+    overall_t0 = time.perf_counter()
+    npr.seed(0)
+    seeds = npr.randint(1, 1e5, size=(N_trials,))
+    for seed in seeds:
+        torch.manual_seed(seed)
+        npr.seed(seed)
+        # create the certificate
+        net = rsa.CertificateModule(device=device)
+        certificate = rsa.SupermartingaleCertificate(sde, spec, net, device)
 
-#
-sample_paths = sde.sample(x0, ts, method="srk").squeeze()
+        # train the certificate
+        print(f"\n--- Seed {seed} ---")
+        t0 = time.perf_counter()
+        result = certificate.train(verify_every_n=1000,
+                                verifier_mesh_size=200,
+                                zeta=1.0,
+                                regularizer_lambda=1e-1,
+                                verification_slack=2,
+                                )
+        t = time.perf_counter() - t0
 
-# Plot
-fig, ax1 = plt.subplots(1, 1)
+        print(f"Seed {seed} training time: {t:.3f} s")
+        print(f"Train returned: {result}")
 
-with torch.no_grad():
-    print(global_bounds[0, 0, 0])
-    grid = torch.stack(
-        torch.meshgrid(
-            torch.linspace(global_bounds[0, 0, 0],
-                           global_bounds[0, 1, 0], 101),
-            torch.linspace(global_bounds[0, 0, 1],
-                           global_bounds[0, 1, 1], 101),
-            indexing='xy'
-        )
-    )
-    grid = grid.reshape(2, -1).T
-    out = certificate.net(grid).detach().numpy().reshape(101, 101)
-    scaling_factor = certificate.net(
-        initial_set.sample(1000)
-    ).detach().numpy().max()
-    out /= scaling_factor
-    min_level = int(np.floor(np.log10(out.min()) * 5))
-    max_level = int(np.ceil(np.log10(out.max()) * 5)) + 1
-    c = ax1.contourf(
-        np.linspace(global_bounds[0, 0, 0], global_bounds[0, 1, 0], 101),
-        np.linspace(global_bounds[0, 0, 1], global_bounds[0, 1, 1], 101),
-        out,
-        norm=colors.LogNorm(),
-        levels=[10 ** (n / 5) for n in range(min_level, max_level, 1)]
-    )
+        row = (seed, t, result[0], result[1])
+        with open('pendulum.csv', 'a', newline='') as file:
+            writer = csv.writer(file, dialect='excel')
+            writer.writerow(row)
 
-fig.colorbar(c, ax=ax1)
+# # Initialize the batch of starting states
+# x0 = torch.tile(torch.tensor([[STARTING_SPEED, STARTING_ANGLE]],
+#                              device=device), dims=(4, 1))
+# ts = torch.linspace(0, 0.1*DURATION, T_SIZE, device=device)
 
-ax1.set_xlim(global_bounds[0, :, 0])
-ax1.set_ylim(global_bounds[0, :, 1])
-for i in range(initial_bounds.shape[0]):
-    ax1.add_patch(Rectangle(initial_bounds[i, 0, :], *(initial_bounds[i, 1, :] - initial_bounds[i, 0, :]),
-                            edgecolor='yellow',
-                            facecolor='none',
-                            lw=2))
-for i in range(target_bounds.shape[0]):
-    ax1.add_patch(Rectangle(target_bounds[i, 0, :], *(target_bounds[i, 1, :] - target_bounds[i, 0, :]),
-                            edgecolor='limegreen',
-                            facecolor='none',
-                            lw=2))
-for i in range(unsafe_bounds.shape[0]):
-    ax1.add_patch(Rectangle(unsafe_bounds[i, 0, :], *(unsafe_bounds[i, 1, :] - unsafe_bounds[i, 0, :]),
-                            edgecolor='red',
-                            facecolor='none',
-                            lw=2))
+# #
+# sample_paths = sde.sample(x0, ts, method="srk").squeeze()
 
-path_data = sample_paths.numpy()
-ax1.plot(path_data[:, :, 0], path_data[:, :, 1],
-         color="white", lw=1, alpha=0.5
-         )
+# # Plot
+# fig, ax1 = plt.subplots(1, 1)
 
-plt.show()
+# with torch.no_grad():
+#     print(global_bounds[0, 0, 0])
+#     grid = torch.stack(
+#         torch.meshgrid(
+#             torch.linspace(global_bounds[0, 0, 0],
+#                            global_bounds[0, 1, 0], 101),
+#             torch.linspace(global_bounds[0, 0, 1],
+#                            global_bounds[0, 1, 1], 101),
+#             indexing='xy'
+#         )
+#     )
+#     grid = grid.reshape(2, -1).T
+#     out = certificate.net(grid).detach().numpy().reshape(101, 101)
+#     scaling_factor = certificate.net(
+#         initial_set.sample(1000)
+#     ).detach().numpy().max()
+#     out /= scaling_factor
+#     min_level = int(np.floor(np.log10(out.min()) * 5))
+#     max_level = int(np.ceil(np.log10(out.max()) * 5)) + 1
+#     c = ax1.contourf(
+#         np.linspace(global_bounds[0, 0, 0], global_bounds[0, 1, 0], 101),
+#         np.linspace(global_bounds[0, 0, 1], global_bounds[0, 1, 1], 101),
+#         out,
+#         norm=colors.LogNorm(),
+#         levels=[10 ** (n / 5) for n in range(min_level, max_level, 1)]
+#     )
 
-# sde.render(sample_paths, ts)
-sde.close()
+# fig.colorbar(c, ax=ax1)
+
+# ax1.set_xlim(global_bounds[0, :, 0])
+# ax1.set_ylim(global_bounds[0, :, 1])
+# for i in range(initial_bounds.shape[0]):
+#     ax1.add_patch(Rectangle(initial_bounds[i, 0, :], *(initial_bounds[i, 1, :] - initial_bounds[i, 0, :]),
+#                             edgecolor='yellow',
+#                             facecolor='none',
+#                             lw=2))
+# for i in range(target_bounds.shape[0]):
+#     ax1.add_patch(Rectangle(target_bounds[i, 0, :], *(target_bounds[i, 1, :] - target_bounds[i, 0, :]),
+#                             edgecolor='limegreen',
+#                             facecolor='none',
+#                             lw=2))
+# for i in range(unsafe_bounds.shape[0]):
+#     ax1.add_patch(Rectangle(unsafe_bounds[i, 0, :], *(unsafe_bounds[i, 1, :] - unsafe_bounds[i, 0, :]),
+#                             edgecolor='red',
+#                             facecolor='none',
+#                             lw=2))
+
+# path_data = sample_paths.numpy()
+# ax1.plot(path_data[:, :, 0], path_data[:, :, 1],
+#          color="white", lw=1, alpha=0.5
+#          )
+
+# plt.show()
+
+# # sde.render(sample_paths, ts)
+# sde.close()

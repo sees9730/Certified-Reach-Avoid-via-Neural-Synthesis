@@ -158,8 +158,10 @@ class GeneratorModule(torch.nn.Module):
         g = self.diffusion(x, u)
         _, jacobian, hessian = self.certificate(x)
         dv_dx = jacobian.squeeze(1)
-        d2v_dx2 = torch.cat(
-            (hessian[:, 0, 0].unsqueeze(0), hessian[:, 1, 1].unsqueeze(0)),
-            dim=0
-        ).T  # extract the diagonal; tried torch.diagonal, LiRPA complains
+        # d2v_dx2 = torch.cat(
+        #     (hessian[:, 0, 0].unsqueeze(0), hessian[:, 1, 1].unsqueeze(0)),
+        #     dim=0
+        # ).T  # extract the diagonal; tried torch.diagonal, LiRPA complains
+        D = x.shape[1]
+        d2v_dx2 = torch.cat([hessian[:, i, i].unsqueeze(0) for i in range(D)], dim=0).T  # (N, D)
         return (f * dv_dx + 0.5 * torch.square(g) * d2v_dx2).sum(dim=1)

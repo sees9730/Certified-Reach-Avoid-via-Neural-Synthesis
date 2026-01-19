@@ -73,7 +73,10 @@ class SupermartingaleCertificate():
         unsafe_set = self.specification.unsafe_set
         target_set = self.specification.target_set
         prob_ra = self.specification.reach_avoid_probability
-        prob_s = self.specification.stay_probability
+        require_stay_attr = getattr(self.specification, "require_stay", True)
+        prob_s_attr = getattr(self.specification, "stay_probability", None)
+        require_stay = bool(require_stay_attr) and (prob_s_attr is not None)
+        prob_s = prob_s_attr if require_stay else None
         generator = self.generator
         n_dim = self.n_dimensions
 
@@ -85,36 +88,48 @@ class SupermartingaleCertificate():
         # initialize the levels (step 1 in the paper)
         alpha_ra = 1.0
         beta_ra = alpha_ra / (1.0 - prob_ra) * verification_slack
-        beta_s = alpha_ra * 0.9
-        alpha_s = beta_s * (1.0 - prob_s) / verification_slack
+        if require_stay:
+            beta_s = alpha_ra * 0.9
+            alpha_s = beta_s * (1.0 - float(prob_s)) / verification_slack
+        else:
+            # RA-only: no stay levels. Use 0 as the lower cutoff for the decrease region.
+            beta_s = None
+            alpha_s = 0.0
 
         # create the cells (step 2 in the paper)
-        cells = torch.meshgrid(
-            torch.linspace(global_set.low[0, 0],
-                           global_set.high[0, 0], verifier_mesh_size + 1),
-            torch.linspace(global_set.low[0, 1],
-                           global_set.high[0, 1], verifier_mesh_size + 1),
-            indexing='xy'
-        )
-        x_L = torch.cat(
-            (torch.reshape(cells[0][:-1, :-1], (-1,)).unsqueeze(1),
-             torch.reshape(cells[1][:-1, :-1], (-1,)).unsqueeze(1)),
-            dim=1
-        )  # lower cell bounds
-        x_U = torch.cat(
-            (torch.reshape(cells[0][1:, 1:], (-1,)).unsqueeze(1),
-             torch.reshape(cells[1][1:, 1:], (-1,)).unsqueeze(1)),
-            dim=1
-        )  # upper cell bounds
+        # --- Sanity check dimensions (fail fast) ---
+        low = global_set.low
+        high = global_set.high
+        lowD = low.shape[-1]
+        highD = high.shape[-1]
+        if lowD != n_dim or highD != n_dim:
+            raise ValueError(
+                f"Dimension mismatch: sde.n_dimensions()={n_dim}, "
+                f"but global_set.low/high have last-dim sizes {lowD}/{highD}. "
+                f"Shapes: low={tuple(low.shape)}, high={tuple(high.shape)}. "
+                "Update Specification/Set bounds to be 3D."
+            )
+
+        edges = [
+            torch.linspace(global_set.low[0, d], global_set.high[0, d], verifier_mesh_size + 1, device=self.device)
+            for d in range(n_dim)
+        ]
+
+        grids_L = torch.meshgrid(*[e[:-1] for e in edges], indexing="ij")
+        grids_U = torch.meshgrid(*[e[1:]  for e in edges], indexing="ij")
+
+        x_L = torch.stack([g.reshape(-1) for g in grids_L], dim=1)  # (Ncells, D)
+        x_U = torch.stack([g.reshape(-1) for g in grids_U], dim=1)  # (Ncells, D)
+
         cells = BoundedTensor(
             0.5 * (x_L + x_U),
             PerturbationLpNorm(x_L=x_L, x_U=x_U)
-        )  # create cells as bounded tensors for auto_LiRPA
-        cell_magnitudes = 0.5 * global_set.magnitudes / verifier_mesh_size
+        )
+
+        cell_magnitudes = 0.5 * global_set.magnitudes[0] / verifier_mesh_size  # (D,)
 
         # run training for n_epochs
-        progress_bar = tqdm.tqdm(range(n_epochs))
-        for epoch in progress_bar:  # step 3 in the paper
+        for epoch in range(n_epochs):  # step 3 in the paper
             # reset the gradients
             optimizer.zero_grad()
 
@@ -126,7 +141,12 @@ class SupermartingaleCertificate():
             x_u = unsafe_set.contains(batch)
             x_0 = initial_set.contains(batch)
             x_g = target_set.contains(batch)
+            # decrease-region mask:
+            # - always: v <= beta_ra and v > alpha_s
+            # - RA/RAS: must be outside target and unsafe (hitting either terminates the property)
             x_d = torch.logical_and(v <= beta_ra, v > alpha_s).squeeze(-1)
+            x_d = torch.logical_and(x_d, torch.logical_not(x_g))
+            x_d = torch.logical_and(x_d, torch.logical_not(x_u))
 
             # find the loss over the safety set points - eq. (11)
             safety_loss = torch.clamp(beta_ra - v[x_u], min=0.0).sum()
@@ -134,12 +154,18 @@ class SupermartingaleCertificate():
             # find the loss over the initial set points - eq. (12)
             init_loss = torch.clamp(v[x_0] - alpha_ra, min=0.0).sum()
 
-            # find the loss over the interior of the target set - eq. (13)
-            goal_loss = torch.clamp(v[x_g] - beta_s, min=0.0).sum()
+            # eq. (13) goal loss (RAS only)
+            if require_stay:
+                goal_loss = torch.clamp(v[x_g] - beta_s, min=0.0).sum()
+            else:
+                goal_loss = torch.tensor(0.0, device=self.device)
 
-            # find the loss for the infinitesimal generator - eq. (14)
-            gen_values = generator(batch[x_d])
-            decrease_loss = torch.clamp(gen_values + zeta, min=0.0).sum()
+            # eq. (14) decrease / generator loss
+            if torch.any(x_d):
+                gen_values = generator(batch[x_d])
+                decrease_loss = torch.clamp(gen_values + zeta, min=0.0).sum()
+            else:
+                decrease_loss = torch.tensor(0.0, device=self.device)
 
             # find the loss regularizer - eq. (15)
             regularizer = regularizer_lambda
@@ -149,19 +175,21 @@ class SupermartingaleCertificate():
                         layer.weight,
                         ord=torch.inf
                     )
+            reg_val = regularizer.item() if isinstance(regularizer, torch.Tensor) else float(regularizer)
 
             # find the total loss - eq. (10) and step 5 of the algorithm
-            loss = init_loss + safety_loss + goal_loss + decrease_loss
-            loss += regularizer
+            loss = init_loss + safety_loss + goal_loss + decrease_loss + regularizer
 
             # update the progress bar with the loss information
-            progress_bar.set_description(
-                f"L0:{init_loss: 8.3f}, "
-                f"Lu:{safety_loss: 8.3f}, "
-                f"Lg:{goal_loss: 8.3f}, "
-                f"Ld:{decrease_loss: 8.3f}, "
-                f"reg:{regularizer.item(): 6.3f}"
-            )
+            if(epoch % 1000 == 0):
+                print(
+                    f"epoch:{epoch: 8.3f}, "
+                    f"L0:{init_loss: 8.3f}, "
+                    f"Lu:{safety_loss: 8.3f}, "
+                    f"Lg:{goal_loss: 8.3f}, "
+                    f"Ld:{decrease_loss: 8.3f}, "
+                    f"reg:{reg_val: 6.3f}"
+                )
 
             # if somehow the loss is scalar (i.e., a batch sample was not
             # representative), go to the next step
@@ -208,36 +236,34 @@ class SupermartingaleCertificate():
                 else:
                     prob_ra_estimate = max(1.0 - init_upper/unsafe_lower, 0.0)
                 print(
-                    f"Reach-avoid condition is satisfied with "
+                    f"Verifying Reach-avoid probability with "
                     f"probability at least {prob_ra_estimate: 5.3f}."
                 )
                 if prob_ra_estimate < self.specification.reach_avoid_probability:
                     continue
 
-                # Verification step 3. Stay probability. This is step 10.
+                # Verification step 3: Stay probability (RAS only)
+                if require_stay:
+                    alpha_s_candidate = torch.min(
+                        cell_ub[target_set.contains(cells), :]
+                    ).item()
+                    beta_s_candidate = torch.max(
+                        cell_lb[target_set.boundary_contains(
+                            cells,
+                            cell_magnitudes
+                        ), :]
+                    ).item()
 
-                # first, find a new alpha_s level if needed; we use the largest
-                # upper bound of a cell, as all of the cell is then within this
-                # sublevel set
-                alpha_s_candidate = torch.min(
-                    cell_ub[target_set.contains(cells), :]
-                ).item()
-                beta_s_candidate = torch.max(
-                    cell_lb[target_set.boundary_contains(
-                        cells,
-                        cell_magnitudes
-                    ), :]
-                ).item()
-
-                # compute the estimated reach-avoid probability, eq. (17)
-                prob_s_estimate = max(
-                    1.0 - alpha_s_candidate/beta_s_candidate, 0.0)
-                print(
-                    f"Stay condition is satisfied with "
-                    f"probability at least {prob_s_estimate: 5.3f}."
-                )
-                if prob_s_estimate < self.specification.stay_probability:
-                    continue
+                    prob_s_estimate = max(1.0 - alpha_s_candidate / beta_s_candidate, 0.0)
+                    print(
+                        f"Stay condition is satisfied with "
+                        f"probability at least {prob_s_estimate: 5.3f}."
+                    )
+                    if prob_s_estimate < float(self.specification.stay_probability):
+                        continue
+                else:
+                    # RA-only: no stay check; set threshold used by decrease mask to 0
+                    alpha_s_candidate = 0.0
 
                 # Verification step 4. decrease condition.
 
@@ -246,6 +272,9 @@ class SupermartingaleCertificate():
                     cell_lb > alpha_s_candidate,
                     cell_ub <= beta_ra
                 ).squeeze()
+                # IMPORTANT: exclude target and unsafe cells from decrease obligation (RA and RAS)
+                mask = torch.logical_and(mask, torch.logical_not(target_set.contains(cells).squeeze()))
+                mask = torch.logical_and(mask, torch.logical_not(unsafe_set.contains(cells).squeeze()))
                 decrease_cells = cells[mask, :]
 
                 if torch.numel(decrease_cells) > 0:
