@@ -335,9 +335,16 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
     # Outside goal (for V constraint)
     print(f"\nOutside goal region: {discretization_config.n_outside_goal} per-dim per rectangle")
     outside_goal_rects = compute_rectangular_partition_outside_goal(regions.full, regions.goal)
-    region_cells['outside'] = []
+    # Pre-allocate: each rectangle -> n_outside_goal^D cells
+    n_per_rect = discretization_config.n_outside_goal ** regions.full.bounds.shape[0]
+    total_outside = n_per_rect * len(outside_goal_rects)
+    region_cells['outside'] = [None] * total_outside
+    idx = 0
     for rect in outside_goal_rects:
-        region_cells['outside'].extend(discretize_region(rect, discretization_config.n_outside_goal))
+        for cell in discretize_region(rect, discretization_config.n_outside_goal):
+            region_cells['outside'][idx] = cell
+            idx += 1
+    region_cells['outside'] = region_cells['outside'][:idx]
     print(f"  → {len(region_cells['outside'])} cells")
 
     # Generator region (outside goal and unsafe)
@@ -366,7 +373,11 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
             exclusion_regions.append(regions.unsafe.bounds)
             print(f'  Excluding goal + 1 unsafe region')
 
-        clipped_cells = []
+        # Pre-allocate with upper bound (clipping can increase cell count)
+        max_clipped = len(all_cells) * (2 ** regions.full.bounds.shape[0])  # worst case: each cell splits
+        clipped_cells = [None] * max_clipped
+        idx = 0
+
         for cell_lower, cell_upper in all_cells:
             lower_np = cell_lower.numpy() if isinstance(cell_lower, torch.Tensor) else cell_lower
             upper_np = cell_upper.numpy() if isinstance(cell_upper, torch.Tensor) else cell_upper
@@ -374,12 +385,13 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
             result_cells = clip_cell_against_exclusions(lower_np, upper_np, exclusion_regions)
 
             for lower, upper in result_cells:
-                clipped_cells.append((
+                clipped_cells[idx] = (
                     torch.tensor(lower, dtype=torch.float32),
                     torch.tensor(upper, dtype=torch.float32)
-                ))
+                )
+                idx += 1
 
-        region_cells['generator'] = clipped_cells
+        region_cells['generator'] = clipped_cells[:idx]
         print(f'  After clipping: {len(region_cells["generator"])} cells (may have increased due to cell splitting)')
         if len(region_cells['generator']) > 0:
             first_cell = region_cells['generator'][0]
@@ -389,9 +401,16 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
         generator_rects = compute_rectangular_partition_outside_goal_and_unsafe(
             regions.full, regions.goal, regions.unsafe
         )
-        region_cells['generator'] = []
+        # Pre-allocate: each rectangle -> n_generator^D cells
+        n_per_rect = discretization_config.n_generator ** regions.full.bounds.shape[0]
+        total_gen = n_per_rect * len(generator_rects)
+        region_cells['generator'] = [None] * total_gen
+        idx = 0
         for rect in generator_rects:
-            region_cells['generator'].extend(discretize_region(rect, discretization_config.n_generator))
+            for cell in discretize_region(rect, discretization_config.n_generator):
+                region_cells['generator'][idx] = cell
+                idx += 1
+        region_cells['generator'] = region_cells['generator'][:idx]
         print(f"  → {len(region_cells['generator'])} cells")
 
     print(f"\nRegion definitions:")

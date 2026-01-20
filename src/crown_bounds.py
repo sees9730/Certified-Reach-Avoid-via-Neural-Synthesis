@@ -64,14 +64,8 @@ class SymbolicCROWNCache:
         # Forward pass to build symbolic computation graph
         _ = self.lirpa_model(bounded_input)
 
-        # Compute bounds once to initialize symbolic structure
-        _ = self.lirpa_model.compute_bounds(
-            x=(bounded_input,),
-            method='IBP',
-            forward=True,
-            bound_lower=True,
-            bound_upper=True
-        )
+        # Cache a dummy batch (zeros) for IBP - actual values don't matter, only bounds
+        self.dummy_batch_cache = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)
 
         # print(f"[SymbolicCROWNCache] Initialized for {num_cells} cells - symbolic structure cached!")
 
@@ -89,18 +83,20 @@ class SymbolicCROWNCache:
         """
         assert input_lowers.shape[0] == self.num_cells
 
-        # Create dummy batch input (center of each cell)
-        dummy_batch = input_lowers.clone().to(self.device)
-        dummy_batch.add_(input_uppers.to(self.device)).mul_(0.5)
+        # Use cached dummy batch (for IBP, actual values don't matter)
+        # Ensure bounds are on correct device (avoid redundant .to() if already on device)
+        if input_lowers.device != self.device:
+            input_lowers = input_lowers.to(self.device)
+            input_uppers = input_uppers.to(self.device)
 
         # Create new perturbation with updated bounds
         ptb = PerturbationLpNorm(
             norm=np.inf,
             eps=None,
-            x_L=input_lowers.detach().to(self.device),
-            x_U=input_uppers.detach().to(self.device)
+            x_L=input_lowers,
+            x_U=input_uppers
         )
-        bounded_input = BoundedTensor(dummy_batch, ptb)
+        bounded_input = BoundedTensor(self.dummy_batch_cache, ptb)
 
         # Compute bounds
         lb, ub = self.lirpa_model.compute_bounds(
@@ -172,14 +168,8 @@ class SymbolicCROWNCache_Phi:
         # Forward pass to build symbolic computation graph
         _ = self.lirpa_model(bounded_input)
 
-        # Compute bounds once to initialize
-        _ = self.lirpa_model.compute_bounds(
-            x=(bounded_input,),
-            method='IBP',
-            forward=True,
-            bound_lower=True,
-            bound_upper=True
-        )
+        # Cache a dummy batch (zeros) for IBP - actual values don't matter, only bounds
+        self.dummy_batch_cache = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)
 
         # print(f"[SymbolicCROWNCache_Phi] Initialized for {num_cells} cells!")
 
@@ -197,20 +187,23 @@ class SymbolicCROWNCache_Phi:
         """
         # assert input_lowers.shape[0] == self.num_cells
 
-        # Create dummy batch input
-        dummy_batch = input_lowers.clone().to(self.device)
-        dummy_batch.add_(input_uppers.to(self.device)).mul_(0.5)
+        # Use cached dummy batch (for IBP, actual values don't matter)
+        # Ensure bounds are on correct device (avoid redundant .to() if already on device)
+        if input_lowers.device != self.device:
+            input_lowers = input_lowers.to(self.device)
+            input_uppers = input_uppers.to(self.device)
 
         # Create new perturbation
         ptb = PerturbationLpNorm(
             norm=np.inf,
             eps=None,
-            x_L=input_lowers.detach().to(self.device),
-            x_U=input_uppers.detach().to(self.device)
+            x_L=input_lowers,
+            x_U=input_uppers
         )
-        bounded_input = BoundedTensor(dummy_batch, ptb)
+        bounded_input = BoundedTensor(self.dummy_batch_cache, ptb)
 
-        # Compute bounds
+        # Compute bounds (only upper bound needed for generator loss, but IBP computes both)
+        # Note: For IBP, bound_lower=False doesn't save computation, so we compute both
         lb, ub = self.lirpa_model.compute_bounds(
             x=(bounded_input,),
             method='IBP',
@@ -219,7 +212,7 @@ class SymbolicCROWNCache_Phi:
             bound_upper=True
         )
 
-        phi_lowers = lb.squeeze(-1)  # (N,)
+        phi_lowers = lb.squeeze(-1)  # (N,) - computed but unused in loss
         phi_uppers = ub.squeeze(-1)  # (N,)
 
         return phi_lowers, phi_uppers
@@ -241,10 +234,16 @@ def prepare_cell_bounds(cells, device='cpu', input_dim=2):
     Returns:
         (input_lowers, input_uppers) tensors of shape (N, input_dim)
     """
-    if len(cells) == 0:
+    n = len(cells)
+    if n == 0:
         return torch.empty(0, input_dim, device=device), torch.empty(0, input_dim, device=device)
 
-    input_lowers = torch.stack([cell[0] for cell in cells]).to(device)
-    input_uppers = torch.stack([cell[1] for cell in cells]).to(device)
+    # Pre-allocate tensors and fill directly (avoid list comprehension + stack)
+    input_lowers = torch.empty(n, input_dim, dtype=torch.float32, device=device)
+    input_uppers = torch.empty(n, input_dim, dtype=torch.float32, device=device)
+
+    for i, (cell_lower, cell_upper) in enumerate(cells):
+        input_lowers[i] = cell_lower.to(device) if cell_lower.device != device else cell_lower
+        input_uppers[i] = cell_upper.to(device) if cell_upper.device != device else cell_upper
 
     return input_lowers, input_uppers

@@ -483,7 +483,7 @@ def refine_failing_cells(
     refine_factor: int = 2,
     N_to_refine: int = 100,
     seed: Optional[int] = 0,
-    scores: Optional[torch.Tensor] = None,   # <-- NEW (larger = refine first)
+    scores: Optional[torch.Tensor] = None,
 ) -> Tuple[List[Tuple[torch.Tensor, torch.Tensor]], int]:
     """
     Refine (split) only a subset of failing cells.
@@ -535,12 +535,21 @@ def refine_failing_cells(
             refine_idxs = rng.choice(failing_idxs_t.tolist(), size=k, replace=False).tolist()
             refine_set = set(refine_idxs)
 
-    new_cells: List[Tuple[torch.Tensor, torch.Tensor]] = []
+    # Pre-allocate: estimate size (upper bound = unrefined + refined*refine_factor^D)
+    n_cells = len(region_cells)
+    n_refine = len(refine_set)
+    if n_refine > 0:
+        D = region_cells[0][0].reshape(-1).numel()
+        max_new_cells = (n_cells - n_refine) + n_refine * (refine_factor ** D)
+    else:
+        max_new_cells = n_cells
+
+    new_cells: List[Tuple[torch.Tensor, torch.Tensor]] = [None] * max_new_cells
+    insert_idx = 0
     num_refined = 0
 
     for i, (cell_lower, cell_upper) in enumerate(region_cells):
         if i in refine_set:
-            # --- build (D,2) bounds (dimension-generic) ---
             cell_lower = cell_lower.reshape(-1)
             cell_upper = cell_upper.reshape(-1)
             D = int(cell_lower.numel())
@@ -549,16 +558,18 @@ def refine_failing_cells(
                 [[cell_lower[d].item(), cell_upper[d].item()] for d in range(D)],
                 dtype=np.float32
             )
-            # ------------------------------------------------
 
             cell_region = Region(cell_bounds)
             refined = discretize_region(cell_region, refine_factor)
-            new_cells.extend(refined)
+            for cell in refined:
+                new_cells[insert_idx] = cell
+                insert_idx += 1
             num_refined += 1
         else:
-            new_cells.append((cell_lower, cell_upper))
+            new_cells[insert_idx] = (cell_lower, cell_upper)
+            insert_idx += 1
 
-    return new_cells, num_refined
+    return new_cells[:insert_idx], num_refined
 
 
 def merge_passing_neighbor_cells(

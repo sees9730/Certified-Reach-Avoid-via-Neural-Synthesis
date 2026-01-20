@@ -35,7 +35,8 @@ def train_network_bounds(
     params: Hyperparameters,
     device: str = 'cpu',
     control_net: nn.Module = None,
-    create_scheduler = None
+    create_scheduler = None,
+    start_time: float = None
 ):
     """
     Train the value network using CROWN bounds.
@@ -64,17 +65,22 @@ def train_network_bounds(
 
     # Collect ALL cells in the same order as original (init, goal, unsafe, outside, generator)
     print("=== Total cells per region for V ===")
-    all_cells_V = []
     cell_counts_V = {}
     region_order_V = ['init', 'goal', 'unsafe', 'outside']
 
+    # Pre-calculate total size and pre-allocate
+    total_cells_V = sum(len(region_cells[name]) for name in region_order_V)
+    all_cells_V = [None] * total_cells_V
+    idx = 0
+
     for name in region_order_V:
         cells = region_cells[name]
-        all_cells_V.extend(cells)
-        cell_counts_V[name] = len(cells)
-        print(f"{name}: {len(cells)} cells")
-
-    total_cells_V = len(all_cells_V)
+        n = len(cells)
+        cell_counts_V[name] = n
+        print(f"{name}: {n} cells")
+        for cell in cells:
+            all_cells_V[idx] = cell
+            idx += 1
     print(f"Total V cells: {total_cells_V}")
 
     # Prepare all input bounds at once
@@ -120,10 +126,32 @@ def train_network_bounds(
     # Scheduler is optional and created via factory function from main.py
     scheduler = create_scheduler(optimizer) if create_scheduler is not None else None
 
+    # Pre-compute region slice indices for fast bound splitting (avoids loop overhead)
+    region_slice_indices = {}
+    start_idx = 0
+    for name in region_order_V:
+        num = cell_counts_V[name]
+        region_slice_indices[name] = (start_idx, start_idx + num)
+        start_idx += num
+
+    # Pre-allocate empty tensors for reuse (avoid repeated allocation)
+    empty_tensor = torch.tensor([], device=device)
+
+    # Pre-allocate dictionaries that are rebuilt every epoch
+    bounds = {}
+    bounds_updated = {}
+    loss_kwargs = {
+        'beta_ra': params.constraints.beta_ra,
+        'device': device,
+        'compute_V': params.compute_V,
+        'compute_GV': params.compute_GV,
+    }
+
     # Training loop
     loss_history = []
     refinement_epochs = {'outside': [], 'generator': []}
-    start_time = time.time()
+    if start_time is None:
+        start_time = time.time()
     final_beta_s = None
 
     for epoch in range(params.training.num_epochs):
@@ -136,26 +164,21 @@ def train_network_bounds(
             if total_cells_V > 0:
                 v_lowers_all, v_uppers_all = crown_cache_all.compute_bounds(input_lowers_all, input_uppers_all)
             else:
-                v_lowers_all = torch.tensor([], device=device)
-                v_uppers_all = torch.tensor([], device=device)
+                v_lowers_all = empty_tensor
+                v_uppers_all = empty_tensor
 
-            # Split bounds by region (matching original's split_bounds_by_region)
-            bounds = {}
-            cell_idx = 0
+            # Split bounds by region using pre-computed indices (reuse dict)
             for name in region_order_V:
-                num_cells = cell_counts_V[name]
-                if num_cells > 0:
-                    bounds[name] = (
-                        v_lowers_all[cell_idx:cell_idx + num_cells],
-                        v_uppers_all[cell_idx:cell_idx + num_cells]
-                    )
-                    cell_idx += num_cells
+                start, end = region_slice_indices[name]
+                if start < end:
+                    bounds[name] = (v_lowers_all[start:end], v_uppers_all[start:end])
                 else:
-                    bounds[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
+                    bounds[name] = (empty_tensor, empty_tensor)
 
         if params.compute_GV:
             # Compute generator bounds if enabled
-            needs_cache_rebuild = False
+            needs_v_cache_rebuild = False
+            needs_gv_cache_rebuild = False
             if (epoch >= params.training.generator_start_epoch and
                 params.training.generator_weight > 0 and
                 crown_cache_phi is not None):
@@ -167,33 +190,20 @@ def train_network_bounds(
                 num_total_failing = phi_upper_failing_mask.sum().item()
 
             else:
-                phi_uppers = torch.tensor([], device=device)
+                phi_uppers = empty_tensor
                 current_gen_weight = 0.0
                 num_total_failing = 0
 
-        # Compute total loss from bounds
-        loss_kwargs = {
-            'beta_ra': params.constraints.beta_ra,
-            'device': device,
-            'compute_V': params.compute_V,
-            'compute_GV': params.compute_GV,
-        }
-
-        # Add V bounds if computing V
+        # Update loss kwargs with current bounds (reuse pre-allocated dict)
         if params.compute_V:
-            loss_kwargs.update({
-                'V_goal_lower': bounds['goal'][0],
-                'V_unsafe_lower': bounds['unsafe'][0],
-                'V_init_upper': bounds['init'][1],
-                'V_outside_lower': bounds['outside'][0],
-            })
+            loss_kwargs['V_goal_lower'] = bounds['goal'][0]
+            loss_kwargs['V_unsafe_lower'] = bounds['unsafe'][0]
+            loss_kwargs['V_init_upper'] = bounds['init'][1]
+            loss_kwargs['V_outside_lower'] = bounds['outside'][0]
 
-        # Add GV bounds if computing GV
         if params.compute_GV:
-            loss_kwargs.update({
-                'Phi_upper': phi_uppers,
-                'generator_weight': current_gen_weight
-            })
+            loss_kwargs['Phi_upper'] = phi_uppers
+            loss_kwargs['generator_weight'] = current_gen_weight
 
         total_loss, loss_dict, sat_dict = compute_total_loss_bounds(**loss_kwargs)
 
@@ -206,22 +216,16 @@ def train_network_bounds(
             if total_cells_V > 0:
                 v_lowers_all_updated, v_uppers_all_updated = crown_cache_all.compute_bounds(input_lowers_all, input_uppers_all)
             else:
-                v_lowers_all_updated = torch.tensor([], device=device)
-                v_uppers_all_updated = torch.tensor([], device=device)
+                v_lowers_all_updated = empty_tensor
+                v_uppers_all_updated = empty_tensor
 
-            # Split updated bounds by region
-            bounds_updated = {}
-            cell_idx = 0
+            # Split updated bounds by region using pre-computed indices (reuse dict)
             for name in region_order_V:
-                num_cells = cell_counts_V[name]
-                if num_cells > 0:
-                    bounds_updated[name] = (
-                        v_lowers_all_updated[cell_idx:cell_idx + num_cells],
-                        v_uppers_all_updated[cell_idx:cell_idx + num_cells]
-                    )
-                    cell_idx += num_cells
+                start, end = region_slice_indices[name]
+                if start < end:
+                    bounds_updated[name] = (v_lowers_all_updated[start:end], v_uppers_all_updated[start:end])
                 else:
-                    bounds_updated[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
+                    bounds_updated[name] = (empty_tensor, empty_tensor)
 
         # Update scheduler after bounds recomputation (if provided)
         if scheduler is not None:
@@ -252,7 +256,7 @@ def train_network_bounds(
                     )
                     region_cells['outside'] = new_cells
                     print(f"Refining outside cells: {num_outside_failing} failing, refined {num_refined} cells, {len(new_cells)} total")
-                    needs_cache_rebuild = True
+                    needs_v_cache_rebuild = True
                     refinement_epochs['outside'].append(epoch + 1)
 
             if (v_cfg.enable_merging and
@@ -266,7 +270,7 @@ def train_network_bounds(
                 )
                 region_cells['outside'] = merged_cells
                 print(f"Merging outside cells: merged {num_merges} pairs, {len(merged_cells)} total")
-                needs_cache_rebuild = True
+                needs_v_cache_rebuild = True
 
         # Adaptive refinement for generator cells
         if params.compute_GV:
@@ -295,7 +299,7 @@ def train_network_bounds(
                     )
                     region_cells['generator'] = new_cells
                     print(f"Refining generator cells: {num_total_failing} failing, refined {num_refined} cells, {len(new_cells)} total")
-                    needs_cache_rebuild = True
+                    needs_gv_cache_rebuild = True
                     refinement_epochs['generator'].append(epoch + 1)
 
             if (gv_cfg.enable_merging and
@@ -309,7 +313,7 @@ def train_network_bounds(
                 )
                 region_cells['generator'] = merged_cells
                 print(f"Merging generator cells: merged {num_merges} pairs, {len(merged_cells)} total")
-                needs_cache_rebuild = True
+                needs_gv_cache_rebuild = True
 
         # Logging
         if epoch % params.logging.loss_log_interval == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
@@ -390,15 +394,20 @@ def train_network_bounds(
         optimizer.step()
 
         # Rebuild CROWN caches after optimizer step if needed (after adaptive refinement)
-        if needs_cache_rebuild:
+        if needs_v_cache_rebuild:
             # Rebuild V cache with all cells (in order: init, goal, unsafe, outside)
             if params.compute_V:
-                all_cells_V = []
+                # Pre-allocate and rebuild all_cells_V
+                total_cells_V = sum(len(region_cells[name]) for name in region_order_V)
+                all_cells_V = [None] * total_cells_V
+                idx = 0
                 for name in region_order_V:
-                    all_cells_V.extend(region_cells[name])
+                    cell_counts_V[name] = len(region_cells[name])
+                    for cell in region_cells[name]:
+                        all_cells_V[idx] = cell
+                        idx += 1
 
-                # Rebuild V CROWN cache
-                total_cells_V = len(all_cells_V)
+                # Rebuild V CROWN cache and input bounds
                 input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device, input_dim=params.network.n_inputs)
                 crown_cache_all = SymbolicCROWNCache(
                     model=V_net,
@@ -408,17 +417,16 @@ def train_network_bounds(
                 )
                 print(f"Rebuilt V cache with {total_cells_V} cells")
 
-                # Update cell counts after refinement
+                # Rebuild region slice indices after refinement
+                region_slice_indices = {}
+                start_idx = 0
                 for name in region_order_V:
-                    cell_counts_V[name] = len(region_cells[name])
+                    num = cell_counts_V[name]
+                    region_slice_indices[name] = (start_idx, start_idx + num)
+                    start_idx += num
 
-                # Rebuild concatenated input bounds for V
-                all_cells_V = []
-                for name in region_order_V:
-                    all_cells_V.extend(region_cells[name])
-                    input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device, input_dim=params.network.n_inputs)
-
-            # Rebuild Phi CROWN cache (only for generator region)
+        # Rebuild Phi CROWN cache (only for generator region, separate from V cache)
+        if needs_gv_cache_rebuild:
             if params.compute_GV:
                 total_cells_GV = len(region_cells['generator'])
                 input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], device, input_dim=params.network.n_inputs)

@@ -1,4 +1,4 @@
-"""Test that all V networks use sigmoid activation (required for manual GV derivatives)."""
+"""Test that all V networks use sigmoid activation."""
 import torch
 from pathlib import Path
 import sys

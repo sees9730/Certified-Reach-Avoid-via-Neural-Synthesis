@@ -102,4 +102,6 @@ def enable_terminal_logging(log_path: Path):
     log_f = open(log_path, "w", buffering=1)  # line-buffered
     sys.stdout = Tee(sys.__stdout__, log_f)
     sys.stderr = Tee(sys.__stderr__, log_f)
+    import atexit
+    atexit.register(log_f.close)
     return log_f  # keep a reference so it doesn't get GC'd
