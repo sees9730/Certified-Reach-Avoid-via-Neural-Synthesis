@@ -33,7 +33,6 @@ def train_network_bounds(
     region_cells: dict,
     regions: Regions,
     params: Hyperparameters,
-    device: str = 'cpu',
     control_net: nn.Module = None,
     create_scheduler = None,
     start_time: float = None
@@ -47,7 +46,6 @@ def train_network_bounds(
         region_cells: Dictionary of discretized cells
         regions: Regions object
         params: Hyperparameters
-        device: Device for training
         control_net: Optional control network for control synthesis
         create_scheduler: Optional scheduler factory function
 
@@ -61,7 +59,7 @@ def train_network_bounds(
     print("="*20)
 
     # Move models to device
-    V_net = V_net.to(device)
+    V_net = V_net.to(params.training.device)
 
     # Collect ALL cells in the same order as original (init, goal, unsafe, outside, generator)
     print("=== Total cells per region for V ===")
@@ -85,17 +83,17 @@ def train_network_bounds(
 
     # Prepare all input bounds at once
     if total_cells_V > 0:
-        input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device, input_dim=params.network.n_inputs)
+        input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, params.training.device, input_dim=params.network.n_inputs)
     else:
-        input_lowers_all = torch.empty(0, params.network.n_inputs, device=device)
-        input_uppers_all = torch.empty(0, params.network.n_inputs, device=device)
+        input_lowers_all = torch.empty(0, params.network.n_inputs, device=params.training.device)
+        input_uppers_all = torch.empty(0, params.network.n_inputs, device=params.training.device)
 
     # Create CROWN cache for all V cells
     crown_cache_all = SymbolicCROWNCache(
         model=V_net,
         num_cells=total_cells_V,
         input_dim=params.network.n_inputs,
-        device=device
+        device=params.training.device
     )
     print(f"Created CROWN cache for V with {total_cells_V} cells")
 
@@ -108,11 +106,11 @@ def train_network_bounds(
             phi_module=GV_net,
             num_cells=len(region_cells['generator']),
             input_dim=params.network.n_inputs,
-            device=device
+            device=params.training.device
         )
         print(f"Created {len(region_cells['generator'])} CROWN caches for GV")
         # Prepare generator input bounds
-        input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], device, input_dim=params.network.n_inputs)
+        input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], params.training.device, input_dim=params.network.n_inputs)
 
     # Prepare optimizer with all trainable parameters
     opt_params = list(V_net.parameters())
@@ -135,14 +133,14 @@ def train_network_bounds(
         start_idx += num
 
     # Pre-allocate empty tensors for reuse (avoid repeated allocation)
-    empty_tensor = torch.tensor([], device=device)
+    empty_tensor = torch.tensor([], device=params.training.device)
 
     # Pre-allocate dictionaries that are rebuilt every epoch
     bounds = {}
     bounds_updated = {}
     loss_kwargs = {
         'beta_ra': params.constraints.beta_ra,
-        'device': device,
+        'device': params.training.device,
         'compute_V': params.compute_V,
         'compute_GV': params.compute_GV,
     }
@@ -226,10 +224,6 @@ def train_network_bounds(
                     bounds_updated[name] = (v_lowers_all_updated[start:end], v_uppers_all_updated[start:end])
                 else:
                     bounds_updated[name] = (empty_tensor, empty_tensor)
-
-        # Update scheduler after bounds recomputation (if provided)
-        if scheduler is not None:
-            scheduler.step(total_loss.item())
 
         # Adaptive refinement for V outside region cells
         needs_cache_rebuild = False
@@ -369,7 +363,7 @@ def train_network_bounds(
                 cell_counts_V=cell_counts_V,
                 input_bounds_gen=(input_lowers_gen, input_uppers_gen) if input_lowers_gen is not None else None,
                 beta_ra=params.constraints.beta_ra,
-                device=device
+                device=params.training.device
             )
 
             # Pass bounds and phi_uppers to show cell statistics
@@ -393,6 +387,14 @@ def train_network_bounds(
         # Optimizer step
         optimizer.step()
 
+        # Update scheduler after optimizer step (if provided)
+        if scheduler is not None:
+            # ReduceLROnPlateau needs metrics, StepLR/etc don't
+            if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+                scheduler.step(total_loss.item())
+            else:
+                scheduler.step()
+
         # Rebuild CROWN caches after optimizer step if needed (after adaptive refinement)
         if needs_v_cache_rebuild:
             # Rebuild V cache with all cells (in order: init, goal, unsafe, outside)
@@ -408,12 +410,12 @@ def train_network_bounds(
                         idx += 1
 
                 # Rebuild V CROWN cache and input bounds
-                input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device, input_dim=params.network.n_inputs)
+                input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, params.training.device, input_dim=params.network.n_inputs)
                 crown_cache_all = SymbolicCROWNCache(
                     model=V_net,
                     num_cells=total_cells_V,
                     input_dim=params.network.n_inputs,
-                    device=device
+                    device=params.training.device
                 )
                 print(f"Rebuilt V cache with {total_cells_V} cells")
 
@@ -429,12 +431,12 @@ def train_network_bounds(
         if needs_gv_cache_rebuild:
             if params.compute_GV:
                 total_cells_GV = len(region_cells['generator'])
-                input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], device, input_dim=params.network.n_inputs)
+                input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], params.training.device, input_dim=params.network.n_inputs)
                 crown_cache_phi = SymbolicCROWNCache_Phi(
                     phi_module=GV_net,
                     num_cells=total_cells_GV,
                     input_dim=params.network.n_inputs,
-                    device=device
+                    device=params.training.device
                 )
                 print(f"Rebuilt Phi cache with {total_cells_GV} cells")
 

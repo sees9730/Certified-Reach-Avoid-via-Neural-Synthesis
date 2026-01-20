@@ -1,7 +1,10 @@
+import warnings
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+
+warnings.filterwarnings("ignore", category=torch.jit.TracerWarning)
 
 # Set up directories
 from pathlib import Path
@@ -13,10 +16,7 @@ from src.dynamics import Dynamics
 
 class GV(nn.Module):
     """
-    Optimized GV:
-      - caches callable signatures once
-      - computes diag(GG^T) via sum of squares (no bmm, no eye mask)
-      - avoids per-forward expand() + bmm(...) patterns by using matmul broadcasting
+    Infinitesimal generator G applied to value function V
     """
 
     def __init__(
@@ -30,14 +30,10 @@ class GV(nn.Module):
         self.V_net = V_net
         self.dynamics = dynamics
 
-        # -------------------------
-        # scale factor
-        # -------------------------
+        # Scale factor
         self.register_buffer("scale_factor", torch.tensor(scale_factor, dtype=torch.float32))
 
-        # -------------------------
-        # input scale
-        # -------------------------
+        # Input scale
         if input_scale_init is None:
             input_scale_init = V_net.input_scale
 
@@ -45,25 +41,23 @@ class GV(nn.Module):
         self.register_buffer("input_scale", s)
         self.register_buffer("input_scale_sq", s ** 2)
 
-        # cache expanded (D,) inverse scales for speed
+        # Cached values
         self._cached_scale_D = None
         self._cached_inv_scale = None
         self._cached_inv_scale_sq = None
 
-        # -------------------------
-        # dynamics (cache dispatch decisions once)
-        # -------------------------
+        # Dynamics
         self.f = dynamics.get_f()
         self.g = dynamics.get_g()
 
         self._init_f_dispatch()
         self._init_g_dispatch()
 
-        print("[PhiModule] Initialized with:")
-        print(f"  scale_factor: {float(self.scale_factor.detach().cpu())}")
-        print(f"  input_scale: {self.input_scale.detach().cpu().tolist() if self.input_scale.numel() > 1 else float(self.input_scale.detach().cpu())}")
-        print(f"  f type: {type(self.f)}")
-        print(f"  g type: {type(self.g)}")
+        print("Phi initialized with:")
+        print(f" input_scale: {self.input_scale.detach().cpu().tolist() if self.input_scale.numel() > 1 else float(self.input_scale.detach().cpu())}")
+        print(f" scale_factor: {self.scale_factor.detach().cpu()}")
+        print(f" f type: {type(self.f)}")
+        print(f" g type: {type(self.g)}")
 
     # -------------------------
     # forward
@@ -144,12 +138,14 @@ class GV(nn.Module):
             inv_scale_sq: (D,)
         """
         # check cache
-        cache_ok = (
-            self._cached_scale_D == D
-            and self._cached_inv_scale is not None
-            and self._cached_inv_scale.device == device
-            and self._cached_inv_scale.dtype == dtype
-        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", torch.jit.TracerWarning)
+            cache_ok = (
+                self._cached_scale_D == D
+                and self._cached_inv_scale is not None
+                and self._cached_inv_scale.device == device
+                and self._cached_inv_scale.dtype == dtype
+            )
         if cache_ok:
             return self._cached_inv_scale, self._cached_inv_scale_sq
 
@@ -441,7 +437,7 @@ def verify_GV(
         max_diff = diff.max().item()
 
     if verbose:
-        print(f"[VERIFY_GV] {'PASSED' if max_diff <= tol else 'FAILED'}: max diff = {max_diff:.6e}")
+        print(f"Phi Verification {'PASSED' if max_diff <= tol else 'FAILED'}: max diff = {max_diff:.6e}")
 
     return max_diff <= tol
 
@@ -450,7 +446,6 @@ def create_GV(
     V_net: nn.Module,
     dynamics: Dynamics,
     network_config,
-    training_config,
     verify: bool = True
 ) -> GV:
     phi = GV(

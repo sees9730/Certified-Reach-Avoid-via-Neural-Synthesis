@@ -21,14 +21,3 @@ def cleanup_and_setup_directories(dirs: list) -> None:
             print(f"Cleaned up old {dir_path.name} directory")
         dir_path.mkdir(exist_ok=True)
 
-
-def print_training_config(params: Hyperparameters) -> None:
-    """Print training configuration summary."""
-    print(f"Network: {params.network.n_inputs} -> {params.network.n_hidden_1} -> "
-          f"{params.network.n_hidden_2} -> {params.network.n_outputs}")
-    print(f"Training: {params.training.num_epochs} epochs, LR={params.training.learning_rate}")
-
-    print(f"Constraints: beta_ra={params.constraints.beta_ra}")
-
-    print(f"Generator: weight={params.training.generator_weight}, start_epoch={params.training.generator_start_epoch}")
-    print(f"Training method: CROWN bounds (rigorous)")

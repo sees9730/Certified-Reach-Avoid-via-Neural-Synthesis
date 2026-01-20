@@ -45,7 +45,7 @@ def save_eval_bundle(
         "final_results": results,
     }, bundle_path)
 
-    print(f"[Saved] eval bundle -> {bundle_path}")
+    print(f"Saved eval bundle -> {bundle_path}")
     return bundle_path
 
 
@@ -54,7 +54,7 @@ def log_loaded_training_epochs(loss_history):
     Print which epochs were recorded in loss_history (and last epoch seen).
     """
     if not loss_history:
-        print("[Loaded] loss_history is empty (no logged epochs).")
+        print("loss_history is empty (no logged epochs).")
         return
 
     epochs = []
@@ -64,19 +64,11 @@ def log_loaded_training_epochs(loss_history):
             epochs.append(int(e))
 
     if not epochs:
-        print("[Loaded] loss_history has no 'epoch' fields.")
+        print("loss_history has no 'epoch' fields.")
         return
 
     epochs_sorted = sorted(set(epochs))
-    # print(f"[Loaded] V_net training epochs recorded: {len(epochs_sorted)} entries")
-    # print(f"[Loaded] First epoch logged: {epochs_sorted[0]}")
-    print(f"[Loaded] Last epoch logged : {epochs_sorted[-1]}")
-    # # optional: show a short preview (not too spammy)
-    # preview_k = min(20, len(epochs_sorted))
-    # print(f"[Loaded] Epochs (first {preview_k}): {epochs_sorted[:preview_k]}")
-    # if len(epochs_sorted) > preview_k:
-    #     print(f"[Loaded] Epochs (last  {preview_k}): {epochs_sorted[-preview_k:]}")
-
+    print(f"Last epoch logged : {epochs_sorted[-1]}")
 
 def load_eval_bundle(bundle_path: Path, map_location="cpu"):
     if not bundle_path.exists():

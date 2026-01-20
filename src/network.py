@@ -22,18 +22,7 @@ from src.hyperparameters import NetworkConfig
 
 
 class V(nn.Module):
-    """
-    Value function neural network.
-
-    Architecture:
-        x -> normalize -> layer1 -> activation -> layer2 -> activation -> output * scale -> V(x)
-
-    Supports configurable:
-    - Number of hidden layers and units
-    - Activation functions (sigmoid, ReLU, GELU, arctan)
-    - Input normalization scale
-    - Output scaling
-    """
+    """Value network architecture."""
 
     def __init__(self, config: NetworkConfig):
         """
@@ -55,26 +44,36 @@ class V(nn.Module):
         self.output = nn.Linear(config.n_hidden_2, config.n_outputs)
 
         # Select activation function
-        self.activation_fn = self._get_activation_fn(config)
+        self.activation_fn = self._get_activation_fn()
 
         # Output scaling (applied before final linear layer)
         self.register_buffer('scale_factor', torch.tensor(config.scale_factor))
 
-    def _get_activation_fn(self, config: NetworkConfig):
+        print("V initialized with:")
+        print(" input_scale:", self.input_scale.detach().cpu().tolist())
+        print(" scale_factor:", self.scale_factor.detach().cpu())
+        print(" activation_fn:", self.activation_fn)
+        print(" n_inputs:", config.n_inputs)
+        print(" n_hidden_1:", config.n_hidden_1)
+        print(" n_hidden_2:", config.n_hidden_2)
+        print(" n_outputs:", config.n_outputs)
+        print("")
+
+    def _get_activation_fn(self):
         """Select activation function."""
         return torch.sigmoid
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Forward pass.
+        Forward pass through network.
 
         Args:
-            x: Input state (batch_size, n_inputs) or (n_inputs,)
+            x: Input tensor of shape (batch_size, n_inputs)
 
         Returns:
-            Value V(x) of shape (batch_size, n_outputs) or (n_outputs,)
+            Output tensor of shape (batch_size, n_outputs)
         """
-        # Normalize input: [-input_scale, input_scale] -> [-1, 1]
+        # Normalize input
         x = x / self.input_scale
 
         # Hidden layers
@@ -84,7 +83,7 @@ class V(nn.Module):
         x = self.layer2(x)
         x = self.activation_fn(x)
 
-        # Output layer with scaling
+        # Scale hidden activations before output layer
         x = self.output(x * self.scale_factor)
 
         return x

@@ -1,14 +1,10 @@
 """
-Hyperparameters for RL verification training.
+Hyperparameters for verification training.
 
 This module centralizes all configuration settings for the neural network training,
 discretization, constraints, and verification.
 """
-
-import torch
 from dataclasses import dataclass, field
-from typing import Optional
-
 
 @dataclass
 class NetworkConfig:
@@ -19,8 +15,8 @@ class NetworkConfig:
     n_outputs: int = 1
 
     # Scaling parameters
-    input_scale: list = field(default_factory=lambda: [100.0, 100.0])  # Input normalization each index corresponds to a dimension
-    scale_factor: float = 20.0  # Output layer scaling
+    input_scale: list = field(default_factory=lambda: [100.0, 100.0])
+    scale_factor: float = 20.0
 
 @dataclass
 class DiscretizationConfig:
@@ -34,16 +30,8 @@ class DiscretizationConfig:
 @dataclass
 class ConstraintConfig:
     """Constraint parameters for training."""
-    beta_s: Optional[float] = 0.6
     beta_ra: float = 20.0
     all_v_lower_target: float = 0.0
-
-    # Pre-training target values
-    pretrain_goal_target: float = 0.3
-    pretrain_unsafe_target: float = 20.0
-    pretrain_init_target: float = 0.92
-    pretrain_phi_target: float = 1.0
-
 
 @dataclass
 class RefinementConfigRegion:
@@ -90,17 +78,17 @@ class TrainingConfig:
     """Training parameters."""
     learning_rate: float = 0.001
     num_epochs: int = 200000
-    device: str = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device: str = 'cpu'
     random_seed: int = 0
 
     # Pre-training
     enable_pretraining: bool = True
     pretrain_epochs: int = 2000
     pretrain_lr: float = 0.01
-    pretrain_n_samples: int = 1000  # Samples per region per epoch during pretraining
+    pretrain_n_samples: int = 1000
 
     # Generator constraint
-    generator_weight: float = 0.0
+    generator_weight: float = 1.0
     generator_start_epoch: int = 0
 
 @dataclass
@@ -180,10 +168,6 @@ class Hyperparameters:
             'constraints': {
                 'beta_ra': self.constraints.beta_ra,
                 'all_v_lower_target': self.constraints.all_v_lower_target,
-                'pretrain_goal_target': self.constraints.pretrain_goal_target,
-                'pretrain_unsafe_target': self.constraints.pretrain_unsafe_target,
-                'pretrain_init_target': self.constraints.pretrain_init_target,
-                'pretrain_phi_target': self.constraints.pretrain_phi_target
             },
             'training': {
                 'learning_rate': self.training.learning_rate,

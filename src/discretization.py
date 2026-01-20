@@ -318,22 +318,22 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
     region_cells = {}
 
     # Init region
-    print(f"\nInit region: {discretization_config.n_init} per-dim grid")
+    print(f"Init region: {discretization_config.n_init} per-dim grid")
     region_cells['init'] = discretize_region(regions.init, discretization_config.n_init)
-    print(f"  → {len(region_cells['init'])} cells")
+    print(f" {len(region_cells['init'])} cells")
 
     # Goal region
-    print(f"\nGoal region: {discretization_config.n_goal} per-dim grid")
+    print(f"Goal region: {discretization_config.n_goal} per-dim grid")
     region_cells['goal'] = discretize_region(regions.goal, discretization_config.n_goal)
-    print(f"  → {len(region_cells['goal'])} cells")
+    print(f" {len(region_cells['goal'])} cells")
 
     # Unsafe region
-    print(f"\nUnsafe region: {discretization_config.n_unsafe} per-dim grid")
+    print(f"Unsafe region: {discretization_config.n_unsafe} per-dim grid")
     region_cells['unsafe'] = discretize_region(regions.unsafe, discretization_config.n_unsafe)
-    print(f"  → {len(region_cells['unsafe'])} cells")
+    print(f" {len(region_cells['unsafe'])} cells")
 
     # Outside goal (for V constraint)
-    print(f"\nOutside goal region: {discretization_config.n_outside_goal} per-dim per rectangle")
+    print(f"Outside goal region: {discretization_config.n_outside_goal} per-dim per rectangle")
     outside_goal_rects = compute_rectangular_partition_outside_goal(regions.full, regions.goal)
     # Pre-allocate: each rectangle -> n_outside_goal^D cells
     n_per_rect = discretization_config.n_outside_goal ** regions.full.bounds.shape[0]
@@ -345,12 +345,12 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
             region_cells['outside'][idx] = cell
             idx += 1
     region_cells['outside'] = region_cells['outside'][:idx]
-    print(f"  → {len(region_cells['outside'])} cells")
+    print(f" {len(region_cells['outside'])} cells")
 
     # Generator region (outside goal and unsafe)
     if use_radial_generator:
-        print(f"\nGenerator region: Radial adaptive discretization with clipping")
-        print(f"  Using adaptive refinement based on distance from origin")
+        print(f"Generator region: Radial adaptive discretization with clipping")
+        print(f" Using adaptive refinement based on distance from origin")
 
         RADIUS_THRESHOLDS = [25.0, 40.0]
         N_SPLITS = [2, 1, 1]
@@ -362,16 +362,16 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
             n_subdivide=6
         )
 
-        print(f'  Clipping {len(all_cells)} generator cells against goal and unsafe regions...')
+        print(f' Clipping {len(all_cells)} generator cells against goal and unsafe regions...')
 
         exclusion_regions = [regions.goal.bounds]
         if regions.unsafe.is_union:
             for comp in regions.unsafe.components:
                 exclusion_regions.append(comp.bounds)
-            print(f'  Excluding goal + {len(regions.unsafe.components)} unsafe components')
+            print(f' Excluding goal + {len(regions.unsafe.components)} unsafe components')
         else:
             exclusion_regions.append(regions.unsafe.bounds)
-            print(f'  Excluding goal + 1 unsafe region')
+            print(f' Excluding goal + 1 unsafe region')
 
         # Pre-allocate with upper bound (clipping can increase cell count)
         max_clipped = len(all_cells) * (2 ** regions.full.bounds.shape[0])  # worst case: each cell splits
@@ -392,12 +392,12 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
                 idx += 1
 
         region_cells['generator'] = clipped_cells[:idx]
-        print(f'  After clipping: {len(region_cells["generator"])} cells (may have increased due to cell splitting)')
+        print(f' After clipping: {len(region_cells["generator"])} cells (may have increased due to cell splitting)')
         if len(region_cells['generator']) > 0:
             first_cell = region_cells['generator'][0]
-            print(f'  First cell bounds: {first_cell[0].numpy()} to {first_cell[1].numpy()}')
+            print(f' First cell bounds: {first_cell[0].numpy()} to {first_cell[1].numpy()}')
     else:
-        print(f"\nGenerator region: {discretization_config.n_generator} per-dim per rectangle")
+        print(f"Generator region: {discretization_config.n_generator} per-dim per rectangle")
         generator_rects = compute_rectangular_partition_outside_goal_and_unsafe(
             regions.full, regions.goal, regions.unsafe
         )
@@ -411,11 +411,6 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
                 region_cells['generator'][idx] = cell
                 idx += 1
         region_cells['generator'] = region_cells['generator'][:idx]
-        print(f"  → {len(region_cells['generator'])} cells")
-
-    print(f"\nRegion definitions:")
-    print(f"  'outside': X \\ Goal (for V >= 0 constraint)")
-    print(f"  'init': X \\ (Goal U Unsafe) (for V <= 1 constraint)")
-    print(f"  'generator': X \\ (Goal U Unsafe) (for generator <= 0 constraint)")
-
+        print(f" {len(region_cells['generator'])} cells")
+        
     return region_cells
