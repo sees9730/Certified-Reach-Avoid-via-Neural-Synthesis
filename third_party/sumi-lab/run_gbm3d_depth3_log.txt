@@ -1,0 +1,3029 @@
+=== GBM Training Run ===
+Start time: 2026-01-18 18:49:45
+
+--- Seed 98540 ---
+epoch:   0.000, L0:   0.000, Lu: 156.135, Lg:   0.000, Ld: 266.816, reg: 1.456
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.000.
+epoch: 1000.000, L0:   0.000, Lu:  69.889, Lg:   0.000, Ld:  68.600, reg: 3.743
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.132.
+epoch: 2000.000, L0:   0.000, Lu:  54.689, Lg:   0.000, Ld:   0.904, reg: 5.385
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.438.
+epoch: 3000.000, L0:   0.000, Lu:  72.099, Lg:   0.000, Ld:   4.235, reg: 7.189
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.557.
+epoch: 4000.000, L0:   0.000, Lu:   4.387, Lg:   0.000, Ld:   4.795, reg: 9.287
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.603.
+epoch: 5000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 8.294
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.634.
+epoch: 6000.000, L0:   0.000, Lu:   0.372, Lg:   0.000, Ld:   2.382, reg: 6.847
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.590.
+epoch: 7000.000, L0:   0.000, Lu:   0.517, Lg:   0.000, Ld:   0.000, reg: 5.668
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.616.
+epoch: 8000.000, L0:  11.062, Lu:   0.753, Lg:   0.000, Ld:   0.000, reg: 4.891
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.615.
+epoch: 9000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 4.361
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.671.
+epoch: 10000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 3.576
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.655.
+epoch: 11000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 3.054
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.663.
+epoch: 12000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.053, reg: 2.872
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.696.
+epoch: 13000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 2.523
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.671.
+epoch: 14000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.722, reg: 2.156
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.676.
+epoch: 15000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 1.780
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.738.
+epoch: 16000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 1.699
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.680.
+epoch: 17000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 1.401
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.774.
+epoch: 18000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.162, reg: 1.173
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.757.
+epoch: 19000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.989
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.765.
+epoch: 20000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.677
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.780.
+epoch: 21000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.388, reg: 0.441
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.771.
+epoch: 22000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.354
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.765.
+epoch: 23000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.402
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.824.
+epoch: 24000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.631, reg: 0.477
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.623.
+epoch: 25000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.342
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.737.
+epoch: 26000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.336
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.752.
+epoch: 27000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.368
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.750.
+epoch: 28000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.016, reg: 0.445
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.720.
+epoch: 29000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.304
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.769.
+epoch: 30000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.598, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.739.
+epoch: 31000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.288
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.824.
+epoch: 32000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.502, reg: 0.410
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.626.
+epoch: 33000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.313
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.816.
+epoch: 34000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.888, reg: 0.350
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.680.
+epoch: 35000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.417
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.678.
+epoch: 36000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.286
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.675.
+epoch: 37000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.033, reg: 0.386
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.819.
+epoch: 38000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.315
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.875.
+epoch: 39000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.607, reg: 0.274
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.902.
+epoch: 40000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.275
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.653.
+epoch: 41000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.448
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.691.
+epoch: 42000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.771.
+epoch: 43000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.525
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.830.
+epoch: 44000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.428, reg: 0.281
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.750.
+epoch: 45000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.369
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.638.
+epoch: 46000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.356
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.899.
+epoch: 47000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.374
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.668.
+epoch: 48000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.314
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.734.
+epoch: 49000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.344
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.774.
+epoch: 50000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.692.
+epoch: 51000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.242, reg: 0.395
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.772.
+epoch: 52000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.500, reg: 0.347
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.744.
+epoch: 53000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.261
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.845.
+epoch: 54000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.121, reg: 0.441
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.869.
+epoch: 55000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.319
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 56000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.430
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.781.
+epoch: 57000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.330
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.785.
+epoch: 58000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.295
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.903.
+epoch: 59000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.297
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.679.
+epoch: 60000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.370
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.751.
+epoch: 61000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.331
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.657.
+epoch: 62000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.414
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.655.
+epoch: 63000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.382, reg: 0.336
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.848.
+epoch: 64000.000, L0:   1.983, Lu:   0.000, Lg:   0.000, Ld:   0.259, reg: 0.343
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.714.
+epoch: 65000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.295
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.713.
+epoch: 66000.000, L0:   0.000, Lu:   1.217, Lg:   0.000, Ld:   0.000, reg: 0.426
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.764.
+epoch: 67000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.879.
+epoch: 68000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.306
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.824.
+epoch: 69000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.325
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.834.
+epoch: 70000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.320
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.920.
+epoch: 71000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.577, reg: 0.336
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.764.
+epoch: 72000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.346
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.889.
+epoch: 73000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.279
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.862.
+epoch: 74000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.355
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.781.
+epoch: 75000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.319
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.599.
+epoch: 76000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.332
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.840.
+epoch: 77000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.350
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.829.
+epoch: 78000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.300
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.821.
+epoch: 79000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.312
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.819.
+epoch: 80000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.300
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.803.
+epoch: 81000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.003, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.786.
+epoch: 82000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.320
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.785.
+epoch: 83000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.235, reg: 0.287
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.700.
+epoch: 84000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.754, reg: 0.297
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.856.
+epoch: 85000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.283
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 86000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.272
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.783.
+epoch: 87000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.334
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.852.
+epoch: 88000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.279
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.837.
+epoch: 89000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.312, reg: 0.372
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.813.
+epoch: 90000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.282
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.699.
+epoch: 91000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.341
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.841.
+epoch: 92000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.275
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.815.
+epoch: 93000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.361
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.810.
+epoch: 94000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.247
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.808.
+epoch: 95000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.348
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.838.
+epoch: 96000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.269
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.870.
+epoch: 97000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.161, reg: 0.378
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.746.
+epoch: 98000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.258
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.804.
+epoch: 99000.000, L0:   4.083, Lu:   0.000, Lg:   0.000, Ld:   0.202, reg: 0.293
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.751.
+epoch: 100000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.495
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.794.
+epoch: 101000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.250
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.759.
+epoch: 102000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.328
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.928.
+epoch: 103000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.329
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+epoch: 104000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.313
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.844.
+epoch: 105000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.340
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.784.
+epoch: 106000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.999, reg: 0.491
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.896.
+epoch: 107000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.312
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.580.
+epoch: 108000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.365
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.772.
+epoch: 109000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.309
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.766.
+epoch: 110000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.373
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.718.
+epoch: 111000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.267
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.787.
+epoch: 112000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.405
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.852.
+epoch: 113000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.472, reg: 0.264
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.797.
+epoch: 114000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.356
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.874.
+epoch: 115000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.788.
+epoch: 116000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.382
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.804.
+epoch: 117000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.198, reg: 0.301
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.816.
+epoch: 118000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.819.
+epoch: 119000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.362
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.880.
+epoch: 120000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.481, reg: 0.270
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.870.
+epoch: 121000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.334
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.692.
+epoch: 122000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.332
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.812.
+epoch: 123000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.109, reg: 0.384
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.747.
+epoch: 124000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.276
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.896.
+epoch: 125000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.818.
+epoch: 126000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.260
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.846.
+epoch: 127000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.515, reg: 0.437
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 128000.000, L0:   2.513, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.354
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.755.
+epoch: 129000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.264
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.816.
+epoch: 130000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.344
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.824.
+epoch: 131000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.272
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 132000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.394
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.766.
+epoch: 133000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.322
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.898.
+epoch: 134000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.392
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.832.
+epoch: 135000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.347
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.822.
+epoch: 136000.000, L0:   4.583, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.328
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.806.
+epoch: 137000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.263
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.821.
+epoch: 138000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.295
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.778.
+epoch: 139000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.744.
+epoch: 140000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.304
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.891.
+epoch: 141000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.488
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 142000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.286
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.684.
+epoch: 143000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.320
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.829.
+epoch: 144000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.291
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.780.
+epoch: 145000.000, L0:   6.612, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.289
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.629.
+epoch: 146000.000, L0:  11.648, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.261
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.798.
+epoch: 147000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.382
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.867.
+epoch: 148000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.301
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.906.
+epoch: 149000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.431, reg: 0.317
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.904.
+epoch: 150000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.348
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.774.
+epoch: 151000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.308
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 152000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.504
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.816.
+epoch: 153000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.268
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.909.
+epoch: 154000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.312
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.818.
+epoch: 155000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.332
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.875.
+epoch: 156000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.599, reg: 0.281
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 157000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.460
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.742.
+epoch: 158000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.353
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 159000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.336
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.866.
+epoch: 160000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.315
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.873.
+epoch: 161000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.442, reg: 0.393
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.737.
+epoch: 162000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.345
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.849.
+epoch: 163000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.283
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.820.
+epoch: 164000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.980, reg: 0.411
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.819.
+epoch: 165000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.277
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.855.
+epoch: 166000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.369
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.832.
+epoch: 167000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.292, reg: 0.315
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.740.
+epoch: 168000.000, L0:   7.725, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.264
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.874.
+epoch: 169000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.508, reg: 0.331
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.848.
+epoch: 170000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.324
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.696.
+epoch: 171000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.357
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.778.
+epoch: 172000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.261
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.761.
+epoch: 173000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.268
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.753.
+epoch: 174000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.219, reg: 0.401
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.767.
+epoch: 175000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.281
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.699.
+epoch: 176000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.936, reg: 0.400
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.855.
+epoch: 177000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.288
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.808.
+epoch: 178000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.322, reg: 0.297
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.789.
+epoch: 179000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.316
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.869.
+epoch: 180000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.275
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.810.
+epoch: 181000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.310
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.805.
+epoch: 182000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.296
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.768.
+epoch: 183000.000, L0:   0.000, Lu:   0.217, Lg:   0.000, Ld:   0.000, reg: 0.338
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.716.
+epoch: 184000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.332
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.751.
+epoch: 185000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.329
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.835.
+epoch: 186000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.261
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+epoch: 187000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.371
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.738.
+epoch: 188000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.246
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.861.
+epoch: 189000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.315
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.846.
+epoch: 190000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.342
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.862.
+epoch: 191000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.275
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.869.
+epoch: 192000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.324
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.894.
+epoch: 193000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.385
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.736.
+epoch: 194000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.414
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.894.
+epoch: 195000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.309
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 196000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.283
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.821.
+epoch: 197000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.295, reg: 0.278
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.776.
+epoch: 198000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.375
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 199000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.355
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.820.
+epoch: 200000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.297
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 201000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.319
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.853.
+epoch: 202000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.296, reg: 0.277
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.906.
+epoch: 203000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.333
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.848.
+epoch: 204000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.265
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.873.
+epoch: 205000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.390
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.868.
+epoch: 206000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.288
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.863.
+epoch: 207000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.344
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.833.
+epoch: 208000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.028, reg: 0.279
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.698.
+epoch: 209000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.893, reg: 0.350
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.786.
+epoch: 210000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.305
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.880.
+epoch: 211000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.289
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.782.
+epoch: 212000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.305
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 213000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.327
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.790.
+epoch: 214000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.381
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 215000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.409, reg: 0.330
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 216000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.280
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.794.
+epoch: 217000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.299
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.842.
+epoch: 218000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.289
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.779.
+epoch: 219000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.400
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.844.
+epoch: 220000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.322
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.743.
+epoch: 221000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.374
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.791.
+epoch: 222000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.575.
+epoch: 223000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.538
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 224000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.291
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.817.
+epoch: 225000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.370
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.800.
+epoch: 226000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.260
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.863.
+epoch: 227000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.388
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.849.
+epoch: 228000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.341
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.802.
+epoch: 229000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.292
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 230000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.347, reg: 0.270
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.612.
+epoch: 231000.000, L0:   9.996, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.470
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.830.
+epoch: 232000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.301
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.786.
+epoch: 233000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.540, reg: 0.373
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.778.
+epoch: 234000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.355
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.817.
+epoch: 235000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.532, reg: 0.380
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.848.
+epoch: 236000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.405
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.832.
+epoch: 237000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.261
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.803.
+epoch: 238000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.571
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.864.
+epoch: 239000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.549, reg: 0.325
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.793.
+epoch: 240000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.269
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.830.
+epoch: 241000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.911.
+epoch: 242000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.208, reg: 0.299
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.688.
+epoch: 243000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.231, reg: 0.332
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.710.
+epoch: 244000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.487
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.711.
+epoch: 245000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.334
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.752.
+epoch: 246000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.566, reg: 0.396
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.779.
+epoch: 247000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.428, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.786.
+epoch: 248000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.785, reg: 0.315
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.774.
+epoch: 249000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.301
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.913.
+epoch: 250000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.358
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.882.
+epoch: 251000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.298, reg: 0.324
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.867.
+epoch: 252000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.331
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.794.
+epoch: 253000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.276
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.746.
+epoch: 254000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.451
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.802.
+epoch: 255000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.286
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.955.
+Could not verify decrease at 867 cells. Splitting further
+Could not verify decrease at 6936 cells. Splitting further
+Could not verify decrease at 52942 cells. Splitting further
+Could not verify decrease at 286814 cells. Splitting further
+Found 286814 potential decrease condition violations. 
+epoch: 256000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.235, reg: 0.367
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.901.
+epoch: 257000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.619.
+epoch: 258000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.506
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.834.
+epoch: 259000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.292
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.802.
+epoch: 260000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.248
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.920.
+epoch: 261000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.330
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.896.
+epoch: 262000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.620, reg: 0.377
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.878.
+epoch: 263000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.316
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.838.
+epoch: 264000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.339
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.839.
+epoch: 265000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.333
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.798.
+epoch: 266000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.245
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.795.
+epoch: 267000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.337
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.894.
+epoch: 268000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.175, reg: 0.278
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.832.
+epoch: 269000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.320
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.875.
+epoch: 270000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.320
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 271000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.380
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.856.
+epoch: 272000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.287
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.735.
+epoch: 273000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.392
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.740.
+epoch: 274000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.418
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.854.
+epoch: 275000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.329
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.663.
+epoch: 276000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.867.
+epoch: 277000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.361
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 278000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.292
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.817.
+epoch: 279000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.263
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.745.
+epoch: 280000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.360
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.808.
+epoch: 281000.000, L0:   5.624, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.288
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.804.
+epoch: 282000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.354
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.706.
+epoch: 283000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.468
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.794.
+epoch: 284000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.254
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.776.
+epoch: 285000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.418
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.840.
+epoch: 286000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.019, reg: 0.388
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.819.
+epoch: 287000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.380
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.798.
+epoch: 288000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.311
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.730.
+epoch: 289000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.908, reg: 0.461
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.874.
+epoch: 290000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.317
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.805.
+epoch: 291000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.308
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.876.
+epoch: 292000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.575, reg: 0.295
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.875.
+epoch: 293000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.304
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.699.
+epoch: 294000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.037, reg: 0.344
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.873.
+epoch: 295000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.296
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.730.
+epoch: 296000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.473, reg: 0.404
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.908.
+epoch: 297000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.306
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.688.
+epoch: 298000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.308
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.729.
+epoch: 299000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.269
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.808.
+epoch: 300000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.279
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.865.
+epoch: 301000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.292, reg: 0.272
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.762.
+epoch: 302000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.149, reg: 0.406
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.880.
+epoch: 303000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.318
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.777.
+epoch: 304000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.333
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.722.
+epoch: 305000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.341
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.827.
+epoch: 306000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.280
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.760.
+epoch: 307000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.382
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.769.
+epoch: 308000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.283
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.901.
+epoch: 309000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.293
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.735.
+epoch: 310000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.460
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.881.
+epoch: 311000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.277
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.806.
+epoch: 312000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.419, reg: 0.335
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.875.
+epoch: 313000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.290
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.916.
+epoch: 314000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.284
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.805.
+epoch: 315000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.371
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.791.
+epoch: 316000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.263
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.837.
+epoch: 317000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.305
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 318000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.003, reg: 0.281
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.835.
+epoch: 319000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.294
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.846.
+epoch: 320000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.394
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.900.
+epoch: 321000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.295
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.827.
+epoch: 322000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.302
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.754.
+epoch: 323000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.255
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.710.
+epoch: 324000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.277
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.899.
+epoch: 325000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.900, reg: 0.476
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.899.
+epoch: 326000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.268, reg: 0.334
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.827.
+epoch: 327000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.254
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.697.
+epoch: 328000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.500
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.682.
+epoch: 329000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.662, reg: 0.322
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+epoch: 330000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.144, reg: 0.290
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.834.
+epoch: 331000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.375, reg: 0.344
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.835.
+epoch: 332000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.293
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.705.
+epoch: 333000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.513
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.894.
+epoch: 334000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.301
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.761.
+epoch: 335000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.386
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.893.
+epoch: 336000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.308
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.723.
+epoch: 337000.000, L0:   8.127, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.625
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.821.
+epoch: 338000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.295
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.847.
+epoch: 339000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.450
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.814.
+epoch: 340000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.274
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.830.
+epoch: 341000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.007, reg: 0.335
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.808.
+epoch: 342000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.466, reg: 0.346
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 343000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.351
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.821.
+epoch: 344000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.194, reg: 0.292
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.849.
+epoch: 345000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.071, reg: 0.464
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.880.
+epoch: 346000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.067, reg: 0.280
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.888.
+epoch: 347000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.322
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.853.
+epoch: 348000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.014, reg: 0.463
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.837.
+epoch: 349000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.327
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.911.
+epoch: 350000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.283
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.798.
+epoch: 351000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.299
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.921.
+epoch: 352000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.759, reg: 0.311
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.775.
+epoch: 353000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.352
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.847.
+epoch: 354000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.244, reg: 0.394
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.845.
+epoch: 355000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.269
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.731.
+epoch: 356000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.438
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.828.
+epoch: 357000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.000, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.831.
+epoch: 358000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.393
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.857.
+epoch: 359000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.263
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.804.
+epoch: 360000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.407
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.808.
+epoch: 361000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.303
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.890.
+epoch: 362000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.004, reg: 0.451
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.784.
+epoch: 363000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.356
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.887.
+epoch: 364000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.572, reg: 0.268
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.760.
+epoch: 365000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.312
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.854.
+epoch: 366000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.360
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.738.
+epoch: 367000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.446
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 368000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.431, reg: 0.333
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.836.
+epoch: 369000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.290
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.765.
+epoch: 370000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.348
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.894.
+epoch: 371000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.286, reg: 0.277
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.873.
+epoch: 372000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.688.
+epoch: 373000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.326
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.783.
+epoch: 374000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.459
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.755.
+epoch: 375000.000, L0:   7.130, Lu:   0.000, Lg:   0.000, Ld:   0.120, reg: 0.272
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.881.
+epoch: 376000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.435, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.887.
+epoch: 377000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.369, reg: 0.278
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.743.
+epoch: 378000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.292, reg: 0.538
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.870.
+epoch: 379000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.309
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.861.
+epoch: 380000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.626, reg: 0.266
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.788.
+epoch: 381000.000, L0:   6.310, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.288
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.847.
+epoch: 382000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.297
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.827.
+epoch: 383000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.511
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.751.
+epoch: 384000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.269
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.791.
+epoch: 385000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.305
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.718.
+epoch: 386000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.384
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.828.
+epoch: 387000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.326
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.887.
+epoch: 388000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.291
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.789.
+epoch: 389000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.287
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.879.
+epoch: 390000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.340
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.873.
+epoch: 391000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.028, reg: 0.311
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.841.
+epoch: 392000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.160, reg: 0.474
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.798.
+epoch: 393000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.386
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.751.
+epoch: 394000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.523, reg: 0.342
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 395000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.299, reg: 0.292
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 396000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.301
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.855.
+epoch: 397000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.335
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 398000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.293
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.701.
+epoch: 399000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.183, reg: 0.397
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.807.
+epoch: 400000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.366
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 401000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.069, reg: 0.343
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.815.
+epoch: 402000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.369
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.837.
+epoch: 403000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.318
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.882.
+epoch: 404000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.455, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+epoch: 405000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.569, reg: 0.354
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.821.
+epoch: 406000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.276
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.816.
+epoch: 407000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.324
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.882.
+epoch: 408000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.213, reg: 0.298
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.897.
+epoch: 409000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.339
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 410000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.310
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.858.
+epoch: 411000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.469, reg: 0.305
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.812.
+epoch: 412000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.290
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.816.
+epoch: 413000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.369
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.767.
+epoch: 414000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.306
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 415000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.365
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.848.
+epoch: 416000.000, L0:   3.623, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.368
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.804.
+epoch: 417000.000, L0:   5.091, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.290
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.886.
+epoch: 418000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.334
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.853.
+epoch: 419000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.289
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.822.
+epoch: 420000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.320
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.814.
+epoch: 421000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.325
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.823.
+epoch: 422000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.379
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.857.
+epoch: 423000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.812.
+epoch: 424000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.308
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.820.
+epoch: 425000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.278
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.827.
+epoch: 426000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.083, reg: 0.318
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.853.
+epoch: 427000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.310
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.843.
+epoch: 428000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.436
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.872.
+epoch: 429000.000, L0:   3.211, Lu:   0.000, Lg:   0.000, Ld:   0.012, reg: 0.311
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.858.
+epoch: 430000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.249
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.893.
+epoch: 431000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.249, reg: 0.284
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.852.
+epoch: 432000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.394
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 433000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.302
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.812.
+epoch: 434000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.259, reg: 0.367
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.829.
+epoch: 435000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.386
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.835.
+epoch: 436000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.104, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.916.
+epoch: 437000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.300
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.842.
+epoch: 438000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.400
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.851.
+epoch: 439000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.289
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.817.
+epoch: 440000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.310, reg: 0.263
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.917.
+epoch: 441000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.354
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.787.
+epoch: 442000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.265
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.751.
+epoch: 443000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.468
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.883.
+epoch: 444000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.320
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.821.
+epoch: 445000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.255
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.773.
+epoch: 446000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.789.
+epoch: 447000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.296
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 448000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.345
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.815.
+epoch: 449000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.322
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.844.
+epoch: 450000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.260
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.747.
+epoch: 451000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.580, reg: 0.495
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.855.
+epoch: 452000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.273
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.753.
+epoch: 453000.000, L0:   6.459, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.327
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.894.
+epoch: 454000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.286
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.801.
+epoch: 455000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.335
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.812.
+epoch: 456000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.388
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.882.
+epoch: 457000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.320
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.875.
+epoch: 458000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.641, reg: 0.318
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.799.
+epoch: 459000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.068, reg: 0.239
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.882.
+epoch: 460000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.346
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.887.
+epoch: 461000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.441
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.846.
+epoch: 462000.000, L0:   3.673, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.359
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.780.
+epoch: 463000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.276
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 464000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.326
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.914.
+epoch: 465000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.294
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.915.
+epoch: 466000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.713, reg: 0.305
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.904.
+epoch: 467000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.298
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.880.
+epoch: 468000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.270
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 469000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.258
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.856.
+epoch: 470000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.383
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 471000.000, L0:   0.000, Lu:   0.003, Lg:   0.000, Ld:   0.000, reg: 0.286
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.871.
+epoch: 472000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.282
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.862.
+epoch: 473000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.271
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.811.
+epoch: 474000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.340
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.837.
+epoch: 475000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.255
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.883.
+epoch: 476000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.249
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 477000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.327
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.816.
+epoch: 478000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.158, reg: 0.332
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.806.
+epoch: 479000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.284
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.863.
+epoch: 480000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.291
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.788.
+epoch: 481000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.363
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.847.
+epoch: 482000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.345
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.728.
+epoch: 483000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.724, reg: 0.356
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.789.
+epoch: 484000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.465
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.746.
+epoch: 485000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.342
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.804.
+epoch: 486000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.471, reg: 0.258
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.843.
+epoch: 487000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.267, reg: 0.338
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.812.
+epoch: 488000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.255
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.733.
+epoch: 489000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.291
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.804.
+epoch: 490000.000, L0:   4.404, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.377
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.729.
+epoch: 491000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.336
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.856.
+epoch: 492000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.277
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.828.
+epoch: 493000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.301
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.813.
+epoch: 494000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.366
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.762.
+epoch: 495000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.267
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.887.
+epoch: 496000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.298
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.811.
+epoch: 497000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.324
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.840.
+epoch: 498000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.314
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.812.
+epoch: 499000.000, L0:   0.000, Lu:   0.269, Lg:   0.000, Ld:   0.094, reg: 0.471
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.855.
+epoch: 500000.000, L0:   2.952, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.305
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.871.
+epoch: 501000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.282
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.830.
+epoch: 502000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.287
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.760.
+epoch: 503000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.314
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.783.
+epoch: 504000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.290
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 505000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.400
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.889.
+epoch: 506000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.287
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.824.
+epoch: 507000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.242
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.791.
+epoch: 508000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.311
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 509000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.272
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.870.
+epoch: 510000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.310
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.708.
+epoch: 511000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.688, reg: 0.398
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.801.
+epoch: 512000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.130, reg: 0.258
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.785.
+epoch: 513000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.311
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 514000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.631, reg: 0.251
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.886.
+epoch: 515000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.271
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.724.
+epoch: 516000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.095, reg: 0.433
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.838.
+epoch: 517000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.306
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.849.
+epoch: 518000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.270
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.801.
+epoch: 519000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.507, reg: 0.271
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.831.
+epoch: 520000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.260
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.806.
+epoch: 521000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.349
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.934.
+epoch: 522000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.310
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.893.
+epoch: 523000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.284
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.797.
+epoch: 524000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.546, reg: 0.298
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.809.
+epoch: 525000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.229, reg: 0.271
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.804.
+epoch: 526000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.248, reg: 0.333
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+epoch: 527000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.325
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.685.
+epoch: 528000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.592, reg: 0.459
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.857.
+epoch: 529000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.275
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.793.
+epoch: 530000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.259
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.836.
+epoch: 531000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.152, reg: 0.288
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.830.
+epoch: 532000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.288
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.838.
+epoch: 533000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.276
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.815.
+epoch: 534000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.298
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.891.
+epoch: 535000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.298
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.803.
+epoch: 536000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.284
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.867.
+epoch: 537000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.282
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.843.
+epoch: 538000.000, L0:   3.465, Lu:   0.000, Lg:   0.000, Ld:   0.149, reg: 0.290
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.743.
+epoch: 539000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.303
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.839.
+epoch: 540000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.299
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.823.
+epoch: 541000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.256
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.778.
+epoch: 542000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.487
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.857.
+epoch: 543000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.577, reg: 0.366
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.865.
+epoch: 544000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.281
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.832.
+epoch: 545000.000, L0:   4.064, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.277
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.832.
+epoch: 546000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.322
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.644.
+epoch: 547000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.436
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.740.
+epoch: 548000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.295
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.842.
+epoch: 549000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.266
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.868.
+epoch: 550000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.274
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.852.
+epoch: 551000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.864.
+epoch: 552000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.280
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.892.
+epoch: 553000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.086, reg: 0.399
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.835.
+epoch: 554000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.351
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 555000.000, L0:   0.000, Lu:   1.756, Lg:   0.000, Ld:   0.000, reg: 0.344
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.839.
+epoch: 556000.000, L0:   4.385, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.253
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.801.
+epoch: 557000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.376
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.867.
+epoch: 558000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.299
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.777.
+epoch: 559000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.219, reg: 0.432
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.820.
+epoch: 560000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.324
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.864.
+epoch: 561000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.314
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.806.
+epoch: 562000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.341
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.847.
+epoch: 563000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.795.
+epoch: 564000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.370
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.864.
+epoch: 565000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.274
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.902.
+epoch: 566000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.724, reg: 0.337
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.869.
+epoch: 567000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.377
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.900.
+epoch: 568000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.801.
+epoch: 569000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.432
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.851.
+epoch: 570000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.334
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.745.
+epoch: 571000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.338
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.875.
+epoch: 572000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.333
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.865.
+epoch: 573000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+epoch: 574000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.869, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.789.
+epoch: 575000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.298
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.761.
+epoch: 576000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.319
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.854.
+epoch: 577000.000, L0:   3.512, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.271
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.854.
+epoch: 578000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.032, reg: 0.373
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.818.
+epoch: 579000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.280
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.886.
+epoch: 580000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.276
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.805.
+epoch: 581000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.315
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.804.
+epoch: 582000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.470
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.862.
+epoch: 583000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.853, reg: 0.306
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.902.
+epoch: 584000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.281
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.828.
+epoch: 585000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.373
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.876.
+epoch: 586000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.272
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.849.
+epoch: 587000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.379
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.763.
+epoch: 588000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.301
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.861.
+epoch: 589000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.375, reg: 0.409
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.882.
+epoch: 590000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.301
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.791.
+epoch: 591000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.255
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.843.
+epoch: 592000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.292
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.829.
+epoch: 593000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.333, reg: 0.308
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.828.
+epoch: 594000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.790.
+epoch: 595000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.286
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 596000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.265
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.823.
+epoch: 597000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.279
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.887.
+epoch: 598000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.437
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.844.
+epoch: 599000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.325
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.866.
+epoch: 600000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.376
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.878.
+epoch: 601000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.955, reg: 0.282
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.838.
+epoch: 602000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.329
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.900.
+epoch: 603000.000, L0:   1.613, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.375
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.866.
+epoch: 604000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.771, reg: 0.294
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.848.
+epoch: 605000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.276
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.895.
+epoch: 606000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.297
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.787.
+epoch: 607000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.251
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.740.
+epoch: 608000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.367
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 609000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.381
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.836.
+epoch: 610000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.283
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.847.
+epoch: 611000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.751, reg: 0.377
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.816.
+epoch: 612000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.560, reg: 0.304
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.849.
+epoch: 613000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.284
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.840.
+epoch: 614000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.715, reg: 0.264
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.841.
+epoch: 615000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.009, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 616000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.390, reg: 0.406
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.872.
+epoch: 617000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.268
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.824.
+epoch: 618000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.293
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.753.
+epoch: 619000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.332, reg: 0.304
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.867.
+epoch: 620000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.297
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.863.
+epoch: 621000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.280
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 622000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.348
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.821.
+epoch: 623000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.870.
+epoch: 624000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.311
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.857.
+epoch: 625000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.312
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.781.
+epoch: 626000.000, L0:   0.000, Lu:   0.144, Lg:   0.000, Ld:   0.000, reg: 0.296
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.871.
+epoch: 627000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.282
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.796.
+epoch: 628000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.335
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.894.
+epoch: 629000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.315
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.846.
+epoch: 630000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.343
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.805.
+epoch: 631000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.274
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.759.
+epoch: 632000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.538
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.783.
+epoch: 633000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.343
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.675.
+epoch: 634000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.503
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.829.
+epoch: 635000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.289
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.697.
+epoch: 636000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.550
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.839.
+epoch: 637000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.291
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.856.
+epoch: 638000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.594, reg: 0.310
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.778.
+epoch: 639000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.326
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.823.
+epoch: 640000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.794.
+epoch: 641000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.262
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+epoch: 642000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.183, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.828.
+epoch: 643000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.299
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.910.
+epoch: 644000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.214, reg: 0.291
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.818.
+epoch: 645000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.309
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.884.
+epoch: 646000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.304
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.812.
+epoch: 647000.000, L0:   5.422, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.265
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.796.
+epoch: 648000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.388, reg: 0.280
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.834.
+epoch: 649000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.121, reg: 0.309
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.714.
+epoch: 650000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.510
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.799.
+epoch: 651000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.326
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.788.
+epoch: 652000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.287
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.869.
+epoch: 653000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.098, reg: 0.332
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.879.
+epoch: 654000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.268
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.843.
+epoch: 655000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.278
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.858.
+epoch: 656000.000, L0:   3.897, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.306
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.908.
+epoch: 657000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.093, reg: 0.361
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+epoch: 658000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.318
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.919.
+epoch: 659000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.281
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.689.
+epoch: 660000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.403
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.880.
+epoch: 661000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.434
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.878.
+epoch: 662000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.257
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.736.
+epoch: 663000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.548
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.887.
+epoch: 664000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.322
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.883.
+epoch: 665000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.158, reg: 0.264
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.769.
+epoch: 666000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.283
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.890.
+epoch: 667000.000, L0:   2.271, Lu:   0.000, Lg:   0.000, Ld:   0.035, reg: 0.376
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.877.
+epoch: 668000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.275
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.708.
+epoch: 669000.000, L0:   9.548, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.252
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.808.
+epoch: 670000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.435
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 671000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.305
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.856.
+epoch: 672000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.333
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 673000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.262, reg: 0.282
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.875.
+epoch: 674000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.430
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.767.
+epoch: 675000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.915, reg: 0.402
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.805.
+epoch: 676000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.296
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.864.
+epoch: 677000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.305
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.902.
+epoch: 678000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.267
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.830.
+epoch: 679000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.237
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.828.
+epoch: 680000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.873.
+epoch: 681000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.182, reg: 0.346
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.864.
+epoch: 682000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.289
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.800.
+epoch: 683000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.339
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.803.
+epoch: 684000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.340
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.861.
+epoch: 685000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.325
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.800.
+epoch: 686000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.881.
+epoch: 687000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.295
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.862.
+epoch: 688000.000, L0:   3.509, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.368
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.797.
+epoch: 689000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.268
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.876.
+epoch: 690000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.026, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.836.
+epoch: 691000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.289
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.891.
+epoch: 692000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.330
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.855.
+epoch: 693000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.257
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.790.
+epoch: 694000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.354
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.849.
+epoch: 695000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.406, reg: 0.370
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 696000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   2.460, reg: 0.420
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.834.
+epoch: 697000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.330
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.881.
+epoch: 698000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.332
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.824.
+epoch: 699000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.449
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.894.
+epoch: 700000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.496, reg: 0.354
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 701000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.292
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.839.
+epoch: 702000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.922, reg: 0.295
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.909.
+epoch: 703000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.287
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.812.
+epoch: 704000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.271
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.733.
+epoch: 705000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.283, reg: 0.402
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.861.
+epoch: 706000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.498
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.807.
+epoch: 707000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.780.
+epoch: 708000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.338
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.819.
+epoch: 709000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.300
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.863.
+epoch: 710000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.324
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.857.
+epoch: 711000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.325
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.837.
+epoch: 712000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.288
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.899.
+epoch: 713000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.270
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.807.
+epoch: 714000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.332
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.692.
+epoch: 715000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.923, reg: 0.325
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.820.
+epoch: 716000.000, L0:   0.000, Lu:   0.463, Lg:   0.000, Ld:   0.000, reg: 0.409
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.817.
+epoch: 717000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.313
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.838.
+epoch: 718000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.334
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.787.
+epoch: 719000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.342
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.809.
+epoch: 720000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.380
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.873.
+epoch: 721000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.337
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.869.
+epoch: 722000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.666, reg: 0.317
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.862.
+epoch: 723000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.269
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.680.
+epoch: 724000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.312, reg: 0.355
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.872.
+epoch: 725000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.314
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.869.
+epoch: 726000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.850, reg: 0.300
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.764.
+epoch: 727000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.362
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.822.
+epoch: 728000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.949, reg: 0.301
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 729000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.467
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.844.
+epoch: 730000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.268
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.800.
+epoch: 731000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.327
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 732000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.280
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 733000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.284
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.853.
+epoch: 734000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.991, reg: 0.296
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.708.
+epoch: 735000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.018, reg: 0.461
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.847.
+epoch: 736000.000, L0:   3.606, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.308
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.831.
+epoch: 737000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.293
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.855.
+epoch: 738000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.053, reg: 0.297
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.851.
+epoch: 739000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.432
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.766.
+epoch: 740000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.295
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.769.
+epoch: 741000.000, L0:   5.513, Lu:   0.000, Lg:   0.000, Ld:   0.470, reg: 0.328
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.836.
+epoch: 742000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.270
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 743000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.006, reg: 0.364
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 744000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.175, reg: 0.275
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.853.
+epoch: 745000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.360
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.836.
+epoch: 746000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.333
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.873.
+epoch: 747000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.023, reg: 0.279
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.728.
+epoch: 748000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.384
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.868.
+epoch: 749000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.343
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.870.
+epoch: 750000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.857, reg: 0.275
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+epoch: 751000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.270
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.745.
+epoch: 752000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.412
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.870.
+epoch: 753000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.313
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.767.
+epoch: 754000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.306
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.831.
+epoch: 755000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.628, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.759.
+epoch: 756000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.275
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.701.
+epoch: 757000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.389
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.809.
+epoch: 758000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.705, reg: 0.337
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.832.
+epoch: 759000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.310
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.863.
+epoch: 760000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.399, reg: 0.397
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.822.
+epoch: 761000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.021, reg: 0.363
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.863.
+epoch: 762000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.340, reg: 0.278
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.760.
+epoch: 763000.000, L0:   0.000, Lu:   0.031, Lg:   0.000, Ld:   0.000, reg: 0.276
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.844.
+epoch: 764000.000, L0:   4.240, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.894.
+epoch: 765000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.554, reg: 0.368
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.838.
+epoch: 766000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.316
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.796.
+epoch: 767000.000, L0:   0.000, Lu:   0.022, Lg:   0.000, Ld:   0.000, reg: 0.304
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.861.
+epoch: 768000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.499, reg: 0.305
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.887.
+epoch: 769000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.291
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.831.
+epoch: 770000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.336
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.804.
+epoch: 771000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.363
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.778.
+epoch: 772000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.385, reg: 0.309
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.910.
+epoch: 773000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.007, reg: 0.308
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.893.
+epoch: 774000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.347
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.852.
+epoch: 775000.000, L0:   3.758, Lu:   0.000, Lg:   0.000, Ld:   0.923, reg: 0.268
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.897.
+epoch: 776000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.367
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.884.
+epoch: 777000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.823.
+epoch: 778000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.359
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.814.
+epoch: 779000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.346
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.856.
+epoch: 780000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.295, reg: 0.329
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 781000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.294
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.711.
+epoch: 782000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.338
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.837.
+epoch: 783000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.764.
+epoch: 784000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.331
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.867.
+epoch: 785000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.106, reg: 0.365
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.828.
+epoch: 786000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.283
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.858.
+epoch: 787000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.201, reg: 0.424
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.894.
+epoch: 788000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.313
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.899.
+epoch: 789000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.244, reg: 0.427
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 790000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.026, reg: 0.313
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.891.
+epoch: 791000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.308
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.867.
+epoch: 792000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.312
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.847.
+epoch: 793000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.285
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.841.
+epoch: 794000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.308
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.746.
+epoch: 795000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.300
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.855.
+epoch: 796000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.210, reg: 0.284
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.765.
+epoch: 797000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   2.400, reg: 0.480
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.840.
+epoch: 798000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.349
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.893.
+epoch: 799000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.291
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 800000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.311
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.857.
+epoch: 801000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.342
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.876.
+epoch: 802000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.423
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.828.
+epoch: 803000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.300
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.875.
+epoch: 804000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.469, reg: 0.367
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.794.
+epoch: 805000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.430
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.905.
+epoch: 806000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.239, reg: 0.299
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.792.
+epoch: 807000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.447
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.800.
+epoch: 808000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.370
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.872.
+epoch: 809000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.298
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.897.
+epoch: 810000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.328
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.828.
+epoch: 811000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.441
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.846.
+epoch: 812000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.198, reg: 0.303
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.749.
+epoch: 813000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.345
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.847.
+epoch: 814000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.701, reg: 0.314
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.851.
+epoch: 815000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.347
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.849.
+epoch: 816000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.273
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.790.
+epoch: 817000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.363
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.893.
+epoch: 818000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.316
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.806.
+epoch: 819000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.390
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 820000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.276
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.852.
+epoch: 821000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.254
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.861.
+epoch: 822000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.345
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.899.
+epoch: 823000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.452, reg: 0.354
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.820.
+epoch: 824000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.269
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.819.
+epoch: 825000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.298
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.868.
+epoch: 826000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.269
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.866.
+epoch: 827000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.296
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.843.
+epoch: 828000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.277
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.834.
+epoch: 829000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.296
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 830000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.300
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.842.
+epoch: 831000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.324
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.886.
+epoch: 832000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.320
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.819.
+epoch: 833000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.313
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.839.
+epoch: 834000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.312
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.837.
+epoch: 835000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.532, reg: 0.273
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.813.
+epoch: 836000.000, L0:   4.539, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.272
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.763.
+epoch: 837000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.266
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.803.
+epoch: 838000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.293
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.816.
+epoch: 839000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.343
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.869.
+epoch: 840000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.303
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.887.
+epoch: 841000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.370
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.788.
+epoch: 842000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.346
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.829.
+epoch: 843000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.287
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.815.
+epoch: 844000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.278
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.830.
+epoch: 845000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.309
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.898.
+epoch: 846000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.278
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.797.
+epoch: 847000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.123, reg: 0.299
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.865.
+epoch: 848000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.310
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 849000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.322
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.870.
+epoch: 850000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.588, reg: 0.299
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.845.
+epoch: 851000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.404
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.791.
+epoch: 852000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.350
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.838.
+epoch: 853000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.260
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.805.
+epoch: 854000.000, L0:   4.487, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.452
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.832.
+epoch: 855000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.374
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.740.
+epoch: 856000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.405
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.887.
+epoch: 857000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.355
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.876.
+epoch: 858000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.333
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.777.
+epoch: 859000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.288
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.810.
+epoch: 860000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.775.
+epoch: 861000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.425
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.873.
+epoch: 862000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.284
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.809.
+epoch: 863000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.259
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.863.
+epoch: 864000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.674, reg: 0.395
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.809.
+epoch: 865000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.265
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.856.
+epoch: 866000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.423
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.820.
+epoch: 867000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.479
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.838.
+epoch: 868000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.290
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.768.
+epoch: 869000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.176, reg: 0.459
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.726.
+epoch: 870000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.310
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.792.
+epoch: 871000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.324
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.783.
+epoch: 872000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.249
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.805.
+epoch: 873000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.333
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.788.
+epoch: 874000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.426
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.815.
+epoch: 875000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.875.
+epoch: 876000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.253
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.764.
+epoch: 877000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.374
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.884.
+epoch: 878000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.289
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.769.
+epoch: 879000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.308
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.790.
+epoch: 880000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.629, reg: 0.429
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.797.
+epoch: 881000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.268
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.877.
+epoch: 882000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.312
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.808.
+epoch: 883000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.283
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.769.
+epoch: 884000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.413
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.880.
+epoch: 885000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.311
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.827.
+epoch: 886000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.243
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.836.
+epoch: 887000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.331
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.844.
+epoch: 888000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.306
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.837.
+epoch: 889000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.142, reg: 0.354
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.841.
+epoch: 890000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.271
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.782.
+epoch: 891000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.442
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.836.
+epoch: 892000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.272
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+epoch: 893000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.409
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.895.
+epoch: 894000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.370
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 895000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.284
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.872.
+epoch: 896000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 897000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.293
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.853.
+epoch: 898000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.279, reg: 0.423
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.840.
+epoch: 899000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.275
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.825.
+epoch: 900000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.675
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.784.
+epoch: 901000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.892.
+epoch: 902000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.294
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.861.
+epoch: 903000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.820.
+epoch: 904000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.382, reg: 0.315
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.791.
+epoch: 905000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.465
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.862.
+epoch: 906000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.292
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.810.
+epoch: 907000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.029, reg: 0.394
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.682.
+epoch: 908000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.049, reg: 0.413
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.783.
+epoch: 909000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.335
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.822.
+epoch: 910000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.652, reg: 0.296
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.822.
+epoch: 911000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.295
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.876.
+epoch: 912000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.385
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.904.
+epoch: 913000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.335
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.785.
+epoch: 914000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.388
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 915000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.329
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.896.
+epoch: 916000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.259
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.829.
+epoch: 917000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.260
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.867.
+epoch: 918000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.352
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.897.
+epoch: 919000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.283
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.820.
+epoch: 920000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.350
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.827.
+epoch: 921000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.282
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 922000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.365
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.802.
+epoch: 923000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.901, reg: 0.263
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.800.
+epoch: 924000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.440
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.834.
+epoch: 925000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.363
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.826.
+epoch: 926000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.360
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.899.
+epoch: 927000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.283
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.872.
+epoch: 928000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.293
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.883.
+epoch: 929000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.301
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.877.
+epoch: 930000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.819.
+epoch: 931000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.327
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.913.
+epoch: 932000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.960, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.863.
+epoch: 933000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.409
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.716.
+epoch: 934000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.304
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.906.
+epoch: 935000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.261
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.845.
+epoch: 936000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.313
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.789.
+epoch: 937000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.364
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 938000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.094, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.834.
+epoch: 939000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.025, reg: 0.341
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.772.
+epoch: 940000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.898, reg: 0.377
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.870.
+epoch: 941000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.279
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.782.
+epoch: 942000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.386
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.830.
+epoch: 943000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.274
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.817.
+epoch: 944000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.035, reg: 0.302
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.788.
+epoch: 945000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.326
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.866.
+epoch: 946000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.112, reg: 0.261
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.889.
+epoch: 947000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.501, reg: 0.304
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.838.
+epoch: 948000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.263
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.780.
+epoch: 949000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.340
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.896.
+epoch: 950000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.351
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.876.
+epoch: 951000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.294
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.807.
+epoch: 952000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.420
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.889.
+epoch: 953000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.034, reg: 0.306
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.745.
+epoch: 954000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.406
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.789.
+epoch: 955000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.276
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.818.
+epoch: 956000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.357
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.692.
+epoch: 957000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.399
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.811.
+epoch: 958000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.323
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.799.
+epoch: 959000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.336
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.792.
+epoch: 960000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.326
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.869.
+epoch: 961000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.299
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.835.
+epoch: 962000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.274
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.841.
+epoch: 963000.000, L0:   0.000, Lu:   0.065, Lg:   0.000, Ld:   0.000, reg: 0.302
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.848.
+epoch: 964000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.352
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.854.
+epoch: 965000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.268
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.835.
+epoch: 966000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.409
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.848.
+epoch: 967000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.282
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.890.
+epoch: 968000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.317
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.813.
+epoch: 969000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.304
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.766.
+epoch: 970000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.525
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.747.
+epoch: 971000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.302
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.795.
+epoch: 972000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.271
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 973000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.370
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.871.
+epoch: 974000.000, L0:   3.380, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.256
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.873.
+epoch: 975000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.280
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.877.
+epoch: 976000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.282
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.854.
+epoch: 977000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   1.278, reg: 0.314
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.816.
+epoch: 978000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.321
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.845.
+epoch: 979000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.305
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.876.
+epoch: 980000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.335
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.884.
+epoch: 981000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.689, reg: 0.312
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.785.
+epoch: 982000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.369
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.846.
+epoch: 983000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.251
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.742.
+epoch: 984000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.304
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+epoch: 985000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.139, reg: 0.374
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.859.
+epoch: 986000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.343
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.854.
+epoch: 987000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.289
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.807.
+epoch: 988000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.423
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.850.
+epoch: 989000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.271
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.848.
+epoch: 990000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.318
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.858.
+epoch: 991000.000, L0:   3.615, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.265
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.841.
+epoch: 992000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.573, reg: 0.307
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.781.
+epoch: 993000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.286
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.819.
+epoch: 994000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.373
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.742.
+epoch: 995000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.297
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.857.
+epoch: 996000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.270
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.885.
+epoch: 997000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.217, reg: 0.288
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.839.
+epoch: 998000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.294
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.831.
+epoch: 999000.000, L0:   0.000, Lu:   0.000, Lg:   0.000, Ld:   0.000, reg: 0.297
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.860.
+Seed 98540 training time: 2875.775 s
+Train returned: (False, 1000000)
+
+--- Seed 77709 ---
+epoch:   0.000, L0:   0.000, Lu:  78.295, Lg:   0.000, Ld: 255.169, reg: 1.383
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.000.
+epoch: 1000.000, L0:   0.000, Lu: 106.798, Lg:   0.000, Ld: 141.327, reg: 3.509
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.000.
+epoch: 2000.000, L0:   0.000, Lu:  63.303, Lg:   0.000, Ld:  21.202, reg: 5.592
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.000.
+epoch: 3000.000, L0:   0.000, Lu:  52.885, Lg:   0.000, Ld:   3.901, reg: 6.593
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.000.
+epoch: 4000.000, L0:   0.000, Lu:  21.310, Lg:   0.000, Ld:   3.151, reg: 7.643
+=== Verification phase ===
+Verifying Reach-avoid probability with probability at least  0.062.
+epoch: 5000.000, L0:   0.000, Lu:  12.057, Lg:   0.000, Ld:   3.240, reg: 9.309
