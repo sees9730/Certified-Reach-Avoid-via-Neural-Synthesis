@@ -8,6 +8,7 @@ class CellVerificationSystem():
         super().__init__()
         self.max_depth = max_depth
         self.corners = None  # built lazily once we know N
+        self.total_cells_checked = 0
 
     @staticmethod
     def _make_corners(dim: int, device: torch.device, dtype: torch.dtype) -> torch.Tensor:
@@ -66,6 +67,7 @@ class CellVerificationSystem():
             self.corners = self._make_corners(dim, device=locations.device, dtype=locations.dtype)
 
         magnitude = self._ensure_mag_shape(magnitude, B=B, dim=dim)
+        self.total_cells_checked += B
 
         bounded_cells = BoundedTensor(
             locations,

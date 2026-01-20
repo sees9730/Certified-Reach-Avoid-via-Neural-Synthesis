@@ -287,6 +287,7 @@ class SupermartingaleCertificate():
                         cell_magnitudes
                     )
                     n_decrease_counterexamples = decrease_counterexamples.shape[0]
+                    print(f"Total cells checked: {cell_system.total_cells_checked}")
                     if n_decrease_counterexamples > 0:
                         print(
                             f"Found {n_decrease_counterexamples} "
@@ -294,6 +295,7 @@ class SupermartingaleCertificate():
                         )
                 else:
                     n_decrease_counterexamples = 0
+                    print(f"Total cells checked: 0")
 
                 # Steps 19-20 of the algorithm
                 if n_decrease_counterexamples == 0:

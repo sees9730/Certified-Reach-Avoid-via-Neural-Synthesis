@@ -8,6 +8,7 @@ import numpy as np
 import math
 import time
 import argparse
+import statistics as stats
 
 # Set up directories
 from pathlib import Path
@@ -203,16 +204,21 @@ def pretrain_network_samples(
     print("=" * 20 + "\n")
 
 
-def main():
+def main(benchmark_mode=False):
     parser = argparse.ArgumentParser()
     parser.add_argument("--train", type=int, default=1, choices=[0, 1],
                         help="1: train + save bundle, 0: load bundle + eval/plot")
+    parser.add_argument("--benchmark", type=int, default=0, choices=[0, 1],
+                        help="1: run benchmark (5 runs), 0: normal run")
     args = parser.parse_args()
 
     """Main training function."""
     print("="*20)
     print("MODULAR RL VERIFICATION - BOUND-BASED TRAINING")
     print("="*20)
+
+    # Return value for benchmark mode
+    training_time_result = None
 
     # ========================================================================
     # 1. HYPERPARAMETERS
@@ -377,6 +383,10 @@ def main():
         PRETRAIN_EPOCHS = 500
         PRETRAIN_LR = 0.01
         if ENABLE_PRETRAINING:
+
+            # Start timer before pretraining
+            training_start_time = time.time()
+
             pretrain_network_samples(
                 model=V_net,
                 x_goal_range=goal_range,
@@ -388,8 +398,7 @@ def main():
                 num_epochs=PRETRAIN_EPOCHS,
                 lr=PRETRAIN_LR,
                 device=params.training.device,
-                n_each=1000,
-                # control_net=u_nn
+                n_each=100
             )
 
             print(f"Pretraining completed!\n")
@@ -415,8 +424,13 @@ def main():
             regions=regions,
             params=params,
             device=device,
-            create_scheduler=create_scheduler
+            create_scheduler=create_scheduler,
+            start_time=training_start_time
         )
+
+        # Record training end time (before eval/visualization)
+        training_end_time = time.time()
+        total_training_time = training_end_time - training_start_time
 
         # ========================================================================
         # 7. FINAL EVALUATION
@@ -470,8 +484,11 @@ def main():
             final_beta_s=final_beta_s,
             loss_history=loss_history,
             refinement_epochs=refinement_epochs,
-            results=results,
+            results=results
         )
+
+        # Set training time result for benchmark
+        training_time_result = total_training_time
 
     else:
         # ====================================================================
@@ -554,7 +571,63 @@ def main():
             output_dir="results"
         )
 
+    return training_time_result
+
 
 
 if __name__ == '__main__':
-    main()
+    # Quick check for benchmark mode before full arg parse
+    import sys
+    is_benchmark = '--benchmark=1' in sys.argv or '--benchmark' in sys.argv and '1' in sys.argv
+
+    if is_benchmark:
+        # Benchmark mode: run 5 times and collect stats
+        n_runs = 2
+        times = []
+        cells = []
+
+        print("="*80)
+        print(f"BENCHMARK MODE: {n_runs} runs")
+        print("="*80)
+
+        for i in range(n_runs):
+            print(f"\n*** Run {i+1}/{n_runs} ***")
+            training_time = main(benchmark_mode=True)
+            if training_time is not None:
+                times.append(training_time)
+
+            # Extract cell counts from last run
+            bundle_path = OUTPUT_DIR / "eval_bundle.pth"
+            if bundle_path.exists():
+                import torch
+                bundle = torch.load(bundle_path, map_location='cpu')
+                cell_counts = {
+                    'init': len(bundle['region_cells']['init']),
+                    'goal': len(bundle['region_cells']['goal']),
+                    'unsafe': len(bundle['region_cells']['unsafe']),
+                    'outside': len(bundle['region_cells']['outside']),
+                    'generator': len(bundle['region_cells']['generator']),
+                }
+                cell_counts['total_v'] = cell_counts['init'] + cell_counts['goal'] + cell_counts['unsafe'] + cell_counts['outside']
+                cell_counts['total'] = cell_counts['total_v'] + cell_counts['generator']
+                cells.append(cell_counts)
+
+        print("\n" + "="*80)
+        print("BENCHMARK RESULTS")
+        print("="*80)
+        avg_time = stats.mean(times)
+        std_time = stats.stdev(times)
+        print(f"Training time (pretrain+train): {avg_time:.2f}s ± {std_time:.2f}s")
+        print(f"  Individual times: {[f'{t:.2f}s' for t in times]}")
+
+        if cells:
+            # Compute averages for each category
+            categories = ['init', 'goal', 'unsafe', 'outside', 'generator', 'total_v', 'total']
+            print("\nCell counts:")
+            for cat in categories:
+                values = [c[cat] for c in cells]
+                avg = stats.mean(values)
+                std = stats.stdev(values)
+                print(f"  {cat:12s}: {avg:.0f} ± {std:.0f}")
+    else:
+        main()

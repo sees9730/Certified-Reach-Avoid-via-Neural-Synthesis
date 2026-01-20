@@ -8,6 +8,7 @@ import numpy as np
 import math
 import time
 import argparse
+import statistics as stats
 
 # Set up directories
 from pathlib import Path
@@ -777,8 +778,8 @@ if __name__ == '__main__':
         print("\n" + "="*80)
         print("BENCHMARK RESULTS")
         print("="*80)
-        avg_time = sum(times) / len(times)
-        std_time = max(times) - min(times)
+        avg_time = stats.mean(times)
+        std_time = stats.stdev(times)
         print(f"Training time (pretrain+train): {avg_time:.2f}s ± {std_time:.2f}s")
         print(f"  Individual times: {[f'{t:.2f}s' for t in times]}")
 
@@ -788,8 +789,8 @@ if __name__ == '__main__':
             print("\nCell counts:")
             for cat in categories:
                 values = [c[cat] for c in cells]
-                avg = sum(values) / len(values)
-                spread = max(values) - min(values)
-                print(f"  {cat:12s}: {avg:.0f} ± {spread:.0f}")
+                avg = stats.mean(values)
+                std = stats.stdev(values)
+                print(f"  {cat:12s}: {avg:.0f} ± {std:.0f}")
     else:
         main()
