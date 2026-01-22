@@ -1,0 +1,96 @@
+Network: 4 -> 64 -> 64 -> 1
+Training: 200000 epochs, LR=0.005
+Constraints: beta_s=0.0, beta_ra=5.0
+Generator: weight=1.0, start_epoch=0
+Training method: CROWN bounds (rigorous)
+
+Dynamics(dim=4, f(x)=<callable>, g(x)=<callable>)
+V network: ValueNetwork(
+  input_dim=4,
+  hidden=[64, 64],
+  output_dim=1,
+  activation=builtin_function_or_method,
+  input_scale=[6.0, 6.0, 6.0, 6.0],
+  scale_factor=20.0
+)
+
+Using device: cpu
+
+================================================================================
+PRE-TRAINING: Constraint-Structured Initialization (Sample-Based)
+================================================================================
+  GV (Φ) pre-training ENABLED (using provided GV_net)
+  Epoch [0/10]: V=135145.078125 (full=10561.669, init=0.000, unsafe=124583.414, goal=10565.824, others=10573.083), Φ=59.514397, Total=1.35205e+05
+
+  Best loss: 15159.930664
+  Saved pretrained V_net to: /Users/chko1829/src/Projects/ML/Neural_Certificate_Scenario/Neural_Certificate/nonlinear4d_syn_unsafe/outputs/V_pretrained.pth
+  Saved pretrained Controller_net to: /Users/chko1829/src/Projects/ML/Neural_Certificate_Scenario/Neural_Certificate/nonlinear4d_syn_unsafe/outputs/controller_pretrained.pth
+================================================================================
+Pre-training complete. V + GV (Φ) + Controller initialized.
+================================================================================
+
+
+Using device: cpu
+
+================================================================================
+BOUND-BASED TRAINING (using CROWN)
+================================================================================
+
+Collecting all cells for V network...
+  init: 1 cells
+  goal: 1 cells
+  unsafe: 8 cells
+  outside: 80 cells
+  boundary: 8 cells
+  Total V cells: 98
+
+Preparing concatenated input bounds for V network...
+
+Initializing CROWN cache for ALL 98 V cells...
+[SymbolicCROWNCache] Creating BoundedModule for 98 cells...
+[SymbolicCROWNCache] Initialized for 98 cells - symbolic structure cached!
+
+Creating CROWN cache for 'generator' (Phi)...
+  generator: 20784 cells
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 20784 cells...
+/Users/chko1829/src/Projects/ML/Neural_Certificate_Scenario/Neural_Certificate/src/phi_module.py:169: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  self._cached_scale_D == D
+[SymbolicCROWNCache_Phi] Initialized for 20784 cells!
+
+Using CONSTANT beta_s = 0.0
+Epoch     0 | Total: 30717.1738 | Goal: 0.0000 | Unsafe: 35.4100 | Init: 18.3167 | Outside: 0.0000 | Boundary: 3.3617 | Gen: 3.066345e+04
+ ✓ Inside Goal passed, min V= 16.0220, min V_outside_lower= 5.6663, min V_lower=15.0016
+
+Epoch 0 - Detailed Evaluation:
+  Constraint Satisfaction:
+    Goal:      ✗ (V_min=15.981, V_mean=16.027, V_max=16.075)
+    Unsafe:    ✗ (V_min=0.149, V_max=28.725)
+    Init:      ✗ (V_min=12.561, V_max=19.317)
+    Outside:   ✓ (V_min=5.666, V_max=24.841)
+    Boundary:  ✗ (V_min=0.149, V_max=28.698)
+    Generator: ✗ (Phi_upper_min=7.543576e-02, Phi_upper_max=3.705090e+00, failing=20784)
+  Goal bounds: V ∈ [15.002, 17.036]
+  Unsafe bounds: V ∈ [0.149, 28.725]
+  Generator bounds: Φ ∈ [7.543576e-02, 3.705090e+00]
+  Generator failing cells: 20784/20784 (100.0%)
+
+Epoch    10 | Total: 3756.6108 | Goal: 0.0000 | Unsafe: 0.0000 | Init: 8.3808 | Outside: 0.0000 | Boundary: 0.0000 | Gen: 3.748230e+03
+ ✓ Inside Goal passed, min V= 8.8192, min V_outside_lower= 7.0765, min V_lower=8.6465
+Epoch    20 | Total: 838.3164 | Goal: 0.0000 | Unsafe: 37.4024 | Init: 0.1465 | Outside: 0.0000 | Boundary: 5.4005 | Gen: 8.007675e+02
+ ✓ Inside Goal passed, min V= 0.9945, min V_outside_lower= 0.5673, min V_lower=0.9489
+Traceback (most recent call last):
+  File "/Users/chko1829/src/Projects/ML/Neural_Certificate_Scenario/Neural_Certificate/nonlinear4d_syn_unsafe/main.py", line 1512, in <module>
+    main()
+  File "/Users/chko1829/src/Projects/ML/Neural_Certificate_Scenario/Neural_Certificate/nonlinear4d_syn_unsafe/main.py", line 1362, in main
+    loss_history, final_beta_s, refinement_epochs = train_network_bounds(
+                                                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chko1829/src/Projects/ML/Neural_Certificate_Scenario/Neural_Certificate/nonlinear4d_syn_unsafe/main.py", line 571, in train_network_bounds
+    total_loss.backward()
+  File "/Users/chko1829/src/Projects/ML/Neural_Certificate_Scenario/Neural_Certificate/.venv/lib/python3.11/site-packages/torch/_tensor.py", line 525, in backward
+    torch.autograd.backward(
+  File "/Users/chko1829/src/Projects/ML/Neural_Certificate_Scenario/Neural_Certificate/.venv/lib/python3.11/site-packages/torch/autograd/__init__.py", line 267, in backward
+    _engine_run_backward(
+  File "/Users/chko1829/src/Projects/ML/Neural_Certificate_Scenario/Neural_Certificate/.venv/lib/python3.11/site-packages/torch/autograd/graph.py", line 744, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

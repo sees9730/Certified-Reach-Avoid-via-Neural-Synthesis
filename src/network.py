@@ -48,11 +48,6 @@ class V(nn.Module):
 
         # Input normalization for each dimension [input_scale_i, input_scale_j] -> [x_orig_i/input_scale_i, x_orig_j/input_scale_j]
         self.register_buffer('input_scale', torch.tensor(config.input_scale, dtype=torch.float32))
-        
-        input_offset = getattr(config, "input_offset", None)
-        if input_offset is None:
-            input_offset = torch.zeros_like(self.input_scale)
-        self.register_buffer("input_offset", torch.tensor(input_offset, dtype=torch.float32))
 
         # Network layers
         self.layer1 = nn.Linear(config.n_inputs, config.n_hidden_1)
@@ -71,34 +66,28 @@ class V(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Guarantee: V(x = input_offset) = 0 by subtracting the full-network baseline at x_norm = 0.
+        Forward pass.
+
+        Args:
+            x: Input state (batch_size, n_inputs) or (n_inputs,)
+
+        Returns:
+            Value V(x) of shape (batch_size, n_outputs) or (n_outputs,)
         """
-        was_1d = (x.dim() == 1)
-        if was_1d:
-            x = x.unsqueeze(0)  # (1,D)
+        # Normalize input: [-input_scale, input_scale] -> [-1, 1]
+        x = x / self.input_scale
 
-        # Normalize: (x - offset)/scale
-        x_norm = (x - self.input_offset.unsqueeze(0)) / self.input_scale.unsqueeze(0)
+        # Hidden layers
+        x = self.layer1(x)
+        x = self.activation_fn(x)
 
-        # ---- main forward ----
-        h = self.layer1(x_norm)
-        h = self.activation_fn(h)
-        h = self.layer2(h)
-        h = self.activation_fn(h)
-        y = self.output(h * self.scale_factor)  # (N,out)
+        x = self.layer2(x)
+        x = self.activation_fn(x)
 
-        # ---- baseline at x_norm = 0 (i.e., x = input_offset) ----
-        x_norm0 = torch.zeros_like(x_norm)      # (N,D) but all zeros
-        h0 = self.layer1(x_norm0)
-        h0 = self.activation_fn(h0)
-        h0 = self.layer2(h0)
-        h0 = self.activation_fn(h0)
-        y0 = self.output(h0 * self.scale_factor)  # (N,out), constant across N
+        # Output layer with scaling
+        x = self.output(x * self.scale_factor)
 
-        out = y - y0 + 0.1
-
-        return out.squeeze(0) if was_1d else out
-
+        return x
 
     def get_weights(self):
         """
@@ -135,40 +124,6 @@ class V(nn.Module):
             f"  scale_factor={self.config.scale_factor}\n"
             f")"
         )
-    
-    @torch.no_grad()
-    def verify_zero_at_offset(
-        self,
-        *,
-        atol: float = 1e-6,
-        rtol: float = 1e-6,
-        verbose: bool = True,
-        device: torch.device | str | None = None,
-        dtype: torch.dtype | None = None,
-    ) -> bool:
-        """
-        Verify numerically that V(input_offset) == 0.
-        Returns True if all outputs are close to zero within tolerances.
-        """
-        if device is None:
-            device = self.input_offset.device
-        if dtype is None:
-            dtype = self.input_offset.dtype
-
-        x0 = self.input_offset.to(device=device, dtype=dtype)
-
-        y0 = self.forward(x0)  # shape (n_outputs,) or scalar-like
-        target = torch.zeros_like(y0)
-
-        ok = torch.allclose(y0, target, atol=atol, rtol=rtol)
-
-        if verbose:
-            print("x = input_offset:", x0.detach().cpu().numpy())
-            print("V(input_offset):", y0.detach().cpu().numpy())
-            print(f"allclose_to_zero={bool(ok)} (atol={atol}, rtol={rtol})")
-
-        return bool(ok)
-
 
 
 def create_V(config: NetworkConfig) -> nn.Module:

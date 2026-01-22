@@ -24,21 +24,31 @@ class LinearControlNN(nn.Module):
     
 
 class LinearControl4DNN(nn.Module):
-    def __init__(self, hidden_dim=64):
+    def __init__(self, hidden_dim=64, K_gain=None):
         super().__init__()
         self.fc1 = nn.Linear(4, hidden_dim, bias=False)
         self.fc2 = nn.Linear(hidden_dim, 2, bias=False)
+        # Initialize NN weights to zero
+        nn.init.zeros_(self.fc1.weight)
+        nn.init.zeros_(self.fc2.weight)
+        
         A = torch.tensor([
             [0.0, 1.0, 0.0, 0.0],
             [0.0, 0.0, 0.0, 1.0],
         ])
         self.register_buffer("A", A)
 
+        # Fixed linear gain (defaults to zeros)
+        K = torch.zeros(4, 4, dtype=torch.float32) if K_gain is None else torch.as_tensor(K_gain, dtype=torch.float32)
+        if K.shape != (4, 4):
+            raise ValueError(f"K_gain must be (4,4), got {tuple(K.shape)}")
+        self.register_buffer("K_gain", K)
+
     def forward(self, x):
         h = torch.tanh(self.fc1(x))
         u13 = torch.tanh(self.fc2(h))
         u = u13 @ self.A
-        return u
+        return u + x @ self.K_gain.t()
 
 class GBMControlNN(nn.Module):
     def __init__(self, input_dim=2, hidden_dim=8, output_dim=2):

@@ -703,7 +703,8 @@ def train_network_bounds(
             all_satisfied = True
             if params.compute_V:
                 show = (epoch % 10 == 0)
-                _, goal_satisfied = compute_loss_goal_bounds(bounds_updated["goal"][0], bounds_updated["goal"][1], bounds_updated['outside'][0], show=show)
+                _, goal_satisfied = compute_loss_goal_bounds(V_net, regions.goal, bounds_updated["goal"][0], bounds_updated["goal"][1], beta_s_check, bounds_updated['outside'][0], 
+                                                             device=device, show=show, check=True, n_samples=1000)
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
                 init_satisfied = (bounds_updated['init'][1].max() <= 1.0)
                 outside_satisfied = (bounds_updated['outside'][0].min() >= 0.0)
@@ -844,6 +845,229 @@ def train_network_bounds(
     return loss_history, final_beta_s, refinement_epochs
 
 
+def animate_sde(
+    f_cl_module,
+    g,
+    init_range,
+    unsafe_range,
+    goal_range,
+    *,
+    dt: float = 0.01,
+    T: float = 10.0,
+    n_traj: int = 32,
+    seed: int = 0,
+    device: str = "cpu",
+    dtype: torch.dtype = torch.float32,
+    frame_stride: int = 5,
+    tail: int | None = 400,   # how many recent points to show (None = full history)
+):
+    """
+    Euler–Maruyama simulate dx = f_cl(x) dt + g(x) dW and animate phase plots:
+      - subplot 1: (x1 vs x2)
+      - subplot 2: (x3 vs x4)
+
+    Also overlays projected boxes for init / unsafe (UNION supported) / goal regions.
+    Your current unsafe_range format is supported:
+      - unsafe_range can be (K*4, 2) produced by np.vstack([...]) of multiple (4,2) boxes.
+      - also supports (4,2) or (K,4,2) if provided.
+
+    Assumptions:
+      - init_range, goal_range are array-like (4,2) with [low, high] per dim
+      - g(x) returns (N,4) (or (4,) for single x) representing diagonal diffusion coefficients
+        so noise term is elementwise: diff * sqrt(dt) * N(0,1).
+    """
+    import numpy as np
+    import torch
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as patches
+    from matplotlib.animation import FuncAnimation
+
+    # ----------------------------
+    # sanitize / normalize ranges
+    # ----------------------------
+    init_range = np.asarray(init_range, dtype=np.float64)
+    goal_range = np.asarray(goal_range, dtype=np.float64)
+    unsafe_arr = np.asarray(unsafe_range, dtype=np.float64)
+
+    if init_range.shape != (4, 2):
+        raise ValueError(f"init_range must be (4,2), got {init_range.shape}")
+    if goal_range.shape != (4, 2):
+        raise ValueError(f"goal_range must be (4,2), got {goal_range.shape}")
+
+    # ------------------------------------------------------------
+    # Parse unsafe union:
+    #  - (K*4,2) from np.vstack of multiple (4,2) boxes  [your case]
+    #  - or (4,2) single box
+    #  - or (K,4,2) already separated
+    # ------------------------------------------------------------
+    if unsafe_arr.ndim == 2 and unsafe_arr.shape[1] == 2 and (unsafe_arr.shape[0] % 4 == 0):
+        K = unsafe_arr.shape[0] // 4
+        unsafe_boxes = unsafe_arr.reshape(K, 4, 2)   # (K,4,2)
+    elif unsafe_arr.shape == (4, 2):
+        unsafe_boxes = unsafe_arr[None, ...]         # (1,4,2)
+    elif unsafe_arr.ndim == 3 and unsafe_arr.shape[1:] == (4, 2):
+        unsafe_boxes = unsafe_arr                    # (K,4,2)
+    else:
+        raise ValueError(
+            "unsafe_range must be (4,2), (K,4,2), or (K*4,2) from vstack. "
+            f"Got shape {unsafe_arr.shape}"
+        )
+
+    # ----------------------------
+    # simulation (Euler–Maruyama)
+    # ----------------------------
+    steps = int(np.ceil(T / dt))
+    sqrt_dt = float(np.sqrt(dt))
+
+    gen = torch.Generator(device=device)
+    gen.manual_seed(int(seed))
+
+    def _sample_uniform_box(N: int, box_4x2: np.ndarray, *, gen: torch.Generator):
+        low = torch.as_tensor(box_4x2[:, 0], device=device, dtype=dtype)
+        high = torch.as_tensor(box_4x2[:, 1], device=device, dtype=dtype)
+        u = torch.rand((N, 4), device=device, dtype=dtype, generator=gen)
+        return low + (high - low) * u
+
+    f_cl_module = f_cl_module.to(device=device)
+    f_cl_module.eval()
+
+    with torch.no_grad():
+        x = _sample_uniform_box(n_traj, init_range, gen=gen)  # (N,4)
+        xs = torch.empty((steps + 1, n_traj, 4), device=device, dtype=dtype)
+        xs[0] = x
+
+        for _k in range(steps):
+            drift = f_cl_module(x)  # (N,4)
+            diff = g(x)             # (N,4) or (4,)
+            if diff.dim() == 1:
+                diff = diff.unsqueeze(0).expand_as(x)
+
+            # Brownian increment ~ N(0, dt)
+            # dW = torch.randn_like(x, generator=gen) * sqrt_dt
+            dW = torch.randn(x.shape, device=x.device, dtype=x.dtype, generator=gen) * sqrt_dt
+            x = x + drift * dt + diff * dW
+            xs[_k + 1] = x
+
+    traj = xs.detach().cpu().numpy()  # (steps+1, N, 4)
+
+    # ----------------------------
+    # plotting helpers
+    # ----------------------------
+    def _add_box(ax, box_4x2: np.ndarray, i: int, j: int, *, linestyle: str, linewidth: float = 1.5):
+        x0 = float(box_4x2[i, 0])
+        y0 = float(box_4x2[j, 0])
+        w = float(box_4x2[i, 1] - box_4x2[i, 0])
+        h = float(box_4x2[j, 1] - box_4x2[j, 0])
+        rect = patches.Rectangle(
+            (x0, y0), w, h,
+            fill=False,
+            linestyle=linestyle,
+            linewidth=linewidth,
+        )
+        ax.add_patch(rect)
+        return rect
+
+    def _lims_for_dims(d0: int, d1: int):
+        mins = np.min(traj[:, :, [d0, d1]], axis=(0, 1))
+        maxs = np.max(traj[:, :, [d0, d1]], axis=(0, 1))
+
+        # include init/goal + all unsafe boxes
+        all_boxes = np.concatenate(
+            [init_range[None, ...], goal_range[None, ...], unsafe_boxes],
+            axis=0
+        )  # (K+2,4,2)
+        bmins = np.min(all_boxes[:, [d0, d1], 0], axis=0)
+        bmaxs = np.max(all_boxes[:, [d0, d1], 1], axis=0)
+
+        lo = np.minimum(mins, bmins)
+        hi = np.maximum(maxs, bmaxs)
+        pad = 0.05 * (hi - lo + 1e-9)
+        return (lo[0] - pad[0], hi[0] + pad[0]), (lo[1] - pad[1], hi[1] + pad[1])
+
+    # ----------------------------
+    # build figure
+    # ----------------------------
+    fig, (ax12, ax34) = plt.subplots(1, 2, figsize=(12, 5), constrained_layout=True)
+
+    ax12.set_title("Phase plot: x1 vs x2")
+    ax12.set_xlabel("x1")
+    ax12.set_ylabel("x2")
+
+    ax34.set_title("Phase plot: x3 vs x4")
+    ax34.set_xlabel("x3")
+    ax34.set_ylabel("x4")
+
+    (xlim12, ylim12) = _lims_for_dims(0, 1)
+    (xlim34, ylim34) = _lims_for_dims(2, 3)
+    ax12.set_xlim(*xlim12)
+    ax12.set_ylim(*ylim12)
+    ax34.set_xlim(*xlim34)
+    ax34.set_ylim(*ylim34)
+
+    # init + goal (single boxes)
+    _add_box(ax12, init_range, 0, 1, linestyle="-", linewidth=1.5)
+    _add_box(ax12, goal_range, 0, 1, linestyle=":", linewidth=1.8)
+
+    _add_box(ax34, init_range, 2, 3, linestyle="-", linewidth=1.5)
+    _add_box(ax34, goal_range, 2, 3, linestyle=":", linewidth=1.8)
+
+    # unsafe union: draw each box projection (your vstack unsafe_range supported)
+    for b in unsafe_boxes:
+        _add_box(ax12, b, 0, 1, linestyle="--", linewidth=1.0)
+        _add_box(ax34, b, 2, 3, linestyle="--", linewidth=1.0)
+
+    # legend proxies (linestyle-only; no manual colors)
+    proxy_init = patches.Patch(fill=False, linestyle="-", label="init")
+    proxy_unsafe = patches.Patch(fill=False, linestyle="--", label="unsafe (union)")
+    proxy_goal = patches.Patch(fill=False, linestyle=":", label="goal")
+    ax12.legend(handles=[proxy_init, proxy_unsafe, proxy_goal], loc="best")
+    ax34.legend(handles=[proxy_init, proxy_unsafe, proxy_goal], loc="best")
+
+    # ----------------------------
+    # trajectory artists
+    # ----------------------------
+    lines12 = [ax12.plot([], [], lw=1.0)[0] for _ in range(n_traj)]
+    dots12  = [ax12.plot([], [], marker="o", markersize=3, linestyle="None")[0] for _ in range(n_traj)]
+    lines34 = [ax34.plot([], [], lw=1.0)[0] for _ in range(n_traj)]
+    dots34  = [ax34.plot([], [], marker="o", markersize=3, linestyle="None")[0] for _ in range(n_traj)]
+
+    frame_stride = max(1, int(frame_stride))
+    frame_ids = np.arange(0, steps + 1, frame_stride, dtype=int)
+
+    def _update(frame_idx: int):
+        k = frame_ids[frame_idx]
+        k0 = 0 if tail is None else max(0, k - int(tail))
+        seg = traj[k0:k + 1]  # (len, N, 4)
+
+        for i in range(n_traj):
+            x1 = seg[:, i, 0]
+            x2 = seg[:, i, 1]
+            x3 = seg[:, i, 2]
+            x4 = seg[:, i, 3]
+
+            lines12[i].set_data(x1, x2)
+            dots12[i].set_data([traj[k, i, 0]], [traj[k, i, 1]])
+
+            lines34[i].set_data(x3, x4)
+            dots34[i].set_data([traj[k, i, 2]], [traj[k, i, 3]])
+
+        artists = []
+        artists.extend(lines12); artists.extend(dots12)
+        artists.extend(lines34); artists.extend(dots34)
+        return artists
+
+    ani = FuncAnimation(
+        fig,
+        _update,
+        frames=len(frame_ids),
+        interval=30,
+        blit=True,
+        repeat=True,
+    )
+    plt.show()
+    return ani
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--train", type=int, default=1, choices=[0, 1],
@@ -878,11 +1102,11 @@ def main():
     params.training.generator_weight = 1.0  # Enable generator constraint
     params.training.generator_start_epoch = 0
 
-    params.discretization.n_goal = 13
-    params.discretization.n_outside_goal = 5
-    params.discretization.n_generator = 1  # Will be overridden by radial discretization
-    params.discretization.n_unsafe = 10
-    params.discretization.n_init = 16
+    params.discretization.n_goal = 11
+    params.discretization.n_outside_goal = 4
+    params.discretization.n_generator = 4  # Will be overridden by radial discretization
+    params.discretization.n_unsafe = 11
+    params.discretization.n_init = 11
 
     # Set beta_s to a value (constant), or set to None to make it learnable
     # If learnable_beta_s is True, this value will be used as initialization
@@ -902,7 +1126,13 @@ def main():
     print("="*80)
 
     # Option 2: Neural network control (implements same K @ x)
-    u_nn = LinearControl4DNN()
+    K_gain = torch.tensor([
+        [0.0,  0.0, 0.0, 0.0],
+        [-1.0, -1.0, 0.0, 0.0],
+        [0.0,  0.0, 0.0,  0.0],
+        [0.0,  0.0, -1.0, -1.0],
+    ], dtype=torch.float32)
+    u_nn = LinearControl4DNN(K_gain=K_gain)
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
         # Batch
@@ -1041,6 +1271,15 @@ def main():
     full = Region(full_range)
     regions = Regions(init=init, goal=goal, unsafe=unsafe, full=full)
 
+    # animate_sde(
+    #     f_cl_module,
+    #     g,
+    #     init_range,
+    #     unsafe_range,
+    #     goal_range
+    # )
+    # return
+
     # ========================================================================
     # 4. CREATE NETWORKS
     # ========================================================================
@@ -1062,7 +1301,7 @@ def main():
     region_cells = discretize_regions(
         regions,
         params.discretization,
-        use_radial_generator=True,  # Use radial + clipping for generator
+        use_radial_generator=False,  # Use radial + clipping for generator
         boundary_n_partitions=1
     )
 
