@@ -36,14 +36,13 @@ class GBMControlNN(nn.Module):
         # Output layer (no activation here; add if you need e.g. tanh/sigmoid/softmax)
         x = self.fc2(x)
         return x
-    
 
 class InvertControlNN(nn.Module):
     def __init__(self, input_dim=2, hidden_dim=8, output_dim=1):
         super().__init__()
         # Fully connected layers
-        self.fc1 = nn.Linear(input_dim, hidden_dim, bias=True)   # input -> hidden
-        self.fc2 = nn.Linear(hidden_dim, output_dim, bias=False)  # hidden -> output
+        self.fc1 = nn.Linear(input_dim, hidden_dim, bias=True)
+        self.fc2 = nn.Linear(hidden_dim, output_dim, bias=False)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         h1 = F.tanh(self.fc1(x))
@@ -105,36 +104,6 @@ class NonlinearControlNN(nn.Module):
         h1 = F.tanh(self.fc1(x))
         out = (self.fc2(h1))
         return out
-    
-
-# class LorentzLinearControlNN(nn.Module):
-#     def __init__(self, prior_knowledge: bool = True, input_dim: int = 3):
-#         super().__init__()
-#         if input_dim != 3:
-#             raise ValueError(f"LinearControlNN here is specialized to input_dim=3, got {input_dim}")
-
-#         # Fully-connected: 3 inputs -> 3 outputs, no bias
-#         self.fc = nn.Linear(input_dim, input_dim, bias=False)
-
-#         if prior_knowledge:
-#             # Want: u1 = -23.71*x1 -18.49*x2 + 0*x3), u2 = 0, u3 = 0
-#             # So set first row = [-23.71, -18.49, 0], other rows = [0,0,0]
-#             W = torch.zeros((3, 3), dtype=torch.float32)
-#             W[0, 0] = -23.71
-#             W[0, 1] = -18.49
-#             # W[0, 2] = 0.0 already
-#             with torch.no_grad():
-#                 self.fc.weight.copy_(W)
-#         else:
-#             # default: all zeros (you can change this if desired)
-#             with torch.no_grad():
-#                 self.fc.weight.zero_()
-
-#     def forward(self, x: torch.Tensor) -> torch.Tensor:
-#         if x.shape[-1] != 3:
-#             raise ValueError(f"Expected x last-dim = 3, got shape {tuple(x.shape)}")
-#         return self.fc(x)
-    
 
 class LorentzLinearControlNN(nn.Module):
     """

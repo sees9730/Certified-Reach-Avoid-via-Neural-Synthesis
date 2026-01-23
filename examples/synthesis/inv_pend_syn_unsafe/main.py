@@ -1,5 +1,5 @@
 """
-2D Inverted Pendulum Verification
+2D Inverted Pendulum Control Synthesis
 """
 import argparse
 import statistics as stats
@@ -29,6 +29,8 @@ from src.training_utils import evaluate_constraints, print_constraint_summary
 from src.utils import cleanup_and_setup_directories
 from src.visualization import create_summary_plots
 
+torch.manual_seed(0)
+
 def pretrain_network_samples(
     model,
     x_goal_range,
@@ -38,11 +40,11 @@ def pretrain_network_samples(
     params,
     GV_net=None,
     num_epochs=1000,
-    lr=0.01,
+    lr=1e-4,
     device='cpu',
     control_net=None,
     n_each: int = 400,
-    lambda_w = 1e-4,
+    lambda_w = 0.1,
     save_v_path=None,
     save_control_path=None,
 ):
@@ -69,8 +71,8 @@ def pretrain_network_samples(
 
     # Convert ranges to torch once: each is (D,2)
     x_range_t = torch.as_tensor(x_range, dtype=torch.float32, device=device)
-    goal_t    = torch.as_tensor(x_goal_range, dtype=torch.float32, device=device)
-    init_t    = torch.as_tensor(x_init_range, dtype=torch.float32, device=device)
+    goal_t = torch.as_tensor(x_goal_range, dtype=torch.float32, device=device)
+    init_t = torch.as_tensor(x_init_range, dtype=torch.float32, device=device)
 
     D = int(x_range_t.shape[0])
     low  = x_range_t[:, 0]
@@ -241,7 +243,6 @@ def pretrain_network_samples(
         networks_trained.append("Controller")
     print(f"Pre-training complete. {' + '.join(networks_trained)} initialized.")
 
-
 def main(benchmark_mode=False):
     parser = argparse.ArgumentParser()
     parser.add_argument("--train", type=int, default=1, choices=[0, 1],
@@ -254,24 +255,27 @@ def main(benchmark_mode=False):
         args.benchmark = 1
 
     print("="*20)
-    print("2D Inverted Pendulum Verification")
+    print("2D Inverted Pendulum Synthesis")
     print("="*20)
 
-    # Return value for benchmark mode
     training_time_result = None
 
     # === Hyperparameters ===
     params = Hyperparameters.default()
 
+    params.network.n_inputs = 2
     params.network.n_hidden_1 = 64
-    params.network.n_hidden_2 = 16
-    params.network.input_scale = [2*np.pi, 20.0]
-    params.network.scale_factor = 10.0
+    params.network.n_hidden_2 = 64
+    pi = np.pi
+    params.network.input_scale = [2*pi, 20.0]
+    params.network.scale_factor = 20.0
 
-    params.training.learning_rate = 0.01
+    params.training.learning_rate = 0.005
     params.training.num_epochs = 200000
+    params.training.generator_weight = 1.0
+    params.training.generator_start_epoch = 0
 
-    params.discretization.n_goal = 5
+    params.discretization.n_goal = 30
     params.discretization.n_outside_goal = 4
     params.discretization.n_generator = 4
     params.discretization.n_unsafe = 15
@@ -283,12 +287,12 @@ def main(benchmark_mode=False):
     params.compute_GV = True
 
     params.training.enable_pretraining = True
-    params.training.pretrain_epochs = 1500
+    params.training.pretrain_epochs = 5000
     params.training.pretrain_lr = 0.01
-    params.training.pretrain_n_samples = 100
+    params.training.pretrain_n_samples = 1200
 
     params.refinement.v_outside.enable_refinement = True
-    params.refinement.v_outside.refine_interval = 250
+    params.refinement.v_outside.refine_interval = 500
     params.refinement.v_outside.late_epoch_threshold = 2500
     params.refinement.v_outside.refine_interval_late = 100
     params.refinement.v_outside.refine_factor = 2
@@ -301,7 +305,7 @@ def main(benchmark_mode=False):
     params.refinement.v_outside.merge_relax_margin = 0.5
 
     params.refinement.gv_generator.enable_refinement = True
-    params.refinement.gv_generator.refine_interval = 250
+    params.refinement.gv_generator.refine_interval = 500
     params.refinement.gv_generator.late_epoch_threshold = 3500
     params.refinement.gv_generator.refine_interval_late = 100
     params.refinement.gv_generator.refine_factor = 2
@@ -316,9 +320,6 @@ def main(benchmark_mode=False):
     # === Dynamics ===
     rl_policy_net = InvertControlNN()
     u_nn = WrapperConterlNN(rl_policy_net)
-    bundle_path = OUTPUT_DIR / "eval_bundle.pth"
-    bundle = load_eval_bundle(bundle_path, map_location="cpu")
-    u_nn.load_state_dict(bundle["control_state_dict"])
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
         g = 9.81
@@ -347,18 +348,26 @@ def main(benchmark_mode=False):
     dynamics = Dynamics.dynamics(f=f_cl_module, g=g)
 
     # === Regions ===
-    init_range = np.array([[(3/4)*np.pi, (5/4)*np.pi], [-1.0, 1.0]], dtype=np.float32)
-    goal_range = np.array([[-0.4*np.pi, 0.4*np.pi], [-4.0, 4.0]], dtype=np.float32)
-    unsafe_down1 = np.array([[-2*np.pi, -2*np.pi+0.5*np.pi], [-20.0, -10.0]], dtype=np.float32)
-    unsafe_down2 = np.array([[2*np.pi-0.5*np.pi, 2*np.pi], [10.0, 20.0]], dtype=np.float32)
-    unsafe_range = np.vstack((unsafe_down1, unsafe_down2))
-    full_range = np.array([[-2*np.pi, 2*np.pi], [-20.0, 20.0]], dtype=np.float32)
+    init_range = np.array([[(3/4)*pi, (5/4)*pi], [-1.0, 1.0]], dtype=np.float32)
+    goal_range = np.array([[-0.4*pi, 0.4*pi], [-4.0, 4.0]], dtype=np.float32)
+    unsafe_down1 = np.array([[-2*pi, -2*pi+0.5*pi], [-20.0, -10.0]], dtype=np.float32)
+    unsafe_down2 = np.array([[2*pi-0.5*pi, 2*pi], [10.0, 20.0]], dtype=np.float32)
+    unsafe_lb = np.array([[-2*pi, -2*pi+0.5], [-20.0, 20.0]], dtype=np.float32)
+    unsafe_rb = np.array([[2*pi-0.5, 2*pi], [-20.0, 20.0]], dtype=np.float32)
+    unsafe_tb = np.array([[-2*pi, 2*pi], [20.0-0.5, 20.0]], dtype=np.float32)
+    unsafe_bb = np.array([[-2*pi, 2*pi], [-20.0, -20.0+0.5]], dtype=np.float32)
+    unsafe_range = np.vstack((unsafe_down1, unsafe_down2, unsafe_tb, unsafe_bb, unsafe_lb, unsafe_rb))
+    full_range = np.array([[-2*pi, 2*pi], [-20.0, 20.0]], dtype=np.float32)
 
     init = Region(init_range)
     goal = Region(goal_range)
     unsafe_down1 = Region(unsafe_down1)
     unsafe_down2 = Region(unsafe_down2)
-    unsafe = Region.union(unsafe_down1, unsafe_down2)
+    unsafe_tb = Region(unsafe_tb)
+    unsafe_bb = Region(unsafe_bb)
+    unsafe_lb = Region(unsafe_lb)
+    unsafe_rb = Region(unsafe_rb)
+    unsafe = Region.union(unsafe_down1, unsafe_down2, unsafe_tb, unsafe_bb, unsafe_lb, unsafe_rb)
     full = Region(full_range)
 
     regions = Regions(init=init, goal=goal, unsafe=unsafe, full=full)
@@ -378,13 +387,14 @@ def main(benchmark_mode=False):
         use_radial_generator=False
     )
 
+    bundle_path = OUTPUT_DIR / "eval_bundle.pth"
+
     if args.train == 1:
         cleanup_and_setup_directories(["results", "training_progress"])
         enable_terminal_logging(OUTPUT_DIR / "terminal_log.txt")
 
         training_start_time = time.time()
 
-        # === Pretraining ===
         if params.training.enable_pretraining:
             pretrain_network_samples(
                 model=V_net,
@@ -397,24 +407,26 @@ def main(benchmark_mode=False):
                 num_epochs=params.training.pretrain_epochs,
                 lr=params.training.pretrain_lr,
                 device=params.training.device,
+                control_net=u_nn,
                 n_each=params.training.pretrain_n_samples,
                 save_v_path=OUTPUT_DIR / "V_pretrained.pth",
+                save_control_path=OUTPUT_DIR / "controller_pretrained.pth"
             )
 
         def create_scheduler(optimizer):
             return torch.optim.lr_scheduler.StepLR(
                 optimizer,
                 step_size=2000,
-                gamma=0.9
+                gamma=0.95
             )
 
-        # === Training ===
         loss_history, final_beta_s, refinement_epochs = train_network_bounds(
             V_net=V_net,
             GV_net=GV_net,
             region_cells=region_cells,
             regions=regions,
             params=params,
+            control_net=u_nn,
             create_scheduler=create_scheduler,
             start_time=training_start_time
         )
@@ -426,7 +438,6 @@ def main(benchmark_mode=False):
         print("Final Evaluation")
         print("="*20)
 
-        # === Final Evaluation ===
         results = evaluate_constraints(
             V_net, GV_net, region_cells,
             beta_ra=params.constraints.beta_ra,
@@ -438,7 +449,6 @@ def main(benchmark_mode=False):
         print("Visualizations")
         print("="*20)
 
-        # === Final Visualizations ===
         create_summary_plots(
             V_net=V_net,
             GV_net=GV_net,
@@ -543,7 +553,6 @@ def main(benchmark_mode=False):
 
 
 if __name__ == '__main__':
-    # Quick check for benchmark mode before full arg parse
     import sys
     is_benchmark = '--benchmark=1' in sys.argv or '--benchmark' in sys.argv and '1' in sys.argv
 
@@ -562,7 +571,6 @@ if __name__ == '__main__':
             if training_time is not None:
                 times.append(training_time)
 
-            # Extract cell counts from last run
             bundle_path = OUTPUT_DIR / "eval_bundle.pth"
             if bundle_path.exists():
                 import torch
@@ -587,7 +595,6 @@ if __name__ == '__main__':
         print(f"  Individual times: {[f'{t:.2f}s' for t in times]}")
 
         if cells:
-            # Compute averages for each category
             categories = ['init', 'goal', 'unsafe', 'outside', 'generator', 'total_v', 'total']
             print("\nCell counts:")
             for cat in categories:
