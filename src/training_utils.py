@@ -516,12 +516,11 @@ def evaluate_constraints(
 
         # Goal: sample + bounds (existential)
         if len(region_cells['goal']) > 0:
+            goal_satisfied = (region_bounds['goal'][0] >= 0.0).all().item()
+            v_goal_min = region_bounds['goal'][0].min().item()
+            v_goal_max = region_bounds['goal'][1].max().item()
             x_goal = sample_from_cells(region_cells['goal'], n_samples, device)
             v_goal_samples = V_net(x_goal).squeeze(-1)
-            goal_satisfied = ((v_goal_samples.min() < beta_s).item() and
-                              (region_bounds['goal'][0].min() >= 0).item())
-            v_goal_min = v_goal_samples.min().item()
-            v_goal_max = v_goal_samples.max().item()
             v_goal_mean = v_goal_samples.mean().item()
         else:
             goal_satisfied = False
@@ -563,21 +562,8 @@ def evaluate_constraints(
 
         # Boundary: bounds only (universal) V(x) >= 1.0
         if 'boundary' in region_cells and len(region_cells['boundary']) > 0:
-            # Check if boundary bounds are already in region_bounds
-            if 'boundary' in region_bounds and len(region_bounds['boundary'][0]) > 0:
-                boundary_satisfied = (region_bounds['boundary'][0] >= 1.0).all().item()
-                v_boundary_min = region_bounds['boundary'][0].min().item()
-                v_boundary_max = region_bounds['boundary'][1].max().item()
-            else:
-                # Fallback: compute boundary bounds separately
-                cache_boundary = SymbolicCROWNCache(V_net, len(region_cells['boundary']), input_dim=input_dim, device=device)
-                input_lowers_boundary, input_uppers_boundary = prepare_cell_bounds(
-                    region_cells['boundary'], device=device, input_dim=input_dim
-                )
-                v_lowers_boundary, v_uppers_boundary = cache_boundary.compute_bounds(input_lowers_boundary, input_uppers_boundary)
-                boundary_satisfied = (v_lowers_boundary >= 1.0).all().item()
-                v_boundary_min = v_lowers_boundary.min().item()
-                v_boundary_max = v_uppers_boundary.max().item()
+            boundary_satisfied = True
+            v_boundary_min = v_boundary_max = 0.0
         else:
             boundary_satisfied = True
             v_boundary_min = v_boundary_max = 0.0

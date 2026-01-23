@@ -49,6 +49,46 @@ def save_eval_bundle(
     return bundle_path
 
 
+def save_eval_bundle_opt(
+    output_dir: Path,
+    *,
+    V_net,
+    GV_net,
+    control_net,
+    params,
+    regions,
+    region_cells,
+    final_beta_s,
+    loss_history,
+    refinement_epochs,
+    results,
+):
+    """
+    Save everything needed to reproduce final evaluation + summary plots.
+    Minimal: store network weights + params/regions/cells/history/results.
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    bundle_path = output_dir / "eval_bundle_opt.pth"
+
+    torch.save({
+        "V_state_dict": {k: v.detach().cpu() for k, v in V_net.state_dict().items()},
+        "GV_state_dict": {k: v.detach().cpu() for k, v in GV_net.state_dict().items()} if GV_net is not None else None,
+        "control_state_dict": {k: v.detach().cpu() for k, v in control_net.state_dict().items()} if control_net is not None else None,
+
+        "hyperparameters": params.to_dict(),
+        "regions": regions.to_dict(),
+        "region_cells": _cells_to_cpu(region_cells),
+
+        "final_beta_s": float(final_beta_s) if final_beta_s is not None else None,
+        "loss_history": loss_history,
+        "refinement_epochs": refinement_epochs,
+        "final_results": results,
+    }, bundle_path)
+
+    print(f"[Saved] eval bundle -> {bundle_path}")
+    return bundle_path
+
+
 def log_loaded_training_epochs(loss_history):
     """
     Print which epochs were recorded in loss_history (and last epoch seen).
