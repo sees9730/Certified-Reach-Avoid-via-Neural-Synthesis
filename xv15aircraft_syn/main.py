@@ -663,6 +663,7 @@ def animate_xv15_aircraft_state_control(
     show_angle_arcs: bool = True,
     save_path: str | None = None,   # e.g. "outputs/xv15_anim.mp4" (needs ffmpeg)
     show: bool = True,
+    controller_label: str | None = None,
 ):
     """
     Layout (3 columns, left column has 2 rows):
@@ -871,6 +872,13 @@ def animate_xv15_aircraft_state_control(
     # Left column uses rows [0:3] for aircraft, [3:6] for 3D state
     # -----------------------------------------
     fig = plt.figure(figsize=(18, 9))
+    title = "XV-15 rollout: state + control + geometry"
+    if controller_label:
+        title += f"  |  Controller: {controller_label}"
+
+    fig.suptitle(title, fontsize=14, y=0.98)
+    fig.subplots_adjust(top=0.92)  # leave room for the suptitle
+
     gs = fig.add_gridspec(
         6, 3,
         width_ratios=[1.55, 1.0, 1.0],
@@ -2602,6 +2610,21 @@ def main():
         u_const = ConstantControl(u_eq_device).to(device)
         f_cl_module_no_control = ClosedLoopDrift(aero=aero, controller=u_const).to(device)
 
+        # create the controller from pretraining
+        u_nn_pretrain = XV15EqMLPControl(
+            x_eq=x_eq,          # (3,) torch tensor
+            u_eq=u_eq,          # (3,) torch tensor
+            T_min=XV15Constants.MASS * 9.81 * 0.1,
+            T_max=XV15Constants.MASS * 9.81 * 1.8,
+            alpha_max=XV15Constants.AOA_MAX,
+            delta_max=XV15Constants.MAX_TILT_ANGLE_RATE,
+            hidden_dim=64,
+            act="tanh",
+        ).to(x_eq.device)
+        u_nn_pretrain.load_state_dict(torch.load(OUTPUT_DIR / "controller_pretrained.pth", map_location=device))
+        u_nn_pretrain.verify_u_at_equilibrium()
+        f_cl_module_pretrain = ClosedLoopDrift(aero=aero, controller=u_nn_pretrain).to(device)
+
         # animation
         # open-loop constant u_eq animation
         animate_xv15_aircraft_state_control(
@@ -2612,6 +2635,18 @@ def main():
             dt=0.02, T=120.0,
             seed=0, save_path=None,
             show=True,
+            controller_label="open-loop"
+        )
+        # pretrain animation
+        animate_xv15_aircraft_state_control(
+            f_cl_module=f_cl_module_pretrain, g_fn=g,
+            init_range=init_range, goal_range=goal_range,
+            full_range=full_range, unsafe_boxes=unsafe_range,   # can be (K*3,2) from vstack
+            device=device,
+            dt=0.02, T=120.0,
+            seed=0, save_path=None,
+            show=True,
+            controller_label="pre-train"
         )
         # control-synthesis animation
         animate_xv15_aircraft_state_control(
@@ -2622,6 +2657,7 @@ def main():
             dt=0.02, T=120.0,
             seed=0, save_path=None,
             show=True,
+            controller_label="certified-synthesis"
         )
 
         print("\n" + "=" * 80)
@@ -2645,7 +2681,24 @@ def main():
         print("Open Loop Control")
         print(mc)
 
-        # monte-carlo
+        # monte-carlo (pretrain)
+        mc = mc_reach_avoid(
+            f_cl_module=f_cl_module_pretrain,
+            g_fn=g,  # or None
+            init_range=init_range,
+            goal_range=goal_range,
+            full_range=full_range,
+            unsafe_boxes=unsafe_range,
+            N_trials=100,
+            dt=0.02,
+            T=120.0,
+            seed=0,
+            device=device,
+        )
+        print("Pretrain Control")
+        print(mc)
+
+        # monte-carlo (synthesis)
         mc = mc_reach_avoid(
             f_cl_module=f_cl_module,
             g_fn=g,  # or None
@@ -2661,6 +2714,10 @@ def main():
         )
         print("Synthesized Control")
         print(mc)
+
+        print("\n" + "=" * 80)
+        print("Recreating Plots")
+        print("=" * 80)
 
         # re-render plots
         dynamics = Dynamics.dynamics(f=f_cl_module, g=g, state_dim=3)
