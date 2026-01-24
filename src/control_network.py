@@ -149,7 +149,7 @@ class LorentzLinearControlNN(nn.Module):
     """
     def __init__(
         self,
-        prior_knowledge: bool = True,
+        prior_knowledge: bool = False,
         input_dim: int = 3,
         k11_base: float = -23.71,
         k12_base: float = -18.49,
@@ -157,27 +157,18 @@ class LorentzLinearControlNN(nn.Module):
         dtype: torch.dtype = torch.float32,
     ):
         super().__init__()
-        if input_dim != 3:
-            raise ValueError(f"LorentzLinearControlNN is specialized to input_dim=3, got {input_dim}")
-
         self.fc = nn.Linear(3, 3, bias=False, device=device, dtype=dtype)
+        with torch.no_grad():
+            self.fc.weight.zero_()
 
         # Base-mask added to weights at forward-time: only affects W_eff[0,0], W_eff[0,1]
         base = torch.zeros((3, 3), device=device, dtype=dtype)
-        base[0, 0] = k11_base
-        base[0, 1] = k12_base
+        if prior_knowledge:
+            base[0, 0] = k11_base
+            base[0, 1] = k12_base
         self.register_buffer("W_base", base)
 
-        if prior_knowledge:
-            # Initialize *learnable* W to zeros so u1 starts at the base rule,
-            # and u2,u3 start as 0 (you can change these if you want).
-            with torch.no_grad():
-                self.fc.weight.zero_()
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        if x.shape[-1] != 3:
-            raise ValueError(f"Expected x last-dim = 3, got shape {tuple(x.shape)}")
-
         W_eff = self.fc.weight + self.W_base  # grad flows to fc.weight
         return F.linear(x, W_eff, bias=None)
 

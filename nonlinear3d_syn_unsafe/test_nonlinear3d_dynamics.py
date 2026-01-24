@@ -26,7 +26,7 @@ HERE = Path(__file__).resolve().parent
 OUTPUT_DIR = HERE / "outputs"
 sys.path.insert(0, str(ROOT))
 
-from src.control_network import LinearControlNN, LorentzLinearControlNN, NonlinearControlNN
+from src.control_network import LorentzLinearControlNN
 from src.save_load_utils import load_eval_bundle
 
 
@@ -190,8 +190,6 @@ def print_net_params(net: torch.nn.Module, *, full_tensor: bool = True, precisio
 def load_control_net(bundle_path, device="cpu"):
     bundle = load_eval_bundle(bundle_path, map_location="cpu")
 
-    # control_net = LinearControlNN(input_dim=3).to(device)
-    # control_net = NonlinearControlNN()
     control_net = LorentzLinearControlNN()
 
     if bundle["control_state_dict"] is not None:
@@ -523,8 +521,12 @@ def main():
     control_net = load_control_net(OUTPUT_DIR / "eval_bundle.pth")
     test_single_traj_run(controller=control_net, n_traj=20)
 
+    control_net_opt = load_control_net(OUTPUT_DIR / "eval_bundle_opt.pth")
+    test_single_traj_run(controller=control_net, n_traj=20)
+
     test_mc(controller=None)
     test_mc(controller=control_net)
+    test_mc(controller=control_net_opt)
 
 
 if __name__ == "__main__":
