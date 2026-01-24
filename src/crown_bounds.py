@@ -49,32 +49,6 @@ class SymbolicCROWNCache:
         print(f"[SymbolicCROWNCache] Creating BoundedModule for {num_cells} cells...")
         self.lirpa_model = BoundedModule(model, dummy_batch, device=device)
 
-        # Initialize with dummy bounds
-        dummy_lower = torch.zeros(num_cells, input_dim, device=device)
-        dummy_upper = torch.ones(num_cells, input_dim, device=device)
-
-        ptb = PerturbationLpNorm(
-            norm=np.inf,
-            eps=None,
-            x_L=dummy_lower,
-            x_U=dummy_upper
-        )
-        bounded_input = BoundedTensor(dummy_batch, ptb)
-
-        # Forward pass to build symbolic computation graph
-        _ = self.lirpa_model(bounded_input)
-
-        # Compute bounds once to initialize symbolic structure
-        _ = self.lirpa_model.compute_bounds(
-            x=(bounded_input,),
-            method='IBP',
-            forward=True,
-            bound_lower=True,
-            bound_upper=True
-        )
-
-        print(f"[SymbolicCROWNCache] Initialized for {num_cells} cells - symbolic structure cached!")
-
     def compute_bounds(self, input_lowers, input_uppers):
         """
         Compute differentiable CROWN bounds using cached symbolic structure.
@@ -156,32 +130,6 @@ class SymbolicCROWNCache_Phi:
         # Create BoundedModule ONCE
         print(f"[SymbolicCROWNCache_Phi] Creating BoundedModule for {num_cells} cells...")
         self.lirpa_model = BoundedModule(phi_module, dummy_batch, device=device)
-
-        # Initialize with dummy bounds
-        dummy_lower = torch.zeros(num_cells, input_dim, device=device)
-        dummy_upper = torch.ones(num_cells, input_dim, device=device)
-
-        ptb = PerturbationLpNorm(
-            norm=np.inf,
-            eps=None,
-            x_L=dummy_lower,
-            x_U=dummy_upper
-        )
-        bounded_input = BoundedTensor(dummy_batch, ptb)
-
-        # Forward pass to build symbolic computation graph
-        _ = self.lirpa_model(bounded_input)
-
-        # Compute bounds once to initialize
-        _ = self.lirpa_model.compute_bounds(
-            x=(bounded_input,),
-            method='IBP',
-            forward=True,
-            bound_lower=True,
-            bound_upper=True
-        )
-
-        print(f"[SymbolicCROWNCache_Phi] Initialized for {num_cells} cells!")
 
     def compute_bounds(self, input_lowers, input_uppers):
         """

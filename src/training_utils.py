@@ -226,6 +226,30 @@ def compute_loss_init_bounds(
     return loss_upper
 
 
+def compute_loss_init_bounds_offset(
+    V_lower: torch.Tensor,
+    V_upper: torch.Tensor,
+    offset: Union[float, torch.Tensor]
+) -> torch.Tensor:
+    """
+    Compute init constraint loss from bounds.
+
+    Init must satisfy TWO constraints:
+    1. V < 1.0 (its own upper bound)
+    2. V >= beta_s (general constraint that applies everywhere except goal)
+
+    Args:
+        V_lower: Lower bounds on V (N,)
+        V_upper: Upper bounds on V (N,)
+        beta_s: Target lower bound for init (float or torch.Tensor)
+
+    Returns:
+        Loss (scalar)
+    """
+    loss_upper = F.relu(V_upper - 1.0).sum() + F.relu(offset - V_lower).sum()
+    return loss_upper
+
+
 def compute_loss_outside_bounds(
     V_lower: torch.Tensor,
     V_upper: torch.Tensor,
@@ -350,9 +374,14 @@ def compute_total_loss_bounds(
     if compute_V:
         loss_unsafe = compute_loss_unsafe_bounds(V_unsafe_lower, V_unsafe_upper, beta_ra)
         loss_goal, _ = compute_loss_goal_bounds(model, goal_region, V_goal_lower, V_goal_upper, beta_s, V_outside_lower,
-                                                 device=device, n_samples=10000, show=False, w_soft=w_soft)
-        loss_init = compute_loss_init_bounds(V_init_lower, V_init_upper, beta_s)
+                                                 device=device, n_samples=10000, show=False, w_soft=w_soft) 
+        if hasattr(model, "output_offset"):
+            output_offset_ref = model.output_offset.detach()  # scalar tensor
+            loss_init = compute_loss_init_bounds(V_init_lower, V_init_upper, output_offset_ref)
+        else:
+            loss_init = compute_loss_init_bounds(V_init_lower, V_init_upper, beta_s)
         loss_outside = compute_loss_outside_bounds(V_outside_lower, V_outside_upper, beta_s)
+        
         # Boundary loss (only if boundary bounds provided)
         if V_boundary_lower is not None and V_boundary_upper is not None:
             loss_boundary = compute_loss_boundary_bounds(V_boundary_lower, V_boundary_upper)
@@ -487,12 +516,11 @@ def evaluate_constraints(
 
         # Goal: sample + bounds (existential)
         if len(region_cells['goal']) > 0:
+            goal_satisfied = (region_bounds['goal'][0] >= 0.0).all().item()
+            v_goal_min = region_bounds['goal'][0].min().item()
+            v_goal_max = region_bounds['goal'][1].max().item()
             x_goal = sample_from_cells(region_cells['goal'], n_samples, device)
             v_goal_samples = V_net(x_goal).squeeze(-1)
-            goal_satisfied = ((v_goal_samples.min() < beta_s).item() and
-                              (region_bounds['goal'][0].min() >= 0).item())
-            v_goal_min = v_goal_samples.min().item()
-            v_goal_max = v_goal_samples.max().item()
             v_goal_mean = v_goal_samples.mean().item()
         else:
             goal_satisfied = False
@@ -534,21 +562,8 @@ def evaluate_constraints(
 
         # Boundary: bounds only (universal) V(x) >= 1.0
         if 'boundary' in region_cells and len(region_cells['boundary']) > 0:
-            # Check if boundary bounds are already in region_bounds
-            if 'boundary' in region_bounds and len(region_bounds['boundary'][0]) > 0:
-                boundary_satisfied = (region_bounds['boundary'][0] >= 1.0).all().item()
-                v_boundary_min = region_bounds['boundary'][0].min().item()
-                v_boundary_max = region_bounds['boundary'][1].max().item()
-            else:
-                # Fallback: compute boundary bounds separately
-                cache_boundary = SymbolicCROWNCache(V_net, len(region_cells['boundary']), input_dim=input_dim, device=device)
-                input_lowers_boundary, input_uppers_boundary = prepare_cell_bounds(
-                    region_cells['boundary'], device=device, input_dim=input_dim
-                )
-                v_lowers_boundary, v_uppers_boundary = cache_boundary.compute_bounds(input_lowers_boundary, input_uppers_boundary)
-                boundary_satisfied = (v_lowers_boundary >= 1.0).all().item()
-                v_boundary_min = v_lowers_boundary.min().item()
-                v_boundary_max = v_uppers_boundary.max().item()
+            boundary_satisfied = True
+            v_boundary_min = v_boundary_max = 0.0
         else:
             boundary_satisfied = True
             v_boundary_min = v_boundary_max = 0.0

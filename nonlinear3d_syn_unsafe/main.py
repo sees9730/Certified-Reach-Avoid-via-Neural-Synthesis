@@ -9,6 +9,8 @@ import numpy as np
 import math
 import time
 import argparse
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 # Set up directories
 from pathlib import Path
@@ -22,7 +24,7 @@ from src.hyperparameters import Hyperparameters
 from src.dynamics import Dynamics, ClosedLoopDrift
 from src.regions import Regions, Region
 from src.network import create_V
-from src.control_network import LinearControlNN, LorentzLinearControlNN, NonlinearControlNN # [control synthesis]
+from src.control_network import LorentzLinearControlNN
 from src.phi_module import create_GV
 from src.discretization import discretize_regions
 from src.crown_bounds import SymbolicCROWNCache, SymbolicCROWNCache_Phi, prepare_cell_bounds
@@ -44,26 +46,6 @@ from src.visualization import (
 
 # Set random seed immediately after imports (matching testing_simple3.py)
 torch.manual_seed(0)
-
-
-class LearnableBetaS(nn.Module):
-    """
-    Learnable beta_s parameter constrained to (0, 1) using sigmoid.
-    """
-    def __init__(self, initial_value: float = 0.6):
-        super().__init__()
-        # Use logit to initialize so that sigmoid(logit) = initial_value
-        initial_logit = math.log(initial_value / (1.0 - initial_value))
-        self.beta_s_logit = nn.Parameter(torch.tensor(initial_logit, dtype=torch.float32))
-
-    def forward(self):
-        """Return beta_s constrained to (0, 1) via sigmoid."""
-        return torch.sigmoid(self.beta_s_logit)
-
-    @property
-    def value(self):
-        """Get the current value of beta_s."""
-        return torch.sigmoid(self.beta_s_logit)
 
 
 def pretrain_network_samples(
@@ -268,8 +250,8 @@ def pretrain_network_samples(
             v_loss_full
             + v_loss_init
             + v_loss_unsafe
-            # + v_loss_inside_goal
-            # + v_loss_others
+            + v_loss_inside_goal
+            + v_loss_others
         )
 
         # Phi loss on SAME x_others -> enforce phi(x) <= 0
@@ -423,31 +405,9 @@ def train_network_bounds(
 
     # Check if beta_s should be learnable
     learnable_beta_s = None
-    beta_s_value = None
-
-    if params.training.learnable_beta_s or params.constraints.beta_s is None:
-        # Create learnable beta_s
-        initial_beta_s = params.constraints.beta_s if params.constraints.beta_s is not None else 0.6
-        learnable_beta_s = LearnableBetaS(initial_value=initial_beta_s).to(device)
-        print(f"\nUsing LEARNABLE beta_s (initialized to {initial_beta_s})")
-
-        # # Optimizer includes both V_net and learnable beta_s
-        # optimizer = torch.optim.Adam(
-        #     list(V_net.parameters()) + list(learnable_beta_s.parameters()),
-        #     lr=params.training.learning_rate
-        # )
-        opt_params = list(V_net.parameters()) + list(learnable_beta_s.parameters())
-    else:
-        # Use constant beta_s
-        beta_s_value = params.constraints.beta_s
-        print(f"\nUsing CONSTANT beta_s = {beta_s_value}")
-
-        # # Optimizer only for V_net
-        # optimizer = torch.optim.Adam(
-        #     V_net.parameters(),
-        #     lr=params.training.learning_rate
-        # )
-        opt_params = list(V_net.parameters())
+    beta_s_value = params.constraints.beta_s
+    print(f"\nUsing CONSTANT beta_s = {beta_s_value}")
+    opt_params = list(V_net.parameters())
 
     # [control synthesis]
     if control_net is not None:
@@ -455,15 +415,11 @@ def train_network_bounds(
 
     optimizer = torch.optim.Adam(opt_params, lr=params.training.learning_rate)
 
-    # Scheduler (matching testing_simple3.py)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    # Scheduler 
+    scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer,
-        mode='min',           # minimize the loss
-        factor=0.5,           # reduce LR by half when plateau detected
-        patience=300,         # wait 100 epochs of no improvement before reducing
-        verbose=True,         # print when LR changes
-        min_lr=1e-6,          # minimum learning rate
-        threshold=1e-3        # minimum change to qualify as improvement
+        step_size=1000,   # every 2000 epochs
+        gamma=0.95         # multiply lr by 0.5
     )
 
     # Training loop
@@ -587,9 +543,6 @@ def train_network_bounds(
                     cell_idx += num_cells
                 else:
                     bounds_updated[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
-
-        # Update scheduler after bounds recomputation
-        scheduler.step(total_loss.item())
 
         # Get current beta_s value for constraint checks
         beta_s_check = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
@@ -779,6 +732,7 @@ def train_network_bounds(
         
         # Optimizer step
         optimizer.step()
+        scheduler.step()
 
         # Rebuild CROWN caches after optimizer step if needed (after adaptive refinement)
         # if params.compute_GV:
@@ -832,13 +786,414 @@ def train_network_bounds(
 
     elapsed_time = time.time() - start_time
     print(f"\nTraining completed in {elapsed_time:.2f} seconds ({elapsed_time/60:.2f} minutes)")
-
-    # Return final beta_s value along with loss history
-    # final_beta_s = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
-    # if learnable_beta_s is not None:
-    #     print(f"\nFinal learned β_s = {final_beta_s:.4f}")
-
     return loss_history, final_beta_s, refinement_epochs
+
+
+def animate_closed_loop_3d_state_control(
+    *,
+    f_cl_module,               # closed-loop drift module: x_dot = f_cl_module(x)
+    g_fn=None,                 # optional diffusion: g(x) (diag (3,) or matrix (3,3))
+    init_range: np.ndarray,    # (3,2)
+    goal_range: np.ndarray,    # (3,2)
+    full_range: np.ndarray,    # (3,2)
+    unsafe_boxes: np.ndarray,  # (K*3,2) or (K,3,2) or (3,2)
+    device: str = "cpu",
+    dt: float = 0.02,
+    T: float = 12.0,
+    seed: int = 0,
+
+    # --- optional extras (kept separate from the "must keep" argument block above) ---
+    state_labels=("x1", "x2", "x3"),     # axis labels for the 3D plot + time-series
+    control_labels=("u1", "u2", "u3"),   # y-labels on control plots (expects 3 controls)
+    controller_label: str | None = None,
+    save_path: str | None = None,       # e.g. "outputs/anim.mp4" (ffmpeg needed)
+    show: bool = True,
+    frame_skip: int = 20,
+    interval_ms: int = 30,
+):
+    """
+    General 3D closed-loop rollout animation.
+
+    Layout (3 columns):
+      LEFT:   3D state trajectory (x1,x2,x3) with init/goal boxes + unsafe union boxes (+ full range)
+      MIDDLE: 3 rows state vs time (x1,x2,x3) with shaded init/goal/unsafe bands (only when tighter than full_range)
+      RIGHT:  3 rows control vs time (u1,u2,u3)
+
+    Assumptions:
+      - state dimension is 3 (for 3D visualization + ranges)
+      - control dimension is 3 for the right column plots; if your controller returns != 3,
+        you can adapt the U handling below (or pass a wrapper controller).
+
+    Stochastic rollout (if g_fn is provided):
+      Euler–Maruyama: x_{k+1} = x_k + f(x_k) dt + G(x_k) dW
+      - if g_fn returns (3,), treats it as diagonal coefficients
+      - if g_fn returns (3,3), uses matrix diffusion
+    """
+
+    rng = np.random.default_rng(seed)
+
+    init_range = np.asarray(init_range, dtype=np.float32)
+    goal_range = np.asarray(goal_range, dtype=np.float32)
+    full_range = np.asarray(full_range, dtype=np.float32)
+
+    def _as_union_boxes(x_unsafe: np.ndarray) -> np.ndarray:
+        x = np.asarray(x_unsafe, dtype=np.float32)
+        if x.ndim == 2:
+            if x.shape == (3, 2):
+                return x[None, ...]
+            if x.shape[1] == 2 and (x.shape[0] % 3 == 0):
+                K = x.shape[0] // 3
+                return x.reshape(K, 3, 2)
+            raise ValueError(f"unsafe_boxes 2D must be (3,2) or (K*3,2), got {x.shape}")
+        if x.ndim == 3:
+            if x.shape[1:] != (3, 2):
+                raise ValueError(f"unsafe_boxes 3D must be (K,3,2), got {x.shape}")
+            return x
+        raise ValueError(f"unsafe_boxes must be (3,2), (K*3,2), or (K,3,2), got {x.shape}")
+
+    unsafeK = _as_union_boxes(unsafe_boxes)  # (K,3,2)
+
+    # -----------------------------------------
+    # Rollout
+    # -----------------------------------------
+    x0 = np.array([
+        rng.uniform(init_range[0, 0], init_range[0, 1]),
+        rng.uniform(init_range[1, 0], init_range[1, 1]),
+        rng.uniform(init_range[2, 0], init_range[2, 1]),
+    ], dtype=np.float32)
+
+    N = int(T / dt) + 1
+    t = np.linspace(0.0, T, N, dtype=np.float32)
+
+    X = np.zeros((N, 3), dtype=np.float32)
+    U = np.zeros((N, 3), dtype=np.float32)
+
+    X[0] = x0
+
+    def _get_control(xk_t: torch.Tensor) -> np.ndarray:
+        # Preferred: f_cl_module.controller(x)
+        if hasattr(f_cl_module, "controller") and callable(getattr(f_cl_module, "controller")):
+            uk_t = f_cl_module.controller(xk_t)
+            uk = uk_t.detach().cpu().numpy().reshape(-1)
+            return uk.astype(np.float32)
+        # Fallbacks
+        for name in ("u", "policy", "actor"):
+            if hasattr(f_cl_module, name) and callable(getattr(f_cl_module, name)):
+                uk_t = getattr(f_cl_module, name)(xk_t)
+                uk = uk_t.detach().cpu().numpy().reshape(-1)
+                return uk.astype(np.float32)
+        return np.zeros(3, dtype=np.float32)
+
+    def _eval_drift(xk_t: torch.Tensor) -> np.ndarray:
+        xdot_t = f_cl_module(xk_t)
+        xdot = xdot_t.detach().cpu().numpy().reshape(-1)
+        if xdot.size != 3:
+            raise ValueError(f"f_cl_module(x) must return 3D drift, got shape {xdot_t.shape} -> size {xdot.size}")
+        return xdot.astype(np.float32)
+
+    def _eval_diffusion(xk_t: torch.Tensor):
+        gk_t = g_fn(xk_t)
+        gk = gk_t.detach().cpu().numpy()
+        gk = np.asarray(gk, dtype=np.float32).reshape(-1)
+        # allow (3,) diag or (9,) flattened 3x3
+        if gk.size == 3:
+            return ("diag", gk)
+        if gk.size == 9:
+            return ("mat", gk.reshape(3, 3))
+        # also allow raw (3,3) in numpy shape form
+        gk2 = np.asarray(gk_t.detach().cpu().numpy(), dtype=np.float32)
+        if gk2.shape == (3, 3):
+            return ("mat", gk2)
+        raise ValueError(f"g_fn(x) must return (3,) or (3,3); got {gk_t.shape}")
+
+    f_cl_module.eval()
+    if g_fn is not None and hasattr(g_fn, "eval"):
+        g_fn.eval()
+
+    with torch.no_grad():
+        for k in range(N - 1):
+            xk_t = torch.tensor(X[k:k + 1], dtype=torch.float32, device=device)  # (1,3)
+
+            uk = _get_control(xk_t)
+            xdot = _eval_drift(xk_t)
+
+            if g_fn is None:
+                xnext = X[k] + dt * xdot
+            else:
+                kind, G = _eval_diffusion(xk_t)
+                dW = (np.sqrt(dt) * rng.standard_normal(3)).astype(np.float32)  # (3,)
+                if kind == "diag":
+                    xnext = X[k] + dt * xdot + G * dW
+                else:
+                    xnext = X[k] + dt * xdot + (G @ dW)
+
+            X[k + 1] = xnext
+            # keep only first 3 controls for plotting (or pad if fewer)
+            if uk.size >= 3:
+                U[k] = uk[:3]
+            else:
+                tmp = np.zeros(3, dtype=np.float32)
+                tmp[:uk.size] = uk
+                U[k] = tmp
+
+        U[-1] = U[-2]
+
+    # -----------------------------------------
+    # Helpers for shaded bands + limits
+    # -----------------------------------------
+    def _is_tighter(rng_1d: np.ndarray, full_1d: np.ndarray, eps: float = 1e-9) -> bool:
+        return (rng_1d[0] > full_1d[0] + eps) or (rng_1d[1] < full_1d[1] - eps)
+
+    def _add_band(ax, lo, hi, color, label=None, alpha=0.12):
+        ax.axhspan(lo, hi, color=color, alpha=alpha, label=label, zorder=0)
+
+    def _add_state_bands(ax, dim: int, ax_label: str):
+        if _is_tighter(init_range[dim], full_range[dim]):
+            _add_band(ax, init_range[dim, 0], init_range[dim, 1], color="green", label=f"init ({ax_label})")
+        if _is_tighter(goal_range[dim], full_range[dim]):
+            _add_band(ax, goal_range[dim, 0], goal_range[dim, 1], color="blue", label=f"goal ({ax_label})")
+        any_unsafe = False
+        for k in range(unsafeK.shape[0]):
+            lo, hi = unsafeK[k, dim, 0], unsafeK[k, dim, 1]
+            if _is_tighter(unsafeK[k, dim], full_range[dim]):
+                _add_band(ax, lo, hi, color="red", label=("unsafe" if not any_unsafe else None), alpha=0.10)
+                any_unsafe = True
+
+    def _collect_band_extents_for_dim(d: int):
+        lows, highs = [], []
+        if _is_tighter(init_range[d], full_range[d]):
+            lows.append(float(init_range[d, 0])); highs.append(float(init_range[d, 1]))
+        if _is_tighter(goal_range[d], full_range[d]):
+            lows.append(float(goal_range[d, 0])); highs.append(float(goal_range[d, 1]))
+        for k in range(unsafeK.shape[0]):
+            if _is_tighter(unsafeK[k, d], full_range[d]):
+                lows.append(float(unsafeK[k, d, 0])); highs.append(float(unsafeK[k, d, 1]))
+        if len(lows) == 0:
+            return None
+        return (min(lows), max(highs))
+
+    def _set_ylim_with_bands(ax, y_data, band_extents):
+        y = np.asarray(y_data, dtype=np.float32)
+        y0, y1 = float(np.min(y)), float(np.max(y))
+        if band_extents is not None:
+            b0, b1 = band_extents
+            y0 = min(y0, b0)
+            y1 = max(y1, b1)
+        if np.isclose(y0, y1):
+            y0 -= 1.0
+            y1 += 1.0
+        pad = 0.10 * (y1 - y0)
+        ax.set_ylim(y0 - pad, y1 + pad)
+
+    def _set_ylim(ax, y):
+        y = np.asarray(y, dtype=np.float32)
+        y0, y1 = float(np.min(y)), float(np.max(y))
+        if np.isclose(y0, y1):
+            y0 -= 1.0
+            y1 += 1.0
+        pad = 0.10 * (y1 - y0)
+        ax.set_ylim(y0 - pad, y1 + pad)
+
+    # -----------------------------------------
+    # 3D box drawing
+    # -----------------------------------------
+    def _draw_box3d(ax3d, box3x2, *, lw=1.5, color="k", alpha=1.0):
+        x0, x1 = float(box3x2[0, 0]), float(box3x2[0, 1])
+        y0, y1 = float(box3x2[1, 0]), float(box3x2[1, 1])
+        z0, z1 = float(box3x2[2, 0]), float(box3x2[2, 1])
+
+        corners = np.array([
+            [x0, y0, z0],
+            [x1, y0, z0],
+            [x1, y1, z0],
+            [x0, y1, z0],
+            [x0, y0, z1],
+            [x1, y0, z1],
+            [x1, y1, z1],
+            [x0, y1, z1],
+        ], dtype=np.float32)
+
+        edges = [
+            (0,1),(1,2),(2,3),(3,0),
+            (4,5),(5,6),(6,7),(7,4),
+            (0,4),(1,5),(2,6),(3,7),
+        ]
+        for (i, j) in edges:
+            ax3d.plot(
+                [corners[i, 0], corners[j, 0]],
+                [corners[i, 1], corners[j, 1]],
+                [corners[i, 2], corners[j, 2]],
+                lw=lw, color=color, alpha=alpha
+            )
+
+    # -----------------------------------------
+    # Figure layout: 6 rows x 3 cols
+    # Left column is one big 3D plot
+    # -----------------------------------------
+    fig = plt.figure(figsize=(18, 9))
+    title = "Closed-loop rollout: 3D state + time series"
+    if controller_label:
+        title += f"  |  Controller: {controller_label}"
+    fig.suptitle(title, fontsize=14, y=0.98)
+    fig.subplots_adjust(top=0.92)
+
+    gs = fig.add_gridspec(
+        6, 3,
+        width_ratios=[1.55, 1.0, 1.0],
+        height_ratios=[1, 1, 1, 1, 1, 1],
+        wspace=0.30,
+        hspace=0.55,
+    )
+
+    ax_3d  = fig.add_subplot(gs[0:6, 0], projection="3d")
+
+    ax_s1 = fig.add_subplot(gs[0:2, 1])
+    ax_s2 = fig.add_subplot(gs[2:4, 1], sharex=ax_s1)
+    ax_s3 = fig.add_subplot(gs[4:6, 1], sharex=ax_s1)
+
+    ax_u1 = fig.add_subplot(gs[0:2, 2])
+    ax_u2 = fig.add_subplot(gs[2:4, 2], sharex=ax_u1)
+    ax_u3 = fig.add_subplot(gs[4:6, 2], sharex=ax_u1)
+
+    # -----------------------------------------
+    # LEFT: 3D trajectory + boxes
+    # -----------------------------------------
+    ax_3d.set_title("3D state trajectory + init/goal/unsafe boxes")
+    ax_3d.set_xlabel(state_labels[0])
+    ax_3d.set_ylabel(state_labels[1])
+    ax_3d.set_zlabel(state_labels[2])
+
+    _draw_box3d(ax_3d, full_range, lw=1.0, color="0.5", alpha=0.35)
+    _draw_box3d(ax_3d, init_range, lw=2.0, color="green", alpha=0.9)
+    _draw_box3d(ax_3d, goal_range, lw=2.0, color="blue", alpha=0.9)
+    for k in range(unsafeK.shape[0]):
+        _draw_box3d(ax_3d, unsafeK[k], lw=1.8, color="red", alpha=0.75)
+
+    line3d, = ax_3d.plot([], [], [], lw=2)
+    pt3d,   = ax_3d.plot([], [], [], marker="o")
+    txt3d = ax_3d.text2D(0.02, 0.98, "", transform=ax_3d.transAxes, va="top")
+
+    ax_3d.set_xlim(float(full_range[0, 0]), float(full_range[0, 1]))
+    ax_3d.set_ylim(float(full_range[1, 0]), float(full_range[1, 1]))
+    ax_3d.set_zlim(float(full_range[2, 0]), float(full_range[2, 1]))
+    ax_3d.view_init(elev=22, azim=-55)
+
+    # -----------------------------------------
+    # MIDDLE: states vs time (with bands)
+    # -----------------------------------------
+    ax_s1.set_title("States vs time")
+    ax_s1.set_ylabel(state_labels[0])
+    ax_s2.set_ylabel(state_labels[1])
+    ax_s3.set_ylabel(state_labels[2])
+    ax_s3.set_xlabel("t [s]")
+    for ax in (ax_s1, ax_s2, ax_s3):
+        ax.grid(True, alpha=0.3)
+
+    _add_state_bands(ax_s1, 0, state_labels[0])
+    _add_state_bands(ax_s2, 1, state_labels[1])
+    _add_state_bands(ax_s3, 2, state_labels[2])
+
+    _set_ylim_with_bands(ax_s1, X[:, 0], _collect_band_extents_for_dim(0))
+    _set_ylim_with_bands(ax_s2, X[:, 1], _collect_band_extents_for_dim(1))
+    _set_ylim_with_bands(ax_s3, X[:, 2], _collect_band_extents_for_dim(2))
+    ax_s1.set_xlim(0, float(T))
+
+    handles, labels = ax_s1.get_legend_handles_labels()
+    if len(handles) > 0:
+        ax_s1.legend(loc="upper right", framealpha=0.85)
+
+    # -----------------------------------------
+    # RIGHT: controls vs time
+    # -----------------------------------------
+    ax_u1.set_title("Controls vs time")
+    ax_u1.set_ylabel(control_labels[0])
+    ax_u2.set_ylabel(control_labels[1])
+    ax_u3.set_ylabel(control_labels[2])
+    ax_u3.set_xlabel("t [s]")
+    for ax in (ax_u1, ax_u2, ax_u3):
+        ax.grid(True, alpha=0.3)
+
+    _set_ylim(ax_u1, U[:, 0])
+    _set_ylim(ax_u2, U[:, 1])
+    _set_ylim(ax_u3, U[:, 2])
+    ax_u1.set_xlim(0, float(T))
+
+    # -----------------------------------------
+    # Time-series lines
+    # -----------------------------------------
+    ls1, = ax_s1.plot([], [], lw=2)
+    ls2, = ax_s2.plot([], [], lw=2)
+    ls3, = ax_s3.plot([], [], lw=2)
+
+    lu1, = ax_u1.plot([], [], lw=2)
+    lu2, = ax_u2.plot([], [], lw=2)
+    lu3, = ax_u3.plot([], [], lw=2)
+
+    # -----------------------------------------
+    # Animation init/update
+    # -----------------------------------------
+    def init_anim():
+        line3d.set_data([], [])
+        line3d.set_3d_properties([])
+        pt3d.set_data([], [])
+        pt3d.set_3d_properties([])
+        txt3d.set_text("")
+
+        ls1.set_data([], [])
+        ls2.set_data([], [])
+        ls3.set_data([], [])
+        lu1.set_data([], [])
+        lu2.set_data([], [])
+        lu3.set_data([], [])
+
+        return (line3d, pt3d, txt3d, ls1, ls2, ls3, lu1, lu2, lu3)
+
+    def update(i: int):
+        i = int(i)
+        xs = X[:i + 1]
+        us = U[:i + 1]
+
+        # LEFT 3D
+        line3d.set_data(xs[:, 0], xs[:, 1])
+        line3d.set_3d_properties(xs[:, 2])
+        pt3d.set_data([xs[-1, 0]], [xs[-1, 1]])
+        pt3d.set_3d_properties([xs[-1, 2]])
+
+        # MIDDLE states
+        ls1.set_data(t[:i + 1], xs[:, 0])
+        ls2.set_data(t[:i + 1], xs[:, 1])
+        ls3.set_data(t[:i + 1], xs[:, 2])
+
+        # RIGHT controls
+        lu1.set_data(t[:i + 1], us[:, 0])
+        lu2.set_data(t[:i + 1], us[:, 1])
+        lu3.set_data(t[:i + 1], us[:, 2])
+
+        txt3d.set_text(
+            f"t={t[i]:.2f}s\n"
+            f"{state_labels[0]}={xs[-1,0]:.3g}, {state_labels[1]}={xs[-1,1]:.3g}, {state_labels[2]}={xs[-1,2]:.3g}\n"
+            f"{control_labels[0]}={us[-1,0]:.3g}, {control_labels[1]}={us[-1,1]:.3g}, {control_labels[2]}={us[-1,2]:.3g}"
+        )
+
+        return (line3d, pt3d, txt3d, ls1, ls2, ls3, lu1, lu2, lu3)
+
+    frames = range(0, N, max(1, int(frame_skip)))
+    ani = FuncAnimation(
+        fig,
+        update,
+        frames=frames,
+        init_func=init_anim,
+        interval=int(interval_ms),
+        blit=False,
+    )
+
+    if save_path is not None:
+        ani.save(save_path, dpi=150)
+
+    if show:
+        plt.show()
+
+    return {"t": t, "X": X, "U": U, "x0": x0}
 
 
 def main():
@@ -878,8 +1233,8 @@ def main():
     params.discretization.n_goal = 13
     params.discretization.n_outside_goal = 5
     params.discretization.n_generator = 1  # Will be overridden by radial discretization
-    params.discretization.n_unsafe = 10
-    params.discretization.n_init = 16
+    params.discretization.n_unsafe = 12
+    params.discretization.n_init = 20
 
     # Set beta_s to a value (constant), or set to None to make it learnable
     # If learnable_beta_s is True, this value will be used as initialization
@@ -901,7 +1256,6 @@ def main():
     # Option 2: Neural network control (implements same K @ x)
     # u_nn = LinearControlNN(prior_knowledge=True, 
     #                        input_dim=params.network.n_inputs)
-    # u_nn = NonlinearControlNN()
     u_nn = LorentzLinearControlNN()
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
@@ -1081,13 +1435,13 @@ def main():
                 device=params.training.device,
                 control_net=u_nn,
                 n_each=1000,
-                lambda_w=1.0,
+                lambda_w=1e-3,
                 save_v_path= OUTPUT_DIR / "V_pretrained.pth",
                 save_control_path= OUTPUT_DIR / "controller_pretrained.pth"
             )
-            # print(f"Pretraining completed!\n")
-            # V_net.load_state_dict(torch.load(OUTPUT_DIR / "V_pretrained.pth", map_location=device))
-            # u_nn.load_state_dict(torch.load(OUTPUT_DIR / "controller_pretrained.pth", map_location=device))
+            print(f"Pretraining completed!\n")
+        V_net.load_state_dict(torch.load(OUTPUT_DIR / "V_pretrained.pth", map_location=device))
+        u_nn.load_state_dict(torch.load(OUTPUT_DIR / "controller_pretrained.pth", map_location=device))
 
         # ========================================================================
         # 6. TRAIN WITH BOUNDS
@@ -1194,8 +1548,7 @@ def main():
         if bundle["GV_state_dict"] is not None:
             GV_net.load_state_dict(bundle["GV_state_dict"])
 
-        # Control net (only needed if your plots depend on it)
-        u_nn = LinearControlNN(input_dim=3).to(device)
+        # Control net
         if bundle["control_state_dict"] is not None:
             u_nn.load_state_dict(bundle["control_state_dict"])
 
