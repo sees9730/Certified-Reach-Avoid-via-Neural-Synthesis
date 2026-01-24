@@ -1,0 +1,466 @@
+Network: 4 -> 64 -> 64 -> 1
+Training: 30000 epochs, LR=0.005
+Constraints: beta_s=0.0, beta_ra=3.0
+Generator: weight=1.0, start_epoch=0
+Training method: CROWN bounds (rigorous)
+
+Dynamics(dim=4, f(x)=<callable>, g(x)=<callable>)
+
+Using device: cpu
+
+================================================================================
+PRE-TRAINING: Constraint-Structured Initialization (Sample-Based)
+================================================================================
+  GV (Φ) pre-training ENABLED (using provided GV_net)
+  Epoch [0/20000]: V=4664.080 (full=1.282, init=0.000, unsafe=4633.980, goal=0.000), 28.817Φ=4.719e+01, Reg=44.929, 21.175, Total=4.711e+03
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [100/20000]: V=45.973 (full=0.000, init=0.000, unsafe=45.973, goal=0.000), 0.000Φ=5.367e+01, Reg=145.334, 30.640, Total=9.978e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [200/20000]: V=85.704 (full=3.733, init=0.000, unsafe=57.699, goal=22.302), 1.971Φ=3.390e+01, Reg=167.406, 31.214, Total=1.198e+02
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [300/20000]: V=13.432 (full=0.000, init=0.000, unsafe=13.432, goal=0.000), 0.000Φ=1.093e+01, Reg=186.567, 31.145, Total=2.455e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [400/20000]: V=4.494 (full=0.000, init=0.000, unsafe=4.494, goal=0.000), 0.000Φ=7.057e+00, Reg=198.060, 32.916, Total=1.175e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [500/20000]: V=8.954 (full=0.000, init=0.000, unsafe=8.954, goal=0.000), 0.000Φ=1.885e+01, Reg=208.090, 35.094, Total=2.801e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [600/20000]: V=1.548 (full=0.000, init=0.153, unsafe=1.395, goal=0.000), 0.000Φ=2.893e+00, Reg=216.878, 36.664, Total=4.658e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [700/20000]: V=6.252 (full=0.000, init=0.000, unsafe=6.252, goal=0.000), 0.000Φ=4.689e+00, Reg=224.708, 38.001, Total=1.117e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [800/20000]: V=5.463 (full=0.000, init=0.000, unsafe=5.463, goal=0.000), 0.000Φ=8.843e+00, Reg=232.577, 40.030, Total=1.454e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [900/20000]: V=5.487 (full=0.000, init=2.043, unsafe=3.444, goal=0.000), 0.000Φ=4.242e+00, Reg=240.751, 40.897, Total=9.971e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [1000/20000]: V=3.699 (full=0.000, init=0.000, unsafe=3.699, goal=0.000), 0.000Φ=9.478e+00, Reg=247.403, 41.599, Total=1.342e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [1100/20000]: V=5.727 (full=0.000, init=1.290, unsafe=4.437, goal=0.000), 0.000Φ=2.534e+00, Reg=253.990, 43.369, Total=8.515e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [1200/20000]: V=3.009 (full=0.000, init=0.000, unsafe=3.009, goal=0.000), 0.000Φ=1.736e+00, Reg=258.964, 45.359, Total=5.004e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [1300/20000]: V=6.345 (full=0.000, init=0.000, unsafe=5.669, goal=0.618), 0.058Φ=3.395e+00, Reg=261.199, 47.166, Total=1.000e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [1400/20000]: V=5.939 (full=0.000, init=0.000, unsafe=5.939, goal=0.000), 0.000Φ=3.172e+00, Reg=267.536, 48.153, Total=9.378e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [1500/20000]: V=0.974 (full=0.000, init=0.000, unsafe=0.974, goal=0.000), 0.000Φ=4.419e+00, Reg=274.932, 50.111, Total=5.668e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [1600/20000]: V=6.213 (full=0.000, init=0.015, unsafe=6.198, goal=0.000), 0.000Φ=8.684e-01, Reg=279.901, 53.828, Total=7.361e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [1700/20000]: V=3.232 (full=0.000, init=0.000, unsafe=3.128, goal=0.104), 0.000Φ=9.319e+00, Reg=285.307, 57.197, Total=1.284e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [1800/20000]: V=5.919 (full=0.000, init=1.715, unsafe=4.203, goal=0.000), 0.000Φ=1.710e+00, Reg=289.327, 58.697, Total=7.918e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [1900/20000]: V=4.934 (full=0.000, init=0.000, unsafe=4.934, goal=0.000), 0.000Φ=1.563e+00, Reg=291.108, 61.571, Total=6.788e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [2000/20000]: V=1.600 (full=0.000, init=0.000, unsafe=1.574, goal=0.026), 0.000Φ=5.202e+00, Reg=294.673, 62.334, Total=7.096e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [2100/20000]: V=2.125 (full=0.000, init=0.096, unsafe=2.029, goal=0.000), 0.000Φ=4.032e+00, Reg=300.928, 64.369, Total=6.459e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [2200/20000]: V=1.094 (full=0.000, init=0.000, unsafe=1.094, goal=0.000), 0.000Φ=4.233e+00, Reg=307.238, 67.859, Total=5.634e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [2300/20000]: V=5.859 (full=0.000, init=0.000, unsafe=2.003, goal=3.856), 0.000Φ=0.000e+00, Reg=310.649, 70.140, Total=6.170e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [2400/20000]: V=1.258 (full=0.000, init=0.138, unsafe=1.119, goal=0.000), 0.000Φ=3.475e+00, Reg=313.804, 69.578, Total=5.047e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [2500/20000]: V=3.887 (full=0.000, init=0.000, unsafe=3.887, goal=0.000), 0.000Φ=2.416e+00, Reg=319.728, 74.117, Total=6.623e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [2600/20000]: V=2.469 (full=0.000, init=0.459, unsafe=2.011, goal=0.000), 0.000Φ=3.345e+00, Reg=325.045, 74.288, Total=6.139e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [2700/20000]: V=4.325 (full=0.000, init=0.172, unsafe=4.152, goal=0.000), 0.000Φ=3.056e+00, Reg=326.764, 74.545, Total=7.708e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [2800/20000]: V=1.873 (full=0.000, init=0.152, unsafe=1.721, goal=0.000), 0.000Φ=2.924e+00, Reg=332.003, 78.189, Total=5.129e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [2900/20000]: V=1.908 (full=0.000, init=0.000, unsafe=0.716, goal=1.192), 0.000Φ=1.469e+00, Reg=336.612, 82.111, Total=3.713e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [3000/20000]: V=4.122 (full=0.000, init=0.165, unsafe=3.958, goal=0.000), 0.000Φ=2.181e+00, Reg=339.229, 87.137, Total=6.642e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [3100/20000]: V=2.100 (full=0.000, init=0.000, unsafe=2.100, goal=0.000), 0.000Φ=1.209e+00, Reg=343.635, 87.268, Total=3.652e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [3200/20000]: V=2.546 (full=0.000, init=0.000, unsafe=2.546, goal=0.000), 0.000Φ=6.157e+00, Reg=348.816, 92.525, Total=9.052e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [3300/20000]: V=3.002 (full=0.000, init=0.000, unsafe=3.002, goal=0.000), 0.000Φ=3.671e+00, Reg=352.123, 97.732, Total=7.025e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [3400/20000]: V=2.788 (full=0.000, init=2.077, unsafe=0.681, goal=0.030), 0.000Φ=5.048e-02, Reg=356.362, 100.264, Total=3.195e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [3500/20000]: V=1.441 (full=0.000, init=0.000, unsafe=1.441, goal=0.000), 0.000Φ=1.165e+00, Reg=363.029, 103.574, Total=2.969e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [3600/20000]: V=5.078 (full=0.000, init=0.000, unsafe=5.078, goal=0.000), 0.000Φ=1.756e+00, Reg=370.238, 99.620, Total=7.205e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [3700/20000]: V=0.356 (full=0.000, init=0.000, unsafe=0.356, goal=0.000), 0.000Φ=6.234e+00, Reg=376.110, 105.331, Total=6.966e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [3800/20000]: V=3.111 (full=0.000, init=0.000, unsafe=2.830, goal=0.281), 0.000Φ=9.464e-01, Reg=381.224, 107.238, Total=4.439e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [3900/20000]: V=1.948 (full=0.000, init=0.000, unsafe=1.937, goal=0.010), 0.000Φ=0.000e+00, Reg=386.664, 114.284, Total=2.334e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [4000/20000]: V=0.054 (full=0.000, init=0.000, unsafe=0.000, goal=0.054), 0.000Φ=0.000e+00, Reg=390.159, 117.583, Total=4.444e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [4100/20000]: V=5.663 (full=0.000, init=0.607, unsafe=5.055, goal=0.000), 0.000Φ=3.854e+00, Reg=395.435, 122.120, Total=9.912e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [4200/20000]: V=0.000 (full=0.000, init=0.000, unsafe=0.000, goal=0.000), 0.000Φ=4.412e+00, Reg=399.662, 128.005, Total=4.812e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [4300/20000]: V=2.206 (full=0.000, init=0.000, unsafe=2.204, goal=0.002), 0.000Φ=4.441e+00, Reg=404.837, 134.072, Total=7.052e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [4400/20000]: V=4.078 (full=0.000, init=0.000, unsafe=3.806, goal=0.215), 0.056Φ=1.869e+00, Reg=409.331, 135.920, Total=6.356e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [4500/20000]: V=3.651 (full=0.000, init=0.000, unsafe=2.669, goal=0.981), 0.000Φ=4.510e+00, Reg=412.199, 151.270, Total=8.573e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [4600/20000]: V=0.353 (full=0.000, init=0.000, unsafe=0.353, goal=0.000), 0.000Φ=3.842e+00, Reg=418.093, 154.364, Total=4.613e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [4700/20000]: V=1.793 (full=0.000, init=0.002, unsafe=1.791, goal=0.000), 0.000Φ=3.217e+00, Reg=427.183, 153.881, Total=5.436e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [4800/20000]: V=0.870 (full=0.000, init=0.404, unsafe=0.024, goal=0.441), 0.000Φ=0.000e+00, Reg=433.423, 157.407, Total=1.303e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [4900/20000]: V=1.968 (full=0.000, init=0.000, unsafe=1.968, goal=0.000), 0.000Φ=0.000e+00, Reg=438.995, 161.382, Total=2.407e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [5000/20000]: V=3.953 (full=0.000, init=0.000, unsafe=3.758, goal=0.195), 0.000Φ=4.535e-01, Reg=442.900, 164.726, Total=4.850e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [5100/20000]: V=4.698 (full=0.000, init=0.000, unsafe=4.698, goal=0.000), 0.000Φ=0.000e+00, Reg=449.642, 161.242, Total=5.148e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [5200/20000]: V=5.077 (full=0.000, init=0.107, unsafe=4.882, goal=0.088), 0.000Φ=1.784e-01, Reg=453.939, 162.301, Total=5.709e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [5300/20000]: V=4.931 (full=0.000, init=1.321, unsafe=3.610, goal=0.000), 0.000Φ=4.145e+00, Reg=458.021, 164.605, Total=9.534e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [5400/20000]: V=0.179 (full=0.000, init=0.179, unsafe=0.000, goal=0.000), 0.000Φ=6.579e+00, Reg=466.268, 165.016, Total=7.224e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [5500/20000]: V=0.658 (full=0.000, init=0.329, unsafe=0.328, goal=0.000), 0.000Φ=0.000e+00, Reg=473.150, 164.236, Total=1.131e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [5600/20000]: V=1.921 (full=0.000, init=0.000, unsafe=1.902, goal=0.020), 0.000Φ=3.407e+00, Reg=478.022, 167.677, Total=5.807e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [5700/20000]: V=0.831 (full=0.000, init=0.000, unsafe=0.805, goal=0.026), 0.000Φ=0.000e+00, Reg=478.900, 174.352, Total=1.310e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [5800/20000]: V=2.712 (full=0.000, init=0.000, unsafe=2.712, goal=0.000), 0.000Φ=0.000e+00, Reg=482.920, 170.592, Total=3.195e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [5900/20000]: V=1.633 (full=0.000, init=0.458, unsafe=1.175, goal=0.000), 0.000Φ=2.453e+00, Reg=492.049, 165.048, Total=4.578e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [6000/20000]: V=2.451 (full=0.000, init=0.000, unsafe=2.451, goal=0.000), 0.000Φ=0.000e+00, Reg=505.115, 174.107, Total=2.956e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [6100/20000]: V=0.020 (full=0.000, init=0.000, unsafe=0.000, goal=0.020), 0.000Φ=0.000e+00, Reg=508.986, 175.510, Total=5.294e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [6200/20000]: V=1.819 (full=0.000, init=0.000, unsafe=1.819, goal=0.000), 0.000Φ=6.648e-01, Reg=514.494, 180.775, Total=2.998e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [6300/20000]: V=0.801 (full=0.000, init=0.000, unsafe=0.799, goal=0.001), 0.000Φ=2.839e-01, Reg=518.705, 185.632, Total=1.603e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [6400/20000]: V=4.381 (full=0.000, init=0.049, unsafe=3.433, goal=0.899), 0.000Φ=4.718e+00, Reg=522.579, 188.864, Total=9.622e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [6500/20000]: V=1.011 (full=0.000, init=0.000, unsafe=0.000, goal=1.011), 0.000Φ=1.072e+00, Reg=527.620, 192.821, Total=2.611e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [6600/20000]: V=0.324 (full=0.000, init=0.000, unsafe=0.000, goal=0.324), 0.000Φ=0.000e+00, Reg=530.955, 197.479, Total=8.548e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [6700/20000]: V=1.144 (full=0.000, init=0.000, unsafe=0.944, goal=0.199), 0.000Φ=5.391e-01, Reg=535.263, 198.391, Total=2.218e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [6800/20000]: V=2.487 (full=0.000, init=0.000, unsafe=2.487, goal=0.000), 0.000Φ=3.944e-01, Reg=541.350, 199.883, Total=3.423e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [6900/20000]: V=4.040 (full=0.000, init=0.692, unsafe=3.348, goal=0.000), 0.000Φ=0.000e+00, Reg=542.258, 203.020, Total=4.582e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [7000/20000]: V=0.192 (full=0.000, init=0.000, unsafe=0.033, goal=0.160), 0.000Φ=9.896e-01, Reg=547.292, 203.186, Total=1.729e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [7100/20000]: V=2.609 (full=0.000, init=0.652, unsafe=1.957, goal=0.000), 0.000Φ=0.000e+00, Reg=553.752, 205.079, Total=3.163e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [7200/20000]: V=2.069 (full=0.000, init=0.000, unsafe=2.029, goal=0.040), 0.000Φ=4.465e-01, Reg=556.161, 205.550, Total=3.072e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [7300/20000]: V=1.789 (full=0.000, init=0.000, unsafe=1.789, goal=0.000), 0.000Φ=0.000e+00, Reg=560.294, 204.814, Total=2.349e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [7400/20000]: V=0.653 (full=0.000, init=0.653, unsafe=0.000, goal=0.000), 0.000Φ=4.863e+00, Reg=564.974, 208.151, Total=6.082e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [7500/20000]: V=1.182 (full=0.000, init=0.000, unsafe=1.123, goal=0.059), 0.000Φ=5.502e+00, Reg=567.906, 208.916, Total=7.252e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [7600/20000]: V=7.782 (full=0.000, init=0.102, unsafe=6.646, goal=1.034), 0.000Φ=0.000e+00, Reg=577.019, 206.133, Total=8.359e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [7700/20000]: V=3.768 (full=0.000, init=0.000, unsafe=3.768, goal=0.000), 0.000Φ=2.685e+00, Reg=619.226, 213.801, Total=7.073e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [7800/20000]: V=0.232 (full=0.000, init=0.000, unsafe=0.232, goal=0.000), 0.000Φ=1.471e+00, Reg=620.964, 216.408, Total=2.324e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [7900/20000]: V=2.476 (full=0.000, init=0.348, unsafe=1.974, goal=0.154), 0.000Φ=0.000e+00, Reg=622.020, 221.274, Total=3.098e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [8000/20000]: V=4.942 (full=0.000, init=0.000, unsafe=4.942, goal=0.000), 0.000Φ=1.456e+00, Reg=626.140, 226.004, Total=7.024e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [8100/20000]: V=2.263 (full=0.000, init=0.316, unsafe=1.909, goal=0.039), 0.000Φ=4.872e-01, Reg=625.615, 222.630, Total=3.376e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [8200/20000]: V=0.551 (full=0.000, init=0.048, unsafe=0.504, goal=0.000), 0.000Φ=3.314e-01, Reg=626.844, 226.117, Total=1.509e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [8300/20000]: V=0.261 (full=0.000, init=0.000, unsafe=0.261, goal=0.000), 0.000Φ=1.471e+00, Reg=628.352, 231.682, Total=2.361e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [8400/20000]: V=2.482 (full=0.000, init=0.959, unsafe=1.523, goal=0.000), 0.000Φ=1.271e+00, Reg=627.652, 235.878, Total=4.381e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [8500/20000]: V=2.473 (full=0.000, init=0.000, unsafe=2.473, goal=0.000), 0.000Φ=0.000e+00, Reg=633.439, 231.146, Total=3.106e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [8600/20000]: V=3.433 (full=0.000, init=0.000, unsafe=3.290, goal=0.142), 0.000Φ=0.000e+00, Reg=633.901, 233.726, Total=4.067e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [8700/20000]: V=3.105 (full=0.000, init=0.000, unsafe=3.096, goal=0.009), 0.000Φ=4.408e-01, Reg=630.231, 233.723, Total=4.176e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [8800/20000]: V=6.504 (full=0.000, init=0.000, unsafe=4.402, goal=2.103), 0.000Φ=1.307e+01, Reg=635.830, 232.749, Total=2.021e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [8900/20000]: V=0.935 (full=0.000, init=0.000, unsafe=0.935, goal=0.000), 0.000Φ=2.504e-01, Reg=646.383, 242.213, Total=1.832e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [9000/20000]: V=0.469 (full=0.000, init=0.456, unsafe=0.000, goal=0.013), 0.000Φ=0.000e+00, Reg=655.107, 243.342, Total=1.124e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [9100/20000]: V=0.933 (full=0.000, init=0.090, unsafe=0.569, goal=0.274), 0.000Φ=1.830e+00, Reg=658.476, 243.736, Total=3.422e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [9200/20000]: V=1.379 (full=0.000, init=0.000, unsafe=1.379, goal=0.000), 0.000Φ=0.000e+00, Reg=658.409, 239.447, Total=2.037e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [9300/20000]: V=4.825 (full=0.000, init=0.000, unsafe=3.617, goal=1.209), 0.000Φ=4.205e+00, Reg=660.427, 242.035, Total=9.691e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [9400/20000]: V=1.363 (full=0.000, init=0.004, unsafe=1.359, goal=0.000), 0.000Φ=8.997e-01, Reg=661.792, 240.682, Total=2.925e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [9500/20000]: V=1.378 (full=0.000, init=0.792, unsafe=0.586, goal=0.000), 0.000Φ=0.000e+00, Reg=666.432, 246.159, Total=2.045e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [9600/20000]: V=0.303 (full=0.000, init=0.000, unsafe=0.303, goal=0.000), 0.000Φ=3.868e+00, Reg=669.587, 244.574, Total=4.840e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [9700/20000]: V=0.432 (full=0.000, init=0.005, unsafe=0.320, goal=0.107), 0.000Φ=0.000e+00, Reg=674.227, 250.011, Total=1.106e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [9800/20000]: V=0.647 (full=0.000, init=0.137, unsafe=0.510, goal=0.000), 0.000Φ=0.000e+00, Reg=684.206, 252.780, Total=1.331e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [9900/20000]: V=0.955 (full=0.000, init=0.000, unsafe=0.836, goal=0.119), 0.000Φ=0.000e+00, Reg=683.100, 251.147, Total=1.638e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [10000/20000]: V=1.345 (full=0.000, init=0.000, unsafe=0.988, goal=0.357), 0.000Φ=3.749e+00, Reg=686.606, 251.998, Total=5.781e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [10100/20000]: V=1.243 (full=0.000, init=0.000, unsafe=1.110, goal=0.134), 0.000Φ=0.000e+00, Reg=689.012, 254.622, Total=1.932e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [10200/20000]: V=2.118 (full=0.000, init=0.000, unsafe=2.118, goal=0.000), 0.000Φ=3.370e+00, Reg=700.915, 255.502, Total=6.188e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [10300/20000]: V=0.907 (full=0.000, init=0.000, unsafe=0.692, goal=0.215), 0.000Φ=0.000e+00, Reg=703.601, 258.166, Total=1.610e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [10400/20000]: V=1.373 (full=0.000, init=0.297, unsafe=1.076, goal=0.000), 0.000Φ=7.188e-01, Reg=702.234, 266.930, Total=2.794e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [10500/20000]: V=1.886 (full=0.000, init=0.000, unsafe=1.885, goal=0.002), 0.000Φ=8.498e-01, Reg=701.433, 279.537, Total=3.438e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [10600/20000]: V=0.254 (full=0.000, init=0.007, unsafe=0.246, goal=0.000), 0.000Φ=0.000e+00, Reg=716.448, 279.118, Total=9.701e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [10700/20000]: V=3.118 (full=0.000, init=0.000, unsafe=3.118, goal=0.000), 0.000Φ=2.169e+00, Reg=719.831, 278.586, Total=6.006e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [10800/20000]: V=0.362 (full=0.000, init=0.000, unsafe=0.362, goal=0.000), 0.000Φ=2.913e+00, Reg=730.141, 284.028, Total=4.005e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [10900/20000]: V=0.976 (full=0.000, init=0.164, unsafe=0.760, goal=0.052), 0.000Φ=4.428e+00, Reg=731.424, 287.624, Total=6.136e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [11000/20000]: V=3.532 (full=0.000, init=0.000, unsafe=3.532, goal=0.000), 0.000Φ=0.000e+00, Reg=759.538, 288.051, Total=4.292e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [11100/20000]: V=1.905 (full=0.000, init=0.044, unsafe=1.861, goal=0.000), 0.000Φ=0.000e+00, Reg=763.334, 283.137, Total=2.668e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [11200/20000]: V=0.032 (full=0.000, init=0.000, unsafe=0.000, goal=0.032), 0.000Φ=7.960e-01, Reg=759.814, 281.669, Total=1.588e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [11300/20000]: V=1.322 (full=0.000, init=0.000, unsafe=1.322, goal=0.000), 0.000Φ=5.840e-02, Reg=757.636, 283.255, Total=2.138e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [11400/20000]: V=2.069 (full=0.000, init=0.000, unsafe=2.053, goal=0.016), 0.000Φ=5.069e+00, Reg=754.580, 288.595, Total=7.892e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [11500/20000]: V=1.917 (full=0.000, init=0.000, unsafe=1.917, goal=0.000), 0.000Φ=2.134e+00, Reg=752.908, 291.886, Total=4.804e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [11600/20000]: V=2.312 (full=0.000, init=0.097, unsafe=2.215, goal=0.000), 0.000Φ=0.000e+00, Reg=756.878, 292.095, Total=3.069e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [11700/20000]: V=0.459 (full=0.000, init=0.000, unsafe=0.297, goal=0.162), 0.000Φ=1.260e+00, Reg=761.097, 295.499, Total=2.480e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [11800/20000]: V=0.287 (full=0.000, init=0.000, unsafe=0.000, goal=0.287), 0.000Φ=3.851e+00, Reg=766.451, 293.796, Total=4.905e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [11900/20000]: V=1.210 (full=0.000, init=0.384, unsafe=0.512, goal=0.315), 0.000Φ=1.123e+01, Reg=768.143, 290.641, Total=1.320e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [12000/20000]: V=0.973 (full=0.000, init=0.117, unsafe=0.699, goal=0.156), 0.000Φ=1.133e+01, Reg=775.451, 283.982, Total=1.308e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [12100/20000]: V=0.394 (full=0.000, init=0.000, unsafe=0.376, goal=0.018), 0.000Φ=1.143e+00, Reg=773.584, 288.581, Total=2.310e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [12200/20000]: V=1.275 (full=0.000, init=0.018, unsafe=1.188, goal=0.068), 0.000Φ=2.726e+00, Reg=776.984, 299.474, Total=4.778e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [12300/20000]: V=0.339 (full=0.000, init=0.000, unsafe=0.339, goal=0.000), 0.000Φ=0.000e+00, Reg=779.093, 295.162, Total=1.118e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [12400/20000]: V=1.244 (full=0.000, init=0.000, unsafe=1.244, goal=0.000), 0.000Φ=1.047e+00, Reg=782.627, 292.266, Total=3.074e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [12500/20000]: V=1.568 (full=0.000, init=0.000, unsafe=1.444, goal=0.123), 0.000Φ=3.733e-02, Reg=784.092, 297.433, Total=2.389e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [12600/20000]: V=0.883 (full=0.000, init=0.000, unsafe=0.883, goal=0.000), 0.000Φ=9.785e-01, Reg=804.763, 290.328, Total=2.666e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [12700/20000]: V=0.441 (full=0.000, init=0.000, unsafe=0.441, goal=0.000), 0.000Φ=7.921e-01, Reg=796.409, 286.937, Total=2.030e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [12800/20000]: V=0.023 (full=0.000, init=0.017, unsafe=0.000, goal=0.006), 0.000Φ=1.847e+00, Reg=790.253, 292.651, Total=2.660e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [12900/20000]: V=1.208 (full=0.000, init=0.000, unsafe=1.208, goal=0.000), 0.000Φ=0.000e+00, Reg=790.044, 298.395, Total=1.998e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [13000/20000]: V=0.189 (full=0.000, init=0.000, unsafe=0.075, goal=0.114), 0.000Φ=0.000e+00, Reg=786.494, 301.340, Total=9.756e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [13100/20000]: V=0.494 (full=0.000, init=0.004, unsafe=0.490, goal=0.000), 0.000Φ=0.000e+00, Reg=797.815, 296.616, Total=1.292e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [13200/20000]: V=2.463 (full=0.000, init=0.000, unsafe=2.324, goal=0.139), 0.000Φ=9.816e-01, Reg=799.360, 298.181, Total=4.244e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [13300/20000]: V=2.598 (full=0.000, init=0.000, unsafe=2.576, goal=0.022), 0.000Φ=2.716e+00, Reg=792.882, 294.416, Total=6.107e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [13400/20000]: V=1.254 (full=0.000, init=0.001, unsafe=1.144, goal=0.109), 0.000Φ=4.584e+00, Reg=795.419, 299.240, Total=6.634e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [13500/20000]: V=0.500 (full=0.000, init=0.000, unsafe=0.500, goal=0.000), 0.000Φ=0.000e+00, Reg=807.014, 300.576, Total=1.307e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [13600/20000]: V=0.000 (full=0.000, init=0.000, unsafe=0.000, goal=0.000), 0.000Φ=0.000e+00, Reg=806.264, 305.169, Total=8.063e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [13700/20000]: V=0.398 (full=0.000, init=0.000, unsafe=0.398, goal=0.000), 0.000Φ=0.000e+00, Reg=794.563, 301.652, Total=1.192e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [13800/20000]: V=0.063 (full=0.000, init=0.023, unsafe=0.000, goal=0.040), 0.000Φ=3.199e+00, Reg=788.011, 307.935, Total=4.050e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [13900/20000]: V=1.489 (full=0.000, init=0.000, unsafe=1.489, goal=0.000), 0.000Φ=3.910e+00, Reg=793.953, 307.037, Total=6.193e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [14000/20000]: V=0.028 (full=0.000, init=0.000, unsafe=0.025, goal=0.003), 0.000Φ=1.930e+00, Reg=789.572, 310.591, Total=2.747e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [14100/20000]: V=1.696 (full=0.000, init=0.000, unsafe=1.683, goal=0.013), 0.000Φ=4.432e+00, Reg=788.910, 312.614, Total=6.917e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [14200/20000]: V=2.881 (full=0.000, init=1.495, unsafe=1.386, goal=0.000), 0.000Φ=2.867e+00, Reg=803.984, 309.461, Total=6.551e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [14300/20000]: V=0.371 (full=0.000, init=0.000, unsafe=0.000, goal=0.371), 0.000Φ=3.069e+00, Reg=792.174, 311.131, Total=4.232e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [14400/20000]: V=0.177 (full=0.000, init=0.177, unsafe=0.000, goal=0.000), 0.000Φ=2.083e+00, Reg=795.004, 310.612, Total=3.054e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [14500/20000]: V=0.280 (full=0.000, init=0.000, unsafe=0.145, goal=0.136), 0.000Φ=9.403e-01, Reg=796.615, 311.447, Total=2.017e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [14600/20000]: V=0.416 (full=0.000, init=0.000, unsafe=0.404, goal=0.000), 0.012Φ=0.000e+00, Reg=810.130, 309.588, Total=1.226e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [14700/20000]: V=0.324 (full=0.000, init=0.000, unsafe=0.324, goal=0.000), 0.000Φ=2.379e+00, Reg=812.723, 313.530, Total=3.515e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [14800/20000]: V=0.005 (full=0.000, init=0.000, unsafe=0.000, goal=0.005), 0.000Φ=2.033e+00, Reg=815.969, 314.116, Total=2.854e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [14900/20000]: V=0.619 (full=0.000, init=0.483, unsafe=0.000, goal=0.136), 0.000Φ=2.062e+00, Reg=807.459, 322.690, Total=3.488e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [15000/20000]: V=1.354 (full=0.000, init=0.005, unsafe=1.089, goal=0.260), 0.000Φ=2.720e+00, Reg=809.355, 324.392, Total=4.883e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [15100/20000]: V=2.014 (full=0.000, init=0.000, unsafe=1.948, goal=0.065), 0.000Φ=2.944e+00, Reg=813.210, 325.703, Total=5.771e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [15200/20000]: V=0.760 (full=0.000, init=0.088, unsafe=0.672, goal=0.000), 0.000Φ=0.000e+00, Reg=856.481, 335.663, Total=1.617e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [15300/20000]: V=0.409 (full=0.000, init=0.076, unsafe=0.230, goal=0.103), 0.000Φ=4.130e+00, Reg=848.190, 338.788, Total=5.387e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [15400/20000]: V=2.646 (full=0.000, init=0.308, unsafe=2.339, goal=0.000), 0.000Φ=1.208e+00, Reg=865.727, 331.767, Total=4.720e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [15500/20000]: V=2.398 (full=0.000, init=1.226, unsafe=1.172, goal=0.000), 0.000Φ=0.000e+00, Reg=918.999, 327.459, Total=3.317e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [15600/20000]: V=0.229 (full=0.000, init=0.113, unsafe=0.116, goal=0.000), 0.000Φ=0.000e+00, Reg=910.137, 325.863, Total=1.139e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [15700/20000]: V=1.513 (full=0.000, init=0.000, unsafe=1.488, goal=0.026), 0.000Φ=0.000e+00, Reg=896.288, 325.711, Total=2.410e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [15800/20000]: V=0.454 (full=0.000, init=0.454, unsafe=0.000, goal=0.000), 0.000Φ=4.100e-01, Reg=887.205, 325.846, Total=1.751e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [15900/20000]: V=1.062 (full=0.000, init=1.062, unsafe=0.000, goal=0.000), 0.000Φ=0.000e+00, Reg=881.345, 328.377, Total=1.944e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [16000/20000]: V=1.120 (full=0.000, init=0.000, unsafe=1.120, goal=0.000), 0.000Φ=2.337e-01, Reg=877.205, 325.152, Total=2.231e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [16100/20000]: V=0.350 (full=0.000, init=0.001, unsafe=0.342, goal=0.007), 0.000Φ=7.870e-01, Reg=874.634, 328.910, Total=2.012e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [16200/20000]: V=0.014 (full=0.000, init=0.014, unsafe=0.000, goal=0.000), 0.000Φ=0.000e+00, Reg=873.559, 336.406, Total=8.880e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [16300/20000]: V=0.238 (full=0.000, init=0.000, unsafe=0.226, goal=0.012), 0.000Φ=0.000e+00, Reg=871.568, 339.518, Total=1.109e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [16400/20000]: V=0.768 (full=0.000, init=0.000, unsafe=0.766, goal=0.002), 0.000Φ=3.883e+00, Reg=862.001, 341.225, Total=5.513e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [16500/20000]: V=0.662 (full=0.000, init=0.213, unsafe=0.449, goal=0.000), 0.000Φ=0.000e+00, Reg=864.647, 336.824, Total=1.527e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [16600/20000]: V=0.019 (full=0.000, init=0.019, unsafe=0.000, goal=0.000), 0.000Φ=0.000e+00, Reg=861.032, 342.635, Total=8.804e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [16700/20000]: V=1.343 (full=0.000, init=0.000, unsafe=1.343, goal=0.000), 0.000Φ=2.104e+00, Reg=856.635, 341.604, Total=4.303e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [16800/20000]: V=1.349 (full=0.000, init=0.000, unsafe=1.349, goal=0.000), 0.000Φ=2.588e+00, Reg=896.879, 350.753, Total=4.834e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [16900/20000]: V=1.256 (full=0.000, init=0.021, unsafe=1.230, goal=0.005), 0.000Φ=1.683e+00, Reg=891.344, 352.576, Total=3.830e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [17000/20000]: V=0.120 (full=0.000, init=0.000, unsafe=0.000, goal=0.120), 0.000Φ=1.672e+01, Reg=884.161, 349.201, Total=1.772e+01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [17100/20000]: V=0.047 (full=0.000, init=0.047, unsafe=0.000, goal=0.000), 0.000Φ=1.948e+00, Reg=873.317, 349.744, Total=2.868e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [17200/20000]: V=0.468 (full=0.000, init=0.050, unsafe=0.394, goal=0.024), 0.000Φ=1.231e+00, Reg=872.611, 352.932, Total=2.571e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [17300/20000]: V=1.513 (full=0.000, init=0.000, unsafe=1.383, goal=0.129), 0.000Φ=8.701e-02, Reg=868.894, 349.096, Total=2.469e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [17400/20000]: V=1.849 (full=0.000, init=0.278, unsafe=1.508, goal=0.064), 0.000Φ=2.478e+00, Reg=871.364, 355.103, Total=5.198e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [17500/20000]: V=0.917 (full=0.000, init=0.000, unsafe=0.916, goal=0.001), 0.000Φ=3.093e+00, Reg=922.854, 345.072, Total=4.933e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [17600/20000]: V=0.123 (full=0.000, init=0.000, unsafe=0.115, goal=0.008), 0.000Φ=0.000e+00, Reg=908.382, 347.345, Total=1.031e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [17700/20000]: V=0.010 (full=0.000, init=0.000, unsafe=0.000, goal=0.010), 0.000Φ=0.000e+00, Reg=897.191, 344.656, Total=9.072e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [17800/20000]: V=0.539 (full=0.000, init=0.000, unsafe=0.000, goal=0.539), 0.000Φ=4.677e-02, Reg=888.828, 346.487, Total=1.475e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [17900/20000]: V=1.663 (full=0.000, init=0.000, unsafe=1.606, goal=0.057), 0.000Φ=0.000e+00, Reg=886.926, 344.029, Total=2.550e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [18000/20000]: V=0.923 (full=0.000, init=0.102, unsafe=0.363, goal=0.458), 0.000Φ=2.907e+00, Reg=881.123, 347.186, Total=4.711e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [18100/20000]: V=1.858 (full=0.000, init=0.487, unsafe=1.362, goal=0.009), 0.000Φ=0.000e+00, Reg=875.284, 348.224, Total=2.733e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [18200/20000]: V=0.121 (full=0.000, init=0.000, unsafe=0.092, goal=0.030), 0.000Φ=0.000e+00, Reg=874.872, 354.064, Total=9.964e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [18300/20000]: V=1.405 (full=0.000, init=0.453, unsafe=0.952, goal=0.000), 0.000Φ=2.217e+00, Reg=873.949, 360.425, Total=4.497e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [18400/20000]: V=0.000 (full=0.000, init=0.000, unsafe=0.000, goal=0.000), 0.000Φ=0.000e+00, Reg=881.878, 359.374, Total=8.819e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [18500/20000]: V=0.456 (full=0.000, init=0.119, unsafe=0.325, goal=0.012), 0.000Φ=2.107e+00, Reg=873.837, 353.818, Total=3.437e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [18600/20000]: V=0.197 (full=0.000, init=0.000, unsafe=0.016, goal=0.181), 0.000Φ=3.780e+00, Reg=870.684, 358.458, Total=4.848e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [18700/20000]: V=0.020 (full=0.000, init=0.000, unsafe=0.000, goal=0.020), 0.000Φ=1.715e+00, Reg=869.857, 364.082, Total=2.605e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [18800/20000]: V=0.279 (full=0.000, init=0.000, unsafe=0.000, goal=0.279), 0.000Φ=5.081e+00, Reg=873.727, 368.584, Total=6.234e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [18900/20000]: V=0.375 (full=0.000, init=0.000, unsafe=0.000, goal=0.375), 0.000Φ=4.753e-01, Reg=873.805, 369.127, Total=1.724e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [19000/20000]: V=1.160 (full=0.000, init=0.000, unsafe=0.494, goal=0.666), 0.000Φ=2.630e+00, Reg=964.357, 379.241, Total=4.755e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [19100/20000]: V=0.356 (full=0.000, init=0.154, unsafe=0.202, goal=0.000), 0.000Φ=4.041e+00, Reg=927.340, 376.038, Total=5.324e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [19200/20000]: V=0.250 (full=0.000, init=0.000, unsafe=0.186, goal=0.064), 0.000Φ=1.877e+00, Reg=910.696, 378.165, Total=3.038e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [19300/20000]: V=0.232 (full=0.000, init=0.232, unsafe=0.000, goal=0.000), 0.000Φ=2.058e+00, Reg=904.127, 373.904, Total=3.194e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [19400/20000]: V=0.007 (full=0.000, init=0.000, unsafe=0.000, goal=0.007), 0.000Φ=1.202e+00, Reg=904.412, 375.819, Total=2.114e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [19500/20000]: V=0.030 (full=0.000, init=0.000, unsafe=0.000, goal=0.030), 0.000Φ=0.000e+00, Reg=900.374, 373.657, Total=9.306e-01
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [19600/20000]: V=0.318 (full=0.000, init=0.270, unsafe=0.000, goal=0.048), 0.000Φ=0.000e+00, Reg=898.671, 369.436, Total=1.217e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [19700/20000]: V=0.502 (full=0.000, init=0.000, unsafe=0.450, goal=0.053), 0.000Φ=0.000e+00, Reg=898.221, 370.437, Total=1.401e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [19800/20000]: V=0.748 (full=0.000, init=0.087, unsafe=0.562, goal=0.099), 0.000Φ=0.000e+00, Reg=895.045, 367.548, Total=1.643e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+  Epoch [19900/20000]: V=2.289 (full=0.000, init=1.492, unsafe=0.731, goal=0.066), 0.000Φ=0.000e+00, Reg=897.455, 371.409, Total=3.186e+00
+tensor([0.1000], grad_fn=<SqueezeBackward1>)
+
+  Best loss: 0.307287
+  Saved pretrained V_net to: /Users/chko1829/src/Projects/ML/Neural_Certificate/cartpole4d_syn/outputs/V_pretrained.pth
+  Saved pretrained Controller_net to: /Users/chko1829/src/Projects/ML/Neural_Certificate/cartpole4d_syn/outputs/controller_pretrained.pth
+================================================================================
+Pre-training complete. V + GV (Φ) + Controller initialized.
+================================================================================
+
+Pretraining completed.
+
+
+================================================================================
+BOUND-BASED TRAINING (using CROWN)
+================================================================================
+
+Collecting all cells for V network...
+  init: 50625 cells
+  goal: 50625 cells
+  unsafe: 80000 cells
+  outside: 20480 cells
+  boundary: 8 cells
+  Total V cells: 201738
+
+Preparing concatenated input bounds for V network...
+
+Initializing CROWN cache for ALL 201738 V cells...
+[SymbolicCROWNCache] Creating BoundedModule for 201738 cells...
+
+Creating CROWN cache for 'generator' (Phi)...
+  generator: 1280 cells
+[SymbolicCROWNCache_Phi] Creating BoundedModule for 1280 cells...
+/Users/chko1829/src/Projects/ML/Neural_Certificate/src/phi_module.py:506: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  self._cached_scale_D == D
+
+Using CONSTANT beta_s = 0.0
+Epoch     0 | Total: 1960650.0000 | Goal: 150199.3125 | Unsafe: 460087.3750 | Init: 42092.7891 | Outside: 249936.1875 | Boundary: 1028.8680 | Gen: 1.058334e+06
+ ✗ Inside Goal failed, min V= 0.0797, min V_outside_lower= -43.8298, min V_lower=-3.8822
+
+Epoch 0 - Detailed Evaluation:
+  Constraint Satisfaction:
+    Goal:      ✗ (V_min=-3.882, V_mean=0.936, V_max=7.262)
+    Unsafe:    ✗ (V_min=-39.385, V_max=131.898)
+    Init:      ✗ (V_min=-1.160, V_max=2.229)
+    Outside:   ✗ (V_min=-43.830, V_max=135.395)
+    Boundary:  ✓ (V_min=0.000, V_max=0.000)
+    Generator: ✗ (Phi_upper_min=1.321727e+02, Phi_upper_max=2.170675e+03, failing=1280)
+  Goal bounds: V ∈ [-3.882, 7.262]
+  Unsafe bounds: V ∈ [-39.385, 131.898]
+  Generator bounds: Φ ∈ [1.321727e+02, 2.170675e+03]
+  Generator failing cells: 1280/1280 (100.0%)
+
+  Creating visualization for epoch 0...

@@ -21,9 +21,10 @@ from src.scenario_utils import (
 )
 from src.hyperparameters import Hyperparameters
 from src.network import create_V
-from src.dynamics import Dynamics, ClosedLoopDrift
-from src.control_network import LorentzLinearControlNN
+from src.dynamics import Dynamics
 from src.save_load_utils import load_eval_bundle
+
+from main import pi, DEG, CartpoleControlNN, ClosedLoopCartPole
 
 
 torch.set_default_dtype(torch.float32)
@@ -33,7 +34,9 @@ torch.set_default_dtype(torch.float32)
 # Build model + dynamics
 # =============================================================================
 def build_V_from_bundle(params: Hyperparameters, bundle_path: Path, device: str = "cpu", pretrain=False):
-    V_net = create_V(params.network).to(device)
+    input_offset = [0.0, 0.0, 0.0, 0.0]
+    output_offset = np.float32(0.1)
+    V_net = create_V(params.network, input_offset=input_offset, output_offset=output_offset)
     if(pretrain):
         V_net.load_state_dict(torch.load(OUTPUT_DIR / "V_pretrained.pth", map_location=device))
     else:
@@ -43,21 +46,14 @@ def build_V_from_bundle(params: Hyperparameters, bundle_path: Path, device: str 
     return V_net
 
 def build_dynamics(params: Hyperparameters, bundle_path: Path, device: str = "cpu", pretrain=False):
-    u_nn = LorentzLinearControlNN()
+    u_nn = CartpoleControlNN()
     if(pretrain):
         u_nn.load_state_dict(torch.load(OUTPUT_DIR / "controller_pretrained.pth", map_location=device))
     else:
         bundle = load_eval_bundle(bundle_path, map_location=device)
         u_nn.load_state_dict(bundle["control_state_dict"])
 
-    def f_ol(x: torch.Tensor, u: torch.Tensor | None = None) -> torch.Tensor:
-        x1, x2, x3 = x[:, 0], x[:, 1], x[:, 2]
-        f1 = -10.0*x1 + 10.0*x2
-        f2 = -x1*x3 + 28.0*x1 - x2
-        f3 =  x1*x2 - 8/3 *x3
-        return torch.stack([f1, f2, f3], dim=1)
-
-    g_coeffs = torch.tensor([0.1, 0.1, 0.1], dtype=torch.float32)
+    g_coeffs = torch.tensor([0.0, 0.05, 0.0, 0.05], dtype=torch.float32)
 
     def g(x: torch.Tensor) -> torch.Tensor:
         """
@@ -78,7 +74,7 @@ def build_dynamics(params: Hyperparameters, bundle_path: Path, device: str = "cp
         else:
             raise ValueError(f"g(x) expects x of shape (D,) or (N, D), got {tuple(x.shape)}")
 
-    f_cl = ClosedLoopDrift(f_ol, u_nn).to(params.training.device)
+    f_cl = ClosedLoopCartPole(controller=u_nn).to(device)
     return Dynamics.dynamics(f=f_cl, g=g)
 
 
@@ -151,64 +147,95 @@ def main():
         p.unlink(missing_ok=True)  # Python 3.8+: ignore if already gone
 
     params = Hyperparameters.default()
-    params.network.n_inputs = 3
+    params.network.n_inputs = 4
     params.network.n_hidden_1 = 64
     params.network.n_hidden_2 = 64
     params.network.n_outputs = 1
-    params.network.input_scale = [6.0, 6.0, 6.0]
+    params.network.input_scale = [2*pi, 20.0, 10.0, 20.0]
     params.network.scale_factor = 20.0
 
+    full_range = np.array([
+        [-2*pi, 2*pi],
+        [-20.0, 20.0],
+        [-10.0, 10.0],
+        [-20.0, 20.0],
+    ], dtype=np.float32)
+
     init_range = np.array([
+        [pi-15*DEG, pi+15*DEG],
+        [-0.1, 0.1],
         [-1.0, 1.0],
-        [-1.0, 1.0],
-        [-1.0, 1.0],
+        [-0.1, 0.1],
     ], dtype=np.float32)
 
     goal_range = np.array([
-        [-0.3, 0.3],
-        [-0.3, 0.3],
-        [-0.3, 0.3],
+        [-0.4*pi, 0.4*pi],
+        [-2.0, 2.0],
+        [-2.0, 2.0],
+        [-1.0, 1.0],
     ], dtype=np.float32)
 
-    unsafe_tb = np.array([
-        [-6.0, 6.0], 
-        [-6.0, 6.0],
-        [-6.0, -6.0+0.5]
+    unsafe_min_z = np.array([
+        full_range[0, :],
+        full_range[1, :],
+        [full_range[2, 0], full_range[2, 0]+0.5],
+        full_range[3, :],
     ], dtype=np.float32)
-    unsafe_db = np.array([
-        [-6.0, 6.0], 
-        [-6.0, 6.0],
-        [6.0-0.5, 6.0]
-    ], dtype=np.float32)
-    unsafe_fb = np.array([
-        [-6.0, 6.0], 
-        [-6.0, -6.0+0.5],
-        [-6.0, 6.0]
-    ], dtype=np.float32)
-    unsafe_bb = np.array([
-        [-6.0, 6.0], 
-        [6.0-0.5, 6.0],
-        [-6.0, 6.0]
-    ], dtype=np.float32)
-    unsafe_lb = np.array([
-        [-6.0, -6.0+0.5], 
-        [-6.0, 6.0],
-        [-6.0, 6.0]
-    ], dtype=np.float32)
-    unsafe_rb = np.array([
-        [6.0-0.5, 6.0], 
-        [-6.0, 6.0],
-        [-6.0, 6.0]
-    ], dtype=np.float32)
-    unsafe_range = np.vstack((unsafe_tb, unsafe_db, 
-                              unsafe_fb, unsafe_bb,
-                              unsafe_lb, unsafe_rb))
 
-    full_range = np.array([
-        [-6.0, 6.0],
-        [-6.0, 6.0],
-        [-6.0, 6.0],
+    unsafe_max_z = np.array([
+        full_range[0, :],
+        full_range[1, :],
+        [full_range[2, 1]-0.5, full_range[2, 1]],
+        full_range[3, :],
     ], dtype=np.float32)
+
+    unsafe_min_theta = np.array([
+        [full_range[0, 0], full_range[0, 0]+0.5*DEG],
+        full_range[1, :],
+        full_range[2, :],
+        full_range[3, :],
+    ], dtype=np.float32)
+
+    unsafe_max_theta = np.array([
+        [full_range[0, 1]-0.5*DEG, full_range[0, 1]],
+        full_range[1, :],
+        full_range[2, :],
+        full_range[3, :],
+    ], dtype=np.float32)
+
+    unsafe_min_z_dot = np.array([
+        full_range[0, :],
+        full_range[1, :],
+        full_range[2, :],
+        [full_range[3, 0], full_range[3,0]+0.5],
+    ], dtype=np.float32)
+
+    unsafe_max_z_dot = np.array([
+        full_range[0, :],
+        full_range[1, :],
+        full_range[2, :],
+        [full_range[3, 1]-0.5, full_range[3, 1]],
+    ], dtype=np.float32)
+
+    unsafe_min_theta_dot = np.array([
+        full_range[0, :],
+        [full_range[1, 0], full_range[1, 0]+0.5],
+        full_range[2, :],
+        full_range[3, :],
+    ], dtype=np.float32)
+
+    unsafe_max_theta_dot = np.array([
+        full_range[0, :],
+        [full_range[1, 1]-0.5, full_range[1, 1]],
+        full_range[2, :],
+        full_range[3, :],
+    ], dtype=np.float32)
+
+    unsafe_range = np.vstack((unsafe_min_z, unsafe_max_z,
+                              unsafe_min_theta, unsafe_max_theta,
+                              unsafe_min_z_dot, unsafe_max_z_dot,
+                              unsafe_min_theta_dot, unsafe_max_theta_dot
+                             ))
     
     ### Just need to Change these two parameters ###
     N_loop = 5
@@ -216,18 +243,11 @@ def main():
     ################################################
 
     # models from bound training
-    V_net = build_V_from_bundle(params, OUTPUT_DIR / "eval_bundle.pth", device="cpu")
-    dynamics = build_dynamics(params, OUTPUT_DIR / "eval_bundle.pth", device="cpu")
-    generate_scenario_data(N_loop, N_samples,
-        full_range, init_range, unsafe_range, goal_range, V_net, dynamics,
-        sample_features_path="samples_features.csv", x_full_path="x_full.csv")
-    
-    # models from opt bound training
-    V_net = build_V_from_bundle(params, OUTPUT_DIR / "eval_bundle_opt.pth", device="cpu")
-    dynamics = build_dynamics(params, OUTPUT_DIR / "eval_bundle_opt.pth", device="cpu")
-    generate_scenario_data(N_loop, N_samples,
-        full_range, init_range, unsafe_range, goal_range, V_net, dynamics,
-        sample_features_path="samples_features_opt.csv", x_full_path="x_full_opt.csv")
+    # V_net = build_V_from_bundle(params, OUTPUT_DIR / "eval_bundle.pth", device="cpu")
+    # dynamics = build_dynamics(params, OUTPUT_DIR / "eval_bundle.pth", device="cpu")
+    # generate_scenario_data(N_loop, N_samples,
+    #     full_range, init_range, unsafe_range, goal_range, V_net, dynamics,
+    #     sample_features_path="samples_features.csv", x_full_path="x_full.csv")
     
     # models from pre-training
     V_net = build_V_from_bundle(params, OUTPUT_DIR / "eval_bundle.pth", device="cpu", pretrain=True)
@@ -235,6 +255,8 @@ def main():
     generate_scenario_data(N_loop, N_samples,
         full_range, init_range, unsafe_range, goal_range, V_net, dynamics,
         sample_features_path="samples_features_pretrain.csv", x_full_path="x_full_pretrain.csv")
+
+
 
 
 if __name__ == "__main__":

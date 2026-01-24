@@ -87,18 +87,46 @@ def G_of_scalar(y: torch.Tensor, x: torch.Tensor, dynamics: Dynamics) -> torch.T
 # =============================================================================
 # V-net feature helpers (consistent with src.network.V.forward)
 # =============================================================================
-def V_last_hidden(V_net, x: torch.Tensor) -> torch.Tensor:
+def V_last_hidden(V_net, x: torch.Tensor, *, subtract_baseline: bool | None = None) -> torch.Tensor:
     """
-    Scaled last-hidden features passed into output():
-        h_tilde(x) = scale_factor * act(layer2(act(layer1(x / input_scale))))
-    Shape: (N, L)
+    Returns the scaled last-hidden features that feed the final linear output layer.
+
+    For V:
+        h_tilde(x) = act(layer2(act(layer1(x / input_scale)))) * scale_factor
+
+    For V_offset:
+        x_norm = (x - input_offset) / input_scale
+        h_tilde_offset(x) = (h(x_norm) - h(0)) * scale_factor
+        so that: V_offset(x) == h_tilde_offset(x) @ w + output_offset   (bias cancels)
     """
     if x.dim() == 1:
-        x = x.unsqueeze(0)
-    z = x / V_net.input_scale
-    z = V_net.activation_fn(V_net.layer1(z))
-    h = V_net.activation_fn(V_net.layer2(z))
+        x = x.unsqueeze(0)  # (1,D)
+
+    # Detect V_offset via presence of buffers
+    is_offset = hasattr(V_net, "input_offset") and hasattr(V_net, "output_offset")
+
+    if subtract_baseline is None:
+        subtract_baseline = bool(is_offset)
+
+    # normalize input
+    if is_offset:
+        x_norm = (x - V_net.input_offset.view(1, -1)) / V_net.input_scale.view(1, -1)
+    else:
+        x_norm = x / V_net.input_scale.view(1, -1)
+
+    # forward through hidden layers
+    h = V_net.activation_fn(V_net.layer1(x_norm))
+    h = V_net.activation_fn(V_net.layer2(h))  # (N,H)
+
+    # optional baseline subtraction for V_offset
+    if subtract_baseline:
+        x0 = torch.zeros_like(x_norm)  # corresponds to x = input_offset for V_offset
+        h0 = V_net.activation_fn(V_net.layer1(x0))
+        h0 = V_net.activation_fn(V_net.layer2(h0))
+        h = h - h0
+
     return h * V_net.scale_factor
+
 
 
 def phi_features(V_net, x: torch.Tensor, dynamics: Dynamics) -> torch.Tensor:
@@ -113,17 +141,20 @@ def phi_features(V_net, x: torch.Tensor, dynamics: Dynamics) -> torch.Tensor:
     return torch.stack(cols, dim=1)  # (N, L)
 
 
-def verify_V_decomposition(V_net, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-    """
-    Verifies:
-      V_net(x) == (V_last_hidden(x) * scale_factor) @ w + b
-    Returns: (max_abs_err, mean_abs_err)
-    """
+def verify_V_decomposition(V_net, x: torch.Tensor):
     V_direct = V_net(x).squeeze(-1)
-    h = V_last_hidden(V_net, x)
-    w = V_net.output.weight[0]
-    b = V_net.output.bias[0]
-    V_recon = h @ w + b
+
+    h = V_last_hidden(V_net, x)              # auto subtract baseline if V_offset
+    w = V_net.output.weight[0]               # (H,)
+
+    if hasattr(V_net, "input_offset") and hasattr(V_net, "output_offset"):
+        # V_offset: V(x) = h @ w + output_offset
+        V_recon = h @ w + V_net.output_offset.view(-1)[0]
+    else:
+        # V: V(x) = h @ w + b
+        b = V_net.output.bias[0]
+        V_recon = h @ w + b
+
     err = (V_direct - V_recon).abs()
     return err.max(), err.mean()
 
