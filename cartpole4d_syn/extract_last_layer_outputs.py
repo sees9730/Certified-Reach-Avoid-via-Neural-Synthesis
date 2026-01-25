@@ -11,7 +11,7 @@ sys.path.insert(0, str(ROOT))
 
 from src.scenario_utils import describe_samples_rows
 from src.scenario_utils import (
-    sample_and_partition,
+    sample_and_partition, sample_weighted_regions,
     V_last_hidden,
     phi_features,
     verify_G_decomposition,
@@ -109,16 +109,21 @@ def generate_scenario_data(N_loop, N_samples, full_range, init_range, unsafe_ran
     # Main usage for scenario
     ###########################
     for i in range(N_loop):
-        x_full, x_init, x_unsafe, x_gen = sample_and_partition(
-            N_samples=N_samples,
-            full_range=full_range,
-            init_range=init_range,
-            goal_range=goal_range,
-            unsafe_range=unsafe_range,
-            device="cpu",
-            dtype=torch.float32,
-            seed=i
+        # new weighted sample method
+        x_full = sample_weighted_regions(
+            N_samples, full_range, init_range, goal_range, unsafe_range,
+            w_init=0.1, w_unsafe=0.1, w_goal=0.1, w_gen=0.7
         )
+        # x_full, x_init, x_unsafe, x_gen = sample_and_partition(
+        #     N_samples=N_samples,
+        #     full_range=full_range,
+        #     init_range=init_range,
+        #     goal_range=goal_range,
+        #     unsafe_range=unsafe_range,
+        #     device="cpu",
+        #     dtype=torch.float32,
+        #     seed=i
+        # )
         # print("Number of all samples: ", x_full.shape)
         # print("Number of init samples: ", x_init.shape)
         # print("Number of unsafe samples: ", x_unsafe.shape)
@@ -130,7 +135,6 @@ def generate_scenario_data(N_loop, N_samples, full_range, init_range, unsafe_ran
             init_range=init_range, unsafe_range=unsafe_range, goal_range=goal_range,
             as_dict=True,
         )
-        print(x_full[0])
 
         # Write [region labels, V, GV] to file
         write_describe_dict_to_csv(data, sample_features_path)

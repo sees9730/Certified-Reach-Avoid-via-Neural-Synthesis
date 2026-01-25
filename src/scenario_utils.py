@@ -239,6 +239,169 @@ def sample_and_partition(
     return x_full, x_full[init_mask], x_full[unsafe_mask], x_full[gen_mask].requires_grad_(True)
 
 
+import numpy as np
+import torch
+
+
+def _sample_uniform_box(box_t: torch.Tensor, n: int, *, gen: torch.Generator) -> torch.Tensor:
+    """box_t: (D,2) -> samples (n,D) uniform in the box."""
+    low, high = box_t[:, 0], box_t[:, 1]
+    D = box_t.shape[0]
+    u = torch.rand(n, D, device=box_t.device, dtype=box_t.dtype, generator=gen)
+    return u * (high - low) + low
+
+
+def sample_weighted_regions(
+    N_samples: int,
+    full_range: np.ndarray,
+    init_range: np.ndarray,
+    goal_range: np.ndarray,
+    unsafe_range: np.ndarray,
+    *,
+    w_init: float,
+    w_unsafe: float,
+    w_goal: float,
+    w_gen: float,
+    device: str = "cpu",
+    dtype: torch.dtype = torch.float32,
+    seed: int = 0,
+    # gen sampling controls
+    gen_oversample_factor: int = 4,   # propose k = factor * remaining each round
+    max_rounds: int = 10_000,
+):
+    """
+    Construct x_full by concatenating 4 groups:
+      - init:  uniform(init_range)  with size ~ N_samples * w_init
+      - unsafe: uniform(unsafe_range) with size ~ N_samples * w_unsafe
+      - goal:  uniform(goal_range)  with size ~ N_samples * w_goal
+      - gen:   uniform(full_range) but *reject* samples that fall in (unsafe union) or goal,
+               until we have size ~ N_samples * w_gen
+
+    Returns:
+      x_full: (N_samples, D) tensor
+
+    Notes:
+      - weights must be in (0,1) and sum to 1 (within tolerance).
+      - counts are computed by floor, then remainder distributed to make exact sum.
+      - gen points are guaranteed to satisfy: not unsafe AND not goal.
+    """
+    # ---------------------------
+    # validate weights
+    # ---------------------------
+    ws = [w_init, w_unsafe, w_goal, w_gen]
+    if any((not np.isfinite(w) or w <= 0.0 or w >= 1.0) for w in ws):
+        raise ValueError("All weights must be finite and strictly in (0,1).")
+    s = float(w_init + w_unsafe + w_goal + w_gen)
+    if abs(s - 1.0) > 1e-6:
+        raise ValueError(f"Weights must sum to 1. Got {s}.")
+
+    # ---------------------------
+    # local RNG
+    # ---------------------------
+    gen_rand = torch.Generator(device=device)
+    gen_rand.manual_seed(int(seed))
+
+    # ---------------------------
+    # tensors
+    # ---------------------------
+    full_t = _as_torch(full_range, device=device, dtype=dtype)
+    init_t = _as_torch(init_range, device=device, dtype=dtype)
+    goal_t = _as_torch(goal_range, device=device, dtype=dtype)
+    D = full_t.shape[0]
+    unsafe_boxes = _unsafe_to_boxes(unsafe_range, D=D, device=device, dtype=dtype)
+
+    # ---------------------------
+    # counts: floor + distribute remainder
+    # ---------------------------
+    raw = torch.tensor(
+        [w_init, w_unsafe, w_goal, w_gen], dtype=torch.float64
+    ) * float(N_samples)
+    base = torch.floor(raw).to(torch.int64)
+    rem = int(N_samples - int(base.sum().item()))
+    if rem > 0:
+        frac = (raw - torch.floor(raw))
+        order = torch.argsort(frac, descending=True)
+        for i in range(rem):
+            base[order[i]] += 1
+
+    n_init, n_unsafe, n_goal, n_gen = base.to(torch.int64).tolist()
+
+    # ---------------------------
+    # direct samples for init/unsafe/goal
+    # ---------------------------
+    x_init = _sample_uniform_box(init_t, n_init, gen=gen_rand) if n_init > 0 else None
+
+    # unsafe_range might be (D,2) or union; user asked "directly sample uniformly" for unsafe.
+    # We'll sample from the *unsafe bounding box* if it's (D,2),
+    # OR if it's a union, we sample by choosing boxes uniformly and sampling within each.
+    def _sample_unsafe(n: int) -> torch.Tensor:
+        if n <= 0:
+            return torch.empty(0, D, device=device, dtype=dtype)
+        # unsafe_boxes: (K,D,2)
+        K = unsafe_boxes.shape[0]
+        if K == 1:
+            return _sample_uniform_box(unsafe_boxes[0], n, gen=gen_rand)
+        # pick which box each point comes from
+        idx = torch.randint(0, K, (n,), device=device, generator=gen_rand)
+        out = torch.empty(n, D, device=device, dtype=dtype)
+        # vectorized per-box fill
+        for k in range(K):
+            m = (idx == k).sum().item()
+            if m > 0:
+                out[idx == k] = _sample_uniform_box(unsafe_boxes[k], int(m), gen=gen_rand)
+        return out
+
+    x_unsafe = _sample_unsafe(n_unsafe) if n_unsafe > 0 else None
+    x_goal = _sample_uniform_box(goal_t, n_goal, gen=gen_rand) if n_goal > 0 else None
+
+    # ---------------------------
+    # gen samples: rejection from full excluding (unsafe union) OR goal
+    # ---------------------------
+    def _sample_gen_reject(n: int) -> torch.Tensor:
+        if n <= 0:
+            return torch.empty(0, D, device=device, dtype=dtype)
+        collected = []
+        got = 0
+        rounds = 0
+        while got < n:
+            rounds += 1
+            if rounds > max_rounds:
+                raise RuntimeError(
+                    f"Failed to collect {n} gen samples after {max_rounds} rounds. "
+                    "Your accept region (not unsafe, not goal) may be too small."
+                )
+            need = n - got
+            k = max(32, int(gen_oversample_factor * need))
+            cand = _sample_uniform_box(full_t, k, gen=gen_rand)
+            ok = (~_in_unsafe_union(cand, unsafe_boxes)) & (~_in_box(cand, goal_t))
+            cand_ok = cand[ok]
+            if cand_ok.numel() == 0:
+                continue
+            take = min(cand_ok.shape[0], need)
+            collected.append(cand_ok[:take])
+            got += take
+        return torch.cat(collected, dim=0)
+
+    x_gen = _sample_gen_reject(n_gen)
+
+    # ---------------------------
+    # stack and return x_full only
+    # ---------------------------
+    parts = []
+    if x_init is not None: parts.append(x_init)
+    if x_unsafe is not None: parts.append(x_unsafe)
+    if x_goal is not None: parts.append(x_goal)
+    parts.append(x_gen)
+
+    x_full = torch.cat(parts, dim=0)
+
+    # sanity: exact N_samples
+    if x_full.shape[0] != N_samples:
+        raise RuntimeError(f"Internal error: expected {N_samples} samples, got {x_full.shape[0]}.")
+
+    return x_full
+
+
 def describe_samples_rows(
     x: Union[np.ndarray, torch.Tensor],
     *,
@@ -306,16 +469,29 @@ def describe_samples_rows(
     unsafe_b = unsafe_mask.detach().cpu().numpy().astype(bool)
     gen_b = gen_mask.detach().cpu().numpy().astype(bool)
 
+    diagnostic_list = [False, False, False, False]
     for i in range(N):
         r: List[str] = []
         if init_b[i]:
             r.append("init")
+            if(diagnostic_list[0] == False):
+                print("init")
+                diagnostic_list[0] = True
         if unsafe_b[i]:
             r.append("unsafe")
+            if(diagnostic_list[1] == False):
+                print("unsafe")
+                diagnostic_list[1] = True
         if goal_b[i]:
             r.append("goal")
+            if(diagnostic_list[2] == False):
+                print("goal")
+                diagnostic_list[2] = True
         if gen_b[i]:
             r.append("gen")
+            if(diagnostic_list[3] == False):
+                print("gen")
+                diagnostic_list[3] = True
         regions_per_sample.append(r)
 
     # -------------------------
