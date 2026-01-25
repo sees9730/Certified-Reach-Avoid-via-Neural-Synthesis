@@ -1,0 +1,980 @@
+
+====================
+Pre-training using samples
+====================
+GV pre-training enabled
+Epoch 0 | V_loss=6194.8896 | GV_loss=1451.3644
+Epoch 100 | V_loss=3892.6152 | GV_loss=  0.9269
+Epoch 200 | V_loss=1249.9132 | GV_loss= 92.2329
+Epoch 300 | V_loss=814.4815 | GV_loss=  0.0000
+Epoch 400 | V_loss= 75.1145 | GV_loss=  2.3881
+Epoch 500 | V_loss=  2.9155 | GV_loss=  0.0000
+Epoch 600 | V_loss= 12.6236 | GV_loss=  5.5605
+Epoch 700 | V_loss=  4.0722 | GV_loss=  0.0000
+Epoch 800 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 900 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 1000 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 1100 | V_loss=  0.1033 | GV_loss=  0.0000
+Epoch 1200 | V_loss=  0.4037 | GV_loss=  0.0000
+Epoch 1300 | V_loss=  1.9449 | GV_loss=  0.0000
+Epoch 1400 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 1500 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 1600 | V_loss=  0.2786 | GV_loss=  0.0000
+Epoch 1700 | V_loss=243.6078 | GV_loss=  0.0000
+Epoch 1800 | V_loss=  0.0600 | GV_loss=  0.0000
+Epoch 1900 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 2000 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 2100 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 2200 | V_loss=  1.2734 | GV_loss=  0.0000
+Epoch 2300 | V_loss=  0.7693 | GV_loss=  0.0000
+Epoch 2400 | V_loss=  2.8183 | GV_loss=  0.0000
+Epoch 2500 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 2600 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 2700 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 2800 | V_loss=  0.1107 | GV_loss=  0.0000
+Epoch 2900 | V_loss= 50.4268 | GV_loss= 13.0511
+Epoch 3000 | V_loss=  0.0175 | GV_loss=  0.0000
+Epoch 3100 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 3200 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 3300 | V_loss=  0.0227 | GV_loss=  0.0000
+Epoch 3400 | V_loss=  0.1887 | GV_loss=  0.0000
+Epoch 3500 | V_loss= 17.4204 | GV_loss=  0.0000
+Epoch 3600 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 3700 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 3800 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 3900 | V_loss=  0.4462 | GV_loss=  0.0000
+Epoch 4000 | V_loss=  0.3380 | GV_loss=  0.0000
+Epoch 4100 | V_loss= 28.1052 | GV_loss=  0.0000
+Epoch 4200 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 4300 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 4400 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 4500 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 4600 | V_loss=  0.0125 | GV_loss=  0.0000
+Epoch 4700 | V_loss=  0.2038 | GV_loss=  0.0000
+Epoch 4800 | V_loss=484.7547 | GV_loss=  0.0000
+Epoch 4900 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 5000 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 5100 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 5200 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 5300 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 5400 | V_loss=  0.6520 | GV_loss=  0.0000
+Epoch 5500 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 5600 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 5700 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 5800 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 5900 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 6000 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 6100 | V_loss=  1.3337 | GV_loss=  0.0000
+Epoch 6200 | V_loss= 11.6221 | GV_loss=  0.0000
+Epoch 6300 | V_loss=  0.2321 | GV_loss=  0.0000
+Epoch 6400 | V_loss=  0.0142 | GV_loss=  0.0000
+Epoch 6500 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 6600 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 6700 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 6800 | V_loss=  0.0202 | GV_loss=  0.0000
+Epoch 6900 | V_loss=  0.6899 | GV_loss=  0.0000
+Epoch 7000 | V_loss=  2.7305 | GV_loss=  0.0000
+Epoch 7100 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 7200 | V_loss=  0.0153 | GV_loss=  0.0000
+Epoch 7300 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 7400 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 7500 | V_loss=  0.1239 | GV_loss=  0.0000
+Epoch 7600 | V_loss=  0.8703 | GV_loss=  0.0000
+Epoch 7700 | V_loss=  0.1314 | GV_loss=  0.0000
+Epoch 7800 | V_loss=  0.0820 | GV_loss=  0.0000
+Epoch 7900 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 8000 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 8100 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 8200 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 8300 | V_loss=  0.2081 | GV_loss=  0.0000
+Epoch 8400 | V_loss=  0.8642 | GV_loss=  0.0000
+Epoch 8500 | V_loss=  0.5696 | GV_loss=  0.0000
+Epoch 8600 | V_loss=  5.1066 | GV_loss=  0.0000
+Epoch 8700 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 8800 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 8900 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 9000 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 9100 | V_loss=  0.2495 | GV_loss=  0.0000
+Epoch 9200 | V_loss= 51.0288 | GV_loss=  0.0000
+Epoch 9300 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 9400 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 9500 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 9600 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 9700 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 9800 | V_loss=  0.0438 | GV_loss=  0.0000
+Epoch 9900 | V_loss=  0.4309 | GV_loss=  0.0000
+Epoch 10000 | V_loss=  0.7653 | GV_loss=  0.0000
+Epoch 10100 | V_loss=  4.2476 | GV_loss=  0.0000
+Epoch 10200 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 10300 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 10400 | V_loss=  0.0015 | GV_loss=  0.0000
+Epoch 10500 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 10600 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 10700 | V_loss=  0.5561 | GV_loss=  0.0000
+Epoch 10800 | V_loss=  0.4956 | GV_loss=  0.0000
+Epoch 10900 | V_loss=332.0717 | GV_loss=  0.0000
+Epoch 11000 | V_loss=  1.1094 | GV_loss=  0.0000
+Epoch 11100 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 11200 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 11300 | V_loss=  0.0000 | GV_loss=  0.2402
+Epoch 11400 | V_loss=  0.0793 | GV_loss=  0.0000
+Epoch 11500 | V_loss=  0.7364 | GV_loss=  0.0000
+Epoch 11600 | V_loss=  0.8266 | GV_loss=  0.0000
+Epoch 11700 | V_loss=  0.6652 | GV_loss=  0.0000
+Epoch 11800 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 11900 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 12000 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 12100 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 12200 | V_loss=  8.5361 | GV_loss=  0.0000
+Epoch 12300 | V_loss=  0.1280 | GV_loss=  0.0000
+Epoch 12400 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 12500 | V_loss=  0.0135 | GV_loss=  0.0000
+Epoch 12600 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 12700 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 12800 | V_loss=  0.2436 | GV_loss=  0.0000
+Epoch 12900 | V_loss=  0.0347 | GV_loss=  0.0000
+Epoch 13000 | V_loss=  1.9043 | GV_loss=  0.0000
+Epoch 13100 | V_loss=  7.3884 | GV_loss=  0.0000
+Epoch 13200 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 13300 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 13400 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 13500 | V_loss=  0.0095 | GV_loss=  0.0000
+Epoch 13600 | V_loss=  0.5589 | GV_loss=  0.0000
+Epoch 13700 | V_loss=  0.3549 | GV_loss=  0.0000
+Epoch 13800 | V_loss=  1.6764 | GV_loss=  0.0000
+Epoch 13900 | V_loss=  0.8805 | GV_loss=  0.0000
+Epoch 14000 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 14100 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 14200 | V_loss=  0.0268 | GV_loss=  0.0000
+Epoch 14300 | V_loss=  0.0005 | GV_loss=  0.0000
+Epoch 14400 | V_loss=  0.3536 | GV_loss=  0.0000
+Epoch 14500 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 14600 | V_loss=  0.4932 | GV_loss=  0.0000
+Epoch 14700 | V_loss=  3.6066 | GV_loss=  0.0000
+Epoch 14800 | V_loss=  0.1130 | GV_loss=  0.0000
+Epoch 14900 | V_loss=  0.0000 | GV_loss=  0.0000
+
+Best loss: 42.222206
+Saved pretrained V_net to: /Users/sebastianescobar/Desktop/Neural_Certificate/nonlinear3d_syn_unsafe/outputs/V_pretrained.pth
+Saved pretrained Controller_net to: /Users/sebastianescobar/Desktop/Neural_Certificate/nonlinear3d_syn_unsafe/outputs/controller_pretrained.pth
+Pre-training complete. V + GV + Controller initialized.
+
+====================
+Bound-based training
+====================
+=== Total cells per region for V ===
+init: 4096 cells
+goal: 2197 cells
+unsafe: 6000 cells
+outside: 3250 cells
+Total V cells: 15543
+Created CROWN cache for V with 15543 cells
+Created 1744 CROWN caches for GV
+/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:28: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.
+  warnings.warn("The verbose parameter is deprecated. Please use get_last_lr() "
+Epoch     0 | Total: 92308.8594 | Goal:   0.0000 | Unsafe: 4969.8105 | Init: 600.3539 | Outside: 726.5076 | Gen: 86012.1875 | Time: 0.2s
+=== Detailed Evaluation ===
+Goal:      PASS, V bounds: [  0.428,   0.773] | 2197/2197 pass (100.0%)
+Unsafe:    FAIL, V bounds: [  1.577,  14.522] | 2261/6000 pass (37.7%)
+Init:      FAIL, V bounds: [  0.174,   1.421] | 2/4096 pass (0.0%)
+Outside:   FAIL, V bounds: [ -2.495,  15.127] | 2270/3250 pass (69.8%)
+Generator: FAIL, GV bounds: [-127.393, 188.800] | 382/1744 pass (21.9%)
+Saved visualization plots for epoch 0 to 'training_progress'
+Epoch    10 | Total: 70801.5859 | Goal:   0.0000 | Unsafe: 3642.5488 | Init: 3415.0156 | Outside: 126.5694 | Gen: 63617.4531 | Time: 12.0s
+Epoch    20 | Total: 55104.8008 | Goal:   0.0000 | Unsafe: 3940.5415 | Init: 4022.8291 | Outside:  28.9816 | Gen: 47112.4492 | Time: 13.7s
+Epoch    30 | Total: 43556.1484 | Goal:   0.0000 | Unsafe: 6313.6646 | Init: 2478.8518 | Outside:  42.7098 | Gen: 34720.9219 | Time: 15.8s
+Epoch    40 | Total: 35240.4375 | Goal:   0.0000 | Unsafe: 6086.7456 | Init: 3519.1838 | Outside:   2.2579 | Gen: 25632.2480 | Time: 17.5s
+Epoch    50 | Total: 29244.6094 | Goal:   0.0000 | Unsafe: 5070.7397 | Init: 5220.3843 | Outside:   0.0000 | Gen: 18953.4863 | Time: 19.2s
+Epoch    60 | Total: 24786.9590 | Goal:   0.0000 | Unsafe: 4622.7964 | Init: 6290.0674 | Outside:   0.0000 | Gen: 13874.0957 | Time: 21.4s
+Epoch    70 | Total: 21525.1660 | Goal:   0.0000 | Unsafe: 4271.6333 | Init: 7201.8066 | Outside:   0.0000 | Gen: 10051.7266 | Time: 23.1s
+Epoch    80 | Total: 19304.5117 | Goal:   0.0000 | Unsafe: 4465.6040 | Init: 7502.3433 | Outside:   0.0000 | Gen: 7336.5635 | Time: 24.9s
+Epoch    90 | Total: 18069.7500 | Goal:   0.0000 | Unsafe: 4866.8638 | Init: 7378.0137 | Outside:   0.0000 | Gen: 5824.8740 | Time: 26.6s
+Epoch   100 | Total: 17268.3789 | Goal:   0.0000 | Unsafe: 4950.6562 | Init: 7426.9419 | Outside:   0.0000 | Gen: 4890.7803 | Time: 28.3s
+Epoch   110 | Total: 16675.8613 | Goal:   0.0000 | Unsafe: 5150.6953 | Init: 7219.1284 | Outside:   0.0000 | Gen: 4306.0371 | Time: 30.2s
+Epoch   120 | Total: 16147.2119 | Goal:   0.0000 | Unsafe: 5292.8452 | Init: 6907.0103 | Outside:   0.0000 | Gen: 3947.3564 | Time: 32.0s
+Epoch   130 | Total: 15634.8223 | Goal:   0.0000 | Unsafe: 5528.3613 | Init: 6418.1445 | Outside:   0.0000 | Gen: 3688.3162 | Time: 33.6s
+Epoch   140 | Total: 15067.2422 | Goal:   0.0000 | Unsafe: 5997.2734 | Init: 5548.7363 | Outside:   0.0000 | Gen: 3521.2327 | Time: 35.4s
+Epoch   150 | Total: 14400.9805 | Goal:   0.0000 | Unsafe: 6682.3184 | Init: 4272.0371 | Outside:   0.0000 | Gen: 3446.6245 | Time: 37.1s
+Epoch   160 | Total: 13611.6777 | Goal:   0.0000 | Unsafe: 7551.6792 | Init: 2562.4304 | Outside:   0.0000 | Gen: 3497.5688 | Time: 38.8s
+Epoch   170 | Total: 12705.5859 | Goal:   0.0000 | Unsafe: 8120.2534 | Init: 885.0032 | Outside:   1.2049 | Gen: 3699.1238 | Time: 40.6s
+Epoch   180 | Total: 12206.9355 | Goal:   0.0000 | Unsafe: 6963.2402 | Init: 1548.7473 | Outside:   0.1844 | Gen: 3694.7632 | Time: 42.3s
+Epoch   190 | Total: 12143.5469 | Goal:   0.0000 | Unsafe: 8574.4033 | Init:   0.0000 | Outside:  56.7730 | Gen: 3512.3699 | Time: 44.0s
+Epoch   200 | Total: 10733.7930 | Goal:   0.0000 | Unsafe: 7067.8081 | Init: 251.7692 | Outside:  13.8993 | Gen: 3400.3164 | Time: 45.8s
+Epoch   210 | Total: 10008.6162 | Goal:   0.0000 | Unsafe: 6283.5620 | Init: 379.3896 | Outside:  14.4489 | Gen: 3331.2158 | Time: 47.5s
+Epoch   220 | Total: 9306.3350 | Goal:   0.0000 | Unsafe: 5323.0225 | Init: 738.7233 | Outside:  10.1334 | Gen: 3234.4563 | Time: 49.2s
+Epoch   230 | Total: 8384.7822 | Goal:   0.0000 | Unsafe: 4863.2012 | Init: 383.9292 | Outside:  22.7273 | Gen: 3114.9246 | Time: 51.4s
+Epoch   240 | Total: 7618.5420 | Goal:   0.0000 | Unsafe: 3950.9355 | Init: 648.8998 | Outside:  18.0028 | Gen: 3000.7039 | Time: 53.1s
+Refining outside cells: 193 failing, refined 100 cells, 3950 total
+Rebuilt V cache with 16243 cells
+Epoch   250 | Total: 6706.9414 | Goal:   0.0000 | Unsafe: 3607.1030 | Init: 165.8950 | Outside:  22.7827 | Gen: 2911.1604 | Time: 55.3s
+Epoch   260 | Total: 6008.6504 | Goal:   0.0000 | Unsafe: 2975.9524 | Init: 220.1484 | Outside:  22.9387 | Gen: 2789.6108 | Time: 57.1s
+Epoch   270 | Total: 5453.0615 | Goal:   0.0000 | Unsafe: 2604.7437 | Init: 125.5284 | Outside:  31.4417 | Gen: 2691.3477 | Time: 58.7s
+Epoch   280 | Total: 5020.7588 | Goal:   0.0000 | Unsafe: 2187.1340 | Init: 194.8655 | Outside:  29.0145 | Gen: 2609.7451 | Time: 60.8s
+Epoch   290 | Total: 4730.9062 | Goal:   0.0000 | Unsafe: 1827.0746 | Init: 386.1046 | Outside:  22.7918 | Gen: 2494.9351 | Time: 62.5s
+Epoch   300 | Total: 4398.8101 | Goal:   0.0000 | Unsafe: 1936.3654 | Init:  20.2975 | Outside:  73.2794 | Gen: 2368.8679 | Time: 64.2s
+Epoch   310 | Total: 5147.6836 | Goal:   0.6720 | Unsafe: 2487.9080 | Init:   0.0000 | Outside: 424.3101 | Gen: 2234.7937 | Time: 65.9s
+Epoch   320 | Total: 4016.9849 | Goal:   0.0000 | Unsafe: 1326.9755 | Init: 514.3324 | Outside:  19.9427 | Gen: 2155.7344 | Time: 67.7s
+Epoch   330 | Total: 3728.1011 | Goal:   0.0000 | Unsafe: 1575.7965 | Init:   8.1233 | Outside:  91.0569 | Gen: 2053.1245 | Time: 69.4s
+Epoch   340 | Total: 3471.2954 | Goal:   0.0000 | Unsafe: 1382.5598 | Init:  53.7566 | Outside:  52.7874 | Gen: 1982.1918 | Time: 71.2s
+Epoch   350 | Total: 3417.4915 | Goal:   0.0000 | Unsafe: 1207.7523 | Init: 265.0117 | Outside:  25.6821 | Gen: 1919.0454 | Time: 72.9s
+Epoch   360 | Total: 3255.8000 | Goal:   0.0000 | Unsafe: 1309.1523 | Init:  37.2157 | Outside:  57.8453 | Gen: 1851.5867 | Time: 74.6s
+Epoch   370 | Total: 3279.5081 | Goal:   0.0000 | Unsafe: 1380.0967 | Init:   4.0438 | Outside:  98.9956 | Gen: 1796.3721 | Time: 76.2s
+Epoch   380 | Total: 3270.4443 | Goal:   0.0000 | Unsafe: 1075.9425 | Init: 404.5798 | Outside:  20.6820 | Gen: 1769.2399 | Time: 78.0s
+Epoch   390 | Total: 3126.6616 | Goal:   0.0000 | Unsafe: 1306.0044 | Init:   5.1741 | Outside:  90.7209 | Gen: 1724.7621 | Time: 79.9s
+Epoch   400 | Total: 2986.9229 | Goal:   0.0000 | Unsafe: 1201.6747 | Init:  31.3221 | Outside:  56.6542 | Gen: 1697.2717 | Time: 81.7s
+Epoch   410 | Total: 2983.1387 | Goal:   0.0000 | Unsafe: 1071.3607 | Init: 214.8054 | Outside:  26.0338 | Gen: 1670.9386 | Time: 83.5s
+Epoch   420 | Total: 2901.6782 | Goal:   0.0000 | Unsafe: 1184.9060 | Init:  20.2718 | Outside:  62.6447 | Gen: 1633.8556 | Time: 85.3s
+Epoch   430 | Total: 2874.0522 | Goal:   0.0000 | Unsafe: 1186.8420 | Init:  13.4230 | Outside:  69.0570 | Gen: 1604.7303 | Time: 87.0s
+Epoch   440 | Total: 2888.7080 | Goal:   0.0000 | Unsafe: 1018.3738 | Init: 262.3007 | Outside:  23.1143 | Gen: 1584.9191 | Time: 88.7s
+Epoch   450 | Total: 2795.6458 | Goal:   0.0000 | Unsafe: 1162.5341 | Init:  11.8752 | Outside:  69.6130 | Gen: 1551.6234 | Time: 90.4s
+Epoch   460 | Total: 2747.8105 | Goal:   0.0000 | Unsafe: 1143.7616 | Init:  13.7406 | Outside:  65.9532 | Gen: 1524.3553 | Time: 92.2s
+Epoch   470 | Total: 2763.5703 | Goal:   0.0000 | Unsafe: 991.1573 | Init: 243.5149 | Outside:  23.2179 | Gen: 1505.6802 | Time: 93.9s
+Epoch   480 | Total: 2685.0908 | Goal:   0.0000 | Unsafe: 1126.7406 | Init:  10.2639 | Outside:  68.9752 | Gen: 1479.1111 | Time: 95.6s
+Epoch   490 | Total: 2629.5645 | Goal:   0.0000 | Unsafe: 1090.5009 | Init:  17.8402 | Outside:  59.3562 | Gen: 1461.8672 | Time: 97.4s
+Refining outside cells: 371 failing, refined 100 cells, 4650 total
+Refining generator cells: 188 failing, refined 100 cells, 2444 total
+Rebuilt V cache with 16943 cells
+Rebuilt Phi cache with 2444 cells
+Merging outside cells: merged 3577 pairs, 1073 total
+Merging generator cells: merged 38 pairs, 2406 total
+Epoch   500 | Total: 1631.8224 | Goal:   0.0000 | Unsafe: 958.1840 | Init: 218.4675 | Outside:  18.6197 | Gen: 436.5511 | Time: 100.5s
+Rebuilt V cache with 13366 cells
+Rebuilt Phi cache with 2406 cells
+Epoch   510 | Total: 1608.2163 | Goal:   0.0000 | Unsafe: 1025.4996 | Init:  21.2623 | Outside: 128.4783 | Gen: 432.9759 | Time: 103.2s
+Epoch   520 | Total: 1576.4230 | Goal:   0.0000 | Unsafe: 974.4558 | Init:  17.4315 | Outside: 140.7240 | Gen: 443.8117 | Time: 105.5s
+Epoch   530 | Total: 1547.8710 | Goal:   0.0000 | Unsafe: 849.0325 | Init: 141.8776 | Outside: 103.2545 | Gen: 453.7063 | Time: 107.7s
+Epoch   540 | Total: 1513.6155 | Goal:   0.0000 | Unsafe: 887.0955 | Init:  23.8953 | Outside: 147.4749 | Gen: 455.1499 | Time: 109.8s
+Epoch   550 | Total: 1481.7737 | Goal:   0.0000 | Unsafe: 844.4001 | Init:  41.3642 | Outside: 139.4380 | Gen: 456.5714 | Time: 112.1s
+Epoch   560 | Total: 1473.8855 | Goal:   0.0000 | Unsafe: 793.9152 | Init: 106.4946 | Outside: 119.1239 | Gen: 454.3520 | Time: 114.1s
+Epoch   570 | Total: 1452.5267 | Goal:   0.0000 | Unsafe: 820.5854 | Init:  34.0689 | Outside: 148.4127 | Gen: 449.4597 | Time: 116.3s
+Epoch   580 | Total: 1434.6896 | Goal:   0.0000 | Unsafe: 803.3300 | Init:  42.5497 | Outside: 144.0383 | Gen: 444.7716 | Time: 118.5s
+Epoch   590 | Total: 1423.2538 | Goal:   0.0000 | Unsafe: 773.1161 | Init:  81.6991 | Outside: 128.2002 | Gen: 440.2383 | Time: 120.7s
+Epoch   600 | Total: 1406.2311 | Goal:   0.0000 | Unsafe: 782.7061 | Init:  48.8428 | Outside: 141.0289 | Gen: 433.6533 | Time: 123.1s
+Epoch   610 | Total: 1393.0435 | Goal:   0.0000 | Unsafe: 775.5308 | Init:  53.4137 | Outside: 138.0959 | Gen: 426.0032 | Time: 125.3s
+Epoch   620 | Total: 1380.4939 | Goal:   0.0000 | Unsafe: 771.6511 | Init:  52.4597 | Outside: 137.8078 | Gen: 418.5753 | Time: 127.6s
+Epoch   630 | Total: 1368.9861 | Goal:   0.0000 | Unsafe: 763.4037 | Init:  56.5218 | Outside: 135.6457 | Gen: 413.4148 | Time: 129.8s
+Epoch   640 | Total: 1357.3252 | Goal:   0.0000 | Unsafe: 759.4408 | Init:  55.0657 | Outside: 135.5128 | Gen: 407.3059 | Time: 131.9s
+Epoch   650 | Total: 1345.7068 | Goal:   0.0000 | Unsafe: 756.1932 | Init:  51.4707 | Outside: 136.5808 | Gen: 401.4619 | Time: 134.0s
+Epoch   660 | Total: 1333.9351 | Goal:   0.0000 | Unsafe: 749.2126 | Init:  53.8086 | Outside: 134.9774 | Gen: 395.9365 | Time: 136.2s
+Epoch   670 | Total: 1321.7000 | Goal:   0.0000 | Unsafe: 740.4924 | Init:  54.2378 | Outside: 134.7087 | Gen: 392.2610 | Time: 138.3s
+Epoch   680 | Total: 1308.5403 | Goal:   0.0000 | Unsafe: 732.7028 | Init:  51.7114 | Outside: 135.7219 | Gen: 388.4042 | Time: 140.6s
+Epoch   690 | Total: 1294.9907 | Goal:   0.0000 | Unsafe: 721.9946 | Init:  52.7834 | Outside: 135.0980 | Gen: 385.1147 | Time: 142.7s
+Epoch   700 | Total: 1279.5162 | Goal:   0.0000 | Unsafe: 708.7250 | Init:  55.3634 | Outside: 133.7537 | Gen: 381.6741 | Time: 144.8s
+Epoch   710 | Total: 1262.4084 | Goal:   0.0000 | Unsafe: 696.2257 | Init:  51.3551 | Outside: 135.5450 | Gen: 379.2827 | Time: 146.9s
+Epoch   720 | Total: 1241.9285 | Goal:   0.0000 | Unsafe: 678.8306 | Init:  51.6486 | Outside: 135.1940 | Gen: 376.2553 | Time: 149.0s
+Epoch   730 | Total: 1217.0935 | Goal:   0.0000 | Unsafe: 653.9037 | Init:  53.0436 | Outside: 134.5189 | Gen: 375.6273 | Time: 151.1s
+Epoch   740 | Total: 1187.1880 | Goal:   0.0000 | Unsafe: 627.7145 | Init:  47.7810 | Outside: 136.6436 | Gen: 375.0488 | Time: 153.2s
+Refining outside cells: 385 failing, refined 100 cells, 1773 total
+Rebuilt V cache with 14066 cells
+Epoch   750 | Total: 1129.8354 | Goal:   0.0000 | Unsafe: 588.2003 | Init:  54.7312 | Outside: 111.2373 | Gen: 375.6667 | Time: 155.7s
+Epoch   760 | Total: 1088.2939 | Goal:   0.0000 | Unsafe: 561.5051 | Init:  37.3995 | Outside: 117.9514 | Gen: 371.4378 | Time: 157.8s
+Epoch   770 | Total: 1038.4955 | Goal:   0.0000 | Unsafe: 511.3676 | Init:  40.3492 | Outside: 114.9054 | Gen: 371.8733 | Time: 159.9s
+Epoch   780 | Total:  984.6353 | Goal:   0.0000 | Unsafe: 455.1719 | Init:  50.9897 | Outside: 107.4332 | Gen: 371.0404 | Time: 162.2s
+Epoch   790 | Total:  924.1111 | Goal:   0.0000 | Unsafe: 397.7714 | Init:  44.3332 | Outside: 107.7635 | Gen: 374.2429 | Time: 164.3s
+Epoch   800 | Total:  862.0774 | Goal:   0.0000 | Unsafe: 322.3628 | Init:  36.3038 | Outside: 111.4868 | Gen: 391.9240 | Time: 166.7s
+Epoch   810 | Total:  806.7401 | Goal:   0.0000 | Unsafe: 258.9102 | Init:  38.5224 | Outside: 107.6643 | Gen: 401.6431 | Time: 168.8s
+Epoch   820 | Total:  764.6650 | Goal:   0.0000 | Unsafe: 224.0370 | Init:  33.7135 | Outside: 107.2152 | Gen: 399.6993 | Time: 171.1s
+Epoch   830 | Total:  727.2239 | Goal:   0.0000 | Unsafe: 203.8579 | Init:  32.5456 | Outside: 104.0849 | Gen: 386.7355 | Time: 173.2s
+Epoch   840 | Total:  695.4243 | Goal:   0.0000 | Unsafe: 180.2577 | Init:  32.0288 | Outside: 101.0980 | Gen: 382.0397 | Time: 175.4s
+Epoch   850 | Total:  667.2316 | Goal:   0.0000 | Unsafe: 172.0519 | Init:  30.1759 | Outside:  97.7238 | Gen: 367.2799 | Time: 177.5s
+Epoch   860 | Total:  640.3428 | Goal:   0.0000 | Unsafe: 159.4818 | Init:  30.8652 | Outside:  93.1360 | Gen: 356.8599 | Time: 179.5s
+Epoch   870 | Total:  615.0165 | Goal:   0.0000 | Unsafe: 148.5282 | Init:  25.7942 | Outside:  91.9669 | Gen: 348.7272 | Time: 181.8s
+Epoch   880 | Total:  590.3271 | Goal:   0.0000 | Unsafe: 140.6677 | Init:  27.8695 | Outside:  86.6030 | Gen: 335.1870 | Time: 184.0s
+Epoch   890 | Total:  566.0021 | Goal:   0.0000 | Unsafe: 134.0558 | Init:  26.4142 | Outside:  83.6267 | Gen: 321.9055 | Time: 186.3s
+Epoch   900 | Total:  544.7150 | Goal:   0.0000 | Unsafe: 122.7582 | Init:  25.6259 | Outside:  80.5858 | Gen: 315.7451 | Time: 188.5s
+Epoch   910 | Total:  524.8281 | Goal:   0.0000 | Unsafe: 114.7164 | Init:  23.5166 | Outside:  78.5548 | Gen: 308.0403 | Time: 190.7s
+Epoch   920 | Total:  507.5892 | Goal:   0.0000 | Unsafe: 107.9804 | Init:  23.5404 | Outside:  75.4632 | Gen: 300.6053 | Time: 192.9s
+Epoch   930 | Total:  492.6840 | Goal:   0.0000 | Unsafe: 100.9551 | Init:  23.0651 | Outside:  73.1815 | Gen: 295.4822 | Time: 195.2s
+Epoch   940 | Total:  478.4229 | Goal:   0.0000 | Unsafe:  98.4307 | Init:  23.1505 | Outside:  70.7039 | Gen: 286.1378 | Time: 197.4s
+Epoch   950 | Total:  465.1783 | Goal:   0.0000 | Unsafe:  92.4531 | Init:  23.3954 | Outside:  68.5472 | Gen: 280.7826 | Time: 199.7s
+Epoch   960 | Total:  452.5971 | Goal:   0.0000 | Unsafe:  84.7396 | Init:  21.3756 | Outside:  68.0312 | Gen: 278.4507 | Time: 202.1s
+Epoch   970 | Total:  440.9930 | Goal:   0.0000 | Unsafe:  78.0031 | Init:  21.9558 | Outside:  65.9344 | Gen: 275.0997 | Time: 204.3s
+Epoch   980 | Total:  430.0822 | Goal:   0.0000 | Unsafe:  73.4075 | Init:  21.2738 | Outside:  64.6418 | Gen: 270.7590 | Time: 206.6s
+Epoch   990 | Total:  419.4327 | Goal:   0.0000 | Unsafe:  70.7299 | Init:  20.5958 | Outside:  63.4830 | Gen: 264.6240 | Time: 208.8s
+Refining outside cells: 243 failing, refined 100 cells, 2473 total
+Refining generator cells: 129 failing, refined 100 cells, 3106 total
+Rebuilt V cache with 14766 cells
+Rebuilt Phi cache with 3106 cells
+Epoch  1000 | Total:  160.7171 | Goal:   0.0000 | Unsafe:  66.0362 | Init:  21.0845 | Outside:  40.0389 | Gen:  33.5574 | Time: 212.1s
+=== Detailed Evaluation ===
+Goal:      PASS, V bounds: [  0.419,   0.616] | 2197/2197 pass (100.0%)
+Unsafe:    FAIL, V bounds: [  3.641,  55.619] | 5839/6000 pass (97.3%)
+Init:      FAIL, V bounds: [  0.296,   1.220] | 3682/4096 pass (89.9%)
+Outside:   FAIL, V bounds: [ -1.212,  55.720] | 2279/2473 pass (92.2%)
+Generator: FAIL, GV bounds: [-2433.869,   1.134] | 3014/3106 pass (97.0%)
+Saved visualization plots for epoch 1000 to 'training_progress'
+Merging outside cells: merged 629 pairs, 1844 total
+Merging generator cells: merged 152 pairs, 2954 total
+Rebuilt V cache with 14137 cells
+Rebuilt Phi cache with 2954 cells
+Epoch  1010 | Total:  248.8926 | Goal:   0.0000 | Unsafe:  54.3102 | Init:  22.1014 | Outside:  58.4336 | Gen: 114.0475 | Time: 225.5s
+Epoch  1020 | Total:  221.7370 | Goal:   0.0000 | Unsafe:  55.8126 | Init:  26.2321 | Outside:  55.1712 | Gen:  84.5211 | Time: 228.2s
+Epoch  1030 | Total:  209.1901 | Goal:   0.0000 | Unsafe:  39.7543 | Init:  18.8897 | Outside:  59.1626 | Gen:  91.3836 | Time: 231.0s
+Epoch  1040 | Total:  200.0086 | Goal:   0.0000 | Unsafe:  41.8818 | Init:  23.1373 | Outside:  54.5203 | Gen:  80.4692 | Time: 233.7s
+Epoch  1050 | Total:  193.5813 | Goal:   0.0000 | Unsafe:  35.4717 | Init:  26.0038 | Outside:  51.6639 | Gen:  80.4420 | Time: 236.3s
+Epoch  1060 | Total:  190.7903 | Goal:   0.0000 | Unsafe:  38.5335 | Init:  10.5682 | Outside:  62.7989 | Gen:  78.8897 | Time: 239.3s
+Epoch  1070 | Total:  182.1930 | Goal:   0.0000 | Unsafe:  34.5578 | Init:  17.3972 | Outside:  54.4053 | Gen:  75.8327 | Time: 242.3s
+Epoch  1080 | Total:  218.7924 | Goal:   0.0000 | Unsafe:  21.9017 | Init:  87.3943 | Outside:  34.5301 | Gen:  74.9663 | Time: 246.0s
+Epoch  1090 | Total:  174.3465 | Goal:   0.0000 | Unsafe:  34.5344 | Init:  12.7720 | Outside:  56.2079 | Gen:  70.8322 | Time: 249.1s
+Epoch  1100 | Total:  168.9371 | Goal:   0.0000 | Unsafe:  33.3803 | Init:  15.7090 | Outside:  52.7915 | Gen:  67.0563 | Time: 252.9s
+Epoch  1110 | Total:  165.6702 | Goal:   0.0000 | Unsafe:  29.9778 | Init:  25.5420 | Outside:  46.2916 | Gen:  63.8588 | Time: 255.6s
+Epoch  1120 | Total:  160.4068 | Goal:   0.0000 | Unsafe:  30.4309 | Init:  19.1266 | Outside:  49.1721 | Gen:  61.6773 | Time: 258.2s
+Epoch  1130 | Total:  156.4803 | Goal:   0.0000 | Unsafe:  30.6216 | Init:  16.0512 | Outside:  50.8721 | Gen:  58.9354 | Time: 261.0s
+Epoch  1140 | Total:  152.3791 | Goal:   0.0000 | Unsafe:  28.9537 | Init:  18.2578 | Outside:  48.8542 | Gen:  56.3134 | Time: 263.7s
+Epoch  1150 | Total:  148.4166 | Goal:   0.0000 | Unsafe:  28.1583 | Init:  17.0706 | Outside:  49.2529 | Gen:  53.9347 | Time: 266.5s
+Epoch  1160 | Total:  144.5787 | Goal:   0.0000 | Unsafe:  27.5586 | Init:  15.9400 | Outside:  49.6220 | Gen:  51.4580 | Time: 269.1s
+Epoch  1170 | Total:  140.6579 | Goal:   0.0000 | Unsafe:  26.8834 | Init:  16.2377 | Outside:  49.0076 | Gen:  48.5292 | Time: 271.7s
+Epoch  1180 | Total:  137.4383 | Goal:   0.0000 | Unsafe:  24.7259 | Init:  16.2926 | Outside:  48.2906 | Gen:  48.1292 | Time: 274.2s
+Epoch  1190 | Total:  134.7691 | Goal:   0.0000 | Unsafe:  23.1898 | Init:  16.5936 | Outside:  47.2260 | Gen:  47.7596 | Time: 276.9s
+Epoch  1200 | Total:  132.7201 | Goal:   0.0000 | Unsafe:  21.4281 | Init:  17.6975 | Outside:  45.7299 | Gen:  47.8646 | Time: 279.4s
+Epoch  1210 | Total:  130.5524 | Goal:   0.0000 | Unsafe:  21.7504 | Init:  15.3648 | Outside:  46.5539 | Gen:  46.8833 | Time: 281.9s
+Epoch  1220 | Total:  128.5897 | Goal:   0.0000 | Unsafe:  21.7831 | Init:  14.5348 | Outside:  46.4242 | Gen:  45.8476 | Time: 284.5s
+Epoch  1230 | Total:  126.6757 | Goal:   0.0000 | Unsafe:  21.2731 | Init:  15.3284 | Outside:  45.0771 | Gen:  44.9971 | Time: 287.1s
+Epoch  1240 | Total:  124.7587 | Goal:   0.0000 | Unsafe:  20.8371 | Init:  15.4180 | Outside:  44.3194 | Gen:  44.1842 | Time: 289.6s
+Refining outside cells: 230 failing, refined 100 cells, 2544 total
+Rebuilt V cache with 14837 cells
+Epoch  1250 | Total:  106.3911 | Goal:   0.0000 | Unsafe:  20.5922 | Init:  15.4410 | Outside:  27.2042 | Gen:  43.1537 | Time: 292.6s
+Epoch  1260 | Total:  106.5013 | Goal:   0.0000 | Unsafe:  23.4765 | Init:   6.5497 | Outside:  34.1254 | Gen:  42.3497 | Time: 295.2s
+Epoch  1270 | Total:  103.5564 | Goal:   0.0000 | Unsafe:  21.5749 | Init:   7.8534 | Outside:  32.5455 | Gen:  41.5827 | Time: 297.9s
+Epoch  1280 | Total:  103.5251 | Goal:   0.0000 | Unsafe:  16.8257 | Init:  20.7839 | Outside:  25.0211 | Gen:  40.8944 | Time: 300.4s
+Epoch  1290 | Total:  101.0080 | Goal:   0.0000 | Unsafe:  20.7718 | Init:   6.9095 | Outside:  33.7196 | Gen:  39.6071 | Time: 303.0s
+Epoch  1300 | Total:   98.6003 | Goal:   0.0000 | Unsafe:  19.4433 | Init:   8.3383 | Outside:  31.9507 | Gen:  38.8680 | Time: 305.5s
+Epoch  1310 | Total:  100.4320 | Goal:   0.0000 | Unsafe:  14.8861 | Init:  23.0017 | Outside:  24.0731 | Gen:  38.4711 | Time: 308.0s
+Epoch  1320 | Total:   98.0577 | Goal:   0.0000 | Unsafe:  19.8581 | Init:   5.4910 | Outside:  35.2187 | Gen:  37.4898 | Time: 310.6s
+Epoch  1330 | Total:   95.0403 | Goal:   0.0000 | Unsafe:  18.6226 | Init:   7.1489 | Outside:  32.5524 | Gen:  36.7164 | Time: 313.1s
+Epoch  1340 | Total:  404.7151 | Goal:   0.0000 | Unsafe:   3.5306 | Init: 354.6867 | Outside:   8.4328 | Gen:  38.0650 | Time: 315.7s
+Epoch  1350 | Total:  172.5653 | Goal:   0.0000 | Unsafe:  36.9360 | Init:   0.0000 | Outside:  96.2619 | Gen:  39.3674 | Time: 318.2s
+Epoch  1360 | Total:   97.9506 | Goal:   0.0000 | Unsafe:  14.2919 | Init:  26.4352 | Outside:  19.9848 | Gen:  37.2387 | Time: 320.8s
+Epoch  1370 | Total:   96.7149 | Goal:   0.0000 | Unsafe:  14.9132 | Init:  27.3432 | Outside:  19.5334 | Gen:  34.9250 | Time: 323.4s
+Epoch  1380 | Total:   87.6337 | Goal:   0.0000 | Unsafe:  19.1145 | Init:   8.3942 | Outside:  26.3350 | Gen:  33.7901 | Time: 325.9s
+Epoch  1390 | Total:   87.1580 | Goal:   0.0000 | Unsafe:  18.8383 | Init:   6.2145 | Outside:  28.6287 | Gen:  33.4765 | Time: 328.4s
+Epoch  1400 | Total:   85.2669 | Goal:   0.0000 | Unsafe:  17.5445 | Init:   7.2345 | Outside:  27.7433 | Gen:  32.7447 | Time: 330.9s
+Epoch  1410 | Total:   83.7992 | Goal:   0.0000 | Unsafe:  16.7742 | Init:   8.1280 | Outside:  27.0474 | Gen:  31.8496 | Time: 333.4s
+Epoch  1420 | Total:   82.4807 | Goal:   0.0000 | Unsafe:  15.8936 | Init:   8.6921 | Outside:  26.6049 | Gen:  31.2901 | Time: 336.0s
+Epoch  1430 | Total:   81.2999 | Goal:   0.0000 | Unsafe:  15.2846 | Init:   9.3407 | Outside:  26.0589 | Gen:  30.6157 | Time: 338.4s
+Epoch  1440 | Total:   80.2849 | Goal:   0.0000 | Unsafe:  14.6777 | Init:  10.5477 | Outside:  25.1334 | Gen:  29.9261 | Time: 341.0s
+Epoch  1450 | Total:   79.1938 | Goal:   0.0000 | Unsafe:  14.8607 | Init:   9.1958 | Outside:  25.9136 | Gen:  29.2237 | Time: 343.5s
+Epoch  1460 | Total:   78.3264 | Goal:   0.0000 | Unsafe:  14.3538 | Init:   9.1386 | Outside:  25.8410 | Gen:  28.9931 | Time: 346.1s
+Epoch  1470 | Total:   77.4075 | Goal:   0.0000 | Unsafe:  13.6000 | Init:   9.4036 | Outside:  25.4869 | Gen:  28.9170 | Time: 348.8s
+Epoch  1480 | Total:   76.6350 | Goal:   0.0000 | Unsafe:  13.4475 | Init:   8.8673 | Outside:  25.7109 | Gen:  28.6093 | Time: 351.5s
+Epoch  1490 | Total:   75.8171 | Goal:   0.0000 | Unsafe:  12.9230 | Init:   9.5008 | Outside:  25.1375 | Gen:  28.2558 | Time: 354.0s
+Refining outside cells: 148 failing, refined 100 cells, 3244 total
+Refining generator cells: 69 failing, refined 69 cells, 3437 total
+Rebuilt V cache with 15537 cells
+Rebuilt Phi cache with 3437 cells
+Epoch  1500 | Total:   35.3830 | Goal:   0.0000 | Unsafe:  12.3236 | Init:   9.7966 | Outside:  12.1840 | Gen:   1.0788 | Time: 359.0s
+Merging outside cells: merged 630 pairs, 2614 total
+Merging generator cells: merged 38 pairs, 3399 total
+Rebuilt V cache with 14907 cells
+Rebuilt Phi cache with 3399 cells
+Epoch  1510 | Total:  111.2134 | Goal:   0.0000 | Unsafe:  31.5046 | Init:  15.2290 | Outside:  19.1775 | Gen:  45.3022 | Time: 363.4s
+Epoch  1520 | Total:   96.8155 | Goal:   0.0000 | Unsafe:  45.4355 | Init:  15.1932 | Outside:  20.6477 | Gen:  15.5390 | Time: 366.6s
+Epoch  1530 | Total:   86.8251 | Goal:   0.0000 | Unsafe:  31.6032 | Init:  11.8660 | Outside:  24.6693 | Gen:  18.6867 | Time: 369.6s
+Epoch  1540 | Total:   81.9228 | Goal:   0.0000 | Unsafe:  20.4485 | Init:  14.0563 | Outside:  23.6529 | Gen:  23.7651 | Time: 373.1s
+Epoch  1550 | Total:   76.9143 | Goal:   0.0000 | Unsafe:  21.7207 | Init:  13.3988 | Outside:  23.9253 | Gen:  17.8694 | Time: 376.7s
+Epoch  1560 | Total:   73.3911 | Goal:   0.0000 | Unsafe:  19.1238 | Init:  12.2940 | Outside:  24.5894 | Gen:  17.3838 | Time: 379.9s
+Epoch  1570 | Total:   70.6167 | Goal:   0.0000 | Unsafe:  17.4700 | Init:  13.7789 | Outside:  22.9975 | Gen:  16.3704 | Time: 382.9s
+Epoch  1580 | Total:   68.1152 | Goal:   0.0000 | Unsafe:  18.6935 | Init:  12.0955 | Outside:  23.5655 | Gen:  13.7608 | Time: 386.1s
+Epoch  1590 | Total:   65.8205 | Goal:   0.0000 | Unsafe:  19.0357 | Init:  10.9836 | Outside:  23.9762 | Gen:  11.8251 | Time: 389.6s
+Epoch  1600 | Total:   63.6914 | Goal:   0.0000 | Unsafe:  18.3212 | Init:  12.4747 | Outside:  22.8725 | Gen:  10.0231 | Time: 392.7s
+Epoch  1610 | Total:   61.6356 | Goal:   0.0000 | Unsafe:  18.4079 | Init:  11.7583 | Outside:  23.2990 | Gen:   8.1704 | Time: 395.8s
+Epoch  1620 | Total:   59.6548 | Goal:   0.0000 | Unsafe:  18.6913 | Init:  11.5787 | Outside:  23.4396 | Gen:   5.9452 | Time: 398.6s
+Epoch  1630 | Total:   57.9218 | Goal:   0.0000 | Unsafe:  17.6757 | Init:  12.0357 | Outside:  23.2291 | Gen:   4.9812 | Time: 401.6s
+Epoch  1640 | Total:   56.3489 | Goal:   0.0000 | Unsafe:  16.9464 | Init:  10.8621 | Outside:  24.2578 | Gen:   4.2826 | Time: 404.7s
+Epoch  1650 | Total:   54.8619 | Goal:   0.0000 | Unsafe:  15.7643 | Init:  10.7413 | Outside:  24.3926 | Gen:   3.9638 | Time: 407.6s
+Epoch  1660 | Total:   53.4951 | Goal:   0.0000 | Unsafe:  14.8455 | Init:  11.5896 | Outside:  23.5537 | Gen:   3.5063 | Time: 410.6s
+Epoch  1670 | Total:   52.4032 | Goal:   0.0000 | Unsafe:  13.8505 | Init:  13.3870 | Outside:  22.1235 | Gen:   3.0421 | Time: 413.4s
+Epoch  1680 | Total:   51.0539 | Goal:   0.0000 | Unsafe:  14.1218 | Init:  10.8310 | Outside:  23.4686 | Gen:   2.6325 | Time: 416.4s
+Epoch  1690 | Total:   50.1092 | Goal:   0.0000 | Unsafe:  13.2147 | Init:  11.2288 | Outside:  22.7803 | Gen:   2.8854 | Time: 419.6s
+Epoch  1700 | Total:   48.9705 | Goal:   0.0000 | Unsafe:  12.8515 | Init:  10.5906 | Outside:  22.8996 | Gen:   2.6289 | Time: 423.1s
+Epoch  1710 | Total:   47.9463 | Goal:   0.0000 | Unsafe:  12.5163 | Init:  10.9681 | Outside:  22.3148 | Gen:   2.1471 | Time: 426.2s
+Epoch  1720 | Total:   46.8618 | Goal:   0.0000 | Unsafe:  12.2626 | Init:  10.0677 | Outside:  22.6404 | Gen:   1.8911 | Time: 429.0s
+Epoch  1730 | Total:   46.1502 | Goal:   0.0000 | Unsafe:  12.0742 | Init:   9.5827 | Outside:  22.7141 | Gen:   1.7791 | Time: 432.1s
+Epoch  1740 | Total:   45.0316 | Goal:   0.0000 | Unsafe:  11.3603 | Init:   9.9923 | Outside:  22.0307 | Gen:   1.6483 | Time: 435.1s
+Refining outside cells: 174 failing, refined 100 cells, 3314 total
+Rebuilt V cache with 15607 cells
+Epoch  1750 | Total:   34.7918 | Goal:   0.0000 | Unsafe:  10.4601 | Init:  11.2142 | Outside:  11.3073 | Gen:   1.8102 | Time: 438.4s
+Epoch  1760 | Total:   33.1237 | Goal:   0.0000 | Unsafe:  11.5243 | Init:   6.4698 | Outside:  13.7260 | Gen:   1.4036 | Time: 441.4s
+Epoch  1770 | Total:   32.8686 | Goal:   0.0000 | Unsafe:  11.0107 | Init:   5.8512 | Outside:  14.4308 | Gen:   1.5759 | Time: 444.3s
+Epoch  1780 | Total:   31.6991 | Goal:   0.0000 | Unsafe:   9.2056 | Init:   7.7408 | Outside:  13.0998 | Gen:   1.6528 | Time: 447.2s
+Epoch  1790 | Total:   31.3542 | Goal:   0.0000 | Unsafe:   8.8167 | Init:   7.9843 | Outside:  13.0787 | Gen:   1.4745 | Time: 450.2s
+Epoch  1800 | Total:   31.2225 | Goal:   0.0000 | Unsafe:   8.8071 | Init:   5.8110 | Outside:  15.0609 | Gen:   1.5436 | Time: 453.1s
+Epoch  1810 | Total:   30.2093 | Goal:   0.0000 | Unsafe:   7.2282 | Init:   8.6060 | Outside:  12.7864 | Gen:   1.5887 | Time: 456.6s
+Epoch  1820 | Total:   29.5868 | Goal:   0.0000 | Unsafe:   7.2494 | Init:   7.4480 | Outside:  13.5138 | Gen:   1.3757 | Time: 459.8s
+Epoch  1830 | Total:   29.3619 | Goal:   0.0000 | Unsafe:   6.8946 | Init:   8.1232 | Outside:  12.9707 | Gen:   1.3734 | Time: 462.7s
+Epoch  1840 | Total:   28.9424 | Goal:   0.0000 | Unsafe:   6.7672 | Init:   7.9032 | Outside:  12.9609 | Gen:   1.3110 | Time: 465.7s
+Epoch  1850 | Total:   28.7658 | Goal:   0.0000 | Unsafe:   6.6645 | Init:   8.1343 | Outside:  12.6675 | Gen:   1.2995 | Time: 468.6s
+Epoch  1860 | Total:   28.4791 | Goal:   0.0000 | Unsafe:   6.1995 | Init:   8.2241 | Outside:  12.4905 | Gen:   1.5651 | Time: 472.2s
+Epoch  1870 | Total:   27.8418 | Goal:   0.0000 | Unsafe:   6.1654 | Init:   7.7438 | Outside:  12.6562 | Gen:   1.2764 | Time: 475.3s
+Epoch  1880 | Total:   27.8502 | Goal:   0.0000 | Unsafe:   5.9522 | Init:   8.5361 | Outside:  12.1111 | Gen:   1.2508 | Time: 478.1s
+Epoch  1890 | Total:   27.7067 | Goal:   0.0000 | Unsafe:   6.5925 | Init:   4.8891 | Outside:  14.8776 | Gen:   1.3475 | Time: 481.2s
+Epoch  1900 | Total:   26.8346 | Goal:   0.0000 | Unsafe:   5.7654 | Init:   7.0451 | Outside:  12.7170 | Gen:   1.3071 | Time: 484.3s
+Epoch  1910 | Total:   26.9844 | Goal:   0.0000 | Unsafe:   5.1735 | Init:   8.5340 | Outside:  11.8521 | Gen:   1.4249 | Time: 487.3s
+Epoch  1920 | Total:   26.8064 | Goal:   0.0000 | Unsafe:   4.9401 | Init:   9.0832 | Outside:  11.4700 | Gen:   1.3131 | Time: 490.4s
+Epoch  1930 | Total:   27.2280 | Goal:   0.0000 | Unsafe:   4.5934 | Init:  10.4997 | Outside:  10.8356 | Gen:   1.2993 | Time: 494.3s
+Epoch  1940 | Total:   26.1100 | Goal:   0.0000 | Unsafe:   5.7868 | Init:   5.0119 | Outside:  13.9882 | Gen:   1.3231 | Time: 498.0s
+Epoch  1950 | Total:   25.4018 | Goal:   0.0000 | Unsafe:   5.0618 | Init:   6.6156 | Outside:  12.4017 | Gen:   1.3227 | Time: 501.9s
+Epoch  1960 | Total:   25.3105 | Goal:   0.0000 | Unsafe:   5.1498 | Init:   6.1465 | Outside:  12.5092 | Gen:   1.5050 | Time: 505.1s
+Epoch  1970 | Total:   24.7891 | Goal:   0.0000 | Unsafe:   4.9779 | Init:   5.8066 | Outside:  12.7007 | Gen:   1.3039 | Time: 508.7s
+Epoch  1980 | Total:   24.5779 | Goal:   0.0000 | Unsafe:   4.9165 | Init:   6.2049 | Outside:  12.2973 | Gen:   1.1592 | Time: 511.9s
+Epoch  1990 | Total:   24.1987 | Goal:   0.0000 | Unsafe:   4.7931 | Init:   5.7856 | Outside:  12.4635 | Gen:   1.1565 | Time: 515.0s
+Refining outside cells: 103 failing, refined 100 cells, 4014 total
+Refining generator cells: 19 failing, refined 19 cells, 3532 total
+Rebuilt V cache with 16307 cells
+Rebuilt Phi cache with 3532 cells
+Epoch  2000 | Total:   11.7406 | Goal:   0.0000 | Unsafe:   4.7983 | Init:   5.2364 | Outside:   1.7060 | Gen:   0.0000 | Time: 519.3s
+=== Detailed Evaluation ===
+Goal:      PASS, V bounds: [  0.362,   0.551] | 2197/2197 pass (100.0%)
+Unsafe:    FAIL, V bounds: [  4.594,  71.163] | 5966/6000 pass (99.4%)
+Init:      FAIL, V bounds: [  0.251,   1.153] | 3961/4096 pass (96.7%)
+Outside:   FAIL, V bounds: [ -0.241,  72.665] | 3972/4014 pass (99.0%)
+Generator: PASS, GV bounds: [-2633.976,  -0.004] | 3532/3532 pass (100.0%)
+Saved visualization plots for epoch 2000 to 'training_progress'
+Merging outside cells: merged 416 pairs, 3598 total
+Merging generator cells: merged 5 pairs, 3527 total
+Rebuilt V cache with 15891 cells
+Rebuilt Phi cache with 3527 cells
+Epoch  2010 | Total:   32.8415 | Goal:   0.0000 | Unsafe:   1.7198 | Init:  28.4051 | Outside:   2.6189 | Gen:   0.0977 | Time: 539.6s
+Epoch  2020 | Total:   15.9643 | Goal:   0.0000 | Unsafe:   3.9037 | Init:   5.8263 | Outside:   6.1936 | Gen:   0.0408 | Time: 543.6s
+Epoch  2030 | Total:   15.3837 | Goal:   0.0000 | Unsafe:   3.7392 | Init:   4.3340 | Outside:   6.8561 | Gen:   0.4544 | Time: 547.7s
+Epoch  2040 | Total:   15.5894 | Goal:   0.0000 | Unsafe:   4.2959 | Init:   2.8831 | Outside:   8.3593 | Gen:   0.0512 | Time: 553.6s
+Epoch  2050 | Total:   20.5992 | Goal:   0.0000 | Unsafe:   2.3967 | Init:  14.7061 | Outside:   3.4393 | Gen:   0.0572 | Time: 558.4s
+Epoch  2060 | Total:   14.5843 | Goal:   0.0000 | Unsafe:   3.9363 | Init:   3.8156 | Outside:   6.7349 | Gen:   0.0975 | Time: 561.9s
+Epoch  2070 | Total:   15.8090 | Goal:   0.0000 | Unsafe:   4.5683 | Init:   2.2159 | Outside:   8.9580 | Gen:   0.0668 | Time: 565.4s
+Epoch  2080 | Total:   18.7748 | Goal:   0.0000 | Unsafe:   2.4221 | Init:  12.7236 | Outside:   3.5301 | Gen:   0.0991 | Time: 568.5s
+Epoch  2090 | Total:   14.5055 | Goal:   0.0000 | Unsafe:   4.1376 | Init:   2.7919 | Outside:   7.4996 | Gen:   0.0765 | Time: 571.6s
+Epoch  2100 | Total:   15.8513 | Goal:   0.0000 | Unsafe:   4.1572 | Init:   1.6790 | Outside:   9.6744 | Gen:   0.3407 | Time: 574.8s
+Epoch  2110 | Total:   18.5810 | Goal:   0.0000 | Unsafe:   2.1774 | Init:  12.9742 | Outside:   3.3214 | Gen:   0.1080 | Time: 577.8s
+Epoch  2120 | Total:   14.4722 | Goal:   0.0000 | Unsafe:   4.1197 | Init:   2.0419 | Outside:   8.2204 | Gen:   0.0901 | Time: 580.9s
+Epoch  2130 | Total:   17.2493 | Goal:   0.0000 | Unsafe:   4.9171 | Init:   1.1350 | Outside:  11.0289 | Gen:   0.1684 | Time: 584.2s
+Epoch  2140 | Total:   34.7070 | Goal:   0.0000 | Unsafe:   1.4361 | Init:  31.4617 | Outside:   1.7226 | Gen:   0.0866 | Time: 587.4s
+Epoch  2150 | Total:   22.5895 | Goal:   0.0000 | Unsafe:   6.4708 | Init:   0.4520 | Outside:  15.5359 | Gen:   0.1309 | Time: 590.5s
+Epoch  2160 | Total:   14.9564 | Goal:   0.0000 | Unsafe:   4.6626 | Init:   1.2972 | Outside:   8.5833 | Gen:   0.4132 | Time: 594.9s
+Epoch  2170 | Total:   14.1354 | Goal:   0.0000 | Unsafe:   4.4505 | Init:   1.4794 | Outside:   8.0859 | Gen:   0.1195 | Time: 598.8s
+Epoch  2180 | Total:   12.5083 | Goal:   0.0000 | Unsafe:   3.1424 | Init:   4.2687 | Outside:   4.9704 | Gen:   0.1268 | Time: 602.5s
+Epoch  2190 | Total:   12.2678 | Goal:   0.0000 | Unsafe:   3.1984 | Init:   3.3429 | Outside:   5.6130 | Gen:   0.1135 | Time: 605.8s
+Epoch  2200 | Total:   12.0922 | Goal:   0.0000 | Unsafe:   2.8804 | Init:   3.7596 | Outside:   5.2998 | Gen:   0.1524 | Time: 608.9s
+Epoch  2210 | Total:   12.0243 | Goal:   0.0000 | Unsafe:   2.9607 | Init:   3.2258 | Outside:   5.7194 | Gen:   0.1184 | Time: 611.9s
+Epoch  2220 | Total:   12.0513 | Goal:   0.0000 | Unsafe:   2.6117 | Init:   3.9440 | Outside:   5.1767 | Gen:   0.3189 | Time: 614.7s
+Epoch  2230 | Total:   11.8857 | Goal:   0.0000 | Unsafe:   2.8777 | Init:   2.9570 | Outside:   5.8591 | Gen:   0.1920 | Time: 617.6s
+Epoch  2240 | Total:   11.9160 | Goal:   0.0000 | Unsafe:   2.5807 | Init:   3.4543 | Outside:   5.4631 | Gen:   0.4179 | Time: 620.6s
+Refining outside cells: 70 failing, refined 70 cells, 4088 total
+Rebuilt V cache with 16381 cells
+Epoch  2250 | Total:    6.2848 | Goal:   0.0000 | Unsafe:   2.6205 | Init:   3.5041 | Outside:   0.0093 | Gen:   0.1508 | Time: 623.9s
+Epoch  2260 | Total:    7.1355 | Goal:   0.0000 | Unsafe:   3.7503 | Init:   0.7924 | Outside:   2.4725 | Gen:   0.1203 | Time: 626.7s
+Epoch  2270 | Total:   17.7776 | Goal:   0.0000 | Unsafe:   1.2453 | Init:  16.4204 | Outside:   0.0000 | Gen:   0.1119 | Time: 629.5s
+Epoch  2280 | Total:    6.3343 | Goal:   0.0000 | Unsafe:   3.1763 | Init:   0.9463 | Outside:   1.7604 | Gen:   0.4514 | Time: 632.5s
+Epoch  2290 | Total:    6.4121 | Goal:   0.0000 | Unsafe:   3.4760 | Init:   0.8200 | Outside:   1.8893 | Gen:   0.2268 | Time: 635.6s
+Epoch  2300 | Total:    6.5780 | Goal:   0.0000 | Unsafe:   2.0393 | Init:   4.4195 | Outside:   0.0000 | Gen:   0.1192 | Time: 638.4s
+Epoch  2310 | Total:    5.2271 | Goal:   0.0000 | Unsafe:   2.3011 | Init:   2.7777 | Outside:   0.0325 | Gen:   0.1158 | Time: 641.3s
+Epoch  2320 | Total:    4.6551 | Goal:   0.0000 | Unsafe:   2.4790 | Init:   1.6944 | Outside:   0.3731 | Gen:   0.1086 | Time: 644.2s
+Epoch  2330 | Total:    4.6352 | Goal:   0.0000 | Unsafe:   1.9993 | Init:   2.0289 | Outside:   0.2414 | Gen:   0.3656 | Time: 647.1s
+Epoch  2340 | Total:    4.4015 | Goal:   0.0000 | Unsafe:   1.9501 | Init:   1.9812 | Outside:   0.3188 | Gen:   0.1515 | Time: 650.0s
+Epoch  2350 | Total:    4.2221 | Goal:   0.0000 | Unsafe:   1.5690 | Init:   2.3552 | Outside:   0.1813 | Gen:   0.1166 | Time: 652.9s
+Epoch  2360 | Total:    4.3650 | Goal:   0.0000 | Unsafe:   1.7693 | Init:   1.7761 | Outside:   0.6639 | Gen:   0.1558 | Time: 655.8s
+Epoch  2370 | Total:    4.0654 | Goal:   0.0000 | Unsafe:   1.4303 | Init:   2.1724 | Outside:   0.3280 | Gen:   0.1347 | Time: 658.7s
+Epoch  2380 | Total:    4.7938 | Goal:   0.0000 | Unsafe:   1.6933 | Init:   2.9655 | Outside:   0.0845 | Gen:   0.0505 | Time: 661.7s
+Epoch  2390 | Total:    4.6985 | Goal:   0.0000 | Unsafe:   1.0702 | Init:   3.4133 | Outside:   0.0422 | Gen:   0.1728 | Time: 664.5s
+Epoch  2400 | Total:    4.3816 | Goal:   0.0000 | Unsafe:   1.6191 | Init:   2.5110 | Outside:   0.2139 | Gen:   0.0375 | Time: 667.5s
+Epoch  2410 | Total:    4.3459 | Goal:   0.0000 | Unsafe:   1.1449 | Init:   2.9314 | Outside:   0.0820 | Gen:   0.1876 | Time: 670.4s
+Epoch  2420 | Total:    4.3879 | Goal:   0.0000 | Unsafe:   1.7418 | Init:   2.2762 | Outside:   0.3002 | Gen:   0.0697 | Time: 673.3s
+Epoch  2430 | Total:    4.2748 | Goal:   0.0000 | Unsafe:   1.2568 | Init:   2.7394 | Outside:   0.1361 | Gen:   0.1426 | Time: 676.3s
+Epoch  2440 | Total:    4.0485 | Goal:   0.0000 | Unsafe:   1.0755 | Init:   2.7759 | Outside:   0.1216 | Gen:   0.0755 | Time: 679.7s
+Epoch  2450 | Total:    3.8415 | Goal:   0.0000 | Unsafe:   1.1545 | Init:   2.4340 | Outside:   0.1829 | Gen:   0.0701 | Time: 683.0s
+Epoch  2460 | Total:    3.6975 | Goal:   0.0000 | Unsafe:   1.0691 | Init:   2.3602 | Outside:   0.1711 | Gen:   0.0971 | Time: 686.1s
+Epoch  2470 | Total:    4.0355 | Goal:   0.0000 | Unsafe:   1.6553 | Init:   1.9627 | Outside:   0.3963 | Gen:   0.0213 | Time: 689.1s
+Epoch  2480 | Total:    3.6728 | Goal:   0.0000 | Unsafe:   1.1849 | Init:   1.6245 | Outside:   0.7195 | Gen:   0.1438 | Time: 692.2s
+Epoch  2490 | Total:    3.6167 | Goal:   0.0000 | Unsafe:   1.2272 | Init:   1.5384 | Outside:   0.7891 | Gen:   0.0620 | Time: 695.2s
+Refining outside cells: 31 failing, refined 31 cells, 4305 total
+Refining generator cells: 4 failing, refined 4 cells, 3555 total
+Rebuilt V cache with 16598 cells
+Rebuilt Phi cache with 3555 cells
+Epoch  2500 | Total:    3.4312 | Goal:   0.0000 | Unsafe:   1.6168 | Init:   1.6899 | Outside:   0.1246 | Gen:   0.0000 | Time: 699.1s
+Merging outside cells: merged 151 pairs, 4154 total
+Merging generator cells: merged 0 pairs, 3555 total
+Rebuilt V cache with 16447 cells
+Rebuilt Phi cache with 3555 cells
+Epoch  2510 | Total:    4.8921 | Goal:   0.0000 | Unsafe:   0.9859 | Init:   2.1412 | Outside:   1.4091 | Gen:   0.3559 | Time: 703.0s
+Epoch  2520 | Total:    4.8590 | Goal:   0.0000 | Unsafe:   0.9893 | Init:   2.1393 | Outside:   1.3932 | Gen:   0.3372 | Time: 706.1s
+Epoch  2530 | Total:    6.5710 | Goal:   0.0000 | Unsafe:   0.9836 | Init:   4.6085 | Outside:   0.9267 | Gen:   0.0523 | Time: 709.1s
+Epoch  2540 | Total: 6245.2109 | Goal:   0.0000 | Unsafe:   0.0000 | Init: 6243.9565 | Outside:   0.0000 | Gen:   1.2542 | Time: 713.6s
+Epoch  2550 | Total: 5292.5996 | Goal:   0.0000 | Unsafe:   0.0000 | Init: 5278.2964 | Outside:   0.0000 | Gen:  14.3033 | Time: 717.0s
+Epoch  2560 | Total:   72.2218 | Goal:   0.0000 | Unsafe:  48.1108 | Init:   0.0000 | Outside:  16.3441 | Gen:   7.7669 | Time: 720.8s
+Epoch  2570 | Total:  274.8468 | Goal:   0.0000 | Unsafe: 114.6119 | Init:   0.0000 | Outside: 145.7780 | Gen:  14.4570 | Time: 724.0s
+Epoch  2580 | Total:  132.2576 | Goal:   0.0000 | Unsafe:  93.9056 | Init:   0.0000 | Outside:  30.9391 | Gen:   7.4128 | Time: 727.4s
+Epoch  2590 | Total:   31.5620 | Goal:   0.0000 | Unsafe:  25.1178 | Init:   1.6859 | Outside:   0.0147 | Gen:   4.7436 | Time: 731.0s
+Refining outside cells: 2 failing, refined 2 cells, 4168 total
+Refining generator cells: 4 failing, refined 4 cells, 3583 total
+Rebuilt V cache with 16461 cells
+Rebuilt Phi cache with 3583 cells
+Epoch  2600 | Total:   23.5812 | Goal:   0.0000 | Unsafe:  13.5668 | Init:  10.0124 | Outside:   0.0000 | Gen:   0.0021 | Time: 735.4s
+Epoch  2610 | Total:   16.7953 | Goal:   0.0000 | Unsafe:   9.7910 | Init:   6.7668 | Outside:   0.0000 | Gen:   0.2374 | Time: 738.4s
+Epoch  2620 | Total:   11.3232 | Goal:   0.0000 | Unsafe:   8.0824 | Init:   2.9390 | Outside:   0.0000 | Gen:   0.3018 | Time: 741.6s
+Epoch  2630 | Total:    8.4626 | Goal:   0.0000 | Unsafe:   6.9692 | Init:   1.4065 | Outside:   0.0073 | Gen:   0.0795 | Time: 744.7s
+Epoch  2640 | Total:    7.0482 | Goal:   0.0000 | Unsafe:   6.1032 | Init:   0.8975 | Outside:   0.0470 | Gen:   0.0006 | Time: 747.8s
+Refining outside cells: 4 failing, refined 4 cells, 4196 total
+Rebuilt V cache with 16489 cells
+Epoch  2650 | Total:    6.0836 | Goal:   0.0000 | Unsafe:   5.1246 | Init:   0.8736 | Outside:   0.0000 | Gen:   0.0854 | Time: 751.1s
+Epoch  2660 | Total:    5.3731 | Goal:   0.0000 | Unsafe:   4.2248 | Init:   1.1483 | Outside:   0.0000 | Gen:   0.0000 | Time: 754.2s
+Epoch  2670 | Total:    4.5559 | Goal:   0.0000 | Unsafe:   3.5368 | Init:   1.0075 | Outside:   0.0116 | Gen:   0.0000 | Time: 757.5s
+Epoch  2680 | Total:    3.9945 | Goal:   0.0000 | Unsafe:   3.1280 | Init:   0.7082 | Outside:   0.0453 | Gen:   0.1129 | Time: 760.5s
+Epoch  2690 | Total:    3.4376 | Goal:   0.0000 | Unsafe:   2.7179 | Init:   0.6395 | Outside:   0.0662 | Gen:   0.0141 | Time: 763.4s
+Refining outside cells: 3 failing, refined 3 cells, 4217 total
+Rebuilt V cache with 16510 cells
+Epoch  2700 | Total:    3.2282 | Goal:   0.0000 | Unsafe:   2.6037 | Init:   0.6187 | Outside:   0.0000 | Gen:   0.0058 | Time: 767.1s
+Epoch  2710 | Total:    2.7987 | Goal:   0.0000 | Unsafe:   2.1716 | Init:   0.5824 | Outside:   0.0004 | Gen:   0.0443 | Time: 770.0s
+Epoch  2720 | Total:    2.8249 | Goal:   0.0000 | Unsafe:   2.0654 | Init:   0.6163 | Outside:   0.0000 | Gen:   0.1433 | Time: 773.0s
+Epoch  2730 | Total:    2.4985 | Goal:   0.0000 | Unsafe:   1.8314 | Init:   0.5665 | Outside:   0.0107 | Gen:   0.0899 | Time: 775.9s
+Epoch  2740 | Total:    2.2871 | Goal:   0.0000 | Unsafe:   1.7614 | Init:   0.5012 | Outside:   0.0245 | Gen:   0.0000 | Time: 778.8s
+Refining outside cells: 3 failing, refined 3 cells, 4238 total
+Rebuilt V cache with 16531 cells
+Epoch  2750 | Total:    2.0979 | Goal:   0.0000 | Unsafe:   1.5718 | Init:   0.5128 | Outside:   0.0000 | Gen:   0.0134 | Time: 782.0s
+Epoch  2760 | Total:    1.9731 | Goal:   0.0000 | Unsafe:   1.4616 | Init:   0.4592 | Outside:   0.0121 | Gen:   0.0402 | Time: 784.8s
+Epoch  2770 | Total:    1.8136 | Goal:   0.0000 | Unsafe:   1.2990 | Init:   0.4889 | Outside:   0.0096 | Gen:   0.0161 | Time: 787.7s
+Epoch  2780 | Total:    1.6515 | Goal:   0.0000 | Unsafe:   1.1451 | Init:   0.4748 | Outside:   0.0140 | Gen:   0.0177 | Time: 790.6s
+Epoch  2790 | Total:    1.5902 | Goal:   0.0000 | Unsafe:   1.0817 | Init:   0.4667 | Outside:   0.0200 | Gen:   0.0218 | Time: 793.4s
+Refining outside cells: 4 failing, refined 4 cells, 4266 total
+Refining generator cells: 2 failing, refined 2 cells, 3597 total
+Rebuilt V cache with 16559 cells
+Rebuilt Phi cache with 3597 cells
+Epoch  2800 | Total:    1.4148 | Goal:   0.0000 | Unsafe:   0.9865 | Init:   0.4283 | Outside:   0.0000 | Gen:   0.0000 | Time: 797.3s
+Epoch  2810 | Total:    1.3196 | Goal:   0.0000 | Unsafe:   0.9795 | Init:   0.3292 | Outside:   0.0011 | Gen:   0.0098 | Time: 800.3s
+Epoch  2820 | Total:    1.2268 | Goal:   0.0000 | Unsafe:   0.8995 | Init:   0.3211 | Outside:   0.0063 | Gen:   0.0000 | Time: 803.3s
+Epoch  2830 | Total:    1.1972 | Goal:   0.0000 | Unsafe:   0.8527 | Init:   0.3355 | Outside:   0.0075 | Gen:   0.0016 | Time: 806.2s
+Epoch  2840 | Total:    1.1447 | Goal:   0.0000 | Unsafe:   0.7897 | Init:   0.3427 | Outside:   0.0084 | Gen:   0.0040 | Time: 809.0s
+Refining outside cells: 5 failing, refined 5 cells, 4301 total
+Rebuilt V cache with 16594 cells
+Epoch  2850 | Total:    1.1045 | Goal:   0.0000 | Unsafe:   0.7460 | Init:   0.3571 | Outside:   0.0000 | Gen:   0.0014 | Time: 812.3s
+Epoch  2860 | Total:    1.0659 | Goal:   0.0000 | Unsafe:   0.6278 | Init:   0.3474 | Outside:   0.0025 | Gen:   0.0882 | Time: 815.1s
+Epoch  2870 | Total:    0.9956 | Goal:   0.0000 | Unsafe:   0.6511 | Init:   0.3266 | Outside:   0.0172 | Gen:   0.0008 | Time: 818.0s
+Epoch  2880 | Total:    1.0064 | Goal:   0.0000 | Unsafe:   0.6371 | Init:   0.3505 | Outside:   0.0134 | Gen:   0.0054 | Time: 820.9s
+Epoch  2890 | Total:    0.9983 | Goal:   0.0000 | Unsafe:   0.5027 | Init:   0.3911 | Outside:   0.0014 | Gen:   0.1030 | Time: 823.6s
+Refining outside cells: 8 failing, refined 8 cells, 4357 total
+Rebuilt V cache with 16650 cells
+Epoch  2900 | Total:    0.9335 | Goal:   0.0000 | Unsafe:   0.5794 | Init:   0.3535 | Outside:   0.0006 | Gen:   0.0000 | Time: 826.9s
+Epoch  2910 | Total:    0.8991 | Goal:   0.0000 | Unsafe:   0.5555 | Init:   0.3366 | Outside:   0.0070 | Gen:   0.0000 | Time: 829.7s
+Epoch  2920 | Total:    0.8437 | Goal:   0.0000 | Unsafe:   0.5215 | Init:   0.2972 | Outside:   0.0250 | Gen:   0.0000 | Time: 832.7s
+Epoch  2930 | Total:    0.8449 | Goal:   0.0000 | Unsafe:   0.5067 | Init:   0.3216 | Outside:   0.0166 | Gen:   0.0000 | Time: 835.7s
+Epoch  2940 | Total:    0.8042 | Goal:   0.0000 | Unsafe:   0.4427 | Init:   0.3457 | Outside:   0.0127 | Gen:   0.0031 | Time: 838.5s
+Refining outside cells: 7 failing, refined 7 cells, 4406 total
+Rebuilt V cache with 16699 cells
+Epoch  2950 | Total:    0.7355 | Goal:   0.0000 | Unsafe:   0.3703 | Init:   0.3549 | Outside:   0.0000 | Gen:   0.0102 | Time: 841.8s
+Epoch  2960 | Total:    0.7628 | Goal:   0.0000 | Unsafe:   0.4338 | Init:   0.3014 | Outside:   0.0256 | Gen:   0.0020 | Time: 844.7s
+Epoch  2970 | Total:    0.7281 | Goal:   0.0000 | Unsafe:   0.3707 | Init:   0.3537 | Outside:   0.0000 | Gen:   0.0036 | Time: 847.7s
+Epoch  2980 | Total:    0.7182 | Goal:   0.0000 | Unsafe:   0.3932 | Init:   0.3080 | Outside:   0.0170 | Gen:   0.0000 | Time: 850.6s
+Epoch  2990 | Total:    0.7324 | Goal:   0.0000 | Unsafe:   0.3888 | Init:   0.3373 | Outside:   0.0063 | Gen:   0.0000 | Time: 853.5s
+Refining outside cells: 12 failing, refined 12 cells, 4490 total
+Rebuilt V cache with 16783 cells
+Epoch  3000 | Total:    0.6420 | Goal:   0.0000 | Unsafe:   0.3146 | Init:   0.3274 | Outside:   0.0000 | Gen:   0.0000 | Time: 856.8s
+=== Detailed Evaluation ===
+Goal:      PASS, V bounds: [  0.304,   0.485] | 2197/2197 pass (100.0%)
+Unsafe:    FAIL, V bounds: [  4.856,  73.351] | 5995/6000 pass (99.9%)
+Init:      FAIL, V bounds: [  0.204,   1.066] | 4083/4096 pass (99.7%)
+Outside:   PASS, V bounds: [  0.001,  73.547] | 4490/4490 pass (100.0%)
+Generator: PASS, GV bounds: [-2427.483,  -0.002] | 3597/3597 pass (100.0%)
+Saved visualization plots for epoch 3000 to 'training_progress'
+Merging outside cells: merged 57 pairs, 4433 total
+Merging generator cells: merged 0 pairs, 3597 total
+Rebuilt V cache with 16726 cells
+Rebuilt Phi cache with 3597 cells
+Epoch  3010 | Total:    0.8692 | Goal:   0.0000 | Unsafe:   0.3534 | Init:   0.3021 | Outside:   0.2114 | Gen:   0.0022 | Time: 871.0s
+Epoch  3020 | Total:    0.8013 | Goal:   0.0000 | Unsafe:   0.2650 | Init:   0.3414 | Outside:   0.1922 | Gen:   0.0027 | Time: 873.9s
+Epoch  3030 | Total:    0.8584 | Goal:   0.0000 | Unsafe:   0.3490 | Init:   0.2990 | Outside:   0.2104 | Gen:   0.0000 | Time: 876.8s
+Epoch  3040 | Total:    0.7927 | Goal:   0.0000 | Unsafe:   0.2588 | Init:   0.3446 | Outside:   0.1893 | Gen:   0.0000 | Time: 879.7s
+Refining outside cells: 6 failing, refined 6 cells, 4475 total
+Rebuilt V cache with 16768 cells
+Epoch  3050 | Total:    0.6597 | Goal:   0.0000 | Unsafe:   0.3087 | Init:   0.3187 | Outside:   0.0005 | Gen:   0.0318 | Time: 882.9s
+Epoch  3060 | Total:    0.6024 | Goal:   0.0000 | Unsafe:   0.2880 | Init:   0.2985 | Outside:   0.0158 | Gen:   0.0000 | Time: 885.8s
+Epoch  3070 | Total:    0.5467 | Goal:   0.0000 | Unsafe:   0.2345 | Init:   0.2973 | Outside:   0.0150 | Gen:   0.0000 | Time: 888.6s
+Epoch  3080 | Total:    0.6348 | Goal:   0.0000 | Unsafe:   0.3195 | Init:   0.3050 | Outside:   0.0103 | Gen:   0.0000 | Time: 891.7s
+Epoch  3090 | Total:    0.5568 | Goal:   0.0000 | Unsafe:   0.2369 | Init:   0.3062 | Outside:   0.0137 | Gen:   0.0000 | Time: 894.5s
+Refining outside cells: 7 failing, refined 7 cells, 4524 total
+Rebuilt V cache with 16817 cells
+Epoch  3100 | Total:    0.5958 | Goal:   0.0000 | Unsafe:   0.2738 | Init:   0.3118 | Outside:   0.0000 | Gen:   0.0102 | Time: 898.7s
+Epoch  3110 | Total:    0.5337 | Goal:   0.0000 | Unsafe:   0.2338 | Init:   0.2810 | Outside:   0.0188 | Gen:   0.0000 | Time: 901.6s
+Epoch  3120 | Total:    0.5601 | Goal:   0.0000 | Unsafe:   0.2607 | Init:   0.2924 | Outside:   0.0071 | Gen:   0.0000 | Time: 905.5s
+Epoch  3130 | Total:    0.5464 | Goal:   0.0000 | Unsafe:   0.2470 | Init:   0.2978 | Outside:   0.0016 | Gen:   0.0000 | Time: 908.9s
+Epoch  3140 | Total:    0.5260 | Goal:   0.0000 | Unsafe:   0.1880 | Init:   0.2945 | Outside:   0.0080 | Gen:   0.0356 | Time: 912.7s
+Refining outside cells: 5 failing, refined 5 cells, 4559 total
+Rebuilt V cache with 16852 cells
+Epoch  3150 | Total:    0.5743 | Goal:   0.0000 | Unsafe:   0.2801 | Init:   0.2928 | Outside:   0.0013 | Gen:   0.0000 | Time: 916.4s
+Epoch  3160 | Total:    0.5115 | Goal:   0.0000 | Unsafe:   0.2188 | Init:   0.2863 | Outside:   0.0064 | Gen:   0.0000 | Time: 920.5s
+Epoch  3170 | Total:    0.5143 | Goal:   0.0000 | Unsafe:   0.1718 | Init:   0.2876 | Outside:   0.0063 | Gen:   0.0485 | Time: 924.2s
+Epoch  3180 | Total:    0.5457 | Goal:   0.0000 | Unsafe:   0.2561 | Init:   0.2849 | Outside:   0.0046 | Gen:   0.0000 | Time: 927.3s
+Epoch  3190 | Total:    0.4981 | Goal:   0.0000 | Unsafe:   0.2122 | Init:   0.2754 | Outside:   0.0105 | Gen:   0.0000 | Time: 930.2s
+Refining outside cells: 3 failing, refined 3 cells, 4580 total
+Refining generator cells: 1 failing, refined 1 cells, 3604 total
+Rebuilt V cache with 16873 cells
+Rebuilt Phi cache with 3604 cells
+Epoch  3200 | Total:    0.4429 | Goal:   0.0000 | Unsafe:   0.1618 | Init:   0.2773 | Outside:   0.0038 | Gen:   0.0000 | Time: 934.0s
+Epoch  3210 | Total:    0.5259 | Goal:   0.0000 | Unsafe:   0.2350 | Init:   0.2768 | Outside:   0.0139 | Gen:   0.0002 | Time: 936.9s
+Epoch  3220 | Total:    0.4928 | Goal:   0.0000 | Unsafe:   0.2152 | Init:   0.2721 | Outside:   0.0055 | Gen:   0.0000 | Time: 939.9s
+Epoch  3230 | Total:    0.4526 | Goal:   0.0000 | Unsafe:   0.1745 | Init:   0.2742 | Outside:   0.0039 | Gen:   0.0000 | Time: 942.8s
+Epoch  3240 | Total:    0.5133 | Goal:   0.0000 | Unsafe:   0.2327 | Init:   0.2745 | Outside:   0.0061 | Gen:   0.0000 | Time: 945.7s
+Refining outside cells: 8 failing, refined 8 cells, 4636 total
+Rebuilt V cache with 16929 cells
+Epoch  3250 | Total:    0.4632 | Goal:   0.0000 | Unsafe:   0.1957 | Init:   0.2675 | Outside:   0.0000 | Gen:   0.0000 | Time: 949.2s
+Epoch  3260 | Total:    0.5326 | Goal:   0.0000 | Unsafe:   0.1284 | Init:   0.2669 | Outside:   0.0000 | Gen:   0.1374 | Time: 952.3s
+Epoch  3270 | Total:    0.4483 | Goal:   0.0000 | Unsafe:   0.2001 | Init:   0.2417 | Outside:   0.0064 | Gen:   0.0000 | Time: 955.2s
+Epoch  3280 | Total:    0.4144 | Goal:   0.0000 | Unsafe:   0.1616 | Init:   0.2486 | Outside:   0.0043 | Gen:   0.0000 | Time: 958.1s
+Epoch  3290 | Total:    0.4019 | Goal:   0.0000 | Unsafe:   0.1512 | Init:   0.2388 | Outside:   0.0119 | Gen:   0.0000 | Time: 961.2s
+Refining outside cells: 3 failing, refined 3 cells, 4657 total
+Rebuilt V cache with 16950 cells
+Epoch  3300 | Total:    0.4579 | Goal:   0.0000 | Unsafe:   0.2086 | Init:   0.2458 | Outside:   0.0035 | Gen:   0.0000 | Time: 964.4s
+Epoch  3310 | Total:    0.4270 | Goal:   0.0000 | Unsafe:   0.1647 | Init:   0.2570 | Outside:   0.0053 | Gen:   0.0000 | Time: 967.4s
+Epoch  3320 | Total:    0.3631 | Goal:   0.0000 | Unsafe:   0.1103 | Init:   0.2464 | Outside:   0.0065 | Gen:   0.0000 | Time: 970.4s
+Epoch  3330 | Total:    0.4282 | Goal:   0.0000 | Unsafe:   0.1834 | Init:   0.2361 | Outside:   0.0087 | Gen:   0.0000 | Time: 973.4s
+Epoch  3340 | Total:    0.4033 | Goal:   0.0000 | Unsafe:   0.1495 | Init:   0.2486 | Outside:   0.0051 | Gen:   0.0000 | Time: 976.2s
+Refining outside cells: 10 failing, refined 10 cells, 4727 total
+Rebuilt V cache with 17020 cells
+Epoch  3350 | Total:    0.3841 | Goal:   0.0000 | Unsafe:   0.0825 | Init:   0.2448 | Outside:   0.0000 | Gen:   0.0568 | Time: 979.5s
+Epoch  3360 | Total:    0.4004 | Goal:   0.0000 | Unsafe:   0.1760 | Init:   0.2054 | Outside:   0.0191 | Gen:   0.0000 | Time: 982.6s
+Epoch  3370 | Total:    0.3703 | Goal:   0.0000 | Unsafe:   0.1402 | Init:   0.2068 | Outside:   0.0233 | Gen:   0.0000 | Time: 985.5s
+Epoch  3380 | Total:    0.3269 | Goal:   0.0000 | Unsafe:   0.0962 | Init:   0.2294 | Outside:   0.0013 | Gen:   0.0000 | Time: 988.4s
+Epoch  3390 | Total:    0.4088 | Goal:   0.0000 | Unsafe:   0.1757 | Init:   0.2280 | Outside:   0.0051 | Gen:   0.0000 | Time: 991.4s
+Refining outside cells: 8 failing, refined 8 cells, 4783 total
+Rebuilt V cache with 17076 cells
+Epoch  3400 | Total:    0.3638 | Goal:   0.0000 | Unsafe:   0.1307 | Init:   0.2331 | Outside:   0.0000 | Gen:   0.0000 | Time: 994.9s
+Epoch  3410 | Total:    0.2939 | Goal:   0.0000 | Unsafe:   0.0687 | Init:   0.2247 | Outside:   0.0005 | Gen:   0.0000 | Time: 997.7s
+Epoch  3420 | Total:    0.3735 | Goal:   0.0000 | Unsafe:   0.1628 | Init:   0.2030 | Outside:   0.0078 | Gen:   0.0000 | Time: 1000.7s
+Epoch  3430 | Total:    0.3428 | Goal:   0.0000 | Unsafe:   0.1273 | Init:   0.2147 | Outside:   0.0008 | Gen:   0.0000 | Time: 1003.6s
+Epoch  3440 | Total:    0.2824 | Goal:   0.0000 | Unsafe:   0.0611 | Init:   0.2142 | Outside:   0.0071 | Gen:   0.0000 | Time: 1006.6s
+Refining outside cells: 5 failing, refined 5 cells, 4818 total
+Rebuilt V cache with 17111 cells
+Epoch  3450 | Total:    0.3622 | Goal:   0.0000 | Unsafe:   0.1487 | Init:   0.1951 | Outside:   0.0068 | Gen:   0.0116 | Time: 1009.9s
+Epoch  3460 | Total:    0.3282 | Goal:   0.0000 | Unsafe:   0.1273 | Init:   0.1954 | Outside:   0.0055 | Gen:   0.0000 | Time: 1012.8s
+Epoch  3470 | Total:    0.2727 | Goal:   0.0000 | Unsafe:   0.0632 | Init:   0.2026 | Outside:   0.0069 | Gen:   0.0000 | Time: 1015.8s
+Epoch  3480 | Total:    0.3380 | Goal:   0.0000 | Unsafe:   0.1115 | Init:   0.2050 | Outside:   0.0014 | Gen:   0.0201 | Time: 1018.7s
+Epoch  3490 | Total:    0.3346 | Goal:   0.0000 | Unsafe:   0.1274 | Init:   0.2039 | Outside:   0.0033 | Gen:   0.0000 | Time: 1021.7s
+Refining outside cells: 8 failing, refined 8 cells, 4874 total
+Rebuilt V cache with 17167 cells
+Epoch  3500 | Total:    0.2791 | Goal:   0.0000 | Unsafe:   0.0694 | Init:   0.2097 | Outside:   0.0000 | Gen:   0.0000 | Time: 1024.9s
+Merging outside cells: merged 0 pairs, 4874 total
+Merging generator cells: merged 0 pairs, 3604 total
+Rebuilt V cache with 17167 cells
+Rebuilt Phi cache with 3604 cells
+Epoch  3510 | Total:    0.2630 | Goal:   0.0000 | Unsafe:   0.0637 | Init:   0.1882 | Outside:   0.0111 | Gen:   0.0000 | Time: 1028.6s
+Epoch  3520 | Total:    0.3177 | Goal:   0.0000 | Unsafe:   0.1255 | Init:   0.1865 | Outside:   0.0058 | Gen:   0.0000 | Time: 1031.5s
+Epoch  3530 | Total:    0.2694 | Goal:   0.0000 | Unsafe:   0.0793 | Init:   0.1878 | Outside:   0.0023 | Gen:   0.0000 | Time: 1034.4s
+Epoch  3540 | Total:    0.2348 | Goal:   0.0000 | Unsafe:   0.0394 | Init:   0.1902 | Outside:   0.0024 | Gen:   0.0027 | Time: 1037.4s
+Refining outside cells: 9 failing, refined 9 cells, 4937 total
+Rebuilt V cache with 17230 cells
+Epoch  3550 | Total:    0.2984 | Goal:   0.0000 | Unsafe:   0.1183 | Init:   0.1797 | Outside:   0.0003 | Gen:   0.0000 | Time: 1040.9s
+Epoch  3560 | Total:    0.3083 | Goal:   0.0000 | Unsafe:   0.1355 | Init:   0.1688 | Outside:   0.0041 | Gen:   0.0000 | Time: 1043.7s
+Epoch  3570 | Total:    0.2381 | Goal:   0.0000 | Unsafe:   0.0637 | Init:   0.1713 | Outside:   0.0030 | Gen:   0.0000 | Time: 1046.7s
+Epoch  3580 | Total:    0.3048 | Goal:   0.0000 | Unsafe:   0.0211 | Init:   0.1868 | Outside:   0.0009 | Gen:   0.0960 | Time: 1049.6s
+Epoch  3590 | Total:    0.2955 | Goal:   0.0000 | Unsafe:   0.1175 | Init:   0.1693 | Outside:   0.0088 | Gen:   0.0000 | Time: 1052.5s
+Refining outside cells: 6 failing, refined 6 cells, 4979 total
+Rebuilt V cache with 17272 cells
+Epoch  3600 | Total:    0.2587 | Goal:   0.0000 | Unsafe:   0.0900 | Init:   0.1687 | Outside:   0.0000 | Gen:   0.0000 | Time: 1055.9s
+Epoch  3610 | Total:    0.2742 | Goal:   0.0000 | Unsafe:   0.0446 | Init:   0.1478 | Outside:   0.0818 | Gen:   0.0000 | Time: 1058.7s
+Epoch  3620 | Total:    0.2626 | Goal:   0.0000 | Unsafe:   0.0331 | Init:   0.2295 | Outside:   0.0000 | Gen:   0.0000 | Time: 1061.7s
+Epoch  3630 | Total:    0.3064 | Goal:   0.0000 | Unsafe:   0.0906 | Init:   0.2157 | Outside:   0.0000 | Gen:   0.0000 | Time: 1064.5s
+Epoch  3640 | Total:    0.3023 | Goal:   0.0000 | Unsafe:   0.0697 | Init:   0.1389 | Outside:   0.0936 | Gen:   0.0000 | Time: 1067.5s
+Epoch  3650 | Total:    0.2042 | Goal:   0.0000 | Unsafe:   0.0165 | Init:   0.1877 | Outside:   0.0000 | Gen:   0.0000 | Time: 1070.5s
+Epoch  3660 | Total:    0.1833 | Goal:   0.0000 | Unsafe:   0.0128 | Init:   0.1644 | Outside:   0.0061 | Gen:   0.0000 | Time: 1073.5s
+Epoch  3670 | Total:    0.1727 | Goal:   0.0000 | Unsafe:   0.0093 | Init:   0.1626 | Outside:   0.0009 | Gen:   0.0000 | Time: 1076.5s
+Epoch  3680 | Total:    0.1703 | Goal:   0.0000 | Unsafe:   0.0081 | Init:   0.1617 | Outside:   0.0005 | Gen:   0.0000 | Time: 1079.5s
+Epoch  3690 | Total:    0.2730 | Goal:   0.0000 | Unsafe:   0.1103 | Init:   0.1450 | Outside:   0.0173 | Gen:   0.0005 | Time: 1082.5s
+Refining outside cells: 10 failing, refined 10 cells, 5049 total
+Rebuilt V cache with 17342 cells
+Epoch  3700 | Total:    0.2405 | Goal:   0.0000 | Unsafe:   0.0906 | Init:   0.1499 | Outside:   0.0000 | Gen:   0.0000 | Time: 1085.8s
+Epoch  3710 | Total:    0.1827 | Goal:   0.0000 | Unsafe:   0.0204 | Init:   0.1607 | Outside:   0.0016 | Gen:   0.0000 | Time: 1088.6s
+Epoch  3720 | Total:    0.1655 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1607 | Outside:   0.0048 | Gen:   0.0000 | Time: 1091.7s
+Epoch  3730 | Total:    0.1519 | Goal:   0.0000 | Unsafe:   0.0003 | Init:   0.1487 | Outside:   0.0029 | Gen:   0.0000 | Time: 1094.7s
+Epoch  3740 | Total:    0.1580 | Goal:   0.0000 | Unsafe:   0.0151 | Init:   0.1394 | Outside:   0.0035 | Gen:   0.0000 | Time: 1097.6s
+Refining outside cells: 1 failing, refined 1 cells, 5056 total
+Rebuilt V cache with 17349 cells
+Epoch  3750 | Total:    0.2732 | Goal:   0.0000 | Unsafe:   0.1237 | Init:   0.1480 | Outside:   0.0015 | Gen:   0.0000 | Time: 1101.1s
+Epoch  3760 | Total:    0.2275 | Goal:   0.0000 | Unsafe:   0.0850 | Init:   0.1385 | Outside:   0.0040 | Gen:   0.0000 | Time: 1104.0s
+Epoch  3770 | Total:    0.1708 | Goal:   0.0000 | Unsafe:   0.0199 | Init:   0.1494 | Outside:   0.0014 | Gen:   0.0000 | Time: 1107.0s
+Epoch  3780 | Total:    0.1776 | Goal:   0.0000 | Unsafe:   0.0297 | Init:   0.1416 | Outside:   0.0062 | Gen:   0.0000 | Time: 1109.9s
+Epoch  3790 | Total:    0.2359 | Goal:   0.0000 | Unsafe:   0.0916 | Init:   0.1443 | Outside:   0.0000 | Gen:   0.0000 | Time: 1112.9s
+Epoch  3800 | Total:    0.1807 | Goal:   0.0000 | Unsafe:   0.0380 | Init:   0.1427 | Outside:   0.0000 | Gen:   0.0000 | Time: 1115.9s
+Epoch  3810 | Total:    0.1513 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1479 | Outside:   0.0034 | Gen:   0.0000 | Time: 1118.9s
+Epoch  3820 | Total:    0.1511 | Goal:   0.0000 | Unsafe:   0.0008 | Init:   0.1363 | Outside:   0.0140 | Gen:   0.0000 | Time: 1121.8s
+Epoch  3830 | Total:    0.1368 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1362 | Outside:   0.0005 | Gen:   0.0000 | Time: 1124.8s
+Epoch  3840 | Total:    0.1308 | Goal:   0.0000 | Unsafe:   0.0010 | Init:   0.1282 | Outside:   0.0015 | Gen:   0.0000 | Time: 1127.7s
+Refining outside cells: 14 failing, refined 14 cells, 5154 total
+Rebuilt V cache with 17447 cells
+Epoch  3850 | Total:    0.1302 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1302 | Outside:   0.0000 | Gen:   0.0000 | Time: 1131.7s
+Epoch  3860 | Total:    0.2358 | Goal:   0.0000 | Unsafe:   0.0978 | Init:   0.1237 | Outside:   0.0008 | Gen:   0.0135 | Time: 1134.6s
+Epoch  3870 | Total:    0.2357 | Goal:   0.0000 | Unsafe:   0.1215 | Init:   0.1115 | Outside:   0.0027 | Gen:   0.0000 | Time: 1137.6s
+Epoch  3880 | Total:    0.1639 | Goal:   0.0000 | Unsafe:   0.0376 | Init:   0.1263 | Outside:   0.0000 | Gen:   0.0000 | Time: 1142.6s
+Epoch  3890 | Total:    0.1305 | Goal:   0.0000 | Unsafe:   0.0014 | Init:   0.1274 | Outside:   0.0017 | Gen:   0.0000 | Time: 1146.0s
+Refining outside cells: 13 failing, refined 13 cells, 5245 total
+Rebuilt V cache with 17538 cells
+Epoch  3900 | Total:    0.1810 | Goal:   0.0000 | Unsafe:   0.0534 | Init:   0.1277 | Outside:   0.0000 | Gen:   0.0000 | Time: 1149.4s
+Epoch  3910 | Total:    0.2502 | Goal:   0.0000 | Unsafe:   0.1154 | Init:   0.1009 | Outside:   0.0340 | Gen:   0.0000 | Time: 1152.4s
+Epoch  3920 | Total:    0.2771 | Goal:   0.0000 | Unsafe:   0.0170 | Init:   0.2601 | Outside:   0.0000 | Gen:   0.0000 | Time: 1155.8s
+Epoch  3930 | Total:    0.1511 | Goal:   0.0000 | Unsafe:   0.0161 | Init:   0.1024 | Outside:   0.0326 | Gen:   0.0000 | Time: 1158.8s
+Epoch  3940 | Total:    0.1492 | Goal:   0.0000 | Unsafe:   0.0106 | Init:   0.1010 | Outside:   0.0376 | Gen:   0.0000 | Time: 1162.4s
+Epoch  3950 | Total:    0.2347 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2347 | Outside:   0.0000 | Gen:   0.0000 | Time: 1165.9s
+Epoch  3960 | Total:    0.2568 | Goal:   0.0000 | Unsafe:   0.0188 | Init:   0.0711 | Outside:   0.1670 | Gen:   0.0000 | Time: 1168.8s
+Epoch  3970 | Total:    0.2149 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2149 | Outside:   0.0000 | Gen:   0.0000 | Time: 1171.9s
+Epoch  3980 | Total:    0.1346 | Goal:   0.0000 | Unsafe:   0.0188 | Init:   0.1158 | Outside:   0.0000 | Gen:   0.0000 | Time: 1174.9s
+Epoch  3990 | Total:    0.2277 | Goal:   0.0000 | Unsafe:   0.1269 | Init:   0.1008 | Outside:   0.0000 | Gen:   0.0000 | Time: 1177.9s
+Epoch  4000 | Total:    0.1736 | Goal:   0.0000 | Unsafe:   0.0759 | Init:   0.0929 | Outside:   0.0047 | Gen:   0.0000 | Time: 1181.1s
+=== Detailed Evaluation ===
+Goal:      PASS, V bounds: [  0.281,   0.458] | 2197/2197 pass (100.0%)
+Unsafe:    FAIL, V bounds: [  4.945,  73.045] | 5997/6000 pass (100.0%)
+Init:      FAIL, V bounds: [  0.181,   1.036] | 4090/4096 pass (99.9%)
+Outside:   FAIL, V bounds: [ -0.001,  73.311] | 5234/5245 pass (99.8%)
+Generator: PASS, GV bounds: [-2514.341,  -0.031] | 3604/3604 pass (100.0%)
+Saved visualization plots for epoch 4000 to 'training_progress'
+Merging outside cells: merged 0 pairs, 5245 total
+Merging generator cells: merged 0 pairs, 3604 total
+Rebuilt V cache with 17538 cells
+Rebuilt Phi cache with 3604 cells
+Epoch  4010 | Total:    0.1187 | Goal:   0.0000 | Unsafe:   0.0022 | Init:   0.1165 | Outside:   0.0000 | Gen:   0.0000 | Time: 1195.4s
+Epoch  4020 | Total:    0.1383 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1383 | Outside:   0.0000 | Gen:   0.0000 | Time: 1199.2s
+Epoch  4030 | Total:    0.1749 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1749 | Outside:   0.0000 | Gen:   0.0000 | Time: 1202.2s
+Epoch  4040 | Total:    0.2155 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2155 | Outside:   0.0000 | Gen:   0.0000 | Time: 1205.4s
+Epoch  4050 | Total:    0.1106 | Goal:   0.0000 | Unsafe:   0.0060 | Init:   0.1046 | Outside:   0.0000 | Gen:   0.0000 | Time: 1208.5s
+Epoch  4060 | Total:    0.1126 | Goal:   0.0000 | Unsafe:   0.0116 | Init:   0.1009 | Outside:   0.0001 | Gen:   0.0000 | Time: 1211.5s
+Epoch  4070 | Total:    0.1570 | Goal:   0.0000 | Unsafe:   0.0008 | Init:   0.1563 | Outside:   0.0000 | Gen:   0.0000 | Time: 1214.4s
+Epoch  4080 | Total:    0.1088 | Goal:   0.0000 | Unsafe:   0.0057 | Init:   0.1032 | Outside:   0.0000 | Gen:   0.0000 | Time: 1217.4s
+Epoch  4090 | Total:    0.1455 | Goal:   0.0000 | Unsafe:   0.0572 | Init:   0.0883 | Outside:   0.0000 | Gen:   0.0000 | Time: 1220.5s
+Epoch  4100 | Total:    0.2316 | Goal:   0.0000 | Unsafe:   0.1473 | Init:   0.0843 | Outside:   0.0000 | Gen:   0.0000 | Time: 1223.7s
+Epoch  4110 | Total:    0.1753 | Goal:   0.0000 | Unsafe:   0.0632 | Init:   0.1120 | Outside:   0.0000 | Gen:   0.0000 | Time: 1226.9s
+Epoch  4120 | Total:    0.2936 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2936 | Outside:   0.0000 | Gen:   0.0000 | Time: 1229.9s
+Epoch  4130 | Total:    0.2855 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2855 | Outside:   0.0000 | Gen:   0.0000 | Time: 1233.1s
+Epoch  4140 | Total:    0.1762 | Goal:   0.0000 | Unsafe:   0.0764 | Init:   0.0995 | Outside:   0.0000 | Gen:   0.0002 | Time: 1236.1s
+Epoch  4150 | Total:    0.2425 | Goal:   0.0000 | Unsafe:   0.1625 | Init:   0.0737 | Outside:   0.0062 | Gen:   0.0000 | Time: 1239.5s
+Epoch  4160 | Total:    0.1679 | Goal:   0.0000 | Unsafe:   0.0854 | Init:   0.0695 | Outside:   0.0130 | Gen:   0.0000 | Time: 1242.5s
+Epoch  4170 | Total:    0.1163 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1163 | Outside:   0.0000 | Gen:   0.0000 | Time: 1245.6s
+Epoch  4180 | Total:    0.0965 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0927 | Outside:   0.0037 | Gen:   0.0000 | Time: 1248.6s
+Epoch  4190 | Total:    0.1007 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1007 | Outside:   0.0000 | Gen:   0.0000 | Time: 1251.7s
+Refining outside cells: 33 failing, refined 33 cells, 5476 total
+Rebuilt V cache with 17769 cells
+Epoch  4200 | Total:    0.0960 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0960 | Outside:   0.0000 | Gen:   0.0000 | Time: 1255.1s
+Epoch  4210 | Total:    0.0751 | Goal:   0.0000 | Unsafe:   0.0015 | Init:   0.0736 | Outside:   0.0000 | Gen:   0.0000 | Time: 1258.1s
+Epoch  4220 | Total:    0.0670 | Goal:   0.0000 | Unsafe:   0.0030 | Init:   0.0640 | Outside:   0.0000 | Gen:   0.0000 | Time: 1261.1s
+Epoch  4230 | Total:    0.0592 | Goal:   0.0000 | Unsafe:   0.0012 | Init:   0.0579 | Outside:   0.0002 | Gen:   0.0000 | Time: 1264.3s
+Epoch  4240 | Total:    0.0576 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0576 | Outside:   0.0000 | Gen:   0.0000 | Time: 1267.3s
+Refining outside cells: 11 failing, refined 11 cells, 5553 total
+Rebuilt V cache with 17846 cells
+Epoch  4250 | Total:    0.0587 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0587 | Outside:   0.0000 | Gen:   0.0000 | Time: 1270.7s
+Epoch  4260 | Total:    0.0534 | Goal:   0.0000 | Unsafe:   0.0031 | Init:   0.0447 | Outside:   0.0056 | Gen:   0.0000 | Time: 1273.7s
+Epoch  4270 | Total:    0.0509 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0509 | Outside:   0.0000 | Gen:   0.0000 | Time: 1276.8s
+Epoch  4280 | Total:    0.0467 | Goal:   0.0000 | Unsafe:   0.0001 | Init:   0.0465 | Outside:   0.0001 | Gen:   0.0000 | Time: 1279.9s
+Epoch  4290 | Total:    0.1968 | Goal:   0.0000 | Unsafe:   0.1329 | Init:   0.0639 | Outside:   0.0000 | Gen:   0.0000 | Time: 1283.0s
+Epoch  4300 | Total:    0.2000 | Goal:   0.0000 | Unsafe:   0.1345 | Init:   0.0656 | Outside:   0.0000 | Gen:   0.0000 | Time: 1286.0s
+Epoch  4310 | Total:    0.0989 | Goal:   0.0000 | Unsafe:   0.0362 | Init:   0.0612 | Outside:   0.0015 | Gen:   0.0000 | Time: 1289.0s
+Epoch  4320 | Total:    0.0739 | Goal:   0.0000 | Unsafe:   0.0002 | Init:   0.0673 | Outside:   0.0063 | Gen:   0.0000 | Time: 1292.0s
+Epoch  4330 | Total:    0.1515 | Goal:   0.0000 | Unsafe:   0.0762 | Init:   0.0532 | Outside:   0.0013 | Gen:   0.0208 | Time: 1295.0s
+Epoch  4340 | Total:    0.1832 | Goal:   0.0000 | Unsafe:   0.1226 | Init:   0.0603 | Outside:   0.0004 | Gen:   0.0000 | Time: 1298.0s
+Refining outside cells: 2 failing, refined 2 cells, 5567 total
+Rebuilt V cache with 17860 cells
+Epoch  4350 | Total:    0.0935 | Goal:   0.0000 | Unsafe:   0.0313 | Init:   0.0615 | Outside:   0.0008 | Gen:   0.0000 | Time: 1301.4s
+Epoch  4360 | Total:    0.0734 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0648 | Outside:   0.0086 | Gen:   0.0000 | Time: 1304.3s
+Epoch  4370 | Total:    0.0671 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0648 | Outside:   0.0023 | Gen:   0.0000 | Time: 1307.3s
+Epoch  4380 | Total:    0.0661 | Goal:   0.0000 | Unsafe:   0.0013 | Init:   0.0503 | Outside:   0.0146 | Gen:   0.0000 | Time: 1310.5s
+Epoch  4390 | Total:    0.0557 | Goal:   0.0000 | Unsafe:   0.0029 | Init:   0.0483 | Outside:   0.0046 | Gen:   0.0000 | Time: 1313.5s
+Refining outside cells: 1 failing, refined 1 cells, 5574 total
+Rebuilt V cache with 17867 cells
+Epoch  4400 | Total:    0.0504 | Goal:   0.0000 | Unsafe:   0.0006 | Init:   0.0498 | Outside:   0.0000 | Gen:   0.0000 | Time: 1317.0s
+Epoch  4410 | Total:    0.0474 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0473 | Outside:   0.0002 | Gen:   0.0000 | Time: 1319.9s
+Epoch  4420 | Total:    0.0454 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0439 | Outside:   0.0015 | Gen:   0.0000 | Time: 1323.1s
+Epoch  4430 | Total:    0.0513 | Goal:   0.0000 | Unsafe:   0.0018 | Init:   0.0410 | Outside:   0.0085 | Gen:   0.0000 | Time: 1326.3s
+Epoch  4440 | Total:    0.0463 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0463 | Outside:   0.0000 | Gen:   0.0000 | Time: 1329.3s
+Epoch  4450 | Total:    0.0615 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0615 | Outside:   0.0000 | Gen:   0.0000 | Time: 1332.3s
+Epoch  4460 | Total:    0.0444 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0444 | Outside:   0.0000 | Gen:   0.0000 | Time: 1335.4s
+Epoch  4470 | Total:    0.0466 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0466 | Outside:   0.0000 | Gen:   0.0000 | Time: 1338.4s
+Epoch  4480 | Total:    0.0555 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0555 | Outside:   0.0000 | Gen:   0.0000 | Time: 1341.6s
+Epoch  4490 | Total:    0.0686 | Goal:   0.0000 | Unsafe:   0.0050 | Init:   0.0335 | Outside:   0.0301 | Gen:   0.0000 | Time: 1344.7s
+Epoch  4500 | Total:    0.0556 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0556 | Outside:   0.0000 | Gen:   0.0000 | Time: 1347.8s
+Merging outside cells: merged 0 pairs, 5574 total
+Merging generator cells: merged 0 pairs, 3604 total
+Rebuilt V cache with 17867 cells
+Rebuilt Phi cache with 3604 cells
+Epoch  4510 | Total:    0.0439 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0439 | Outside:   0.0000 | Gen:   0.0000 | Time: 1352.5s
+Epoch  4520 | Total:    0.0649 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0649 | Outside:   0.0000 | Gen:   0.0000 | Time: 1355.6s
+Epoch  4530 | Total:    0.0400 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0400 | Outside:   0.0000 | Gen:   0.0000 | Time: 1358.6s
+Epoch  4540 | Total:    0.0385 | Goal:   0.0000 | Unsafe:   0.0010 | Init:   0.0375 | Outside:   0.0000 | Gen:   0.0000 | Time: 1361.7s
+Epoch  4550 | Total:    0.0448 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0448 | Outside:   0.0000 | Gen:   0.0000 | Time: 1364.7s
+Epoch  4560 | Total:    0.0385 | Goal:   0.0000 | Unsafe:   0.0016 | Init:   0.0337 | Outside:   0.0031 | Gen:   0.0000 | Time: 1367.7s
+Epoch  4570 | Total:    0.0616 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0616 | Outside:   0.0000 | Gen:   0.0000 | Time: 1370.9s
+Epoch  4580 | Total:    0.0395 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0386 | Outside:   0.0000 | Gen:   0.0009 | Time: 1373.9s
+Epoch  4590 | Total:    0.2064 | Goal:   0.0000 | Unsafe:   0.1546 | Init:   0.0518 | Outside:   0.0000 | Gen:   0.0000 | Time: 1376.9s
+Refining outside cells: 1 failing, refined 1 cells, 5581 total
+Rebuilt V cache with 17874 cells
+Epoch  4600 | Total:    0.2052 | Goal:   0.0000 | Unsafe:   0.1555 | Init:   0.0497 | Outside:   0.0000 | Gen:   0.0000 | Time: 1380.3s
+Epoch  4610 | Total:    0.0899 | Goal:   0.0000 | Unsafe:   0.0294 | Init:   0.0594 | Outside:   0.0011 | Gen:   0.0000 | Time: 1383.4s
+Epoch  4620 | Total:    0.0703 | Goal:   0.0000 | Unsafe:   0.0014 | Init:   0.0570 | Outside:   0.0119 | Gen:   0.0000 | Time: 1386.4s
+Epoch  4630 | Total:    0.0634 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0595 | Outside:   0.0039 | Gen:   0.0000 | Time: 1389.4s
+Epoch  4640 | Total:    0.0545 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0545 | Outside:   0.0000 | Gen:   0.0000 | Time: 1392.4s
+Refining outside cells: 6 failing, refined 6 cells, 5623 total
+Rebuilt V cache with 17916 cells
+Epoch  4650 | Total:    0.0414 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0414 | Outside:   0.0000 | Gen:   0.0000 | Time: 1395.9s
+Epoch  4660 | Total:    0.0400 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0400 | Outside:   0.0000 | Gen:   0.0000 | Time: 1398.9s
+Epoch  4670 | Total:    0.0423 | Goal:   0.0000 | Unsafe:   0.0009 | Init:   0.0344 | Outside:   0.0068 | Gen:   0.0002 | Time: 1402.0s
+Epoch  4680 | Total:    0.0416 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0416 | Outside:   0.0000 | Gen:   0.0000 | Time: 1405.1s
+Epoch  4690 | Total:    0.0401 | Goal:   0.0000 | Unsafe:   0.0015 | Init:   0.0340 | Outside:   0.0047 | Gen:   0.0000 | Time: 1408.1s
+Epoch  4700 | Total:    0.0424 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0424 | Outside:   0.0000 | Gen:   0.0000 | Time: 1411.2s
+Epoch  4710 | Total:    0.0388 | Goal:   0.0000 | Unsafe:   0.0024 | Init:   0.0317 | Outside:   0.0046 | Gen:   0.0000 | Time: 1414.1s
+Epoch  4720 | Total:    0.0348 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0327 | Outside:   0.0021 | Gen:   0.0000 | Time: 1417.2s
+Epoch  4730 | Total:    0.0336 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0329 | Outside:   0.0007 | Gen:   0.0000 | Time: 1420.3s
+Epoch  4740 | Total:    0.0361 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0361 | Outside:   0.0000 | Gen:   0.0000 | Time: 1423.4s
+Refining outside cells: 1 failing, refined 1 cells, 5630 total
+Rebuilt V cache with 17923 cells
+Epoch  4750 | Total:    0.0329 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0303 | Outside:   0.0026 | Gen:   0.0000 | Time: 1426.8s
+Epoch  4760 | Total:    0.0317 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0314 | Outside:   0.0003 | Gen:   0.0000 | Time: 1429.8s
+Epoch  4770 | Total:    0.0393 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0393 | Outside:   0.0000 | Gen:   0.0000 | Time: 1432.9s
+Epoch  4780 | Total:    0.0344 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0344 | Outside:   0.0000 | Gen:   0.0000 | Time: 1436.0s
+Epoch  4790 | Total:    0.0387 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0387 | Outside:   0.0000 | Gen:   0.0000 | Time: 1439.0s
+Epoch  4800 | Total:    0.0317 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0317 | Outside:   0.0000 | Gen:   0.0000 | Time: 1442.0s
+Epoch  4810 | Total:    0.0388 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0388 | Outside:   0.0000 | Gen:   0.0000 | Time: 1445.4s
+Epoch  4820 | Total:    0.2125 | Goal:   0.0000 | Unsafe:   0.1422 | Init:   0.0703 | Outside:   0.0000 | Gen:   0.0000 | Time: 1448.4s
+Epoch  4830 | Total:    0.1974 | Goal:   0.0000 | Unsafe:   0.1411 | Init:   0.0564 | Outside:   0.0000 | Gen:   0.0000 | Time: 1451.5s
+Epoch  4840 | Total:    0.0707 | Goal:   0.0000 | Unsafe:   0.0111 | Init:   0.0596 | Outside:   0.0000 | Gen:   0.0000 | Time: 1454.4s
+Refining outside cells: 1 failing, refined 1 cells, 5637 total
+Rebuilt V cache with 17930 cells
+Epoch  4850 | Total:    0.0523 | Goal:   0.0000 | Unsafe:   0.0061 | Init:   0.0352 | Outside:   0.0109 | Gen:   0.0000 | Time: 1457.9s
+Epoch  4860 | Total:    0.0421 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0421 | Outside:   0.0000 | Gen:   0.0000 | Time: 1461.1s
+Epoch  4870 | Total:    0.0366 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0366 | Outside:   0.0000 | Gen:   0.0000 | Time: 1464.2s
+Epoch  4880 | Total:    0.0327 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0327 | Outside:   0.0000 | Gen:   0.0000 | Time: 1467.2s
+Epoch  4890 | Total:    0.0325 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0325 | Outside:   0.0000 | Gen:   0.0000 | Time: 1470.2s
+Refining outside cells: 1 failing, refined 1 cells, 5644 total
+Rebuilt V cache with 17937 cells
+Epoch  4900 | Total:    0.0329 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0329 | Outside:   0.0000 | Gen:   0.0000 | Time: 1473.7s
+Epoch  4910 | Total:    0.0320 | Goal:   0.0000 | Unsafe:   0.0017 | Init:   0.0245 | Outside:   0.0058 | Gen:   0.0000 | Time: 1476.7s
+Epoch  4920 | Total:    0.0286 | Goal:   0.0000 | Unsafe:   0.0002 | Init:   0.0264 | Outside:   0.0021 | Gen:   0.0000 | Time: 1479.8s
+Epoch  4930 | Total:    0.0306 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0306 | Outside:   0.0000 | Gen:   0.0000 | Time: 1482.9s
+Epoch  4940 | Total:    0.0287 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0287 | Outside:   0.0000 | Gen:   0.0000 | Time: 1485.9s
+Epoch  4950 | Total:    0.0274 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0274 | Outside:   0.0000 | Gen:   0.0000 | Time: 1489.0s
+Epoch  4960 | Total:    0.0306 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0306 | Outside:   0.0000 | Gen:   0.0000 | Time: 1492.2s
+Epoch  4970 | Total:    0.0244 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0225 | Outside:   0.0019 | Gen:   0.0000 | Time: 1495.2s
+Epoch  4980 | Total:    0.0243 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0238 | Outside:   0.0005 | Gen:   0.0000 | Time: 1498.3s
+Epoch  4990 | Total:    0.0252 | Goal:   0.0000 | Unsafe:   0.0009 | Init:   0.0213 | Outside:   0.0030 | Gen:   0.0000 | Time: 1501.3s
+Epoch  5000 | Total:    0.0237 | Goal:   0.0000 | Unsafe:   0.0010 | Init:   0.0201 | Outside:   0.0026 | Gen:   0.0000 | Time: 1504.4s
+=== Detailed Evaluation ===
+Goal:      PASS, V bounds: [  0.270,   0.444] | 2197/2197 pass (100.0%)
+Unsafe:    FAIL, V bounds: [  4.999,  72.041] | 5999/6000 pass (100.0%)
+Init:      FAIL, V bounds: [  0.171,   1.014] | 4094/4096 pass (100.0%)
+Outside:   FAIL, V bounds: [ -0.001,  72.304] | 5640/5644 pass (99.9%)
+Generator: PASS, GV bounds: [-2594.438,  -0.007] | 3604/3604 pass (100.0%)
+Saved visualization plots for epoch 5000 to 'training_progress'
+Merging outside cells: merged 0 pairs, 5644 total
+Merging generator cells: merged 0 pairs, 3604 total
+Rebuilt V cache with 17937 cells
+Rebuilt Phi cache with 3604 cells
+Epoch  5010 | Total:    0.0239 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0239 | Outside:   0.0000 | Gen:   0.0000 | Time: 1519.4s
+Epoch  5020 | Total:    0.0221 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0211 | Outside:   0.0010 | Gen:   0.0000 | Time: 1522.7s
+Epoch  5030 | Total:    0.0228 | Goal:   0.0000 | Unsafe:   0.0010 | Init:   0.0183 | Outside:   0.0035 | Gen:   0.0000 | Time: 1525.8s
+Epoch  5040 | Total:    0.0232 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0224 | Outside:   0.0000 | Gen:   0.0007 | Time: 1528.7s
+Epoch  5050 | Total:    0.0205 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0203 | Outside:   0.0002 | Gen:   0.0000 | Time: 1531.8s
+Epoch  5060 | Total:    0.0196 | Goal:   0.0000 | Unsafe:   0.0001 | Init:   0.0177 | Outside:   0.0017 | Gen:   0.0000 | Time: 1534.8s
+Epoch  5070 | Total:    0.0206 | Goal:   0.0000 | Unsafe:   0.0005 | Init:   0.0153 | Outside:   0.0047 | Gen:   0.0000 | Time: 1537.8s
+Epoch  5080 | Total:    0.1256 | Goal:   0.0000 | Unsafe:   0.0720 | Init:   0.0199 | Outside:   0.0007 | Gen:   0.0330 | Time: 1540.9s
+Epoch  5090 | Total:    0.2678 | Goal:   0.0000 | Unsafe:   0.2188 | Init:   0.0491 | Outside:   0.0000 | Gen:   0.0000 | Time: 1543.9s
+Epoch  5100 | Total:    0.1531 | Goal:   0.0000 | Unsafe:   0.0958 | Init:   0.0572 | Outside:   0.0000 | Gen:   0.0000 | Time: 1546.9s
+Epoch  5110 | Total:    0.0417 | Goal:   0.0000 | Unsafe:   0.0016 | Init:   0.0366 | Outside:   0.0035 | Gen:   0.0000 | Time: 1550.2s
+Epoch  5120 | Total:    0.0378 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0370 | Outside:   0.0008 | Gen:   0.0000 | Time: 1553.4s
+Epoch  5130 | Total:    0.0313 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0276 | Outside:   0.0037 | Gen:   0.0000 | Time: 1556.4s
+Epoch  5140 | Total:    0.0262 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0259 | Outside:   0.0003 | Gen:   0.0000 | Time: 1559.4s
+Epoch  5150 | Total:    0.0347 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0347 | Outside:   0.0000 | Gen:   0.0000 | Time: 1562.5s
+Epoch  5160 | Total:    0.0308 | Goal:   0.0000 | Unsafe:   0.0012 | Init:   0.0176 | Outside:   0.0117 | Gen:   0.0004 | Time: 1565.6s
+Epoch  5170 | Total:    0.0256 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0256 | Outside:   0.0000 | Gen:   0.0000 | Time: 1568.7s
+Epoch  5180 | Total:    0.0273 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0273 | Outside:   0.0000 | Gen:   0.0000 | Time: 1571.7s
+Epoch  5190 | Total:    0.0241 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0241 | Outside:   0.0000 | Gen:   0.0000 | Time: 1574.7s
+Refining outside cells: 3 failing, refined 3 cells, 5665 total
+Rebuilt V cache with 17958 cells
+Epoch  5200 | Total:    0.0191 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0181 | Outside:   0.0010 | Gen:   0.0000 | Time: 1578.1s
+Epoch  5210 | Total:    0.0198 | Goal:   0.0000 | Unsafe:   0.0007 | Init:   0.0152 | Outside:   0.0040 | Gen:   0.0000 | Time: 1581.2s
+Epoch  5220 | Total:    0.0181 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0179 | Outside:   0.0001 | Gen:   0.0000 | Time: 1584.2s
+Epoch  5230 | Total:    0.0186 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0170 | Outside:   0.0003 | Gen:   0.0012 | Time: 1587.3s
+Epoch  5240 | Total:    0.0171 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0149 | Outside:   0.0022 | Gen:   0.0000 | Time: 1590.3s
+Refining outside cells: 2 failing, refined 2 cells, 5679 total
+Rebuilt V cache with 17972 cells
+Epoch  5250 | Total:    0.0158 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0158 | Outside:   0.0000 | Gen:   0.0000 | Time: 1593.9s
+Epoch  5260 | Total:    0.0133 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0129 | Outside:   0.0004 | Gen:   0.0000 | Time: 1596.9s
+Epoch  5270 | Total:    0.0122 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0114 | Outside:   0.0008 | Gen:   0.0000 | Time: 1599.9s
+Epoch  5280 | Total:    0.0158 | Goal:   0.0000 | Unsafe:   0.0019 | Init:   0.0077 | Outside:   0.0062 | Gen:   0.0000 | Time: 1602.9s
+Epoch  5290 | Total:    0.0136 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0078 | Outside:   0.0050 | Gen:   0.0009 | Time: 1605.9s
+Epoch  5300 | Total:    0.2454 | Goal:   0.0000 | Unsafe:   0.2021 | Init:   0.0433 | Outside:   0.0000 | Gen:   0.0000 | Time: 1608.9s
+Epoch  5310 | Total:    0.2110 | Goal:   0.0000 | Unsafe:   0.1781 | Init:   0.0329 | Outside:   0.0000 | Gen:   0.0000 | Time: 1612.2s
+Epoch  5320 | Total:    0.0509 | Goal:   0.0000 | Unsafe:   0.0059 | Init:   0.0401 | Outside:   0.0023 | Gen:   0.0025 | Time: 1615.6s
+Epoch  5330 | Total:    0.0339 | Goal:   0.0000 | Unsafe:   0.0002 | Init:   0.0293 | Outside:   0.0043 | Gen:   0.0000 | Time: 1618.8s
+Epoch  5340 | Total:    0.0260 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0260 | Outside:   0.0000 | Gen:   0.0000 | Time: 1622.2s
+Refining outside cells: 1 failing, refined 1 cells, 5686 total
+Rebuilt V cache with 17979 cells
+Epoch  5350 | Total:    0.0216 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0216 | Outside:   0.0000 | Gen:   0.0000 | Time: 1626.1s
+Epoch  5360 | Total:    0.0169 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0169 | Outside:   0.0000 | Gen:   0.0000 | Time: 1629.0s
+Epoch  5370 | Total:    0.0164 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0164 | Outside:   0.0000 | Gen:   0.0000 | Time: 1632.1s
+Epoch  5380 | Total:    0.0199 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0199 | Outside:   0.0000 | Gen:   0.0000 | Time: 1635.2s
+Epoch  5390 | Total:    0.0217 | Goal:   0.0000 | Unsafe:   0.0021 | Init:   0.0078 | Outside:   0.0118 | Gen:   0.0000 | Time: 1638.3s
+Epoch  5400 | Total:    0.0128 | Goal:   0.0000 | Unsafe:   0.0011 | Init:   0.0092 | Outside:   0.0026 | Gen:   0.0000 | Time: 1641.5s
+Epoch  5410 | Total:    0.0276 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0276 | Outside:   0.0000 | Gen:   0.0000 | Time: 1644.5s
+Epoch  5420 | Total:    0.0124 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0124 | Outside:   0.0000 | Gen:   0.0000 | Time: 1647.7s
+Epoch  5430 | Total:    0.0216 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0216 | Outside:   0.0000 | Gen:   0.0000 | Time: 1650.7s
+Epoch  5440 | Total:    0.0139 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0139 | Outside:   0.0000 | Gen:   0.0000 | Time: 1653.8s
+Epoch  5450 | Total:    0.0142 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0142 | Outside:   0.0000 | Gen:   0.0000 | Time: 1656.7s
+Epoch  5460 | Total:    0.0594 | Goal:   0.0000 | Unsafe:   0.0049 | Init:   0.0013 | Outside:   0.0532 | Gen:   0.0000 | Time: 1659.8s
+Epoch  5470 | Total:    0.0146 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0146 | Outside:   0.0000 | Gen:   0.0000 | Time: 1662.8s
+Epoch  5480 | Total:    0.0056 | Goal:   0.0000 | Unsafe:   0.0002 | Init:   0.0050 | Outside:   0.0005 | Gen:   0.0000 | Time: 1666.0s
+Epoch  5490 | Total:    0.0050 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0049 | Outside:   0.0001 | Gen:   0.0000 | Time: 1669.1s
+Epoch  5500 | Total:    0.0060 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0060 | Outside:   0.0000 | Gen:   0.0000 | Time: 1672.2s
+Merging outside cells: merged 0 pairs, 5686 total
+Merging generator cells: merged 0 pairs, 3604 total
+Epoch  5510 | Total:    0.0418 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0418 | Outside:   0.0000 | Gen:   0.0000 | Time: 1675.5s
+Rebuilt V cache with 17979 cells
+Rebuilt Phi cache with 3604 cells
+Epoch  5520 | Total:    0.0809 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0809 | Outside:   0.0000 | Gen:   0.0000 | Time: 1679.2s
+Epoch  5530 | Total:    0.0458 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0458 | Outside:   0.0000 | Gen:   0.0000 | Time: 1682.2s
+Epoch  5540 | Total:    0.0604 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0604 | Outside:   0.0000 | Gen:   0.0000 | Time: 1685.2s
+Epoch  5550 | Total:    0.0980 | Goal:   0.0000 | Unsafe:   0.0062 | Init:   0.0536 | Outside:   0.0000 | Gen:   0.0382 | Time: 1688.3s
+Epoch  5560 | Total:    0.3247 | Goal:   0.0000 | Unsafe:   0.2854 | Init:   0.0393 | Outside:   0.0000 | Gen:   0.0000 | Time: 1691.4s
+Epoch  5570 | Total:    0.1175 | Goal:   0.0000 | Unsafe:   0.0910 | Init:   0.0243 | Outside:   0.0022 | Gen:   0.0000 | Time: 1694.4s
+Epoch  5580 | Total:    0.0398 | Goal:   0.0000 | Unsafe:   0.0041 | Init:   0.0356 | Outside:   0.0001 | Gen:   0.0000 | Time: 1697.4s
+Epoch  5590 | Total:    0.0225 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0202 | Outside:   0.0023 | Gen:   0.0000 | Time: 1700.6s
+Refining outside cells: 2 failing, refined 2 cells, 5700 total
+Rebuilt V cache with 17993 cells
+Epoch  5600 | Total:    0.0164 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0155 | Outside:   0.0009 | Gen:   0.0000 | Time: 1704.0s
+Epoch  5610 | Total:    0.0154 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0125 | Outside:   0.0029 | Gen:   0.0000 | Time: 1707.3s
+Epoch  5620 | Total:    0.0114 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0114 | Outside:   0.0000 | Gen:   0.0000 | Time: 1710.4s
+Epoch  5630 | Total:    0.0114 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0114 | Outside:   0.0000 | Gen:   0.0000 | Time: 1713.6s
+Epoch  5640 | Total:    0.0243 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0243 | Outside:   0.0000 | Gen:   0.0000 | Time: 1716.7s
+Refining outside cells: 11 failing, refined 11 cells, 5777 total
+Rebuilt V cache with 18070 cells
+Epoch  5650 | Total:    0.0124 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0124 | Outside:   0.0000 | Gen:   0.0000 | Time: 1720.2s
+Epoch  5660 | Total:    0.0149 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0149 | Outside:   0.0000 | Gen:   0.0000 | Time: 1723.2s
+Epoch  5670 | Total:    0.0114 | Goal:   0.0000 | Unsafe:   0.0032 | Init:   0.0002 | Outside:   0.0081 | Gen:   0.0000 | Time: 1726.2s
+Epoch  5680 | Total:    0.0064 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0064 | Outside:   0.0000 | Gen:   0.0000 | Time: 1729.3s
+Epoch  5690 | Total:    0.0159 | Goal:   0.0000 | Unsafe:   0.0017 | Init:   0.0000 | Outside:   0.0142 | Gen:   0.0000 | Time: 1732.4s
+Epoch  5700 | Total:    0.0287 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0287 | Outside:   0.0000 | Gen:   0.0000 | Time: 1735.5s
+Epoch  5710 | Total:    0.0359 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0359 | Outside:   0.0000 | Gen:   0.0000 | Time: 1738.6s
+Epoch  5720 | Total:    0.0450 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0450 | Outside:   0.0000 | Gen:   0.0000 | Time: 1741.7s
+Epoch  5730 | Total:    0.0098 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0098 | Outside:   0.0000 | Gen:   0.0000 | Time: 1744.7s
+Epoch  5740 | Total:    0.0030 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0030 | Outside:   0.0000 | Gen:   0.0000 | Time: 1747.8s
+Refining outside cells: 2 failing, refined 2 cells, 5791 total
+Rebuilt V cache with 18084 cells
+Epoch  5750 | Total:    0.0067 | Goal:   0.0000 | Unsafe:   0.0013 | Init:   0.0000 | Outside:   0.0054 | Gen:   0.0000 | Time: 1751.2s
+
+====================
+All constraints satisfied, early stopping!
+====================
+Training converged at epoch 5759
+Final losses: Goal=0.0000, Unsafe=0.0000, Init=0.0000, Outside=0.0000, Gen=0.0000
+Final beta_s: 0.0009
+
+Training completed in 1753.81 seconds (29.23 minutes)
+
+====================
+Final Evaluation
+====================
+Goal:      PASS, V bounds: [  0.263,   0.435]
+Unsafe:    PASS, V bounds: [  5.001,  71.561]
+Init:      PASS, V bounds: [  0.164,   0.999]
+Outside:   PASS, V bounds: [  0.001,  71.919]
+Generator: PASS, GV bounds: [-2639.828,  -0.001]
+
+====================
+Visualizations
+====================
+All plots saved to 'results/'
+
+====================
+Saving Bundle
+====================
+Saved eval bundle -> /Users/sebastianescobar/Desktop/Neural_Certificate/nonlinear3d_syn_unsafe/outputs/eval_bundle.pth

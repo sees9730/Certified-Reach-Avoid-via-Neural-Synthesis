@@ -138,16 +138,11 @@ class LorentzLinearControlNN(nn.Module):
         self.register_buffer("W_base", base)
 
         if prior_knowledge:
-            # Initialize *learnable* W to zeros so u1 starts at the base rule,
-            # and u2,u3 start as 0 (you can change these if you want).
             with torch.no_grad():
                 self.fc.weight.zero_()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        if x.shape[-1] != 3:
-            raise ValueError(f"Expected x last-dim = 3, got shape {tuple(x.shape)}")
-
-        W_eff = self.fc.weight + self.W_base  # grad flows to fc.weight
+        W_eff = self.fc.weight + self.W_base
         return F.linear(x, W_eff, bias=None)
 
     @torch.no_grad()
