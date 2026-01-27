@@ -1,0 +1,72 @@
+
+====================
+Pre-training using samples
+====================
+GV pre-training enabled
+Epoch 0 | V_loss=1543.1555 | GV_loss= 38.5954
+Epoch 100 | V_loss=1231.1350 | GV_loss= 27.3420
+Epoch 200 | V_loss=859.4589 | GV_loss=141.3970
+Epoch 300 | V_loss=  1.4386 | GV_loss= 12.5591
+Epoch 400 | V_loss= 11.2256 | GV_loss=  1.1989
+Epoch 500 | V_loss=  0.0000 | GV_loss=  0.3370
+Epoch 600 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 700 | V_loss=  0.0000 | GV_loss=  0.2240
+Epoch 800 | V_loss=  0.0000 | GV_loss=  0.0235
+Epoch 900 | V_loss=  0.0000 | GV_loss=  0.0357
+Epoch 1000 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 1100 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 1200 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 1300 | V_loss=  0.0000 | GV_loss=  0.0000
+Epoch 1400 | V_loss=  0.0000 | GV_loss=  0.0274
+
+Best loss: 0.021788
+Pre-training complete. V + GV initialized.
+Pretraining completed!
+
+
+Using device: cpu
+
+====================
+Bound-based training
+====================
+=== Total cells per region for V ===
+init: 1296 cells
+goal: 1296 cells
+unsafe: 1296 cells
+outside: 1280 cells
+Total V cells: 5168
+Created CROWN cache for V with 5168 cells
+Created 3008 CROWN caches for GV
+/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/torch/optim/lr_scheduler.py:28: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.
+  warnings.warn("The verbose parameter is deprecated. Please use get_last_lr() "
+Epoch     0 | Total: 108440.7500 | Goal: 1049.5790 | Unsafe: 264.4296 | Init:   0.0000 | Outside: 3449.2019 | Gen: 103677.5391 | Time: 0.3s
+=== Detailed Evaluation ===
+Goal:      FAIL, V bounds: [ -1.227,   5.350] | 60/1296 pass (4.6%)
+Unsafe:    FAIL, V bounds: [ 17.171,  26.656] | 886/1296 pass (68.4%)
+Init:      PASS, V bounds: [  0.142,   0.546] | 1296/1296 pass (100.0%)
+Outside:   FAIL, V bounds: [ -4.791,  28.986] | 112/1280 pass (8.8%)
+Generator: FAIL, GV bounds: [-11.121,  94.055] | 95/3008 pass (3.2%)
+Traceback (most recent call last):
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/examples/verification/4D_gbm_veri/main.py", line 611, in <module>
+    main()
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/examples/verification/4D_gbm_veri/main.py", line 467, in main
+    loss_history, final_beta_s, refinement_epochs = train_network_bounds(
+                                                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/src/trainer.py", line 391, in train_network_bounds
+    visualize_training_progress(
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/src/visualization.py", line 401, in visualize_training_progress
+    visualize_value_function(
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/src/visualization.py", line 249, in visualize_value_function
+    ax.add_patch(rect)
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/matplotlib/axes/_base.py", line 2492, in add_patch
+    self._update_patch_limits(p)
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/matplotlib/axes/_base.py", line 2523, in _update_patch_limits
+    patch_trf = patch.get_transform()
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/matplotlib/patches.py", line 309, in get_transform
+    return self.get_patch_transform() + artist.Artist.get_transform(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sebastianescobar/Desktop/Neural_Certificate/venv/lib/python3.11/site-packages/matplotlib/patches.py", line 800, in get_patch_transform
+    def get_patch_transform(self):
+
+KeyboardInterrupt
