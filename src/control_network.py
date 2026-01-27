@@ -23,6 +23,17 @@ class LinearControlNN(nn.Module):
         return self.fc(x)
     
 
+class ZeroControl(nn.Module):
+    def __init__(self, input_dim):
+        super().__init__()
+        self.fc = nn.Linear(input_dim, input_dim, bias=False)
+        with torch.no_grad():
+            self.fc.weight.copy_(torch.diag(torch.zeros(input_dim)))
+                
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.fc(x)
+    
+
 class GBMControlNN(nn.Module):
     def __init__(self, input_dim=2, hidden_dim=8, output_dim=2):
         super().__init__()

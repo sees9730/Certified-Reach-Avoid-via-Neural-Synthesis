@@ -22,7 +22,7 @@ from src.scenario_utils import (
 )
 from src.hyperparameters import Hyperparameters
 from src.network import create_V
-from src.control_network import ZeroControl
+from src.control_network import LinearControlNN
 from src.dynamics import Dynamics, ClosedLoopDrift
 from src.save_load_utils import load_eval_bundle
 
@@ -34,25 +34,25 @@ torch.set_default_dtype(torch.float32)
 def build_V(params: Hyperparameters, device: str = "cpu", pretrain=False, model_seed=None):
     V_net = create_V(params.network).to(device)
     if(pretrain):
-        ckpt_path = OUTPUT_DIR / "3D_GBM_pretrained_V" / f"V_pretrained_seed_{model_seed}.pth"
+        ckpt_path = OUTPUT_DIR / "pretrained_V" / f"V_pretrained_seed_{model_seed}.pth"
         V_net.load_state_dict(torch.load(ckpt_path, map_location=device))
     else:
-        bundle_path = OUTPUT_DIR / "3D_GBM_sat_V" / f"eval_bundle_seed_{model_seed}.pth"
+        bundle_path = OUTPUT_DIR / "sat_V" / f"eval_bundle_seed_{model_seed}.pth"
         bundle = load_eval_bundle(bundle_path, map_location=device)
         V_net.load_state_dict(bundle["V_state_dict"])
     V_net.eval()
     return V_net
 
 def build_dynamics(params: Hyperparameters, device: str = "cpu", pretrain=False):
-    u_nn = ZeroControl(input_dim=params.network.n_inputs)
+    u_nn = LinearControlNN(prior_knowledge=True, input_dim=2)
     def f_ol(x: torch.Tensor, u: torch.Tensor | None = None) -> torch.Tensor:
-        x1, x2, x3 = x[:, 0], x[:, 1], x[:, 2]
-        f1 = -1.5 * x1 + 1.0 * x2 + 0.0 * x3
-        f2 = -1.0 * x1 - 1.5 * x2 + 1.0 * x3
-        f3 =  0.0 * x1 - 1.0 * x2 - 1.5 * x3
-        return torch.stack([f1, f2, f3], dim=1)
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        f1 = -0.5 * x1 + 1.0 * x2
+        f2 = -1.0 * x1 + -0.5 * x2
+        return torch.stack([f1, f2], dim=1)
 
-    g_coeffs = torch.tensor([0.2, 0.2, 0.2], dtype=torch.float32)
+    g_coeffs = torch.tensor([0.2, 0.2], dtype=torch.float32)
 
     def g(x: torch.Tensor) -> torch.Tensor:
         return g_coeffs.to(device=x.device, dtype=x.dtype) * x  # (N,3) diagonal diffusion entries
@@ -127,25 +127,17 @@ def generate_scenario_data(N_loop, N_samples, full_range, init_range, unsafe_ran
 
 def main():
     params = Hyperparameters.default()
-    params.network.n_inputs = 3
+    params.network.n_inputs = 2
     params.network.n_hidden_1 = 64
     params.network.n_hidden_2 = 64
     params.network.n_outputs = 1
-    params.network.input_scale = [100.0, 100.0, 100.0]
+    params.network.input_scale = [100.0, 100.0]
     params.network.scale_factor = 20.0
 
-    init_range = np.array([[45.0, 55.0],
-                           [-55.0, -45.0],
-                           [50.0, 60.0]], dtype=np.float32)
-    goal_range = np.array([[-25.0, 25.0],
-                           [-25.0, 25.0],
-                           [-25.0, 25.0]], dtype=np.float32)
-    unsafe_range = np.array([[-100.0, -80.0],
-                             [-100.0, 100.0],
-                             [-100.0, -80.0]], dtype=np.float32)
-    full_range = np.array([[-100.0, 100.0],
-                           [-100.0, 100.0],
-                           [-100.0, 100.0]], dtype=np.float32)
+    init_range = np.array([[45.0, 55.0], [-55.0, -45.0]], dtype=np.float32)
+    goal_range = np.array([[-25.0, 25.0], [-25.0, 25.0]], dtype=np.float32)
+    unsafe_range = np.array([[-100.0, -80.0], [-100.0, 100.0]], dtype=np.float32)
+    full_range = np.array([[-100.0, 100.0], [-100.0, 100.0]], dtype=np.float32)
     
     ### Just need to Change these five parameters ###
     N_loop = 5

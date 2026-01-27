@@ -31,28 +31,34 @@ torch.set_default_dtype(torch.float32)
 # =============================================================================
 # Build model + dynamics
 # =============================================================================
-def build_V(params: Hyperparameters, device: str = "cpu", pretrain=False, model_seed=None):
+def build_V(params: Hyperparameters, bundle_path: Path, device: str = "cpu", pretrain=False, model_seed=None):
     V_net = create_V(params.network).to(device)
     if(pretrain):
-        ckpt_path = OUTPUT_DIR / "3D_GBM_pretrained_V" / f"V_pretrained_seed_{model_seed}.pth"
+        ckpt_path = OUTPUT_DIR / "5D_GBM_pretrained_V" / f"V_pretrained_seed_{model_seed}.pth"
         V_net.load_state_dict(torch.load(ckpt_path, map_location=device))
     else:
-        bundle_path = OUTPUT_DIR / "3D_GBM_sat_V" / f"eval_bundle_seed_{model_seed}.pth"
         bundle = load_eval_bundle(bundle_path, map_location=device)
         V_net.load_state_dict(bundle["V_state_dict"])
     V_net.eval()
     return V_net
 
-def build_dynamics(params: Hyperparameters, device: str = "cpu", pretrain=False):
+def build_dynamics(params: Hyperparameters, bundle_path: Path, device: str = "cpu", pretrain=False):
     u_nn = ZeroControl(input_dim=params.network.n_inputs)
-    def f_ol(x: torch.Tensor, u: torch.Tensor | None = None) -> torch.Tensor:
-        x1, x2, x3 = x[:, 0], x[:, 1], x[:, 2]
-        f1 = -1.5 * x1 + 1.0 * x2 + 0.0 * x3
-        f2 = -1.0 * x1 - 1.5 * x2 + 1.0 * x3
-        f3 =  0.0 * x1 - 1.0 * x2 - 1.5 * x3
-        return torch.stack([f1, f2, f3], dim=1)
 
-    g_coeffs = torch.tensor([0.2, 0.2, 0.2], dtype=torch.float32)
+    def f_ol(x: torch.Tensor, u: torch.Tensor | None = None) -> torch.Tensor:
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        x3 = x[:, 2]
+        x4 = x[:, 3]
+        x5 = x[:, 4]
+        f1 = -1.5 * x1 + 1.0 * x2 + 0.0 * x3 + 0.0 * x4 + 0.0 * x5
+        f2 = -1.0 * x1 - 1.5 * x2 + 1.0 * x3 + 0.0 * x4 + 0.0 * x5
+        f3 =  0.0 * x1 - 1.0 * x2 - 1.5 * x3 + 1.0 * x4 + 0.0 * x5
+        f4 =  0.0 * x1 + 0.0 * x2 - 1.0 * x3 - 1.5 * x4 + 1.0 * x5
+        f5 =  0.0 * x1 + 0.0 * x2 + 0.0 * x3 - 1.0 * x4 - 1.5 * x5
+        return torch.stack([f1, f2, f3, f4, f5], dim=1)
+
+    g_coeffs = torch.full((params.network.n_inputs,), 0.2, dtype=torch.float32)
 
     def g(x: torch.Tensor) -> torch.Tensor:
         return g_coeffs.to(device=x.device, dtype=x.dtype) * x  # (N,3) diagonal diffusion entries
@@ -127,25 +133,17 @@ def generate_scenario_data(N_loop, N_samples, full_range, init_range, unsafe_ran
 
 def main():
     params = Hyperparameters.default()
-    params.network.n_inputs = 3
+    params.network.n_inputs = 5
     params.network.n_hidden_1 = 64
-    params.network.n_hidden_2 = 64
+    params.network.n_hidden_2 = 16
     params.network.n_outputs = 1
-    params.network.input_scale = [100.0, 100.0, 100.0]
+    params.network.input_scale = [100.0, 100.0, 100.0, 100.0, 100.0]
     params.network.scale_factor = 20.0
 
-    init_range = np.array([[45.0, 55.0],
-                           [-55.0, -45.0],
-                           [50.0, 60.0]], dtype=np.float32)
-    goal_range = np.array([[-25.0, 25.0],
-                           [-25.0, 25.0],
-                           [-25.0, 25.0]], dtype=np.float32)
-    unsafe_range = np.array([[-100.0, -80.0],
-                             [-100.0, 100.0],
-                             [-100.0, -80.0]], dtype=np.float32)
-    full_range = np.array([[-100.0, 100.0],
-                           [-100.0, 100.0],
-                           [-100.0, 100.0]], dtype=np.float32)
+    init_range = np.array([[45.0, 55.0], [-55.0, -45.0], [45.0, 55.0], [45.0, 55.0], [45.0, 55.0]], dtype=np.float32)
+    goal_range = np.array([[-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0]], dtype=np.float32)
+    unsafe_range = np.array([[-100.0, -80.0], [-100.0, 100.0], [-100.0, -80.0], [-100.0, -80.0], [-100.0, -80.0]], dtype=np.float32)
+    full_range = np.array([[-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0]], dtype=np.float32)
     
     ### Just need to Change these five parameters ###
     N_loop = 5
@@ -156,27 +154,17 @@ def main():
     default_weights = [0.1, 0.1, 0.1, 0.7]
     ################################################
 
+    # models from sample pre-training
     for i in range(5):
         model_seed = i
-        # models from sample pre-training
-        V_net = build_V(params, device="cpu", pretrain=True, model_seed=model_seed)
-        dynamics = build_dynamics(params, device="cpu", pretrain=True)
+        V_net = build_V(params, OUTPUT_DIR / "eval_bundle.pth", device="cpu", pretrain=True, model_seed=model_seed)
+        dynamics = build_dynamics(params, OUTPUT_DIR / "eval_bundle.pth", device="cpu", pretrain=True)
         generate_scenario_data(N_loop, N_samples,
             full_range, init_range, unsafe_range, goal_range, V_net, dynamics,
             Use_weighted_uniform, default_weights,
             sample_features_path="samples_features_pretrainmodel_"+str(model_seed)+".csv", 
             x_full_path="x_full_pretrainmodel_"+str(model_seed)+".csv")
-        
-        # models from bound training (sat)
-        V_net = build_V(params, device="cpu", pretrain=False, model_seed=model_seed)
-        dynamics = build_dynamics(params, device="cpu", pretrain=False)
-        generate_scenario_data(N_loop, N_samples,
-            full_range, init_range, unsafe_range, goal_range, V_net, dynamics,
-            Use_weighted_uniform, default_weights,
-            sample_features_path="samples_features_satmodel_"+str(model_seed)+".csv", 
-            x_full_path="x_full_satmodel_"+str(model_seed)+".csv")
-
-    # Ignore below codes
+    
     # w_last = V_net.output.weight[0] # extract the weights of the last layer
     # b_last = V_net.output.bias[0] # extract the bias of the last layer
     # # =============================================================================
