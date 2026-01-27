@@ -32,7 +32,7 @@ from src.utils import cleanup_and_setup_directories
 from src.visualization import create_summary_plots
 
 # Set random seed
-# torch.manual_seed(0)
+torch.manual_seed(4)
 
 def pretrain_network_samples(
     model,
@@ -402,6 +402,7 @@ def main(benchmark_mode=False):
                 lr=params.training.pretrain_lr,
                 n_each=params.training.pretrain_n_samples,
                 device=params.training.device,
+                save_v_path=OUTPUT_DIR / "V_pretrained.pth",
             )
 
         # === Training ===
