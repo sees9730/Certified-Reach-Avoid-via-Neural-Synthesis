@@ -46,7 +46,9 @@ def pretrain_network_samples(
     lr=0.01,
     device="cpu",
     control_net=None,
-    n_each: int = 400, 
+    n_each: int = 400,
+    save_v_path=None,
+    save_control_path=None,
 ):
     print("\n" + "="*20)
     print("Pre-training")
@@ -175,11 +177,20 @@ def pretrain_network_samples(
         total_loss.backward()
         optimizer.step()
 
+    # Restore best model
     if best_model_state is not None:
         model.load_state_dict(best_model_state)
         if control_net is not None and best_control_state is not None:
             control_net.load_state_dict(best_control_state)
         print(f"\nBest loss: {best_loss:.6f}")
+
+        # Save best pretrained weights (state_dict)
+        if save_v_path is not None:
+            torch.save(best_model_state, save_v_path)
+            print(f"Saved pretrained V_net to: {save_v_path}")
+        if (control_net is not None) and (best_control_state is not None) and (save_control_path is not None):
+            torch.save(best_control_state, save_control_path)
+            print(f"Saved pretrained Controller_net to: {save_control_path}")
 
     print("="*20)
     networks_trained = ["V"]
@@ -199,6 +210,9 @@ def main(benchmark_mode=False):
                         help="1: run benchmark (5 runs), 0: normal run")
     args = parser.parse_args()
 
+    if benchmark_mode:
+        args.benchmark = 1
+
     print("="*20)
     print("Geometric Brownian Motion Verification")
     print("="*20)
@@ -207,10 +221,6 @@ def main(benchmark_mode=False):
     training_time_result = None
 
     # === Hyperparameters ===
-    print("\n" + "="*20)
-    print("Hyperparameters")
-    print("="*20)
-
     params = Hyperparameters.default()
 
     # Customize configuration
@@ -231,7 +241,6 @@ def main(benchmark_mode=False):
     params.discretization.n_unsafe = 7
     params.discretization.n_init = 7
 
-    params.constraints.beta_s = 0.0
     params.constraints.beta_ra = 20.0
 
     params.compute_V = True
@@ -250,13 +259,13 @@ def main(benchmark_mode=False):
     params.refinement.v_outside.max_cells = 30000
     params.refinement.v_outside.N_to_refine = 100
 
-    # Merging - Outside Region
+    # Merging
     params.refinement.v_outside.enable_merging = True
     params.refinement.v_outside.merge_interval = 502
     params.refinement.v_outside.merge_max_passes = 8
     params.refinement.v_outside.merge_relax_margin = 0.3
 
-    # Refinement - Generator Region
+    # Refinement
     params.refinement.gv_generator.enable_refinement = True
     params.refinement.gv_generator.refine_interval = 100
     params.refinement.gv_generator.late_epoch_threshold = 2500
@@ -265,7 +274,7 @@ def main(benchmark_mode=False):
     params.refinement.gv_generator.max_cells = 30000
     params.refinement.gv_generator.N_to_refine = 100
 
-    # Merging - Generator Region
+    # Merging
     params.refinement.gv_generator.enable_merging = True
     params.refinement.gv_generator.merge_interval = 502
     params.refinement.gv_generator.merge_max_passes = 8
@@ -344,7 +353,8 @@ def main(benchmark_mode=False):
                 num_epochs=params.training.pretrain_epochs,
                 lr=params.training.pretrain_lr,
                 device=params.training.device,
-                n_each=params.training.pretrain_n_samples
+                n_each=params.training.pretrain_n_samples,
+                save_v_path=OUTPUT_DIR / "V_pretrained.pth",
             )
 
         # === Training ===

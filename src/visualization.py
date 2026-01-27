@@ -170,9 +170,9 @@ def _draw_region_proj(ax, region, color: str, label: str, x_dim: int, y_dim: int
 def visualize_value_function(
     V_net,
     regions: Regions,
-    title: str = "Value Function V(x)",
     show_regions: bool = True,
     show_discretization: bool = False,
+    epoch: Optional[int] = None,
     training_cells: Optional[List] = None,
     filename: Optional[str] = None,
     resolution: int = 100,
@@ -214,9 +214,14 @@ def visualize_value_function(
 
         ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
         ax.set_ylabel(_format_dim_label(y_dim), fontsize=12)
-        ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
-                     f"Range: [{vmin:.4f}, {vmax:.4f}]",
-                     fontsize=12, fontweight='bold')
+        if epoch is not None:
+            ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
+                        f"Epoch: {epoch} - V(x) Output Range: [{vmin:.4f}, {vmax:.4f}]",
+                        fontsize=12, fontweight='bold')
+        else:
+            ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
+                        f"Final Evaluation - V(x) Output Range: [{vmin:.4f}, {vmax:.4f}]",
+                        fontsize=12, fontweight='bold')
 
         # Regions (projected)
         if show_regions:
@@ -225,9 +230,9 @@ def visualize_value_function(
             lab_unsafe = "Unsafe" if p == 0 else None
             lab_goal  = "Goal" if p == 0 else None
 
-            _draw_region_proj(ax, regions.init,   'green', lab_init,  x_dim, y_dim)
-            _draw_region_proj(ax, regions.unsafe, 'red',   lab_unsafe, x_dim, y_dim)
-            _draw_region_proj(ax, regions.goal,   'blue',  lab_goal,  x_dim, y_dim)
+            _draw_region_proj(ax, regions.init, 'seagreen', lab_init, x_dim, y_dim)
+            _draw_region_proj(ax, regions.unsafe, 'firebrick', lab_unsafe, x_dim, y_dim)
+            _draw_region_proj(ax, regions.goal, 'darkgoldenrod', lab_goal, x_dim, y_dim)
 
             if p == 0:
                 ax.legend(loc='upper right', fontsize=10)
@@ -239,16 +244,15 @@ def visualize_value_function(
                     (cell_lower[x_dim].item(), cell_lower[y_dim].item()),
                     cell_upper[x_dim].item() - cell_lower[x_dim].item(),
                     cell_upper[y_dim].item() - cell_lower[y_dim].item(),
-                    linewidth=0.5, edgecolor='black', facecolor='none', alpha=0.5
+                    linewidth=0.5, edgecolor='dimgray', facecolor='none', alpha=1.0
                 )
                 ax.add_patch(rect)
 
-    fig.suptitle(title, fontsize=14, fontweight='bold')
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    fig.tight_layout()
 
     if filename is None:
-        filename = "value_function.png"
-    fig.savefig(filename, dpi=150)
+        filename = "value_function.pdf"
+    fig.savefig(filename, dpi=500, format='pdf')
     plt.close(fig)
 
     V_net.train()
@@ -258,9 +262,9 @@ def visualize_generator(
     V_net,
     GV_net,
     regions: Regions,
-    title: str = "Generator GV(x)",
     show_regions: bool = True,
     show_discretization: bool = False,
+    epoch: Optional[int] = None,
     training_cells: Optional[List] = None,
     results=None,
     filename: Optional[str] = None,
@@ -291,7 +295,7 @@ def visualize_generator(
         ax = axes[p]
 
         slice_point = make_slice_point_for_region(
-            regions.goal,   # or regions.goal / regions.init / regions.full
+            regions.goal,
             full_bounds,
             x_dim=x_dim,
             y_dim=y_dim,
@@ -320,8 +324,13 @@ def visualize_generator(
 
         ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
         ax.set_ylabel(_format_dim_label(y_dim), fontsize=12)
-        ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
-                     f"Range: [{phi_min:.4f}, {phi_max:.4f}]",
+        if epoch is not None:
+            ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
+                     f"Epoch {epoch} - GV(x) Output Range: [{phi_min:.4f}, {phi_max:.4f}]",
+                     fontsize=12, fontweight='bold')
+        else:
+            ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
+                     f"Final Evaluation - GV(x) Output Range: [{phi_min:.4f}, {phi_max:.4f}]",
                      fontsize=12, fontweight='bold')
 
         if show_regions:
@@ -329,9 +338,9 @@ def visualize_generator(
             lab_unsafe = "Unsafe" if p == 0 else None
             lab_goal  = "Goal" if p == 0 else None
 
-            _draw_region_proj(ax, regions.init,   'green', lab_init,  x_dim, y_dim)
-            _draw_region_proj(ax, regions.unsafe, 'red',   lab_unsafe, x_dim, y_dim)
-            _draw_region_proj(ax, regions.goal,   'blue',  lab_goal,  x_dim, y_dim)
+            _draw_region_proj(ax, regions.init, 'seagreen', lab_init, x_dim, y_dim)
+            _draw_region_proj(ax, regions.unsafe, 'firebrick', lab_unsafe, x_dim, y_dim)
+            _draw_region_proj(ax, regions.goal, 'darkgoldenrod', lab_goal, x_dim, y_dim)
 
             if p == 0:
                 ax.legend(loc='upper right', fontsize=10)
@@ -342,16 +351,15 @@ def visualize_generator(
                     (cell_lower[x_dim].item(), cell_lower[y_dim].item()),
                     cell_upper[x_dim].item() - cell_lower[x_dim].item(),
                     cell_upper[y_dim].item() - cell_lower[y_dim].item(),
-                    linewidth=0.5, edgecolor='black', facecolor='none', alpha=0.5
+                    linewidth=0.5, edgecolor='dimgray', facecolor='none', alpha=1.0
                 )
                 ax.add_patch(rect)
 
-    fig.suptitle(title, fontsize=14, fontweight='bold')
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    fig.tight_layout()
 
     if filename is None:
-        filename = "generator.png"
-    fig.savefig(filename, dpi=150)
+        filename = "generator.pdf"
+    fig.savefig(filename, dpi=500, format='pdf')
     plt.close(fig)
 
     V_net.train()
@@ -382,7 +390,7 @@ def visualize_training_progress(
 
     # Cells for V network (all regions except generator)
     v_cells = []
-    for region_name in ['init', 'goal', 'unsafe', 'outside', 'boundary']:
+    for region_name in ['init', 'goal', 'unsafe', 'outside']:
         if region_name in region_cells:
             v_cells.extend(region_cells[region_name])
 
@@ -393,11 +401,11 @@ def visualize_training_progress(
     visualize_value_function(
         V_net=V_net,
         regions=regions,
-        title=f"Value Function V(x) - Epoch {epoch}",
+        epoch=epoch,
         show_regions=True,
         show_discretization=True,
         training_cells=v_cells,
-        filename=f"{output_dir}/value_function_epoch_{epoch}.png"
+        filename=f"{output_dir}/value_function_epoch_{epoch}.pdf"
     )
 
     # Plot generator with GV discretization
@@ -405,11 +413,11 @@ def visualize_training_progress(
         V_net=V_net,
         GV_net=GV_net,
         regions=regions,
-        title=f"Generator GV(x) - Epoch {epoch}",
+        epoch=epoch,
         show_regions=True,
         show_discretization=True,
         training_cells=gv_cells,
-        filename=f"{output_dir}/generator_epoch_{epoch}.png"
+        filename=f"{output_dir}/generator_epoch_{epoch}.pdf"
     )
 
     print(f"Saved visualization plots for epoch {epoch} to '{output_dir}'")
@@ -463,9 +471,9 @@ def plot_constraint_regions(
 
         # constraint contours
         ax.contour(X, Y, V_grid, levels=[beta_s / 2.0], colors='cyan', linewidths=2, linestyles='--')
-        ax.contour(X, Y, V_grid, levels=[beta_s],       colors='yellow', linewidths=2, linestyles='--')
-        ax.contour(X, Y, V_grid, levels=[1.0],       colors='green', linewidths=2, linestyles='--')
-        ax.contour(X, Y, V_grid, levels=[beta_ra],      colors='orange', linewidths=2, linestyles='--')
+        ax.contour(X, Y, V_grid, levels=[beta_s], colors='yellow', linewidths=2, linestyles='--')
+        ax.contour(X, Y, V_grid, levels=[1.0], colors='green', linewidths=2, linestyles='--')
+        ax.contour(X, Y, V_grid, levels=[beta_ra], colors='orange', linewidths=2, linestyles='--')
 
         ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
         ax.set_ylabel(_format_dim_label(y_dim), fontsize=12)
@@ -487,8 +495,8 @@ def plot_constraint_regions(
     fig.tight_layout(rect=[0, 0, 1, 0.95])
 
     if filename is None:
-        filename = "constraint_regions.png"
-    fig.savefig(filename, dpi=150)
+        filename = "constraint_regions.pdf"
+    fig.savefig(filename, dpi = 500, format='pdf')
     plt.close(fig)
 
     V_net.train()
@@ -498,10 +506,10 @@ def plot_loss_history(
     loss_history: List[dict],
     refinement_epochs: Optional[dict] = None,
     filename: Optional[str] = None,
-    figsize: Tuple[int, int] = (12, 8)
+    figsize: Tuple[int, int] = (14, 7)
 ):
     """
-    Plot training loss history.
+    Plot training loss history with stacked area chart showing contribution of each component.
 
     Args:
         loss_history: List of loss dictionaries from training
@@ -513,89 +521,75 @@ def plot_loss_history(
         print("No loss history to plot")
         return
 
-    epochs = [d['epoch'] for d in loss_history]
+    epochs = np.array([d['epoch'] for d in loss_history])
 
-    fig, axes = plt.subplots(2, 3, figsize=figsize)
-    fig.suptitle("Training Loss History", fontsize=16, fontweight='bold')
+    # Extract loss components
+    init_loss = np.array([d['init'] for d in loss_history])
+    unsafe_loss = np.array([d['unsafe'] for d in loss_history])
+    outside_loss = np.array([d['outside'] for d in loss_history])
+    generator_loss = np.array([d['generator'] for d in loss_history])
+    total_loss = np.array([d['total'] for d in loss_history])
 
-    # Total loss
-    axes[0, 0].plot(epochs, [d['total'] for d in loss_history], 'k-', linewidth=2)
-    axes[0, 0].set_title('Total Loss')
-    axes[0, 0].set_xlabel('Epoch')
-    axes[0, 0].set_ylabel('Loss')
-    axes[0, 0].grid(True, alpha=0.3)
+    # Create single figure
+    fig, ax = plt.subplots(1, 1, figsize=figsize)
+    fig.suptitle("Training Loss History - Component Contributions", fontsize=16, fontweight='bold')
 
-    # Goal loss
-    axes[0, 1].plot(epochs, [d['goal'] for d in loss_history], 'b-', linewidth=2)
-    axes[0, 1].set_title('Goal Loss')
-    axes[0, 1].set_xlabel('Epoch')
-    axes[0, 1].set_ylabel('Loss')
-    axes[0, 1].grid(True, alpha=0.3)
+    # Stacked area chart showing contribution of each loss component
+    ax.stackplot(epochs, init_loss, unsafe_loss, outside_loss, generator_loss,
+                 labels=['Init', 'Unsafe', 'Outside', 'Generator'],
+                 colors=['#2ecc71', '#e74c3c', 'orange', '#9b59b6'],
+                 alpha=0.8)
 
-    # Unsafe loss
-    axes[0, 2].plot(epochs, [d['unsafe'] for d in loss_history], 'r-', linewidth=2)
-    axes[0, 2].set_title('Unsafe Loss')
-    axes[0, 2].set_xlabel('Epoch')
-    axes[0, 2].set_ylabel('Loss')
-    axes[0, 2].grid(True, alpha=0.3)
+    # Overlay total loss as a thick black line
+    ax.plot(epochs, total_loss, 'k-', linewidth=3, label='Total Loss', zorder=10)
 
-    # Init loss
-    axes[1, 0].plot(epochs, [d['init'] for d in loss_history], 'g-', linewidth=2)
-    axes[1, 0].set_title('Init Loss')
-    axes[1, 0].set_xlabel('Epoch')
-    axes[1, 0].set_ylabel('Loss')
-    axes[1, 0].grid(True, alpha=0.3)
+    ax.set_xlabel('Epoch', fontsize=12)
+    ax.set_ylabel('Loss Magnitude', fontsize=12)
+    ax.legend(loc='upper right', fontsize=11, framealpha=0.95)
+    ax.grid(True, alpha=0.3, zorder=0)
 
-    # Outside loss
-    axes[1, 1].plot(epochs, [d['outside'] for d in loss_history], 'c-', linewidth=2)
-    axes[1, 1].set_title('Outside Loss')
-    axes[1, 1].set_xlabel('Epoch')
-    axes[1, 1].set_ylabel('Loss')
-    axes[1, 1].grid(True, alpha=0.3)
+    # Add refinement epoch markers with improved visualization
+    refinement_legend_items = []
 
-    # Generator loss
-    axes[1, 2].plot(epochs, [d['generator'] for d in loss_history], 'm-', linewidth=2)
-    axes[1, 2].set_title('Generator Loss')
-    axes[1, 2].set_xlabel('Epoch')
-    axes[1, 2].set_ylabel('Loss')
-    axes[1, 2].grid(True, alpha=0.3)
-
-    # Add vertical lines for adaptive refinement events
-    legend_added = False
     if refinement_epochs is not None:
-        # Outside refinements
+        # Outside refinements - use solid vertical spans
         outside_refs = refinement_epochs.get('outside', [])
         if len(outside_refs) > 0:
-            for ax in axes.flat:
-                for ref_epoch in outside_refs:
-                    ax.axvline(x=ref_epoch, color='black', linestyle='--',
-                              linewidth=1.5, alpha=0.7)
-            # Add to legend
-            axes[0, 0].axvline(x=outside_refs[0], color='black', linestyle='--',
-                              linewidth=1.5, alpha=0.7, label='Outside Refine')
-            legend_added = True
+            for i, ref_epoch in enumerate(outside_refs):
+                # Use narrow vertical spans instead of lines for better visibility
+                ax.axvspan(ref_epoch - 5, ref_epoch + 5, color='orange', alpha=0.15, zorder=0)
+                line = ax.axvline(x=ref_epoch, color='darkorange', linestyle='-',
+                                 linewidth=2.5, alpha=0.85, zorder=1)
+                if i == 0:
+                    refinement_legend_items.append((line, 'Outside Refine'))
 
-        # Generator refinements
+        # Generator refinements - use different color
         generator_refs = refinement_epochs.get('generator', [])
         if len(generator_refs) > 0:
-            for ax in axes.flat:
-                for ref_epoch in generator_refs:
-                    ax.axvline(x=ref_epoch, color='steelblue', linestyle='--',
-                              linewidth=1.5, alpha=0.7)
-            # Add to legend
-            axes[0, 0].axvline(x=generator_refs[0], color='steelblue', linestyle='--',
-                              linewidth=1.5, alpha=0.7, label='Generator Refine')
-            legend_added = True
+            for i, ref_epoch in enumerate(generator_refs):
+                # Use narrow vertical spans
+                ax.axvspan(ref_epoch - 5, ref_epoch + 5, color='purple', alpha=0.12, zorder=0)
+                line = ax.axvline(x=ref_epoch, color='purple', linestyle='-',
+                                 linewidth=2.5, alpha=0.85, zorder=1)
+                if i == 0:
+                    refinement_legend_items.append((line, 'Generator Refine'))
 
-        if legend_added:
-            axes[0, 0].legend(loc='best', fontsize=8)
+        # Add refinement markers to the legend
+        if refinement_legend_items:
+            # Get existing legend items
+            handles, labels = ax.get_legend_handles_labels()
+            # Add refinement markers
+            for line, label in refinement_legend_items:
+                handles.append(line)
+                labels.append(label)
+            ax.legend(handles, labels, loc='upper right', fontsize=11, framealpha=0.95)
 
     plt.tight_layout()
 
     # Save
     if filename is None:
-        filename = "loss_history.png"
-    plt.savefig(filename, dpi=150)
+        filename = "loss_history.pdf"
+    plt.savefig(filename, dpi=500, format='pdf')
     plt.close()
 
 
@@ -630,7 +624,7 @@ def create_summary_plots(
 
     # Cells for V network (all regions except generator)
     v_cells = []
-    for region_name in ['init', 'goal', 'unsafe', 'outside', 'boundary']:
+    for region_name in ['init', 'goal', 'unsafe', 'outside']:
         if region_name in region_cells:
             v_cells.extend(region_cells[region_name])
 
@@ -640,28 +634,26 @@ def create_summary_plots(
     # Value function with V discretization
     visualize_value_function(
         V_net, regions,
-        title="Value Function V(x)",
         show_regions=True,
         show_discretization=True,
         training_cells=v_cells,
-        filename=f"{output_dir}/value_function.png"
+        filename=f"{output_dir}/value_function.pdf"
     )
 
     # Generator with GV discretization
     visualize_generator(
         V_net, GV_net, regions,
-        title="Generator GV(x) outside goal and outside unsafe",
         show_regions=True,
         show_discretization=True,
         training_cells=gv_cells,
         results=results,
-        filename=f"{output_dir}/generator.png"
+        filename=f"{output_dir}/generator.pdf"
     )
 
     # Constraint regions
     plot_constraint_regions(
         V_net, regions, beta_s, beta_ra,
-        filename=f"{output_dir}/constraint_regions.png"
+        filename=f"{output_dir}/constraint_regions.pdf"
     )
 
     # Loss history
@@ -669,7 +661,7 @@ def create_summary_plots(
         plot_loss_history(
             loss_history,
             refinement_epochs=refinement_epochs,
-            filename=f"{output_dir}/loss_history.png"
+            filename=f"{output_dir}/loss_history.pdf"
         )
 
     print(f"All plots saved to '{output_dir}/'")
