@@ -33,12 +33,7 @@ jobs:
       run: |
         python -m pytest tests/test_activation_functions.py -v
 
-    - name: Smoke test gbm_syn
+    - name: Test 2D_gbm_veri
       run: |
-        cd gbm_syn
-        timeout 120 python main.py --train=1 || true
-
-    - name: Smoke test gbm_veri
-      run: |
-        cd gbm_veri
+        cd examples/verification/2D_gbm_veri
         timeout 120 python main.py --train=1 || true

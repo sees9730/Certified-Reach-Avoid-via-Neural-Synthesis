@@ -1,43 +1,37 @@
 """
-3D Geometric Brownian Motion Control Synthesis
-NOTE: the training progress visualization is turned off because it has not been changed to allow generic x dimension
+4D Geometric Brownian Motion Verification
 """
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import numpy as np
-import math
-import time
 import argparse
+import statistics as stats
+import sys
+import time
+from pathlib import Path
+
+import numpy as np
+import torch
+import torch.nn.functional as F
 
 # Set up directories
-from pathlib import Path
-ROOT = Path(__file__).resolve().parents[3]   # repo_root
+ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 OUTPUT_DIR = HERE / "outputs"
-import sys
 sys.path.insert(0, str(ROOT))
 
-from src.hyperparameters import Hyperparameters
-from src.dynamics import Dynamics, ClosedLoopDrift
-from src.regions import Regions, Region
-from src.network import create_V
-from src.control_network import LinearControlNN # [control synthesis]
-from src.phi_module import create_GV
+from src.control_network import LinearControlNN
 from src.discretization import discretize_regions
-from src.training_utils import (
-    evaluate_constraints,
-    print_constraint_summary,
-)
+from src.dynamics import ClosedLoopDrift, Dynamics
+from src.hyperparameters import Hyperparameters
+from src.network import create_V
+from src.phi_module import create_GV
+from src.regions import Region, Regions
+from src.save_load_utils import (enable_terminal_logging, load_eval_bundle,
+                                  log_loaded_training_epochs, save_eval_bundle)
 from src.trainer import train_network_bounds
-from src.save_load_utils import save_eval_bundle, load_eval_bundle, log_loaded_training_epochs, enable_terminal_logging
+from src.training_utils import evaluate_constraints, print_constraint_summary
 from src.utils import cleanup_and_setup_directories
-from src.visualization import (
-    # visualize_training_progress,
-    create_summary_plots
-)
+from src.visualization import create_summary_plots
 
-# Set random seed immediately after imports (matching testing_simple3.py)
+# Set random seed
 torch.manual_seed(0)
 
 def pretrain_network_samples(
@@ -253,24 +247,22 @@ def pretrain_network_samples(
     print(f"Pre-training complete. {' + '.join(networks_trained)} initialized.")
 
 
-def main():
+def main(benchmark_mode=False):
     parser = argparse.ArgumentParser()
     parser.add_argument("--train", type=int, default=1, choices=[0, 1],
                         help="1: train + save bundle, 0: load bundle + eval/plot")
+    parser.add_argument("--benchmark", type=int, default=0, choices=[0, 1],
+                        help="1: run benchmark (5 runs), 0: normal run")
     args = parser.parse_args()
 
-    """Main training function."""
-    print("="*80)
-    print("MODULAR RL VERIFICATION - BOUND-BASED TRAINING")
-    print("="*80)
+    if benchmark_mode:
+        args.benchmark = 1
 
-    # ========================================================================
-    # 1. HYPERPARAMETERS
-    # ========================================================================
-    print("\n" + "="*80)
-    print("HYPERPARAMETERS")
-    print("="*80)
+    print("="*20)
+    print("4D Geometric Brownian Motion Verification")
+    print("="*20)
 
+    # === Hyperparameters ===
     params = Hyperparameters.default()
 
     # Customize configuration
@@ -281,27 +273,25 @@ def main():
     params.network.scale_factor = 20.0
 
     params.training.learning_rate = 0.005
-    params.training.num_epochs = 200000  # Adjust as needed
-    params.training.learnable_scale = False
-    params.training.learnable_input_scale = False
-    params.training.generator_weight = 1.0  # Enable generator constraint
+    params.training.num_epochs = 200000
+    params.training.generator_weight = 1.0
     params.training.generator_start_epoch = 0
 
     params.discretization.n_goal = 6
     params.discretization.n_outside_goal = 2
-    params.discretization.n_generator = 2  # Will be overridden by radial discretization
+    params.discretization.n_generator = 2
     params.discretization.n_unsafe = 6
     params.discretization.n_init = 6
 
-    # Set beta_s to a value (constant), or set to None to make it learnable
-    # If learnable_beta_s is True, this value will be used as initialization
-    params.training.learnable_beta_s = False  # Set to True to make beta_s learnable
-    params.constraints.beta_s = 0.00
     params.constraints.beta_ra = 20.0
 
     # Control what to compute during training
     params.compute_V = True
     params.compute_GV = True
+
+    params.training.enable_pretraining = True
+    params.training.pretrain_epochs = 1500
+    params.training.pretrain_lr = 0.01
 
     params.refinement.v_outside.enable_refinement = True
     params.refinement.v_outside.refine_interval = 250
@@ -309,7 +299,7 @@ def main():
     params.refinement.v_outside.refine_interval_late = 50
     params.refinement.v_outside.refine_factor = 2
     params.refinement.v_outside.max_cells = 30000
-    params.refinement.v_outside.N_to_refine = 300  # Not specified (older version)
+    params.refinement.v_outside.N_to_refine = 300
 
     params.refinement.v_outside.enable_merging = True
     params.refinement.v_outside.merge_interval = 501
@@ -322,21 +312,14 @@ def main():
     params.refinement.gv_generator.refine_interval_late = 100
     params.refinement.gv_generator.refine_factor = 2
     params.refinement.gv_generator.max_cells = 30000
-    params.refinement.gv_generator.N_to_refine = 300  # Not specified (older version)
+    params.refinement.gv_generator.N_to_refine = 300
 
     params.refinement.gv_generator.enable_merging = True
     params.refinement.gv_generator.merge_interval = 501
     params.refinement.gv_generator.merge_max_passes = 8
     params.refinement.gv_generator.merge_relax_margin = -100.0
 
-    # ========================================================================
-    # 2. SYSTEM DYNAMICS
-    # ========================================================================
-    print("\n" + "="*80)
-    print("SYSTEM DYNAMICS")
-    print("="*80)
-
-    # Option 2: Neural network control (implements same K @ x)
+    # === System Dynamics ===
     u_nn = LinearControlNN(prior_knowledge=True, 
                            input_dim=params.network.n_inputs)
 
@@ -352,8 +335,8 @@ def main():
         return torch.stack([f1, f2, f3, f4], dim=1)
 
 
-    # Create diffusion coefficients as a persistent tensor to avoid TracerWarnings
     g_coeffs = torch.tensor([0.2, 0.2, 0.2, 0.2], dtype=torch.float32)
+
     def g(x: torch.Tensor) -> torch.Tensor:
         return g_coeffs.to(device=x.device, dtype=x.dtype) * x
 
@@ -362,25 +345,16 @@ def main():
 
     dynamics = Dynamics.dynamics(f=f_cl_module, g=g)
 
-    # ========================================================================
-    # 3. SPATIAL REGIONS
-    # ========================================================================
-    print("\n" + "="*80)
-    print("SPATIAL REGIONS")
-    print("="*80)
-
+    # === Regions ===
     init_range = np.array([[45.0, 55.0], 
                            [-55.0, -45.0],
                            [50.0, 60.0],
                            [45.0, 55.0]
                            ], dtype=np.float32)
-    
     goal_range = np.array([[-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0]
                            ], dtype=np.float32)
-
     unsafe_range = np.array([[-100.0, -80.0], [-100.0, 100.0], [-100.0, -80.0], [-100.0, -80.0]
                              ], dtype=np.float32)
-
     full_range = np.array([[-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0]
                            ], dtype=np.float32)
 
@@ -391,13 +365,7 @@ def main():
 
     regions = Regions(init=init, goal=goal, unsafe=unsafe, full=full)
 
-    # ========================================================================
-    # 4. CREATE NETWORKS
-    # ========================================================================
-    print("\n" + "="*80)
-    print("NETWORKS")
-    print("="*80)
-
+    # === Networks ===
     V_net = create_V(params.network)
     GV_net = create_GV(
         V_net=V_net,
@@ -405,9 +373,7 @@ def main():
         network_config=params.network
     )
 
-    # ========================================================================
-    # 5. DISCRETIZE REGIONS
-    # ========================================================================
+    # === Discretization ===
     region_cells = discretize_regions(
         regions,
         params.discretization,
@@ -416,22 +382,18 @@ def main():
 
     # === Set up ===
     device = params.training.device
-    # Path to bundle we will save/load
     bundle_path = OUTPUT_DIR / "eval_bundle.pth"
 
     if args.train == 1:
-        # ========================================================================
-        # 6.1. PRE-TRAINING (Optional)
-        # ========================================================================
-        cleanup_and_setup_directories(["results", "training_progress"]) # CLEANUP: Remove old results and training progress
+        # === Pre-training ===
+        cleanup_and_setup_directories(["results", "training_progress"])
         enable_terminal_logging(OUTPUT_DIR / "terminal_log.txt")
 
 
-        ENABLE_PRETRAINING = True  # Set to True to enable
-        PRETRAIN_EPOCHS = 1500
-        PRETRAIN_LR = 0.01
+        if params.training.enable_pretraining:
+            # Start timer before pretraining
+            training_start_time = time.time()
 
-        if ENABLE_PRETRAINING:
             pretrain_network_samples(
                 model=V_net,
                 x_goal_range=goal_range,
@@ -439,20 +401,15 @@ def main():
                 x_init_range=init_range,
                 x_range=full_range,
                 params=params,
-                GV_net=GV_net,  # Pass GV_net if you want GV loss, None otherwise
-                num_epochs=PRETRAIN_EPOCHS,
-                lr=PRETRAIN_LR,
+                GV_net=GV_net,
+                num_epochs=params.training.pretrain_epochs,
+                lr=params.training.pretrain_lr,
                 device=params.training.device,
             )
 
             print(f"Pretraining completed!\n")
 
-        # ========================================================================
-        # 6. TRAIN WITH BOUNDS
-        # ========================================================================
-        device = params.training.device
-        print(f"\nUsing device: {device}")
-
+        # === Training ===
         def create_scheduler(optimizer):
             return torch.optim.lr_scheduler.ReduceLROnPlateau(
                 optimizer,
@@ -470,15 +427,18 @@ def main():
             region_cells=region_cells,
             regions=regions,
             params=params,
-            create_scheduler=create_scheduler
+            create_scheduler=create_scheduler,
+            start_time=training_start_time
         )
 
-        # ========================================================================
-        # 7. FINAL EVALUATION
-        # ========================================================================
-        print("\n" + "="*80)
-        print("FINAL EVALUATION")
-        print("="*80)
+        # Record training end time
+        training_end_time = time.time()
+        total_training_time = training_end_time - training_start_time
+
+        # === Final Evaluation ===
+        print("\n" + "="*20)
+        print("Final Evaluation")
+        print("="*20)
 
         results = evaluate_constraints(
             V_net, GV_net, region_cells,
@@ -487,13 +447,10 @@ def main():
         )
         print_constraint_summary(results)
 
-        # ========================================================================
-        # 8. FINAL VISUALIZATIONS
-        # ========================================================================
-        print("\n" + "="*80)
-        print("CREATING FINAL VISUALIZATIONS")
-        print("="*80)
-
+        # === Visualizations ===
+        print("\n" + "="*20)
+        print("Creating Visualizations")
+        print("="*20)
         create_summary_plots(
             V_net=V_net,
             GV_net=GV_net,
@@ -507,9 +464,7 @@ def main():
             output_dir="results"
         )
 
-        # ====================================================================
-        # 9. SAVE BUNDLE (for future eval/plots)
-        # ====================================================================
+        # === Save Bundle ===
         print("\n" + "="*80)
         print("SAVING EVAL BUNDLE")
         print("="*80)
@@ -532,9 +487,9 @@ def main():
         # ====================================================================
         # LOAD + EVAL + PLOT
         # ====================================================================
-        print("\n" + "="*80)
+        print("\n" + "="*20)
         print("LOADING SAVED BUNDLE (skip training)")
-        print("="*80)
+        print("="*20)
 
         bundle = load_eval_bundle(bundle_path, map_location="cpu")
 
@@ -608,4 +563,55 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+    is_benchmark = '--benchmark=1' in sys.argv or '--benchmark' in sys.argv and '1' in sys.argv
+
+    if is_benchmark:
+        n_runs = 2
+        times = []
+        cells = []
+
+        print("="*20)
+        print(f"Benchmark mode: {n_runs} runs")
+        print("="*20)
+
+        for i in range(n_runs):
+            print(f"\n*** Run {i+1}/{n_runs} ***")
+            torch.manual_seed(i)
+            training_time = main(benchmark_mode=True)
+            if training_time is not None:
+                times.append(training_time)
+
+            bundle_path = OUTPUT_DIR / "eval_bundle.pth"
+            if bundle_path.exists():
+                import torch
+                bundle = torch.load(bundle_path, map_location='cpu')
+                cell_counts = {
+                    'init': len(bundle['region_cells']['init']),
+                    'goal': len(bundle['region_cells']['goal']),
+                    'unsafe': len(bundle['region_cells']['unsafe']),
+                    'outside': len(bundle['region_cells']['outside']),
+                    'generator': len(bundle['region_cells']['generator']),
+                }
+                cell_counts['total_v'] = cell_counts['init'] + cell_counts['goal'] + cell_counts['unsafe'] + cell_counts['outside']
+                cell_counts['total'] = cell_counts['total_v'] + cell_counts['generator']
+                cells.append(cell_counts)
+
+        print("\n" + "="*20)
+        print("Benchmark results")
+        print("="*20)
+        avg_time = stats.mean(times)
+        std_time = stats.stdev(times)
+        print(f"Training time (pretrain+train): {avg_time:.2f}s ± {std_time:.2f}s")
+        print(f"  Individual times: {[f'{t:.2f}s' for t in times]}")
+
+        if cells:
+            categories = ['init', 'goal', 'unsafe', 'outside', 'generator', 'total_v', 'total']
+            print("\nCell counts:")
+            for cat in categories:
+                values = [c[cat] for c in cells]
+                avg = stats.mean(values)
+                std = stats.stdev(values)
+                print(f"  {cat:12s}: {avg:.0f} ± {std:.0f}")
+    else:
+        main()

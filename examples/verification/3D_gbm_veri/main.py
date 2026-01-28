@@ -32,7 +32,7 @@ from src.utils import cleanup_and_setup_directories
 from src.visualization import create_summary_plots
 
 # Set random seed
-torch.manual_seed(4)
+torch.manual_seed(0)
 
 def pretrain_network_samples(
     model,
@@ -576,6 +576,7 @@ if __name__ == '__main__':
 
         for i in range(n_runs):
             print(f"\n*** Run {i+1}/{n_runs} ***")
+            torch.manual_seed(i)
             training_time = main(benchmark_mode=True)
             if training_time is not None:
                 times.append(training_time)
