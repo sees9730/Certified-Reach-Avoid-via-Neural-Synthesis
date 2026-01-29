@@ -268,12 +268,12 @@ def main(benchmark_mode=False):
     # Customize configuration
     params.network.n_inputs = 4
     params.network.n_hidden_1 = 64
-    params.network.n_hidden_2 = 64
+    params.network.n_hidden_2 = 16
     params.network.input_scale = [100.0, 100.0, 100.0, 100.0]
     params.network.scale_factor = 20.0
 
     params.training.learning_rate = 0.005
-    params.training.num_epochs = 200000
+    params.training.num_epochs = 100
     params.training.generator_weight = 1.0
     params.training.generator_start_epoch = 0
 
@@ -311,13 +311,13 @@ def main(benchmark_mode=False):
     params.refinement.gv_generator.late_epoch_threshold = 2500
     params.refinement.gv_generator.refine_interval_late = 100
     params.refinement.gv_generator.refine_factor = 2
-    params.refinement.gv_generator.max_cells = 30000
+    params.refinement.gv_generator.max_cells = 40000
     params.refinement.gv_generator.N_to_refine = 300
 
     params.refinement.gv_generator.enable_merging = True
     params.refinement.gv_generator.merge_interval = 501
     params.refinement.gv_generator.merge_max_passes = 8
-    params.refinement.gv_generator.merge_relax_margin = -100.0
+    params.refinement.gv_generator.merge_relax_margin = -80.0
 
     # === System Dynamics ===
     u_nn = LinearControlNN(prior_knowledge=True, 
@@ -333,7 +333,6 @@ def main(benchmark_mode=False):
         f3 =  0.0 * x1 - 1.0 * x2 - 1.5 * x3 + 1.0*x4
         f4 =  0.0 * x1 + 0.0 * x2 - 1.0 * x3 - 1.5*x4
         return torch.stack([f1, f2, f3, f4], dim=1)
-
 
     g_coeffs = torch.tensor([0.2, 0.2, 0.2, 0.2], dtype=torch.float32)
 
@@ -560,6 +559,8 @@ def main(benchmark_mode=False):
             results=results,
             output_dir="results"
         )
+
+    return total_training_time
 
 
 if __name__ == '__main__':

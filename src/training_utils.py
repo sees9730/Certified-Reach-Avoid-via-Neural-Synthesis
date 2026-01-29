@@ -337,13 +337,13 @@ def evaluate_constraints(
                     input_lowers, input_uppers = prepare_cell_bounds(
                         region_cells['generator'], device=device, input_dim=input_dim
                     )
-                phi_lowers, phi_uppers = crown_cache_phi.compute_bounds(input_lowers, input_uppers)
+                phi_uppers = crown_cache_phi.compute_bounds(input_lowers, input_uppers)
             else:
                 cache_phi = SymbolicCROWNCache_Phi(GV_net, len(region_cells['generator']), input_dim=input_dim, device=device)
                 input_lowers, input_uppers = prepare_cell_bounds(
                     region_cells['generator'], device=device, input_dim=input_dim
                 )
-                phi_lowers, phi_uppers = cache_phi.compute_bounds(input_lowers, input_uppers)
+                phi_uppers = cache_phi.compute_bounds(input_lowers, input_uppers)
 
             num_failing = (phi_uppers > 0.0).sum().item()
             generator_satisfied = (num_failing == 0)

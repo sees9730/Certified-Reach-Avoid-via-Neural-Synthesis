@@ -67,8 +67,6 @@ class SymbolicCROWNCache:
         # Cache a dummy batch (zeros) for IBP - actual values don't matter, only bounds
         self.dummy_batch_cache = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)
 
-        # print(f"[SymbolicCROWNCache] Initialized for {num_cells} cells - symbolic structure cached!")
-
     def compute_bounds(self, input_lowers, input_uppers):
         """
         Compute differentiable CROWN bounds using cached symbolic structure.
@@ -101,10 +99,7 @@ class SymbolicCROWNCache:
         # Compute bounds
         lb, ub = self.lirpa_model.compute_bounds(
             x=(bounded_input,),
-            method='IBP',
-            forward=True,
-            bound_lower=True,
-            bound_upper=True
+            method='IBP'
         )
 
         v_lowers = lb.squeeze(-1)  # (N,)
@@ -171,8 +166,6 @@ class SymbolicCROWNCache_Phi:
         # Cache a dummy batch (zeros) for IBP - actual values don't matter, only bounds
         self.dummy_batch_cache = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)
 
-        # print(f"[SymbolicCROWNCache_Phi] Initialized for {num_cells} cells!")
-
     def compute_bounds(self, input_lowers, input_uppers):
         """
         Compute differentiable CROWN bounds on GV(x).
@@ -204,18 +197,15 @@ class SymbolicCROWNCache_Phi:
 
         # Compute bounds (only upper bound needed for generator loss, but IBP computes both)
         # Note: For IBP, bound_lower=False doesn't save computation, so we compute both
-        lb, ub = self.lirpa_model.compute_bounds(
+        _, ub = self.lirpa_model.compute_bounds(
             x=(bounded_input,),
-            method='IBP',
-            forward=True,
-            bound_lower=True,
-            bound_upper=True
+            method='IBP'
         )
 
-        phi_lowers = lb.squeeze(-1)  # (N,) - computed but unused in loss
+        # phi_lowers = lb.squeeze(-1)  # (N,) - computed but unused in loss
         phi_uppers = ub.squeeze(-1)  # (N,)
 
-        return phi_lowers, phi_uppers
+        return phi_uppers
 
     def __del__(self):
         """Restore training mode"""
