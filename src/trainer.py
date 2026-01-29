@@ -151,11 +151,13 @@ def train_network_bounds(
     if start_time is None:
         start_time = time.time()
     final_beta_s = None
+    profile_times = {'bounds': 0, 'loss': 0, 'backward': 0, 'eval': 0, 'refine': 0, 'step': 0}
 
     for epoch in range(params.training.num_epochs):
         V_net.train()
 
         optimizer.zero_grad()
+        t0 = time.time()
 
         if params.compute_V:
             # Compute bounds for ALL V cells at once (matching original!)
@@ -180,7 +182,7 @@ def train_network_bounds(
             if (epoch >= params.training.generator_start_epoch and
                 params.training.generator_weight > 0 and
                 crown_cache_phi is not None):
-                phi_lowers, phi_uppers = crown_cache_phi.compute_bounds(input_lowers_gen, input_uppers_gen)
+                phi_uppers = crown_cache_phi.compute_bounds(input_lowers_gen, input_uppers_gen)
                 current_gen_weight = params.training.generator_weight
 
                 # Track failing cells for adaptive refinement
@@ -192,8 +194,12 @@ def train_network_bounds(
                 current_gen_weight = 0.0
                 num_total_failing = 0
 
+        profile_times['bounds'] += time.time() - t0
+        t0 = time.time()
+
         # Update loss kwargs with current bounds (reuse pre-allocated dict)
         if params.compute_V:
+            loss_kwargs['beta_ra'] = params.constraints.beta_ra
             loss_kwargs['V_goal_lower'] = bounds['goal'][0]
             loss_kwargs['V_unsafe_lower'] = bounds['unsafe'][0]
             loss_kwargs['V_init_upper'] = bounds['init'][1]
@@ -204,9 +210,13 @@ def train_network_bounds(
             loss_kwargs['generator_weight'] = current_gen_weight
 
         total_loss, loss_dict, sat_dict = compute_total_loss_bounds(**loss_kwargs)
+        profile_times['loss'] += time.time() - t0
+        t0 = time.time()
 
         # Backward pass
         total_loss.backward()
+        profile_times['backward'] += time.time() - t0
+        t0 = time.time()
 
         # Recompute bounds after optimizer step for verification
         V_net.eval()
@@ -225,8 +235,10 @@ def train_network_bounds(
                 else:
                     bounds_updated[name] = (empty_tensor, empty_tensor)
 
+        profile_times['eval'] += time.time() - t0
+        t0 = time.time()
+
         # Adaptive refinement for V outside region cells
-        needs_cache_rebuild = False
         if params.compute_V and len(bounds_updated['outside'][0]) > 0:
             # Track failing cells in outside region
             v_cfg = params.refinement.v_outside
@@ -295,6 +307,11 @@ def train_network_bounds(
                     print(f"Refining generator cells: {num_total_failing} failing, refined {num_refined} cells, {len(new_cells)} total")
                     needs_gv_cache_rebuild = True
                     refinement_epochs['generator'].append(epoch + 1)
+                
+                elif (gv_cfg.enable_refinement and
+                    (epoch + 1) % refine_interval == 0 and
+                    len(region_cells['generator']) > gv_cfg.max_cells):
+                    print(f"Generator cells exceed max cells threshold: {len(region_cells['generator'])} > {gv_cfg.max_cells}")    
 
             if (gv_cfg.enable_merging and
                 (epoch + 1) % gv_cfg.merge_interval == 0):
@@ -308,6 +325,9 @@ def train_network_bounds(
                 region_cells['generator'] = merged_cells
                 print(f"Merging generator cells: merged {num_merges} pairs, {len(merged_cells)} total")
                 needs_gv_cache_rebuild = True
+
+        profile_times['refine'] += time.time() - t0
+        t0 = time.time()
 
         # Logging
         if epoch % params.logging.loss_log_interval == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
@@ -330,6 +350,16 @@ def train_network_bounds(
             if params.compute_GV:
                 if sat_dict['generator'] is False:
                     all_satisfied = False
+
+            # Check if beta_ra is greater than 20.0, if not, increase it
+            # if bounds_updated['unsafe'][0].min() > params.constraints.beta_ra and params.constraints.beta_ra < 20.0:
+            if params.constraints.beta_ra < 20.0 and all_satisfied:
+                params.constraints.beta_ra += 0.2
+                all_satisfied = False
+                # Print updated beta_ra
+                print(f"Incremented beta_ra to {params.constraints.beta_ra:.2f}")
+            elif all_satisfied:
+                print(f"beta_ra reached maximum of {params.constraints.beta_ra:.2f}")
 
             # Early stop if all active constraints are satisfied
             if all_satisfied:
@@ -354,7 +384,6 @@ def train_network_bounds(
         # Detailed evaluation and visualization
         if (epoch % params.logging.detailed_eval_interval == 0) or epoch == params.training.num_epochs - 1:
             print(f"=== Detailed Evaluation ===")
-            # For evaluation, we can just create temporary caches (not in the hot path)
             results = evaluate_constraints(
                 V_net, GV_net, region_cells,
                 crown_cache_all=crown_cache_all,
@@ -376,24 +405,25 @@ def train_network_bounds(
                 beta_ra=params.constraints.beta_ra
             )
 
-            # Visualize progress
-            if params.logging.visualize_interval > 0 and epoch % params.logging.visualize_interval == 0:
-                visualize_training_progress(
-                    V_net, GV_net, regions, region_cells,
-                    epoch=epoch,
-                    output_dir="training_progress"
-                )
+        # Visualize progress
+        if params.logging.visualize_interval > 0 and epoch % params.logging.visualize_interval == 0:
+            visualize_training_progress(
+                V_net, GV_net, regions, region_cells,
+                epoch=epoch,
+                output_dir="training_progress"
+            )
 
         # Optimizer step
         optimizer.step()
 
-        # Update scheduler after optimizer step (if provided)
+        # Update scheduler after optimizer step
         if scheduler is not None:
             # ReduceLROnPlateau needs metrics, StepLR/etc don't
             if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
                 scheduler.step(total_loss.item())
             else:
                 scheduler.step()
+        profile_times['step'] += time.time() - t0
 
         # Rebuild CROWN caches after optimizer step if needed (after adaptive refinement)
         if needs_v_cache_rebuild:
@@ -442,5 +472,11 @@ def train_network_bounds(
 
     elapsed_time = time.time() - start_time
     print(f"\nTraining completed in {elapsed_time:.2f} seconds ({elapsed_time/60:.2f} minutes)")
+
+    print("\n=== Profiling Summary ===")
+    total_profiled = sum(profile_times.values())
+    for name, t in sorted(profile_times.items(), key=lambda x: -x[1]):
+        pct = 100 * t / total_profiled if total_profiled > 0 else 0
+        print(f"{name:12s}: {t:6.2f}s ({pct:5.1f}%)")
 
     return loss_history, final_beta_s, refinement_epochs
