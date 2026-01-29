@@ -1,5 +1,5 @@
 """
-2D Geometric Brownian Motion Verification
+5D Geometric Brownian Motion Verification
 """
 import argparse
 import statistics as stats
@@ -44,17 +44,20 @@ def pretrain_network_samples(
     GV_net=None,
     num_epochs=1000,
     lr=0.01,
-    device="cpu",
+    device='cpu',
     control_net=None,
     n_each: int = 400,
+    lambda_w = 1e-2,
     save_v_path=None,
     save_control_path=None,
 ):
+    """
+    Pre-train V and GV networks using sampled points.
+    """
     print("\n" + "="*20)
-    print("Pre-training")
+    print("Pre-training using samples")
     print("="*20)
 
-    # Build optimizer over V network and controller if it exists
     opt_params = list(model.parameters())
     if control_net is not None:
         opt_params += list(control_net.parameters())
@@ -65,87 +68,132 @@ def pretrain_network_samples(
     else:
         print("GV pre-training disabled")
 
-    best_loss = float("inf")
+    best_loss = float('inf')
     best_model_state = None
     best_control_state = None
 
-    # Convert all state space ranges to torch tensors
+    # Convert ranges to torch once: each is (D,2)
     x_range_t = torch.as_tensor(x_range, dtype=torch.float32, device=device)
-    goal_t = torch.as_tensor(x_goal_range, dtype=torch.float32, device=device)
-    unsafe_t = torch.as_tensor(x_unsafe_range, dtype=torch.float32, device=device)
-    init_t = torch.as_tensor(x_init_range, dtype=torch.float32, device=device)
+    goal_t    = torch.as_tensor(x_goal_range, dtype=torch.float32, device=device)
+    init_t    = torch.as_tensor(x_init_range, dtype=torch.float32, device=device)
 
-    # Extract dimension and bounds of the full state space
-    D = x_range_t.shape[0]
-    low = x_range_t[:, 0]
+    D = int(x_range_t.shape[0])
+    low  = x_range_t[:, 0]
     high = x_range_t[:, 1]
     span = high - low
 
-    # Sample uniformly from a box
     def _sample_in_box(box: torch.Tensor, N: int) -> torch.Tensor:
         b_low = box[:, 0]
         b_high = box[:, 1]
         return torch.rand(N, D, device=device) * (b_high - b_low) + b_low
 
-    # Check whether points are inside a box
-    def _in_box(x: torch.Tensor, box: torch.Tensor) -> torch.Tensor:
-        return ((x >= box[:, 0]) & (x <= box[:, 1])).all(dim=1)
+    def _in_box(x_batch: torch.Tensor, box: torch.Tensor) -> torch.Tensor:
+        return ((x_batch >= box[:, 0]) & (x_batch <= box[:, 1])).all(dim=1)
 
+    def _unsafe_to_boxes(x_unsafe) -> torch.Tensor:
+        t = torch.as_tensor(x_unsafe, dtype=torch.float32, device=device)
+
+        if t.dim() == 2:
+            if t.shape == (D, 2):
+                return t.unsqueeze(0)  # (1,D,2)
+            if t.shape[1] == 2 and (t.shape[0] % D == 0):
+                K = int(t.shape[0] // D)
+                return t.view(K, D, 2)  # (K,D,2)  <-- handles vstack case
+            raise ValueError(f"x_unsafe_range 2D must be (D,2) or (K*D,2); got {tuple(t.shape)}")
+
+        if t.dim() == 3:
+            if t.shape[1:] != (D, 2):
+                raise ValueError(f"x_unsafe_range 3D must be (K,D,2) with D={D}; got {tuple(t.shape)}")
+            return t
+
+        raise ValueError(f"x_unsafe_range must be (D,2), (K,D,2), or (K*D,2); got {tuple(t.shape)}")
+
+    unsafe_boxes = _unsafe_to_boxes(x_unsafe_range)  # (K,D,2)
+    K_unsafe = int(unsafe_boxes.shape[0])
+
+    def _in_unsafe_union(x_batch: torch.Tensor) -> torch.Tensor:
+        """mask True if x is inside ANY unsafe box."""
+        mask = torch.zeros(x_batch.shape[0], dtype=torch.bool, device=device)
+        for k in range(K_unsafe):
+            mask |= _in_box(x_batch, unsafe_boxes[k])
+        return mask
+
+    def _sample_in_unsafe_union(N: int) -> torch.Tensor:
+        if N <= 0:
+            raise ValueError(f"N must be positive, got {N}")
+
+        if K_unsafe == 1:
+            return _sample_in_box(unsafe_boxes[0], N)
+
+        xs = []
+        for k in range(K_unsafe):
+            xs.append(_sample_in_box(unsafe_boxes[k], N))  # (N, D) per box
+
+        x = torch.cat(xs, dim=0)  # (K_unsafe * N, D)
+        x = x[torch.randperm(x.shape[0], device=device)]  # shuffle
+        return x
+    
+    def _l2_weight_penalty(model: torch.nn.Module, exclude_bias: bool = True) -> torch.Tensor:
+        reg = 0.0
+        for name, p in model.named_parameters():
+            if not p.requires_grad:
+                continue
+            if exclude_bias and (p.dim() == 1 or name.endswith("bias")):
+                continue
+            reg = reg + (p ** 2).sum()
+        return reg
+
+    # Main training loop
     for epoch in range(num_epochs):
-        # Put all networks in training mode
         model.train()
         if control_net is not None:
             control_net.train()
         if GV_net is not None:
             GV_net.train()
 
-        # Sample from the full state space and enforce v(x) >= 0
+        # full-range samples -> enforce v(x) >= 0
         x_full = torch.rand(n_each, D, device=device) * span + low
         v_full = model(x_full).squeeze(-1)
         v_loss_full = F.relu(0.0 - v_full).sum()
 
-        # Sample from the initial set and enforce v(x) <= 1
+        # init-range samples -> enforce v(x) <= 1
         x_init = _sample_in_box(init_t, n_each)
         v_init = model(x_init).squeeze(-1)
         v_loss_init = F.relu(v_init - 1.0).sum()
 
-        # Sample from the unsafe set and enforce large values
-        x_unsafe = _sample_in_box(unsafe_t, n_each)
+        # unsafe-range samples -> enforce v(x) >= beta_ra
+        x_unsafe = _sample_in_unsafe_union(int(n_each /6))
         v_unsafe = model(x_unsafe).squeeze(-1)
         v_loss_unsafe = F.relu(params.constraints.beta_ra - v_unsafe).sum()
 
-        # Sample points that are not in the goal or unsafe sets
+        # samples inside full-range but outside (goal ∪ unsafe) -> enforce v(x) >= 0.0
         x_others_list = []
         need = n_each
         max_tries = 20
         tries = 0
-
         while need > 0 and tries < max_tries:
             tries += 1
             x_cand = torch.rand(max(need * 4, 32), D, device=device) * span + low
-            in_goal = _in_box(x_cand, goal_t)
-            in_unsafe = _in_box(x_cand, unsafe_t)
-            keep = ~(in_goal | in_unsafe)
+            cand_in_goal = _in_box(x_cand, goal_t)
+            cand_in_unsafe = _in_unsafe_union(x_cand)
+            keep = ~(cand_in_goal | cand_in_unsafe)
             x_keep = x_cand[keep]
-            if x_keep.numel() > 0:
+            if x_keep.shape[0] > 0:
                 take = min(need, x_keep.shape[0])
                 x_others_list.append(x_keep[:take])
                 need -= take
 
-        # Fall back to full-space samples if rejection sampling fails
         if len(x_others_list) == 0:
             x_others = x_full.detach()
         else:
             x_others = torch.cat(x_others_list, dim=0)
 
-        # Combine the value losses exactly as in the original logic
         loss_v = (
             v_loss_full
             + v_loss_init
             + v_loss_unsafe
         )
 
-        # Compute the GV loss on the same "other" states
         loss_gv = torch.tensor(0.0, device=device)
         if GV_net is not None and x_others.numel() > 0:
             x_gv = x_others.detach().clone().requires_grad_(True)
@@ -154,17 +202,16 @@ def pretrain_network_samples(
 
         total_loss = loss_v + loss_gv
 
-        # Save the best model seen so far
+        # L2 weight penalty
+        reg_w = _l2_weight_penalty(model, exclude_bias=True)
+        total_loss = total_loss + lambda_w * reg_w
+
+        # Track best
         if total_loss.item() <= best_loss:
             best_loss = total_loss.item()
-            best_model_state = {
-                k: v.cpu().clone() for k, v in model.state_dict().items()
-            }
+            best_model_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
             if control_net is not None:
-                best_control_state = {
-                    k: v.cpu().clone()
-                    for k, v in control_net.state_dict().items()
-                }
+                best_control_state = {k: v.detach().cpu().clone() for k, v in control_net.state_dict().items()}
 
         if epoch % 100 == 0:
             if GV_net is not None:
@@ -172,7 +219,7 @@ def pretrain_network_samples(
             else:
                 print(f"Epoch {epoch} | V_loss={loss_v.item():8.4f}")
 
-        # Backprop and update parameters
+        # Optimize/update networks
         optimizer.zero_grad()
         total_loss.backward()
         optimizer.step()
@@ -192,14 +239,12 @@ def pretrain_network_samples(
             torch.save(best_control_state, save_control_path)
             print(f"Saved pretrained Controller_net to: {save_control_path}")
 
-    print("="*20)
     networks_trained = ["V"]
     if GV_net is not None:
         networks_trained.append("GV")
     if control_net is not None:
         networks_trained.append("Controller")
-    print(f"Pre-training complete: {' + '.join(networks_trained)}")
-    print("="*20 + "\n")
+    print(f"Pre-training complete. {' + '.join(networks_trained)} initialized.")
 
 
 def main(benchmark_mode=False):
@@ -224,10 +269,10 @@ def main(benchmark_mode=False):
     params = Hyperparameters.default()
 
     # Customize configuration
-    params.network.n_inputs = 2
+    params.network.n_inputs = 5
     params.network.n_hidden_1 = 64
-    params.network.n_hidden_2 = 64
-    params.network.input_scale = [100.0, 100.0]
+    params.network.n_hidden_2 = 16
+    params.network.input_scale = [100.0, 100.0, 100.0, 100.0, 100.0]
     params.network.scale_factor = 20.0
 
     params.training.learning_rate = 0.005
@@ -235,11 +280,11 @@ def main(benchmark_mode=False):
     params.training.generator_weight = 1.0  
     params.training.generator_start_epoch = 0
 
-    params.discretization.n_goal = 7
-    params.discretization.n_outside_goal = 4
+    params.discretization.n_goal = 4
+    params.discretization.n_outside_goal = 2
     params.discretization.n_generator = 1
-    params.discretization.n_unsafe = 7
-    params.discretization.n_init = 7
+    params.discretization.n_unsafe = 5
+    params.discretization.n_init = 5
 
     params.constraints.beta_ra = 20.0
 
@@ -247,7 +292,7 @@ def main(benchmark_mode=False):
     params.compute_GV = True
 
     params.training.enable_pretraining = True
-    params.training.pretrain_epochs = 500
+    params.training.pretrain_epochs = 1500
     params.training.pretrain_lr = 0.01
     params.training.pretrain_n_samples = 100
 
@@ -271,28 +316,36 @@ def main(benchmark_mode=False):
     params.refinement.gv_generator.late_epoch_threshold = 2500
     params.refinement.gv_generator.refine_interval_late = 100
     params.refinement.gv_generator.refine_factor = 2
-    params.refinement.gv_generator.max_cells = 30000
+    params.refinement.gv_generator.max_cells = 200000
     params.refinement.gv_generator.N_to_refine = 100
 
     # Merging
     params.refinement.gv_generator.enable_merging = True
     params.refinement.gv_generator.merge_interval = 502
     params.refinement.gv_generator.merge_max_passes = 8
-    params.refinement.gv_generator.merge_relax_margin = -200.0
+    params.refinement.gv_generator.merge_relax_margin = -100.0
+
+    params.logging.visualize_interval = 100000000
+    params.logging.detailed_eval_interval = 10000000
 
     # === System Dynamics ===
     u_nn = LinearControlNN(prior_knowledge=True, input_dim=params.network.n_inputs)
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
-        # Batch
         x1 = x[:, 0]
         x2 = x[:, 1]
+        x3 = x[:, 2]
+        x4 = x[:, 3]
+        x5 = x[:, 4]
         f1 = -1.5 * x1 + 1.0 * x2
-        f2 = -1.0 * x1 + -1.5 * x2
-        return torch.stack([f1, f2], dim=1)
+        f2 = -1.0 * x1 - 1.5 * x2 + 1.0 * x3
+        f3 = -1.0 * x2 - 1.5 * x3 + 1.0 * x4
+        f4 = -1.0 * x3 - 1.5 * x4 + 1.0 * x5
+        f5 = -1.0 * x4 - 1.5 * x5
+        return torch.stack([f1, f2, f3, f4, f5], dim=1)
 
     # Create diffusion coefficients as a persistent tensor to avoid TracerWarnings
-    g_coeffs = torch.tensor([0.2, 0.2], dtype=torch.float32)
+    g_coeffs = torch.tensor([0.2, 0.2, 0.2, 0.2, 0.2], dtype=torch.float32)
 
     def g(x: torch.Tensor) -> torch.Tensor:
         return g_coeffs.to(device=x.device, dtype=x.dtype) * x
@@ -301,10 +354,10 @@ def main(benchmark_mode=False):
     dynamics = Dynamics.dynamics(f=f_cl_module, g=g)
 
     # === Spatial Regions ===
-    init_range = np.array([[45.0, 55.0], [-55.0, -45.0]], dtype=np.float32)
-    goal_range = np.array([[-25.0, 25.0], [-25.0, 25.0]], dtype=np.float32)
-    unsafe_range = np.array([[-100.0, -80.0], [-100.0, 100.0]], dtype=np.float32)
-    full_range = np.array([[-100.0, 100.0], [-100.0, 100.0]], dtype=np.float32)
+    init_range = np.array([[45.0, 55.0], [-55.0, -45.0], [45.0, 55.0], [45.0, 55.0], [45.0, 55.0]], dtype=np.float32)
+    goal_range = np.array([[-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0]], dtype=np.float32)
+    unsafe_range = np.array([[-100.0, -80.0], [-100.0, 100.0], [-100.0, -80.0], [-100.0, -80.0], [-100.0, -80.0]], dtype=np.float32)
+    full_range = np.array([[-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0]], dtype=np.float32)
 
     init = Region(init_range)
     goal = Region(goal_range)
@@ -533,7 +586,6 @@ if __name__ == '__main__':
 
         for i in range(n_runs):
             print(f"\n*** Run {i+1}/{n_runs} ***")
-            torch.manual_seed(i)
             training_time = main(benchmark_mode=True)
             if training_time is not None:
                 times.append(training_time)

@@ -4,27 +4,18 @@ import torch.nn.functional as F
 
 
 class LinearControlNN(nn.Module):
-    def __init__(self, prior_knowledge=True, input_dim=2):
-        super().__init__()
-        # Standard fully-connected layer: 2 inputs -> 2 outputs, no bias
-        self.fc = nn.Linear(input_dim, input_dim, bias=False)
+      def __init__(self, prior_knowledge=True, input_dim=2):
+          super().__init__()
+          # Standard fully-connected layer: input_dim inputs -> input_dim outputs, no bias
+          self.fc = nn.Linear(input_dim, input_dim, bias=False)
 
-        if(prior_knowledge):
-            if(input_dim == 2):
-                #Initialize as diag(-1, -1)
-                with torch.no_grad():
-                    self.fc.weight.copy_(torch.diag(torch.tensor([-1.0, -1.0])))
-            if(input_dim == 3):
-                #Initialize as diag(0, 0)
-                with torch.no_grad():
-                    self.fc.weight.copy_(torch.diag(torch.tensor([0.0, 0.0, 0.0])))
-            if(input_dim == 4):
-                #Initialize as diag(0, 0, 0, 0)
-                with torch.no_grad():
-                    self.fc.weight.copy_(torch.diag(torch.tensor([0.0, 0.0, 0.0, 0.0])))
-                
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.fc(x)
+          if prior_knowledge:
+              # Initialize as diagonal matrix of zeros for any input_dim
+              with torch.no_grad():
+                  self.fc.weight.copy_(torch.diag(torch.zeros(input_dim)))
+
+      def forward(self, x: torch.Tensor) -> torch.Tensor:
+          return self.fc(x)
     
 
 class GBMControlNN(nn.Module):
