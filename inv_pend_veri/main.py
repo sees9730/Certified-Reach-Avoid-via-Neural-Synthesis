@@ -232,11 +232,6 @@ def pretrain_network_samples(
         v_unsafe = model(x_unsafe).squeeze(-1)
         v_loss_unsafe = F.relu(params.constraints.pretrain_unsafe_target - v_unsafe).sum()
 
-        # 4) goal-range samples -> enforce v(x) >= 0.0
-        x_goal = _sample_in_box(goal_t, n_each)
-        v_goal = model(x_goal).squeeze(-1)
-        v_loss_inside_goal = F.relu(0.0 - v_goal).sum()
-
         # 5) samples inside full-range but outside (goal ∪ unsafe) -> enforce v(x) >= 0.0
         x_others_list = []
         need = n_each
@@ -259,16 +254,11 @@ def pretrain_network_samples(
         else:
             x_others = torch.cat(x_others_list, dim=0)
 
-        v_others = model(x_others).squeeze(-1)
-        v_loss_others = F.relu(0.0 - v_others).sum()
-
         # Total V loss (v_loss_inside_goal and v_loss_others are not used anymore)
         loss_v = (
             v_loss_full
             + v_loss_init
             + v_loss_unsafe
-            # + v_loss_inside_goal
-            # + v_loss_others
         )
 
         # Phi loss on SAME x_others -> enforce phi(x) <= 0
@@ -299,8 +289,7 @@ def pretrain_network_samples(
                     f"  Epoch [{epoch}/{num_epochs}]: "
                     f"V={loss_v.item():.6f} "
                     f"(full={v_loss_full.item():.3f}, init={v_loss_init.item():.3f}, "
-                    f"unsafe={v_loss_unsafe.item():.3f}, goal={v_loss_inside_goal.item():.3f}, "
-                    f"others={v_loss_others.item():.3f}), "
+                    f"unsafe={v_loss_unsafe.item():.3f}, "
                     f"Φ={loss_phi.item():.6f}, Total={total_loss.item():.5e}"
                 )
             else:
@@ -308,8 +297,7 @@ def pretrain_network_samples(
                     f"  Epoch [{epoch}/{num_epochs}]: "
                     f"V={loss_v.item():.6f} "
                     f"(full={v_loss_full.item():.3f}, init={v_loss_init.item():.3f}, "
-                    f"unsafe={v_loss_unsafe.item():.3f}, goal={v_loss_inside_goal.item():.3f}, "
-                    f"others={v_loss_others.item():.3f})"
+                    f"unsafe={v_loss_unsafe.item():.3f}, "
                 )
 
         # Optimize/update networks
@@ -594,10 +582,6 @@ def train_network_bounds(
                 else:
                     bounds_updated[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
 
-        # Update scheduler after bounds recomputation
-        # scheduler.step(total_loss.item())
-        scheduler.step()
-
         # Get current beta_s value for constraint checks
         beta_s_check = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
 
@@ -624,7 +608,7 @@ def train_network_bounds(
                         outside_failing_mask,
                         REFINE_FACTOR,
                         scores=-bounds_updated['outside'][0],
-                        N_to_refine=999999
+                        N_to_refine=300
                     )
                     region_cells['outside'] = new_cells
                     print(f"[Refine-Outside] Epoch {epoch+1}: {num_outside_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
@@ -632,7 +616,7 @@ def train_network_bounds(
                     refinement_epochs['outside'].append(epoch + 1)
 
                 if((epoch + 1) % 501 == 0):
-                    outside_failing_mask_relax = bounds_updated['outside'][0] < (0.0 + 0.5)
+                    outside_failing_mask_relax = bounds_updated['outside'][0] < 2.0
                     merged_cells, num_merges = merge_passing_neighbor_cells(
                         region_cells['outside'],
                         outside_failing_mask_relax,
@@ -658,7 +642,7 @@ def train_network_bounds(
                 MAX_CELLS = 50000  # Don't refine if we already have too many cells
 
                 # Adjust interval for later epochs
-                if epoch > 3500:
+                if epoch > 2500:
                     REFINE_INTERVAL = 100
 
                 # Check if it's time to refine
@@ -669,7 +653,7 @@ def train_network_bounds(
                         phi_upper_failing_mask,
                         REFINE_FACTOR,
                         scores=phi_uppers,
-                        N_to_refine=999999
+                        N_to_refine=300
                     )
                     region_cells['generator'] = new_cells
                     print(f"[Refine-Generator] Epoch {epoch+1}: {num_total_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
@@ -791,6 +775,7 @@ def train_network_bounds(
         
         # Optimizer step
         optimizer.step()
+        scheduler.step()
 
         # Rebuild CROWN caches after optimizer step if needed (after adaptive refinement)
         if params.compute_GV:
@@ -852,6 +837,49 @@ def train_network_bounds(
     return loss_history, final_beta_s, refinement_epochs
 
 
+class TanhPolicy(nn.Sequential):
+    """
+    A policy with three layers and tanh activations.
+    """
+
+    def __init__(
+        self,
+        n_in: int = 2,
+        n_out: int = 1,
+        n_hidden: int = 64,
+        device: torch.device | str = "cpu"
+    ):
+        super().__init__(
+            nn.Linear(n_in, n_hidden, dtype=torch.float32, device=device),
+            nn.Tanh(),
+            nn.Linear(n_hidden, n_hidden, dtype=torch.float32, device=device),
+            nn.Tanh(),
+            nn.Linear(n_hidden, n_out, dtype=torch.float32, device=device),
+        )
+
+
+class SwapStateWrapper(nn.Module):
+    """
+    Wrap a policy that expects state=[angular_rate, angle]
+    so it can be called with state=[angle, angular_rate].
+
+    Works with input shape (2,) or (N,2).
+    """
+    def __init__(self, base_policy: nn.Module):
+        super().__init__()
+        self.base_policy = base_policy
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if x.ndim == 1:
+            x_swapped = x[[1, 0]]  # [angle, ang_rate] -> [ang_rate, angle]
+        elif x.ndim == 2:
+            x_swapped = x[:, [1, 0]]
+        else:
+            raise ValueError(f"Expected x.ndim in {{1,2}}, got {x.ndim}")
+
+        return self.base_policy(x_swapped)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--train", type=int, default=1, choices=[0, 1],
@@ -873,8 +901,8 @@ def main():
     params = Hyperparameters.default()
 
     # Customize configuration
-    params.network.n_hidden_1 = 64
-    params.network.n_hidden_2 = 64
+    params.network.n_hidden_1 = 32
+    params.network.n_hidden_2 = 32
     pi = np.pi
     params.network.input_scale = [2*pi, 20.0]
     params.network.scale_factor = 20.0
@@ -886,11 +914,11 @@ def main():
     params.training.generator_weight = 1.0  # Enable generator constraint
     params.training.generator_start_epoch = 0
 
-    params.discretization.n_goal = 30
+    params.discretization.n_goal = 25
     params.discretization.n_outside_goal = 4
     params.discretization.n_generator = 4  # Will be overridden by radial discretization
-    params.discretization.n_unsafe = 15
-    params.discretization.n_init = 30 # 20^2 = 10^2 * 4
+    params.discretization.n_unsafe = 25
+    params.discretization.n_init = 25 # 20^2 = 10^2 * 4
 
     # Set beta_s to a value (constant), or set to None to make it learnable
     # If learnable_beta_s is True, this value will be used as initialization
@@ -901,6 +929,7 @@ def main():
     # Control what to compute during training
     params.compute_V = True
     params.compute_GV = True
+    device = params.training.device
 
     # ========================================================================
     # 2. SYSTEM DYNAMICS
@@ -910,21 +939,16 @@ def main():
     print("="*80)
 
     # pre-trained in RL deterministic env
-    # rl_policy_net = TanhPolicy(2, 1, 64, device=device)
-    # rl_policy_net.load_state_dict(torch.load(
-    #     OUTPUT_DIR / "pendulum_policy.pt",
-    #     map_location=device,
-    #     weights_only=True
-    # ))
+    rl_policy_net = TanhPolicy(2, 1, 64, device=device)
+    rl_policy_net.load_state_dict(torch.load(
+        "outputs/pendulum_policy.pt",
+        map_location=device,
+        weights_only=True
+    ))
     # rl_policy_net.requires_grad_(False)
-    # create a u_nn wrapper to wrap around the rl_policy_net and retrun [rl_policy_net(x), 0] vector
-    # u_nn = WrapperConterlNN(rl_policy_net)
-
-    rl_policy_net = InvertControlNN()
-    u_nn = WrapperConterlNN(rl_policy_net) # wrapper around InvertControlNN to create u_nn for ClosedLoopDrift
-    bundle_path = OUTPUT_DIR / "eval_bundle.pth"
-    bundle = load_eval_bundle(bundle_path, map_location="cpu")
-    u_nn.load_state_dict(bundle["control_state_dict"])
+    rl_policy_swap = SwapStateWrapper(rl_policy_net)
+    u_nn = WrapperConterlNN(rl_policy_swap)
+    # u_nn.requires_grad_(False)
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
         g = 9.81
@@ -1032,7 +1056,6 @@ def main():
     # ========================================================================
     # 6.0 Setup saving
     # ========================================================================
-    device = params.training.device
     params.constraints.pretrain_goal_target = params.constraints.beta_s
     params.constraints.pretrain_unsafe_target = params.constraints.beta_ra
     params.constraints.pretrain_init_target = 1.0
@@ -1049,8 +1072,8 @@ def main():
         print(f"V network: {V_net}")
         print(f"\nUsing device: {device}")
         
-        ENABLE_PRETRAINING = True
-        PRETRAIN_EPOCHS = 5000
+        ENABLE_PRETRAINING = False
+        PRETRAIN_EPOCHS = 10000
         PRETRAIN_LR = 0.01
 
         if ENABLE_PRETRAINING:
@@ -1064,11 +1087,13 @@ def main():
                 GV_net=GV_net,  # Pass GV_net if you want GV loss, None otherwise
                 num_epochs=PRETRAIN_EPOCHS,
                 lr=PRETRAIN_LR,
+                lambda_w=1e-2,
                 device=params.training.device,
-                n_each=1200,
+                n_each=1500,
                 save_v_path= OUTPUT_DIR / "V_pretrained.pth",
             )
             print(f"Pretraining completed!\n")
+        V_net.load_state_dict(torch.load(OUTPUT_DIR / "V_pretrained.pth", map_location=device))
 
         # ========================================================================
         # 6.2 TRAIN WITH BOUNDS
