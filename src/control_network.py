@@ -2,7 +2,6 @@ import torch.nn as nn
 import torch
 import torch.nn.functional as F
 
-
 class LinearControlNN(nn.Module):
       def __init__(self, prior_knowledge=True, input_dim=2):
           super().__init__()
@@ -16,7 +15,22 @@ class LinearControlNN(nn.Module):
 
       def forward(self, x: torch.Tensor) -> torch.Tensor:
           return self.fc(x)
-    
+
+class TanhPolicy(nn.Sequential):
+    def __init__(
+        self,
+        n_in: int = 2,
+        n_out: int = 1,
+        n_hidden: int = 64,
+        device: torch.device | str = "cpu"
+    ):
+        super().__init__(
+            nn.Linear(n_in, n_hidden, dtype=torch.float32, device=device),
+            nn.Tanh(),
+            nn.Linear(n_hidden, n_hidden, dtype=torch.float32, device=device),
+            nn.Tanh(),
+            nn.Linear(n_hidden, n_out, dtype=torch.float32, device=device),
+        )
 
 class GBMControlNN(nn.Module):
     def __init__(self, input_dim=2, hidden_dim=8, output_dim=2):
@@ -44,7 +58,6 @@ class InvertControlNN(nn.Module):
         out = F.tanh(self.fc2(h1))
         return out
 
-
 class TanhPolicy(nn.Sequential):
     """
     A policy with three layers and tanh activations.
@@ -64,7 +77,6 @@ class TanhPolicy(nn.Sequential):
             nn.Tanh(),
             nn.Linear(n_hidden, n_out, dtype=torch.float32, device=device),
         )
-
 
 class WrapperConterlNN(nn.Module):
     """
@@ -87,6 +99,26 @@ class WrapperConterlNN(nn.Module):
         u = torch.cat([zeros, self.M_mLsquare*u2], dim=-1)  # (N, 2)
         return u
 
+class SwapStateWrapper(nn.Module):
+    """
+    Wrap a policy that expects state=[angular_rate, angle]
+    so it can be called with state=[angle, angular_rate].
+
+    Works with input shape (2,) or (N,2).
+    """
+    def __init__(self, base_policy: nn.Module):
+        super().__init__()
+        self.base_policy = base_policy
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if x.ndim == 1:
+            x_swapped = x[[1, 0]]  # [angle, ang_rate] -> [ang_rate, angle]
+        elif x.ndim == 2:
+            x_swapped = x[:, [1, 0]]
+        else:
+            raise ValueError(f"Expected x.ndim in {{1,2}}, got {x.ndim}")
+
+        return self.base_policy(x_swapped)
 
 class NonlinearControlNN(nn.Module):
     def __init__(self, input_dim=3, hidden_dim=64, output_dim=3):

@@ -15,7 +15,7 @@ HERE = Path(__file__).resolve().parent
 OUTPUT_DIR = HERE / "outputs"
 sys.path.insert(0, str(ROOT))
 
-from src.control_network import InvertControlNN, WrapperConterlNN
+from src.control_network import TanhPolicy, WrapperConterlNN, SwapStateWrapper
 from src.discretization import discretize_regions
 from src.dynamics import ClosedLoopDrift, Dynamics
 from src.hyperparameters import Hyperparameters
@@ -62,7 +62,7 @@ def main(benchmark_mode=False):
     params.training.num_epochs = 200000
 
     params.discretization.n_goal = 5
-    params.discretization.n_outside_goal = 4
+    params.discretization.n_outside_goal = 3
     params.discretization.n_generator = 4
     params.discretization.n_unsafe = 15
     params.discretization.n_init = 30
@@ -73,42 +73,50 @@ def main(benchmark_mode=False):
     params.compute_GV = True
 
     params.training.enable_pretraining = True
-    params.training.pretrain_epochs = 1500
+    params.training.pretrain_epochs = 2000
     params.training.pretrain_lr = 0.01
-    params.training.pretrain_n_samples = 100
+    params.training.pretrain_n_samples = 500
 
     params.refinement.v_outside.enable_refinement = True
     params.refinement.v_outside.refine_interval = 250
-    params.refinement.v_outside.late_epoch_threshold = 2500
+    params.refinement.v_outside.late_epoch_threshold = 1000
     params.refinement.v_outside.refine_interval_late = 100
     params.refinement.v_outside.refine_factor = 2
     params.refinement.v_outside.max_cells = 50000
     params.refinement.v_outside.N_to_refine = 999999
 
     params.refinement.v_outside.enable_merging = True
-    params.refinement.v_outside.merge_interval = 501
+    params.refinement.v_outside.merge_interval = 200
     params.refinement.v_outside.merge_max_passes = 8
     params.refinement.v_outside.merge_relax_margin = 0.5
 
     params.refinement.gv_generator.enable_refinement = True
-    params.refinement.gv_generator.refine_interval = 250
-    params.refinement.gv_generator.late_epoch_threshold = 3500
+    params.refinement.gv_generator.refine_interval = 300
+    params.refinement.gv_generator.late_epoch_threshold = 1000
     params.refinement.gv_generator.refine_interval_late = 100
     params.refinement.gv_generator.refine_factor = 2
     params.refinement.gv_generator.max_cells = 50000
     params.refinement.gv_generator.N_to_refine = 999999
 
     params.refinement.gv_generator.enable_merging = True
-    params.refinement.gv_generator.merge_interval = 501
+    params.refinement.gv_generator.merge_interval = 200
     params.refinement.gv_generator.merge_max_passes = 8
-    params.refinement.gv_generator.merge_relax_margin = -500.0
+    params.refinement.gv_generator.merge_relax_margin = -200.0
 
     # === Dynamics ===
-    rl_policy_net = InvertControlNN()
-    u_nn = WrapperConterlNN(rl_policy_net)
-    bundle_path = OUTPUT_DIR / "eval_bundle.pth"
-    bundle = load_eval_bundle(bundle_path, map_location="cpu")
-    u_nn.load_state_dict(bundle["control_state_dict"])
+    # pre-trained in RL deterministic env
+    rl_policy_net = TanhPolicy(2, 1, 64, device=params.training.device)
+    rl_policy_net.load_state_dict(torch.load(
+        "outputs/pendulum_policy.pt",
+        map_location=params.training.device,
+        weights_only=True
+    ))
+    # rl_policy_net.requires_grad_(False)
+    rl_policy_swap = SwapStateWrapper(rl_policy_net)
+    u_nn = WrapperConterlNN(rl_policy_swap)
+    # bundle_path = OUTPUT_DIR / "eval_bundle.pth"
+    # bundle = load_eval_bundle(bundle_path, map_location="cpu")
+    # u_nn.load_state_dict(bundle["control_state_dict"])
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
         g = 9.81
@@ -189,7 +197,7 @@ def main(benchmark_mode=False):
                 device=params.training.device,
                 n_each=params.training.pretrain_n_samples,
                 lambda_w=1e-4,
-                unsafe_sample_fraction=1.0/6.0,
+                unsafe_sample_fraction=1.0/3.0,
                 save_v_path=OUTPUT_DIR / "V_pretrained.pth",
             )
 
@@ -334,7 +342,7 @@ if __name__ == '__main__':
     is_benchmark = '--benchmark=1' in sys.argv or '--benchmark' in sys.argv and '1' in sys.argv
 
     if is_benchmark:
-        n_runs = 2
+        n_runs = 5
         times = []
         cells = []
 

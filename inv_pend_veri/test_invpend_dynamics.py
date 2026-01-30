@@ -34,6 +34,7 @@ sys.path.insert(0, str(ROOT))
 
 from src.control_network import InvertControlNN, WrapperConterlNN
 from src.save_load_utils import load_eval_bundle
+from main import TanhPolicy, SwapStateWrapper
 
 # ----------------------------
 # Parameters
@@ -105,7 +106,6 @@ def load_control_net(bundle_path, device="cpu"):
     control_net.eval()
     return control_net
 
-control_net = load_control_net(OUTPUT_DIR / "eval_bundle.pth")
 
 # ----------------------------
 # small helper to get u
@@ -481,10 +481,24 @@ def test_mc(controller=None):
 
 
 def main():
+    device="cpu"
+    rl_policy_net = TanhPolicy(2, 1, 64, device=device)
+    rl_policy_net.load_state_dict(torch.load(
+        "outputs/pendulum_policy.pt",
+        map_location=device,
+        weights_only=True
+    ))
+    rl_policy_net.requires_grad_(False)
+    rl_policy_swap = SwapStateWrapper(rl_policy_net)
+    u_nn = WrapperConterlNN(rl_policy_swap)
+    u_nn.requires_grad_(False)
+
     test_single_traj_run()
-    test_single_traj_run(controller=control_net)
-    test_mc(controller=None)
-    test_mc(controller=control_net)
+    test_single_traj_run(controller=u_nn)
+    
+    # test_mc(controller=None)
+    # control_net = load_control_net(OUTPUT_DIR / "eval_bundle.pth")
+    # test_mc(controller=control_net)
 
 
 if __name__ == "__main__":
