@@ -9,7 +9,6 @@ from pathlib import Path
 
 import numpy as np
 import torch
-import torch.nn.functional as F
 
 # Set up directories
 ROOT = Path(__file__).resolve().parents[3]
@@ -27,180 +26,13 @@ from src.regions import Region, Regions
 from src.save_load_utils import (enable_terminal_logging, load_eval_bundle,
                                   log_loaded_training_epochs, save_eval_bundle)
 from src.trainer import train_network_bounds
+from src.pretrainer import pretrain_network_samples
 from src.training_utils import evaluate_constraints, print_constraint_summary
 from src.utils import cleanup_and_setup_directories
 from src.visualization import create_summary_plots
 
 # Set random seed
 torch.manual_seed(0)
-
-def pretrain_network_samples(
-    model,
-    x_goal_range,
-    x_unsafe_range,
-    x_init_range,
-    x_range,
-    params,
-    GV_net=None,
-    num_epochs=1000,
-    lr=0.01,
-    device="cpu",
-    control_net=None,
-    n_each: int = 400,
-    save_v_path=None,
-    save_control_path=None,
-):
-    print("\n" + "="*20)
-    print("Pre-training")
-    print("="*20)
-
-    # Build optimizer over V network and controller if it exists
-    opt_params = list(model.parameters())
-    if control_net is not None:
-        opt_params += list(control_net.parameters())
-    optimizer = torch.optim.Adam(opt_params, lr=lr)
-
-    if GV_net is not None:
-        print("GV pre-training enabled")
-    else:
-        print("GV pre-training disabled")
-
-    best_loss = float("inf")
-    best_model_state = None
-    best_control_state = None
-
-    # Convert all state space ranges to torch tensors
-    x_range_t = torch.as_tensor(x_range, dtype=torch.float32, device=device)
-    goal_t = torch.as_tensor(x_goal_range, dtype=torch.float32, device=device)
-    unsafe_t = torch.as_tensor(x_unsafe_range, dtype=torch.float32, device=device)
-    init_t = torch.as_tensor(x_init_range, dtype=torch.float32, device=device)
-
-    # Extract dimension and bounds of the full state space
-    D = x_range_t.shape[0]
-    low = x_range_t[:, 0]
-    high = x_range_t[:, 1]
-    span = high - low
-
-    # Sample uniformly from a box
-    def _sample_in_box(box: torch.Tensor, N: int) -> torch.Tensor:
-        b_low = box[:, 0]
-        b_high = box[:, 1]
-        return torch.rand(N, D, device=device) * (b_high - b_low) + b_low
-
-    # Check whether points are inside a box
-    def _in_box(x: torch.Tensor, box: torch.Tensor) -> torch.Tensor:
-        return ((x >= box[:, 0]) & (x <= box[:, 1])).all(dim=1)
-
-    for epoch in range(num_epochs):
-        # Put all networks in training mode
-        model.train()
-        if control_net is not None:
-            control_net.train()
-        if GV_net is not None:
-            GV_net.train()
-
-        # Sample from the full state space and enforce v(x) >= 0
-        x_full = torch.rand(n_each, D, device=device) * span + low
-        v_full = model(x_full).squeeze(-1)
-        v_loss_full = F.relu(0.0 - v_full).sum()
-
-        # Sample from the initial set and enforce v(x) <= 1
-        x_init = _sample_in_box(init_t, n_each)
-        v_init = model(x_init).squeeze(-1)
-        v_loss_init = F.relu(v_init - 1.0).sum()
-
-        # Sample from the unsafe set and enforce large values
-        x_unsafe = _sample_in_box(unsafe_t, n_each)
-        v_unsafe = model(x_unsafe).squeeze(-1)
-        v_loss_unsafe = F.relu(params.constraints.beta_ra - v_unsafe).sum()
-
-        # Sample points that are not in the goal or unsafe sets
-        x_others_list = []
-        need = n_each
-        max_tries = 20
-        tries = 0
-
-        while need > 0 and tries < max_tries:
-            tries += 1
-            x_cand = torch.rand(max(need * 4, 32), D, device=device) * span + low
-            in_goal = _in_box(x_cand, goal_t)
-            in_unsafe = _in_box(x_cand, unsafe_t)
-            keep = ~(in_goal | in_unsafe)
-            x_keep = x_cand[keep]
-            if x_keep.numel() > 0:
-                take = min(need, x_keep.shape[0])
-                x_others_list.append(x_keep[:take])
-                need -= take
-
-        # Fall back to full-space samples if rejection sampling fails
-        if len(x_others_list) == 0:
-            x_others = x_full.detach()
-        else:
-            x_others = torch.cat(x_others_list, dim=0)
-
-        # Combine the value losses exactly as in the original logic
-        loss_v = (
-            v_loss_full
-            + v_loss_init
-            + v_loss_unsafe
-        )
-
-        # Compute the GV loss on the same "other" states
-        loss_gv = torch.tensor(0.0, device=device)
-        if GV_net is not None and x_others.numel() > 0:
-            x_gv = x_others.detach().clone().requires_grad_(True)
-            gv_output = GV_net(x_gv).squeeze(-1)
-            loss_gv = F.relu(gv_output).sum()
-
-        total_loss = loss_v + loss_gv
-
-        # Save the best model seen so far
-        if total_loss.item() <= best_loss:
-            best_loss = total_loss.item()
-            best_model_state = {
-                k: v.cpu().clone() for k, v in model.state_dict().items()
-            }
-            if control_net is not None:
-                best_control_state = {
-                    k: v.cpu().clone()
-                    for k, v in control_net.state_dict().items()
-                }
-
-        if epoch % 100 == 0:
-            if GV_net is not None:
-                print(f"Epoch {epoch} | V_loss={loss_v.item():8.4f} | GV_loss={loss_gv.item():8.4f}")
-            else:
-                print(f"Epoch {epoch} | V_loss={loss_v.item():8.4f}")
-
-        # Backprop and update parameters
-        optimizer.zero_grad()
-        total_loss.backward()
-        optimizer.step()
-
-    # Restore best model
-    if best_model_state is not None:
-        model.load_state_dict(best_model_state)
-        if control_net is not None and best_control_state is not None:
-            control_net.load_state_dict(best_control_state)
-        print(f"\nBest loss: {best_loss:.6f}")
-
-        # Save best pretrained weights (state_dict)
-        if save_v_path is not None:
-            torch.save(best_model_state, save_v_path)
-            print(f"Saved pretrained V_net to: {save_v_path}")
-        if (control_net is not None) and (best_control_state is not None) and (save_control_path is not None):
-            torch.save(best_control_state, save_control_path)
-            print(f"Saved pretrained Controller_net to: {save_control_path}")
-
-    print("="*20)
-    networks_trained = ["V"]
-    if GV_net is not None:
-        networks_trained.append("GV")
-    if control_net is not None:
-        networks_trained.append("Controller")
-    print(f"Pre-training complete: {' + '.join(networks_trained)}")
-    print("="*20 + "\n")
-
 
 def main(benchmark_mode=False):
     parser = argparse.ArgumentParser()
@@ -242,15 +74,16 @@ def main(benchmark_mode=False):
     params.discretization.n_init = 7
 
     params.constraints.beta_ra = 20.0
-
     params.compute_V = True
     params.compute_GV = True
 
+    # Pretraining
     params.training.enable_pretraining = True
     params.training.pretrain_epochs = 500
     params.training.pretrain_lr = 0.01
     params.training.pretrain_n_samples = 100
 
+    # Refinement
     params.refinement.v_outside.enable_refinement = True
     params.refinement.v_outside.refine_interval = 200
     params.refinement.v_outside.late_epoch_threshold = 2500
@@ -353,6 +186,7 @@ def main(benchmark_mode=False):
                 num_epochs=params.training.pretrain_epochs,
                 lr=params.training.pretrain_lr,
                 device=params.training.device,
+                lambda_w=0.0,
                 n_each=params.training.pretrain_n_samples,
                 save_v_path=OUTPUT_DIR / "V_pretrained.pth",
             )
@@ -446,27 +280,20 @@ def main(benchmark_mode=False):
         params = Hyperparameters.from_dict(bundle["hyperparameters"])
 
         # Rebuild discretization cells
-        region_cells = bundle["region_cells"]  # already list of (cpu tensors)
+        region_cells = bundle["region_cells"]
 
-        # Rebuild networks (same as before) and load weights
+        # Rebuild networks and load weights
         V_net = create_V(params.network).to(device)
         V_net.load_state_dict(bundle["V_state_dict"])
 
-        # Recreate dynamics + GV_net (same construction as training path)
-        # NOTE: uses your existing dynamics creation earlier in main()
+        # Recreate dynamics + GV_net 
         GV_net = create_GV(
             V_net=V_net,
             dynamics=dynamics,
-            network_config=params.network,
-            training_config=params.training
+            network_config=params.network
         ).to(device)
         if bundle["GV_state_dict"] is not None:
             GV_net.load_state_dict(bundle["GV_state_dict"])
-
-        # Control net (only needed if your plots depend on it)
-        u_nn = LinearControlNN(prior_knowledge=True).to(device)
-        if bundle["control_state_dict"] is not None:
-            u_nn.load_state_dict(bundle["control_state_dict"])
 
         # Move cells to device for evaluation/plots
         region_cells = {
@@ -491,12 +318,12 @@ def main(benchmark_mode=False):
             )
 
         print("\n" + "="*20)
-        print("Final Evaluation (Loaded)")
+        print("Final Evaluation (loaded)")
         print("="*20)
         print_constraint_summary(results)
 
         print("\n" + "="*20)
-        print("Creating Visualizations (Loaded)")
+        print("Creating Visualizations (loaded)")
         print("="*20)
         log_loaded_training_epochs(loss_history)
 
@@ -514,8 +341,6 @@ def main(benchmark_mode=False):
         )
 
     return training_time_result
-
-
 
 if __name__ == '__main__':
     # Quick check for benchmark mode before full arg parse

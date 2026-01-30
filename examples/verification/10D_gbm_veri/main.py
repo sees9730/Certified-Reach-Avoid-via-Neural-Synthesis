@@ -1,5 +1,5 @@
 """
-3D Geometric Brownian Motion Verification
+10D Geometric Brownian Motion Verification
 """
 import argparse
 import statistics as stats
@@ -12,7 +12,7 @@ import torch
 import torch.nn.functional as F
 
 # Set up directories
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 OUTPUT_DIR = HERE / "outputs"
 sys.path.insert(0, str(ROOT))
@@ -44,174 +44,135 @@ def pretrain_network_samples(
     GV_net=None,
     num_epochs=1000,
     lr=0.01,
-    device='cpu',
+    device="cpu",
     control_net=None,
-    n_each: int = 400,   # samples per region per epoch
+    n_each: int = 400,
+    save_v_path=None,
+    save_control_path=None,
 ):
-    """
-    Pre-train V network using sampled points to match constraint structure.
+    print("\n" + "="*20)
+    print("Pre-training")
+    print("="*20)
 
-    v_loss = v_loss_full + v_loss_init + v_loss_unsafe + v_loss_inside_goal + v_loss_others
-    and optionally:
-      loss_phi = relu(phi_output).sum() on the SAME "others" samples (x in X \ (goal ∪ unsafe)).
-    """
-    print("\n" + "="*80)
-    print("PRE-TRAINING: Constraint-Structured Initialization (Sample-Based)")
-    print("="*80)
-
+    # Build optimizer over V network and controller if it exists
     opt_params = list(model.parameters())
     if control_net is not None:
         opt_params += list(control_net.parameters())
     optimizer = torch.optim.Adam(opt_params, lr=lr)
 
     if GV_net is not None:
-        print("  GV (Φ) pre-training ENABLED (using provided GV_net)")
+        print("GV pre-training enabled")
     else:
-        print("  GV (Φ) pre-training DISABLED (no GV_net provided)")
+        print("GV pre-training disabled")
 
-    best_loss = float('inf')
+    best_loss = float("inf")
     best_model_state = None
     best_control_state = None
 
-    # Convert ranges to torch once: each is (D,2)
+    # Convert all state space ranges to torch tensors
     x_range_t = torch.as_tensor(x_range, dtype=torch.float32, device=device)
-    goal_t    = torch.as_tensor(x_goal_range, dtype=torch.float32, device=device)
-    unsafe_t  = torch.as_tensor(x_unsafe_range, dtype=torch.float32, device=device)
-    init_t    = torch.as_tensor(x_init_range, dtype=torch.float32, device=device)
+    goal_t = torch.as_tensor(x_goal_range, dtype=torch.float32, device=device)
+    unsafe_t = torch.as_tensor(x_unsafe_range, dtype=torch.float32, device=device)
+    init_t = torch.as_tensor(x_init_range, dtype=torch.float32, device=device)
 
+    # Extract dimension and bounds of the full state space
     D = x_range_t.shape[0]
-    low  = x_range_t[:, 0]
+    low = x_range_t[:, 0]
     high = x_range_t[:, 1]
     span = high - low
 
+    # Sample uniformly from a box
     def _sample_in_box(box: torch.Tensor, N: int) -> torch.Tensor:
-        """box: (D,2) -> samples: (N,D) uniform in box."""
         b_low = box[:, 0]
         b_high = box[:, 1]
         return torch.rand(N, D, device=device) * (b_high - b_low) + b_low
 
-    def _in_box(x_batch: torch.Tensor, box: torch.Tensor) -> torch.Tensor:
-        """x_batch: (N,D), box: (D,2) -> mask: (N,)"""
-        return ((x_batch >= box[:, 0]) & (x_batch <= box[:, 1])).all(dim=1)
+    # Check whether points are inside a box
+    def _in_box(x: torch.Tensor, box: torch.Tensor) -> torch.Tensor:
+        return ((x >= box[:, 0]) & (x <= box[:, 1])).all(dim=1)
 
     for epoch in range(num_epochs):
+        # Put all networks in training mode
         model.train()
         if control_net is not None:
             control_net.train()
         if GV_net is not None:
             GV_net.train()
 
-        # ---------------------------------------------------------------------
-        # 1) full-range samples -> enforce v(x) >= 0
-        # ---------------------------------------------------------------------
+        # Sample from the full state space and enforce v(x) >= 0
         x_full = torch.rand(n_each, D, device=device) * span + low
         v_full = model(x_full).squeeze(-1)
         v_loss_full = F.relu(0.0 - v_full).sum()
 
-        # ---------------------------------------------------------------------
-        # 2) init-range samples -> enforce v(x) <= 1
-        # ---------------------------------------------------------------------
+        # Sample from the initial set and enforce v(x) <= 1
         x_init = _sample_in_box(init_t, n_each)
         v_init = model(x_init).squeeze(-1)
         v_loss_init = F.relu(v_init - 1.0).sum()
 
-        # ---------------------------------------------------------------------
-        # 3) unsafe-range samples -> enforce v(x) >= pretrain_unsafe_target
-        # ---------------------------------------------------------------------
+        # Sample from the unsafe set and enforce large values
         x_unsafe = _sample_in_box(unsafe_t, n_each)
         v_unsafe = model(x_unsafe).squeeze(-1)
-        v_loss_unsafe = F.relu(params.constraints.pretrain_unsafe_target - v_unsafe).sum()
+        v_loss_unsafe = F.relu(params.constraints.beta_ra - v_unsafe).sum()
 
-        # ---------------------------------------------------------------------
-        # 5) samples inside full-range but outside (goal ∪ unsafe)
-        #    -> enforce v(x) >= pretrain_goal_target
-        # ---------------------------------------------------------------------
-        # Rejection sampling (simple + robust). Oversample and filter.
-        # If goal/unsafe are large, loop a few times to collect enough.
+        # Sample points that are not in the goal or unsafe sets
         x_others_list = []
         need = n_each
         max_tries = 20
         tries = 0
+
         while need > 0 and tries < max_tries:
             tries += 1
             x_cand = torch.rand(max(need * 4, 32), D, device=device) * span + low
-            cand_in_goal = _in_box(x_cand, goal_t)
-            cand_in_unsafe = _in_box(x_cand, unsafe_t)
-            keep = ~(cand_in_goal | cand_in_unsafe)
+            in_goal = _in_box(x_cand, goal_t)
+            in_unsafe = _in_box(x_cand, unsafe_t)
+            keep = ~(in_goal | in_unsafe)
             x_keep = x_cand[keep]
-            if x_keep.shape[0] > 0:
+            if x_keep.numel() > 0:
                 take = min(need, x_keep.shape[0])
                 x_others_list.append(x_keep[:take])
                 need -= take
 
+        # Fall back to full-space samples if rejection sampling fails
         if len(x_others_list) == 0:
-            # Fallback: if we cannot find any "others", just use random full samples.
-            # (Keeps code from crashing; also signals geometry is degenerate.)
             x_others = x_full.detach()
         else:
             x_others = torch.cat(x_others_list, dim=0)
 
-        v_others = model(x_others).squeeze(-1)
-        v_loss_others = F.relu(0.0 - v_others).sum()
-
-        # ---------------------------------------------------------------------
-        # 4) goal-range samples -> enforce v(x) <= pretrain_goal_target
-        # ---------------------------------------------------------------------
-        x_goal = _sample_in_box(goal_t, n_each)
-        v_goal = model(x_goal).squeeze(-1)
-        v_loss_inside_goal = F.relu(v_goal - 0.0).sum()
-
-        # ---------------------------------------------------------------------
-        # Total V loss
-        # ---------------------------------------------------------------------
+        # Combine the value losses exactly as in the original logic
         loss_v = (
             v_loss_full
             + v_loss_init
             + v_loss_unsafe
-            # + v_loss_inside_goal
-            # + v_loss_others
         )
 
-        # ---------------------------------------------------------------------
-        # Phi loss on SAME x_others -> enforce phi(x) <= 0
-        # ---------------------------------------------------------------------
-        loss_phi = torch.tensor(0.0, device=device)
+        # Compute the GV loss on the same "other" states
+        loss_gv = torch.tensor(0.0, device=device)
         if GV_net is not None and x_others.numel() > 0:
-            # Make leaf for autograd inside GV (∇V / Hessian)
-            x_phi = x_others.detach().clone().requires_grad_(True)
-            phi_output = GV_net(x_phi).squeeze(-1)
-            loss_phi = F.relu(phi_output).sum()
+            x_gv = x_others.detach().clone().requires_grad_(True)
+            gv_output = GV_net(x_gv).squeeze(-1)
+            loss_gv = F.relu(gv_output).sum()
 
-        total_loss = loss_v + loss_phi
+        total_loss = loss_v + loss_gv
 
-        # Track best
+        # Save the best model seen so far
         if total_loss.item() <= best_loss:
             best_loss = total_loss.item()
-            best_model_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
+            best_model_state = {
+                k: v.cpu().clone() for k, v in model.state_dict().items()
+            }
             if control_net is not None:
-                best_control_state = {k: v.cpu().clone() for k, v in control_net.state_dict().items()}
+                best_control_state = {
+                    k: v.cpu().clone()
+                    for k, v in control_net.state_dict().items()
+                }
 
-        # Logging
         if epoch % 100 == 0:
             if GV_net is not None:
-                print(
-                    f"  Epoch [{epoch}/{num_epochs}]: "
-                    f"V={loss_v.item():.6f} "
-                    f"(full={v_loss_full.item():.3f}, init={v_loss_init.item():.3f}, "
-                    f"unsafe={v_loss_unsafe.item():.3f}, goal={v_loss_inside_goal.item():.3f}, "
-                    f"others={v_loss_others.item():.3f}), "
-                    f"Φ={loss_phi.item():.6f}, Total={total_loss.item():.6f}"
-                )
+                print(f"Epoch {epoch} | V_loss={loss_v.item():8.4f} | GV_loss={loss_gv.item():8.4f}")
             else:
-                print(
-                    f"  Epoch [{epoch}/{num_epochs}]: "
-                    f"V={loss_v.item():.6f} "
-                    f"(full={v_loss_full.item():.3f}, init={v_loss_init.item():.3f}, "
-                    f"unsafe={v_loss_unsafe.item():.3f}, goal={v_loss_inside_goal.item():.3f}, "
-                    f"others={v_loss_others.item():.3f})"
-                )
+                print(f"Epoch {epoch} | V_loss={loss_v.item():8.4f}")
 
-        # Optimize/update networks
+        # Backprop and update parameters
         optimizer.zero_grad()
         total_loss.backward()
         optimizer.step()
@@ -221,17 +182,24 @@ def pretrain_network_samples(
         model.load_state_dict(best_model_state)
         if control_net is not None and best_control_state is not None:
             control_net.load_state_dict(best_control_state)
-        print(f"\n  Best loss: {best_loss:.6f}")
+        print(f"\nBest loss: {best_loss:.6f}")
 
-    print("="*80)
-    networks_trained = []
-    networks_trained.append("V")
+        # Save best pretrained weights (state_dict)
+        if save_v_path is not None:
+            torch.save(best_model_state, save_v_path)
+            print(f"Saved pretrained V_net to: {save_v_path}")
+        if (control_net is not None) and (best_control_state is not None) and (save_control_path is not None):
+            torch.save(best_control_state, save_control_path)
+            print(f"Saved pretrained Controller_net to: {save_control_path}")
+
+    print("="*20)
+    networks_trained = ["V"]
     if GV_net is not None:
-        networks_trained.append("GV (Φ)")
+        networks_trained.append("GV")
     if control_net is not None:
         networks_trained.append("Controller")
-    print(f"Pre-training complete. {' + '.join(networks_trained)} initialized.")
-    print("="*80 + "\n")
+    print(f"Pre-training complete: {' + '.join(networks_trained)}")
+    print("="*20 + "\n")
 
 
 def main(benchmark_mode=False):
@@ -246,7 +214,7 @@ def main(benchmark_mode=False):
         args.benchmark = 1
 
     print("="*20)
-    print("3D Geometric Brownian Motion Verification")
+    print("Geometric Brownian Motion Verification")
     print("="*20)
 
     # Return value for benchmark mode
@@ -256,22 +224,22 @@ def main(benchmark_mode=False):
     params = Hyperparameters.default()
 
     # Customize configuration
-    params.network.n_inputs = 3
+    params.network.n_inputs = 10
     params.network.n_hidden_1 = 64
     params.network.n_hidden_2 = 64
-    params.network.input_scale = [100.0, 100.0, 100.0]
+    params.network.input_scale = [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
     params.network.scale_factor = 20.0
 
     params.training.learning_rate = 0.005
     params.training.num_epochs = 200000
-    params.training.generator_weight = 1.0
+    params.training.generator_weight = 1.0  
     params.training.generator_start_epoch = 0
 
-    params.discretization.n_goal = 14
-    params.discretization.n_outside_goal = 4
+    params.discretization.n_goal = 1
+    params.discretization.n_outside_goal = 1
     params.discretization.n_generator = 1
-    params.discretization.n_unsafe = 5
-    params.discretization.n_init = 4
+    params.discretization.n_unsafe = 1
+    params.discretization.n_init = 1
 
     params.constraints.beta_ra = 20.0
 
@@ -279,50 +247,67 @@ def main(benchmark_mode=False):
     params.compute_GV = True
 
     params.training.enable_pretraining = True
-    params.training.pretrain_epochs = 3000
+    params.training.pretrain_epochs = 500
     params.training.pretrain_lr = 0.01
-    params.training.pretrain_n_samples = 400
+    params.training.pretrain_n_samples = 100
 
     params.refinement.v_outside.enable_refinement = True
-    params.refinement.v_outside.refine_interval = 250
+    params.refinement.v_outside.refine_interval = 200
     params.refinement.v_outside.late_epoch_threshold = 2500
-    params.refinement.v_outside.refine_interval_late = 50
+    params.refinement.v_outside.refine_interval_late = 100
     params.refinement.v_outside.refine_factor = 2
     params.refinement.v_outside.max_cells = 30000
     params.refinement.v_outside.N_to_refine = 100
 
+    # Merging
     params.refinement.v_outside.enable_merging = True
-    params.refinement.v_outside.merge_interval = 501
+    params.refinement.v_outside.merge_interval = 502
     params.refinement.v_outside.merge_max_passes = 8
     params.refinement.v_outside.merge_relax_margin = 0.3
 
+    # Refinement
     params.refinement.gv_generator.enable_refinement = True
-    params.refinement.gv_generator.refine_interval = 500
+    params.refinement.gv_generator.refine_interval = 100
     params.refinement.gv_generator.late_epoch_threshold = 2500
     params.refinement.gv_generator.refine_interval_late = 100
     params.refinement.gv_generator.refine_factor = 2
     params.refinement.gv_generator.max_cells = 30000
     params.refinement.gv_generator.N_to_refine = 100
 
+    # Merging
     params.refinement.gv_generator.enable_merging = True
-    params.refinement.gv_generator.merge_interval = 501
+    params.refinement.gv_generator.merge_interval = 502
     params.refinement.gv_generator.merge_max_passes = 8
-    params.refinement.gv_generator.merge_relax_margin = -100.0
+    params.refinement.gv_generator.merge_relax_margin = -200.0
 
     # === System Dynamics ===
-    u_nn = LinearControlNN(prior_knowledge=True, 
-                           input_dim=params.network.n_inputs)
+    u_nn = LinearControlNN(prior_knowledge=True, input_dim=10)
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
         x1 = x[:, 0]
         x2 = x[:, 1]
         x3 = x[:, 2]
-        f1 = -1.5 * x1 + 1.0 * x2 + 0.0 * x3
+        x4 = x[:, 3]
+        x5 = x[:, 4]
+        x6 = x[:, 5]
+        x7 = x[:, 6]
+        x8 = x[:, 7]
+        x9 = x[:, 8]
+        x10 = x[:, 9]
+        f1 = -1.5 * x1 + 1.0 * x2
         f2 = -1.0 * x1 - 1.5 * x2 + 1.0 * x3
-        f3 =  0.0 * x1 - 1.0 * x2 - 1.5 * x3
-        return torch.stack([f1, f2, f3], dim=1)
+        f3 = -1.0 * x2 - 1.5 * x3 + 1.0 * x4
+        f4 = -1.0 * x3 - 1.5 * x4 + 1.0 * x5
+        f5 = -1.0 * x4 - 1.5 * x5 + 1.0 * x6
+        f6 = -1.0 * x5 - 1.5 * x6 + 1.0 * x7
+        f7 = -1.0 * x6 - 1.5 * x7 + 1.0 * x8
+        f8 = -1.0 * x7 - 1.5 * x8 + 1.0 * x9
+        f9 = -1.0 * x8 - 1.5 * x9 + 1.0 * x10
+        f10 = -1.0 * x9 - 1.5 * x10
+        return torch.stack([f1, f2, f3, f4, f5, f6, f7, f8, f9, f10], dim=1)
 
-    g_coeffs = torch.tensor([0.2, 0.2, 0.2], dtype=torch.float32)
+    # Create diffusion coefficients as a persistent tensor to avoid TracerWarnings
+    g_coeffs = torch.tensor([0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2], dtype=torch.float32)
 
     def g(x: torch.Tensor) -> torch.Tensor:
         return g_coeffs.to(device=x.device, dtype=x.dtype) * x
@@ -330,17 +315,11 @@ def main(benchmark_mode=False):
     f_cl_module = ClosedLoopDrift(f_ol, u_nn).to(params.training.device)
     dynamics = Dynamics.dynamics(f=f_cl_module, g=g)
 
-    # === Regions ===
-    init_range = np.array([[45.0, 55.0], 
-                           [-55.0, -45.0],
-                           [50.0, 60.0]
-                           ], dtype=np.float32)
-    goal_range = np.array([[-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0]
-                           ], dtype=np.float32)
-    unsafe_range = np.array([[-100.0, -80.0], [-100.0, 100.0], [-100.0, -80.0]
-                             ], dtype=np.float32)
-    full_range = np.array([[-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0]
-                           ], dtype=np.float32)
+    # === Spatial Regions ===
+    init_range = np.array([[45.0, 55.0], [-55.0, -45.0], [45.0, 55.0], [45.0, 55.0], [45.0, 55.0], [45.0, 55.0], [45.0, 55.0], [45.0, 55.0], [45.0, 55.0], [45.0, 55.0]], dtype=np.float32)
+    goal_range = np.array([[-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0], [-25.0, 25.0]], dtype=np.float32)
+    unsafe_range = np.array([[-100.0, -80.0], [-100.0, 100.0], [-100.0, -80.0], [-100.0, -80.0], [-100.0, -80.0], [-100.0, -80.0], [-100.0, -80.0], [-100.0, -80.0], [-100.0, -80.0], [-100.0, -80.0]], dtype=np.float32)
+    full_range = np.array([[-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0], [-100.0, 100.0]], dtype=np.float32)
 
     init = Region(init_range)
     goal = Region(goal_range)
@@ -374,6 +353,7 @@ def main(benchmark_mode=False):
         enable_terminal_logging(OUTPUT_DIR / "terminal_log.txt")
 
         if params.training.enable_pretraining:
+
             # Start timer before pretraining
             training_start_time = time.time()
 
@@ -388,8 +368,11 @@ def main(benchmark_mode=False):
                 num_epochs=params.training.pretrain_epochs,
                 lr=params.training.pretrain_lr,
                 device=params.training.device,
-                control_net=u_nn
+                n_each=params.training.pretrain_n_samples,
+                save_v_path=OUTPUT_DIR / "V_pretrained.pth",
             )
+
+            exit()
 
         # === Training ===
         def create_scheduler(optimizer):
@@ -398,7 +381,6 @@ def main(benchmark_mode=False):
                 mode='min',
                 factor=0.5,
                 patience=300,
-                verbose=True,
                 min_lr=1e-6,
                 threshold=1e-3
             )
@@ -413,7 +395,7 @@ def main(benchmark_mode=False):
             start_time=training_start_time
         )
 
-        # Record training end time
+        # Record training end time (before eval/visualization)
         training_end_time = time.time()
         total_training_time = training_end_time - training_start_time
 
@@ -463,7 +445,7 @@ def main(benchmark_mode=False):
             final_beta_s=final_beta_s,
             loss_history=loss_history,
             refinement_epochs=refinement_epochs,
-            results=results,
+            results=results
         )
 
         # Set training time result for benchmark
@@ -481,13 +463,14 @@ def main(benchmark_mode=False):
         params = Hyperparameters.from_dict(bundle["hyperparameters"])
 
         # Rebuild discretization cells
-        region_cells = bundle["region_cells"]
+        region_cells = bundle["region_cells"]  # already list of (cpu tensors)
 
-        # Rebuild networks and load weights
+        # Rebuild networks (same as before) and load weights
         V_net = create_V(params.network).to(device)
         V_net.load_state_dict(bundle["V_state_dict"])
 
-        # Recreate dynamics + GV_net
+        # Recreate dynamics + GV_net (same construction as training path)
+        # NOTE: uses your existing dynamics creation earlier in main()
         GV_net = create_GV(
             V_net=V_net,
             dynamics=dynamics,
@@ -498,6 +481,7 @@ def main(benchmark_mode=False):
             GV_net.load_state_dict(bundle["GV_state_dict"])
 
         # Control net (only needed if your plots depend on it)
+        u_nn = LinearControlNN(prior_knowledge=True).to(device)
         if bundle["control_state_dict"] is not None:
             u_nn.load_state_dict(bundle["control_state_dict"])
 
@@ -517,8 +501,10 @@ def main(benchmark_mode=False):
             print("No saved results found in bundle, recomputing evaluation...")
             results = evaluate_constraints(
                 V_net, GV_net, region_cells,
+                beta_s=final_beta_s,
                 beta_ra=params.constraints.beta_ra,
-                device=device
+                device=device,
+                n_samples=5000
             )
 
         print("\n" + "="*20)
@@ -547,7 +533,9 @@ def main(benchmark_mode=False):
     return training_time_result
 
 
+
 if __name__ == '__main__':
+    # Quick check for benchmark mode before full arg parse
     import sys
     is_benchmark = '--benchmark=1' in sys.argv or '--benchmark' in sys.argv and '1' in sys.argv
 
@@ -566,6 +554,7 @@ if __name__ == '__main__':
             if training_time is not None:
                 times.append(training_time)
 
+            # Extract cell counts from last run
             bundle_path = OUTPUT_DIR / "eval_bundle.pth"
             if bundle_path.exists():
                 import torch
@@ -590,6 +579,7 @@ if __name__ == '__main__':
         print(f"  Individual times: {[f'{t:.2f}s' for t in times]}")
 
         if cells:
+            # Compute averages for each category
             categories = ['init', 'goal', 'unsafe', 'outside', 'generator', 'total_v', 'total']
             print("\nCell counts:")
             for cat in categories:

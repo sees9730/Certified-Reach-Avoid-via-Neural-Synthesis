@@ -1,0 +1,17 @@
+
+====================
+Pre-training
+====================
+GV pre-training enabled
+Epoch 0 | V_loss=3247.6279 | GV_loss=  8.2817
+Epoch 100 | V_loss=  0.8921 | GV_loss=105.7245
+Epoch 200 | V_loss=  0.0000 | GV_loss= 35.3527
+Epoch 300 | V_loss=  0.2525 | GV_loss=  0.0000
+Epoch 400 | V_loss=  0.0000 | GV_loss=  0.0000
+
+Best loss: 0.000000
+Saved pretrained V_net to: /Users/sebastianescobar/Desktop/Neural_Certificate/examples/verification/10D_gbm_veri/outputs/V_pretrained.pth
+====================
+Pre-training complete: V + GV
+====================
+

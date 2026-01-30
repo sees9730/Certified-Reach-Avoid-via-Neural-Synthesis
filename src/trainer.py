@@ -48,6 +48,7 @@ def train_network_bounds(
         params: Hyperparameters
         control_net: Optional control network for control synthesis
         create_scheduler: Optional scheduler factory function
+        start_time: Optional start time for timing purposes
 
     Returns:
         loss_history: List of loss dictionaries per epoch
@@ -151,7 +152,6 @@ def train_network_bounds(
     if start_time is None:
         start_time = time.time()
     final_beta_s = None
-    profile_times = {'bounds': 0, 'loss': 0, 'backward': 0, 'eval': 0, 'refine': 0, 'step': 0}
 
     for epoch in range(params.training.num_epochs):
         V_net.train()
@@ -194,9 +194,6 @@ def train_network_bounds(
                 current_gen_weight = 0.0
                 num_total_failing = 0
 
-        profile_times['bounds'] += time.time() - t0
-        t0 = time.time()
-
         # Update loss kwargs with current bounds (reuse pre-allocated dict)
         if params.compute_V:
             loss_kwargs['beta_ra'] = params.constraints.beta_ra
@@ -210,13 +207,9 @@ def train_network_bounds(
             loss_kwargs['generator_weight'] = current_gen_weight
 
         total_loss, loss_dict, sat_dict = compute_total_loss_bounds(**loss_kwargs)
-        profile_times['loss'] += time.time() - t0
-        t0 = time.time()
 
         # Backward pass
         total_loss.backward()
-        profile_times['backward'] += time.time() - t0
-        t0 = time.time()
 
         # Recompute bounds after optimizer step for verification
         V_net.eval()
@@ -234,9 +227,6 @@ def train_network_bounds(
                     bounds_updated[name] = (v_lowers_all_updated[start:end], v_uppers_all_updated[start:end])
                 else:
                     bounds_updated[name] = (empty_tensor, empty_tensor)
-
-        profile_times['eval'] += time.time() - t0
-        t0 = time.time()
 
         # Adaptive refinement for V outside region cells
         if params.compute_V and len(bounds_updated['outside'][0]) > 0:
@@ -325,9 +315,6 @@ def train_network_bounds(
                 region_cells['generator'] = merged_cells
                 print(f"Merging generator cells: merged {num_merges} pairs, {len(merged_cells)} total")
                 needs_gv_cache_rebuild = True
-
-        profile_times['refine'] += time.time() - t0
-        t0 = time.time()
 
         # Logging
         if epoch % params.logging.loss_log_interval == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
@@ -423,7 +410,6 @@ def train_network_bounds(
                 scheduler.step(total_loss.item())
             else:
                 scheduler.step()
-        profile_times['step'] += time.time() - t0
 
         # Rebuild CROWN caches after optimizer step if needed (after adaptive refinement)
         if needs_v_cache_rebuild:
@@ -472,11 +458,5 @@ def train_network_bounds(
 
     elapsed_time = time.time() - start_time
     print(f"\nTraining completed in {elapsed_time:.2f} seconds ({elapsed_time/60:.2f} minutes)")
-
-    print("\n=== Profiling Summary ===")
-    total_profiled = sum(profile_times.values())
-    for name, t in sorted(profile_times.items(), key=lambda x: -x[1]):
-        pct = 100 * t / total_profiled if total_profiled > 0 else 0
-        print(f"{name:12s}: {t:6.2f}s ({pct:5.1f}%)")
 
     return loss_history, final_beta_s, refinement_epochs
