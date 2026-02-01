@@ -22,13 +22,14 @@ def save_eval_bundle(
     loss_history,
     refinement_epochs,
     results,
+    file_name="eval_bundle.pth"
 ):
     """
     Save everything needed to reproduce final evaluation + summary plots.
     Minimal: store network weights + params/regions/cells/history/results.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
-    bundle_path = output_dir / "eval_bundle.pth"
+    bundle_path = output_dir / file_name
 
     torch.save({
         "V_state_dict": {k: v.detach().cpu() for k, v in V_net.state_dict().items()},
