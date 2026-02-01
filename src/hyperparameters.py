@@ -4,7 +4,19 @@ Hyperparameters for verification training.
 This module centralizes all configuration settings for the neural network training,
 discretization, constraints, and verification.
 """
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
+from typing import Any, Dict, Type, TypeVar
+
+T = TypeVar("T")
+
+def _filter_kwargs(cls: Type[T], d: Dict[str, Any]) -> Dict[str, Any]:
+    allowed = {f.name for f in fields(cls)}
+    d = d or {}
+    return {k: v for k, v in d.items() if k in allowed}
+
+def _dc_from_dict(cls: Type[T], d: Dict[str, Any]) -> T:
+    return cls(**_filter_kwargs(cls, d))
+
 
 @dataclass
 class NetworkConfig:
@@ -121,19 +133,18 @@ class Hyperparameters:
             logging=LoggingConfig()
         )
 
+    # --- in Hyperparameters.from_dict ---
     @classmethod
     def from_dict(cls, config_dict: dict):
-        """Create hyperparameters from dictionary."""
-        network = NetworkConfig(**config_dict.get('network', {}))
-        discretization = DiscretizationConfig(**config_dict.get('discretization', {}))
-        constraints = ConstraintConfig(**config_dict.get('constraints', {}))
-        training = TrainingConfig(**config_dict.get('training', {}))
-        logging = LoggingConfig(**config_dict.get('logging', {}))
+        network = _dc_from_dict(NetworkConfig, config_dict.get("network"))
+        discretization = _dc_from_dict(DiscretizationConfig, config_dict.get("discretization"))
+        constraints = _dc_from_dict(ConstraintConfig, config_dict.get("constraints"))  # beta_s gets dropped here
+        training = _dc_from_dict(TrainingConfig, config_dict.get("training"))
+        logging = _dc_from_dict(LoggingConfig, config_dict.get("logging"))
 
-        # Handle nested refinement config
-        refinement_dict = config_dict.get('refinement', {})
-        v_outside = RefinementConfigRegion(**refinement_dict.get('v_outside', {}))
-        gv_generator = RefinementConfigRegion(**refinement_dict.get('gv_generator', {}))
+        refinement_dict = config_dict.get("refinement") or {}
+        v_outside = _dc_from_dict(RefinementConfigRegion, refinement_dict.get("v_outside"))
+        gv_generator = _dc_from_dict(RefinementConfigRegion, refinement_dict.get("gv_generator"))
         refinement = RefinementConfig(v_outside=v_outside, gv_generator=gv_generator)
 
         return cls(
@@ -143,8 +154,8 @@ class Hyperparameters:
             training=training,
             refinement=refinement,
             logging=logging,
-            compute_V=config_dict.get('compute_V', True),
-            compute_GV=config_dict.get('compute_GV', True)
+            compute_V=config_dict.get("compute_V", True),
+            compute_GV=config_dict.get("compute_GV", True),
         )
 
     def to_dict(self):
@@ -218,3 +229,21 @@ class Hyperparameters:
             'compute_V': self.compute_V,
             'compute_GV': self.compute_GV
         }
+
+
+def load_hparams(hp_dict: dict) -> Hyperparameters:
+    # start from defaults (so newly-added fields get sensible values)
+    base = Hyperparameters.default().to_dict()
+
+    # shallow merge at top-level + sub-dicts
+    # (for your structure, a simple recursive merge is safer)
+    def deep_update(dst, src):
+        for k, v in src.items():
+            if isinstance(v, dict) and isinstance(dst.get(k), dict):
+                deep_update(dst[k], v)
+            else:
+                dst[k] = v
+        return dst
+
+    merged = deep_update(base, hp_dict or {})
+    return Hyperparameters.from_dict(merged)
