@@ -99,6 +99,45 @@ class WrapperConterlNN(nn.Module):
         u = torch.cat([zeros, self.M_mLsquare*u2], dim=-1)  # (N, 2)
         return u
 
+class Veh4DControlNN(nn.Module):
+    def __init__(self, input_dim=4, hidden_dim=16, output_dim=2):
+        super().__init__()
+        # Fully connected layers
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        h1 = F.tanh(self.fc1(x))
+        out = F.tanh(self.fc2(h1))
+        return out
+
+
+class Wrapper4DConterlNN(nn.Module):
+    """
+    Wraps a 2D policy network and returns a 4D control:
+
+        u(x) = [0, M_mLsquare * policy(x)[:, 0], 0, M_mLsquare * policy(x)[:, 1]]
+
+    Assumption:
+      - policy_net(x) returns shape (N, 2)
+      - x is (N, state_dim)
+    """
+
+    def __init__(self, policy_net: nn.Module, U_max: float):
+        super().__init__()
+        self.policy_net = policy_net
+        self.register_buffer("U_max", torch.tensor(U_max, dtype=torch.float32))
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        u2d = self.policy_net(x)
+        zeros = torch.zeros((x.size(0), 1), dtype=x.dtype, device=x.device)
+        u = torch.cat(
+            [zeros, self.U_max * u2d[:, 0:1], zeros, self.U_max * u2d[:, 1:2]],
+            dim=-1,
+        )  # (N, 4)
+        return u
+
+
 class SwapStateWrapper(nn.Module):
     """
     Wrap a policy that expects state=[angular_rate, angle]
