@@ -111,7 +111,6 @@ class Veh4DControlNN(nn.Module):
         out = F.tanh(self.fc2(h1))
         return out
 
-
 class Wrapper4DConterlNN(nn.Module):
     """
     Wraps a 2D policy network and returns a 4D control:

@@ -28,7 +28,7 @@ from src.dynamics import Dynamics, ClosedLoopDrift
 from src.regions import Regions, Region
 from src.network import create_V
 from src.phi_module import create_GV
-from src.control_network import Veh4DControlNN, Wrapper4DConterlNN
+from src.control_network import TanhPolicy, Wrapper4DConterlNN
 from src.discretization import discretize_regions
 from src.crown_bounds import SymbolicCROWNCache, SymbolicCROWNCache_Phi, prepare_cell_bounds
 from src.trainer import train_network_bounds
@@ -278,7 +278,7 @@ def pretrain_network_samples(
     device='cpu',
     control_net=None,
     n_each: int = 400,
-    lambda_w = 1e-3,
+    lambda_w = 0.1,
     save_v_path=None,
     save_control_path=None,
 ):
@@ -393,7 +393,7 @@ def pretrain_network_samples(
         v_loss_init = F.relu(v_init - 1.0).sum()
 
         # unsafe-range samples -> enforce v(x) >= beta_ra
-        x_unsafe = _sample_in_unsafe_union(int(n_each))
+        x_unsafe = _sample_in_unsafe_union(int(n_each/8))
         v_unsafe = model(x_unsafe).squeeze(-1)
         v_loss_unsafe = F.relu(params.constraints.beta_ra - v_unsafe).sum()
 
@@ -509,13 +509,13 @@ def main(benchmark_mode=False):
     params.training.generator_weight = 1.0
     params.training.generator_start_epoch = 0
 
-    params.discretization.n_goal = 14
-    params.discretization.n_outside_goal = 3
+    params.discretization.n_goal = 12
+    params.discretization.n_outside_goal = 4
     params.discretization.n_generator = 2
     params.discretization.n_unsafe = 8
-    params.discretization.n_init = 14
+    params.discretization.n_init = 12
 
-    params.constraints.beta_ra = 4.0
+    params.constraints.beta_ra = 5.0
 
     params.compute_V = True
     params.compute_GV = True
@@ -523,12 +523,12 @@ def main(benchmark_mode=False):
     params.training.enable_pretraining = True
     params.training.pretrain_epochs = 5000
     params.training.pretrain_lr = 0.01
-    params.training.pretrain_n_samples = 800
+    params.training.pretrain_n_samples = 1600
 
     params.refinement.v_outside.enable_refinement = True
     params.refinement.v_outside.refine_interval = 500
-    params.refinement.v_outside.late_epoch_threshold = 5000
-    params.refinement.v_outside.refine_interval_late = 200
+    params.refinement.v_outside.late_epoch_threshold = 999999999
+    params.refinement.v_outside.refine_interval_late = 100
     params.refinement.v_outside.refine_factor = 2
     params.refinement.v_outside.max_cells = 100000
     params.refinement.v_outside.N_to_refine = 100
@@ -536,7 +536,7 @@ def main(benchmark_mode=False):
     params.refinement.v_outside.enable_merging = True
     params.refinement.v_outside.merge_interval = 501
     params.refinement.v_outside.merge_max_passes = 8
-    params.refinement.v_outside.merge_relax_margin = 8.0
+    params.refinement.v_outside.merge_relax_margin = 6.0
 
     params.refinement.gv_generator.enable_refinement = True
     params.refinement.gv_generator.refine_interval = 500
@@ -552,7 +552,7 @@ def main(benchmark_mode=False):
     params.refinement.gv_generator.merge_relax_margin = -500.0
 
     # === Dynamics ===
-    policy_net = Veh4DControlNN(input_dim=4, hidden_dim=64, output_dim=2)
+    policy_net = TanhPolicy(n_in=4, n_hidden=64, n_out=2)
     u_nn = Wrapper4DConterlNN(policy_net, U_max=10.0)
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
@@ -574,7 +574,7 @@ def main(benchmark_mode=False):
         f4 = -g * dhdy
         return torch.stack([f1, f2, f3, f4], dim=1)
 
-    g_coeffs = torch.tensor([0.0, 0.1, 0.0, 0.1], dtype=torch.float32)
+    g_coeffs = torch.tensor([0.0, 1.0, 0.0, 1.0], dtype=torch.float32)
 
     def g(x: torch.Tensor) -> torch.Tensor:
         base = g_coeffs.to(device=x.device, dtype=x.dtype)
@@ -701,7 +701,7 @@ def main(benchmark_mode=False):
         input_offset=input_offset,
         verify=False
     )
-    check_gv_matches_autograd_full_range(
+    res = check_gv_matches_autograd_full_range(
         V_net, GV_net, dynamics,
         full_range=full_range,
         num_points=1024,
@@ -748,7 +748,7 @@ def main(benchmark_mode=False):
         def create_scheduler(optimizer):
             return torch.optim.lr_scheduler.StepLR(
                 optimizer,
-                step_size=5000,
+                step_size=2000,
                 gamma=0.95
             )
 
@@ -760,7 +760,7 @@ def main(benchmark_mode=False):
             params=params,
             control_net=u_nn,
             create_scheduler=create_scheduler,
-            start_time=training_start_time,
+            start_time=training_start_time
         )
 
         training_end_time = time.time()
@@ -834,6 +834,7 @@ def main(benchmark_mode=False):
         ).to(params.training.device)
         if bundle["GV_state_dict"] is not None:
             GV_net.load_state_dict(bundle["GV_state_dict"])
+
         if bundle["control_state_dict"] is not None:
             u_nn.load_state_dict(bundle["control_state_dict"])
 
