@@ -474,24 +474,24 @@ def describe_samples_rows(
         r: List[str] = []
         if init_b[i]:
             r.append("init")
-            if(diagnostic_list[0] == False):
-                print("init")
-                diagnostic_list[0] = True
+            # if(diagnostic_list[0] == False):
+            #     print("init")
+            #     diagnostic_list[0] = True
         if unsafe_b[i]:
             r.append("unsafe")
-            if(diagnostic_list[1] == False):
-                print("unsafe")
-                diagnostic_list[1] = True
+            # if(diagnostic_list[1] == False):
+            #     print("unsafe")
+            #     diagnostic_list[1] = True
         if goal_b[i]:
             r.append("goal")
-            if(diagnostic_list[2] == False):
-                print("goal")
-                diagnostic_list[2] = True
+            # if(diagnostic_list[2] == False):
+            #     print("goal")
+            #     diagnostic_list[2] = True
         if gen_b[i]:
             r.append("gen")
-            if(diagnostic_list[3] == False):
-                print("gen")
-                diagnostic_list[3] = True
+            # if(diagnostic_list[3] == False):
+            #     print("gen")
+            #     diagnostic_list[3] = True
         regions_per_sample.append(r)
 
     # -------------------------

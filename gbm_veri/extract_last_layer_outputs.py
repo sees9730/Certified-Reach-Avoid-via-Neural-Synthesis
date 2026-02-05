@@ -114,7 +114,7 @@ def generate_scenario_data(N_loop, N_samples, full_range, init_range, unsafe_ran
             init_range=init_range, unsafe_range=unsafe_range, goal_range=goal_range,
             as_dict=True,
         )
-        print(x_full[0])
+        # print(x_full[0])
 
         # Write [region labels, V, GV] to file
         write_describe_dict_to_csv(data, sample_features_path)
@@ -150,6 +150,8 @@ def main():
 
     for i in range(5):
         model_seed = i
+
+        print("\n===========\n Pre-train model")
         # models from sample pre-training
         V_net = build_V(params, device="cpu", pretrain=True, model_seed=model_seed)
         dynamics = build_dynamics(params, device="cpu", pretrain=True)
@@ -159,6 +161,7 @@ def main():
             sample_features_path="samples_features_pretrainmodel_"+str(model_seed)+".csv", 
             x_full_path="x_full_pretrainmodel_"+str(model_seed)+".csv")
         
+        print("\n===========\n SAT model")
         # models from bound training (sat)
         V_net = build_V(params, device="cpu", pretrain=False, model_seed=model_seed)
         dynamics = build_dynamics(params, device="cpu", pretrain=False)

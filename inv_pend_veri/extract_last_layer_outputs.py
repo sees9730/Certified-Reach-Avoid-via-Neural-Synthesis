@@ -22,9 +22,10 @@ from src.scenario_utils import (
 )
 from src.hyperparameters import Hyperparameters
 from src.network import create_V
-from src.control_network import ZeroControl
+from src.control_network import TanhPolicy, WrapperConterlNN
 from src.dynamics import Dynamics, ClosedLoopDrift
 from src.save_load_utils import load_eval_bundle
+from main import SwapStateWrapper
 
 torch.set_default_dtype(torch.float32)
 
@@ -34,28 +35,59 @@ torch.set_default_dtype(torch.float32)
 def build_V(params: Hyperparameters, device: str = "cpu", pretrain=False, model_seed=None):
     V_net = create_V(params.network).to(device)
     if(pretrain):
-        ckpt_path = OUTPUT_DIR / "3D_GBM_pretrained_V" / f"V_pretrained_seed_{model_seed}.pth"
+        ckpt_path = OUTPUT_DIR / "pretrained_V" / f"V_pretrained_seed_{model_seed}.pth"
         V_net.load_state_dict(torch.load(ckpt_path, map_location=device))
     else:
-        bundle_path = OUTPUT_DIR / "3D_GBM_sat_V" / f"eval_bundle_seed_{model_seed}.pth"
+        bundle_path = OUTPUT_DIR / "sat_V" / f"eval_bundle_seed_{model_seed}.pth"
         bundle = load_eval_bundle(bundle_path, map_location=device)
         V_net.load_state_dict(bundle["V_state_dict"])
     V_net.eval()
     return V_net
 
 def build_dynamics(params: Hyperparameters, device: str = "cpu", pretrain=False):
-    u_nn = ZeroControl(input_dim=params.network.n_inputs)
-    def f_ol(x: torch.Tensor, u: torch.Tensor | None = None) -> torch.Tensor:
-        x1, x2, x3 = x[:, 0], x[:, 1], x[:, 2]
-        f1 = -1.5 * x1 + 1.0 * x2 + 0.0 * x3
-        f2 = -1.0 * x1 - 1.5 * x2 + 1.0 * x3
-        f3 =  0.0 * x1 - 1.0 * x2 - 1.5 * x3
-        return torch.stack([f1, f2, f3], dim=1)
+    rl_policy_net = TanhPolicy(2, 1, 64, device=device)
+    rl_policy_net.load_state_dict(torch.load(
+        "outputs/pendulum_policy.pt",
+        map_location=device,
+        weights_only=True
+    ))
+    # rl_policy_net.requires_grad_(False)
+    rl_policy_swap = SwapStateWrapper(rl_policy_net)
+    u_nn = WrapperConterlNN(rl_policy_swap)
 
-    g_coeffs = torch.tensor([0.2, 0.2, 0.2], dtype=torch.float32)
+    def f_ol(x: torch.Tensor, u: torch.Tensor | None = None) -> torch.Tensor:
+        g = 9.81
+        L = 0.5
+        b = 0.1
+        m = 0.15
+        # Batch
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        f1 = x2
+        f2 = (g/L)*torch.sin(x1) - (b/(m*L**2))*x2
+        return torch.stack([f1, f2], dim=1)
+
+    # Create diffusion coefficients as a persistent tensor to avoid TracerWarnings
+    g_coeffs = torch.tensor([0.0, 2.0], dtype=torch.float32)
 
     def g(x: torch.Tensor) -> torch.Tensor:
-        return g_coeffs.to(device=x.device, dtype=x.dtype) * x  # (N,3) diagonal diffusion entries
+        """
+        Diffusion term g(x) that is constant: [0.0, 0.2] for every x.
+
+        If x has shape (2,), returns (2,).
+        If x has shape (N, 2), returns (N, 2) with each row [0.0, 0.2].
+        """
+        base = g_coeffs.to(device=x.device, dtype=x.dtype)  # shape (2,)
+
+        if x.dim() == 1:
+            # x is shape (2,)
+            return base
+        elif x.dim() == 2:
+            # x is shape (N, 2)
+            N = x.shape[0]
+            return base.unsqueeze(0).expand(N, -1)  # (N, 2)
+        else:
+            raise ValueError(f"g(x) expects x of shape (2,) or (N, 2), got {tuple(x.shape)}")
 
     f_cl = ClosedLoopDrift(f_ol, u_nn).to(params.training.device)
     return Dynamics.dynamics(f=f_cl, g=g)
@@ -127,25 +159,19 @@ def generate_scenario_data(N_loop, N_samples, full_range, init_range, unsafe_ran
 
 def main():
     params = Hyperparameters.default()
-    params.network.n_inputs = 3
+    params.network.n_inputs = 2
     params.network.n_hidden_1 = 64
-    params.network.n_hidden_2 = 64
-    params.network.n_outputs = 1
-    params.network.input_scale = [100.0, 100.0, 100.0]
+    params.network.n_hidden_2 = 16
+    pi = np.pi
+    params.network.input_scale = [2*pi, 20.0]
     params.network.scale_factor = 20.0
 
-    init_range = np.array([[45.0, 55.0],
-                           [-55.0, -45.0],
-                           [50.0, 60.0]], dtype=np.float32)
-    goal_range = np.array([[-25.0, 25.0],
-                           [-25.0, 25.0],
-                           [-25.0, 25.0]], dtype=np.float32)
-    unsafe_range = np.array([[-100.0, -80.0],
-                             [-100.0, 100.0],
-                             [-100.0, -80.0]], dtype=np.float32)
-    full_range = np.array([[-100.0, 100.0],
-                           [-100.0, 100.0],
-                           [-100.0, 100.0]], dtype=np.float32)
+    init_range = np.array([[(3/4)*pi, (5/4)*pi], [-1.0, 1.0]], dtype=np.float32)
+    goal_range = np.array([[-0.4*pi, 0.4*pi], [-4.0, 4.0]], dtype=np.float32)
+    unsafe_down1 = np.array([[-2*pi, -2*pi+0.5*pi], [-20.0, -10.0]], dtype=np.float32)
+    unsafe_down2 = np.array([[2*pi-0.5*pi, 2*pi], [10.0, 20.0]], dtype=np.float32)
+    unsafe_range = np.vstack((unsafe_down1, unsafe_down2))
+    full_range = np.array([[-2*pi, 2*pi], [-20.0, 20.0]], dtype=np.float32)
     
     ### Just need to Change these five parameters ###
     N_loop = 5
@@ -158,6 +184,8 @@ def main():
 
     for i in range(5):
         model_seed = i
+
+        print("\n===========\n Pre-train model")
         # models from sample pre-training
         V_net = build_V(params, device="cpu", pretrain=True, model_seed=model_seed)
         dynamics = build_dynamics(params, device="cpu", pretrain=True)
@@ -167,6 +195,7 @@ def main():
             sample_features_path="samples_features_pretrainmodel_"+str(model_seed)+".csv", 
             x_full_path="x_full_pretrainmodel_"+str(model_seed)+".csv")
         
+        print("\n===========\n SAT model")
         # models from bound training (sat)
         V_net = build_V(params, device="cpu", pretrain=False, model_seed=model_seed)
         dynamics = build_dynamics(params, device="cpu", pretrain=False)
