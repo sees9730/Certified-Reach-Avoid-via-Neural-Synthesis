@@ -520,7 +520,7 @@ def main(benchmark_mode=False):
     params.compute_V = True
     params.compute_GV = True
 
-    params.training.enable_pretraining = True
+    params.training.enable_pretraining = False
     params.training.pretrain_epochs = 5000
     params.training.pretrain_lr = 0.01
     params.training.pretrain_n_samples = 1600
@@ -540,7 +540,7 @@ def main(benchmark_mode=False):
 
     params.refinement.gv_generator.enable_refinement = True
     params.refinement.gv_generator.refine_interval = 500
-    params.refinement.gv_generator.late_epoch_threshold = 999999999
+    params.refinement.gv_generator.late_epoch_threshold = 5000
     params.refinement.gv_generator.refine_interval_late = 100
     params.refinement.gv_generator.refine_factor = 2
     params.refinement.gv_generator.max_cells = 100000
@@ -552,7 +552,7 @@ def main(benchmark_mode=False):
     params.refinement.gv_generator.merge_relax_margin = -500.0
 
     # === Dynamics ===
-    policy_net = TanhPolicy(n_in=4, n_hidden=64, n_out=2)
+    policy_net = TanhPolicy(n_in=4, n_hidden=128, n_out=2)
     u_nn = Wrapper4DConterlNN(policy_net, U_max=10.0)
 
     def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
@@ -574,7 +574,7 @@ def main(benchmark_mode=False):
         f4 = -g * dhdy
         return torch.stack([f1, f2, f3, f4], dim=1)
 
-    g_coeffs = torch.tensor([0.0, 1.0, 0.0, 1.0], dtype=torch.float32)
+    g_coeffs = torch.tensor([0.0, 0.2, 0.0, 0.2], dtype=torch.float32)
 
     def g(x: torch.Tensor) -> torch.Tensor:
         base = g_coeffs.to(device=x.device, dtype=x.dtype)
@@ -825,18 +825,35 @@ def main(benchmark_mode=False):
 
         V_net = create_V(params.network).to(params.training.device)
         V_net.load_state_dict(bundle["V_state_dict"])
+        GV_net.load_state_dict(bundle["GV_state_dict"])
+        u_nn.load_state_dict(bundle["control_state_dict"])
 
-        GV_net = create_GV(
-            V_net=V_net,
-            dynamics=dynamics,
-            network_config=params.network,
-            training_config=params.training
-        ).to(params.training.device)
-        if bundle["GV_state_dict"] is not None:
-            GV_net.load_state_dict(bundle["GV_state_dict"])
-
-        if bundle["control_state_dict"] is not None:
-            u_nn.load_state_dict(bundle["control_state_dict"])
+        print("\n" + "="*20)
+        print("MC valiation")
+        print("="*20)
+        mc_dt=0.01
+        mc_T=40.0
+        mc_N_init=100
+        mc_N_sim=100
+        mc_seed=0
+        p_ra_mc, info = estimate_reach_avoid_mc(
+            f_cl_model=f_cl_module_no_control,
+            g_fn=g,                    # your g(x)
+            full_range=full_range, init_range=init_range,
+            goal_range=goal_range, unsafe_range=unsafe_range,   # vstack boxes, or None / empty
+            dt=mc_dt, T=mc_T, N_init=mc_N_init, N_sim=mc_N_sim,
+            seed=mc_seed, device="cpu", dtype=torch.float32, return_details=True,
+        )
+        print("Open-loop controlled reach-avoid prob (MC): ", p_ra_mc)
+        p_ra_mc, info = estimate_reach_avoid_mc(
+            f_cl_model=f_cl_module_pretrain,
+            g_fn=g,                    # your g(x)
+            full_range=full_range, init_range=init_range,
+            goal_range=goal_range, unsafe_range=unsafe_range,   # vstack boxes, or None / empty
+            dt=mc_dt, T=mc_T, N_init=mc_N_init, N_sim=mc_N_sim,
+            seed=mc_seed, device="cpu", dtype=torch.float32, return_details=True,
+        )
+        print("Pretrain-controlled reach-avoid prob (MC): ", p_ra_mc)
 
         region_cells = {
             k: [(lo.to(params.training.device), hi.to(params.training.device)) for (lo, hi) in v]
