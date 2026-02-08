@@ -43,6 +43,7 @@ from src.visualization import (
     # visualize_training_progress,
     create_summary_plots
 )
+from animate_minimal import animate_nonlinear3d_minimal
 
 # Set random seed immediately after imports (matching testing_simple3.py)
 torch.manual_seed(0)
@@ -1563,6 +1564,44 @@ def main():
             refinement_epochs=refinement_epochs,
             results=results,
             output_dir="results"
+        )
+
+        # ====================================================================
+        # MINIMAL ANIMATION
+        # ====================================================================
+        print("\n" + "="*80)
+        print("GENERATING MINIMAL ANIMATION")
+        print("="*80)
+
+        # Create open-loop dynamics (no control)
+        class OpenLoopDrift(nn.Module):
+            def __init__(self, f_ol_fn):
+                super().__init__()
+                self.f_ol_fn = f_ol_fn
+
+            def forward(self, x):
+                return self.f_ol_fn(x, u=None)
+
+        f_open_module = OpenLoopDrift(f_ol).to(device)
+
+        # Generate animation with both controlled and uncontrolled trajectories
+        animate_nonlinear3d_minimal(
+            f_cl_module=f_cl_module,
+            f_open_module=f_open_module,
+            g_fn=g,
+            init_range=init_range,
+            goal_range=goal_range,
+            full_range=full_range,
+            unsafe_boxes=unsafe_range,
+            device=device,
+            dt=0.01,
+            T=10.0,
+            seed=0,
+            save_path=None,
+            save_final_frame=HERE / "results" / "animation_minimal.pdf",
+            show=True,
+            controller_label="3D Nonlinear System Control",
+            n_trajectories=5
         )
 
 

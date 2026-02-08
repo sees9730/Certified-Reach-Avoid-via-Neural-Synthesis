@@ -44,12 +44,13 @@ from src.visualization import (
     create_summary_plots
 )
 from main import(
-    XV15Constants, XV15AeroCoefficients, XV15KLinearAeroTorch, 
+    XV15Constants, XV15AeroCoefficients, XV15KLinearAeroTorch,
     find_xv15_equilibrium_for_tilt_min_thrust,
     XV15EqMLPControl, ConstantControl, ClosedLoopDrift,
     animate_xv15_aircraft_state_control, mc_reach_avoid,
     check_gv_matches_autograd_full_range
 )
+from animate_minimal import animate_xv15_minimal
 
 # -----------------------------------------------------------------------------
 # Reuse your training functions from the Lorentz example
@@ -899,50 +900,68 @@ def main():
         u_nn_pretrain.verify_u_at_equilibrium()
         f_cl_module_pretrain = ClosedLoopDrift(aero=aero, controller=u_nn_pretrain).to(device)
 
-        # animation
-        # open-loop constant u_eq animation
-        animate_xv15_aircraft_state_control(
-            f_cl_module=f_cl_module_no_control, g_fn=g,
+        # # Minimal publication-ready animations
+        # print("\n" + "=" * 80)
+        # print("GENERATING PUBLICATION-READY ANIMATIONS")
+        # print("=" * 80)
+
+        # # Open-loop
+        # animate_xv15_minimal(
+        #     f_cl_module=f_cl_module_no_control, g_fn=g,
+        #     init_range=init_range, goal_range=goal_range,
+        #     full_range=full_range, unsafe_boxes=unsafe_range,
+        #     device=device,
+        #     dt=0.02, T=120.0,
+        #     seed=0,
+        #     save_path=None,
+        #     save_final_frame=HERE / "results_opt" / "animation_open_loop.pdf",
+        #     show=True,
+        #     controller_label="Open-Loop Control"
+        # )
+
+        # # Pretrain
+        # animate_xv15_minimal(
+        #     f_cl_module=f_cl_module_pretrain, g_fn=g,
+        #     init_range=init_range, goal_range=goal_range,
+        #     full_range=full_range, unsafe_boxes=unsafe_range,
+        #     device=device,
+        #     dt=0.02, T=120.0,
+        #     seed=0,
+        #     save_path=None,
+        #     save_final_frame=HERE / "results_opt" / "animation_pretrain.pdf",
+        #     show=True,
+        #     controller_label="Pre-trained Controller"
+        # )
+
+        # # Certified synthesis
+        # animate_xv15_minimal(
+        #     f_cl_module=f_cl_module, g_fn=g,
+        #     init_range=init_range, goal_range=goal_range,
+        #     full_range=full_range, unsafe_boxes=unsafe_range,
+        #     device=device,
+        #     dt=0.02, T=120.0,
+        #     seed=0,
+        #     save_path=None,
+        #     save_final_frame=HERE / "results_opt" / "animation_synthesis.pdf",
+        #     show=True,
+        #     controller_label="Certified Synthesis"
+        # )
+
+        # Optimized certified synthesis
+        animate_xv15_minimal(
+            f_cl_module=f_cl_module_opt,
+            f_open_module=f_cl_module_no_control,
+            f_pretrain_module=f_cl_module_pretrain,
+            g_fn=g,
             init_range=init_range, goal_range=goal_range,
-            full_range=full_range, unsafe_boxes=unsafe_range,   # can be (K*3,2) from vstack
+            full_range=full_range, unsafe_boxes=unsafe_range,
             device=device,
             dt=0.02, T=120.0,
-            seed=0, save_path=None,
+            seed=0,
+            save_path=None,
+            save_final_frame=HERE / "results_opt" / "animation_synthesis_opt.pdf",
             show=True,
-            controller_label="open-loop"
-        )
-        # pretrain animation
-        animate_xv15_aircraft_state_control(
-            f_cl_module=f_cl_module_pretrain, g_fn=g,
-            init_range=init_range, goal_range=goal_range,
-            full_range=full_range, unsafe_boxes=unsafe_range,   # can be (K*3,2) from vstack
-            device=device,
-            dt=0.02, T=120.0,
-            seed=0, save_path=None,
-            show=True,
-            controller_label="pre-train"
-        )
-        # control-synthesis animation
-        animate_xv15_aircraft_state_control(
-            f_cl_module=f_cl_module, g_fn=g,
-            init_range=init_range, goal_range=goal_range,
-            full_range=full_range, unsafe_boxes=unsafe_range,   # can be (K*3,2) from vstack
-            device=device,
-            dt=0.02, T=120.0,
-            seed=0, save_path=None,
-            show=True,
-            controller_label="certified-synthesis"
-        )
-        # control-synthesis-opt animation
-        animate_xv15_aircraft_state_control(
-            f_cl_module=f_cl_module_opt, g_fn=g,
-            init_range=init_range, goal_range=goal_range,
-            full_range=full_range, unsafe_boxes=unsafe_range,   # can be (K*3,2) from vstack
-            device=device,
-            dt=0.02, T=120.0,
-            seed=0, save_path=None,
-            show=True,
-            controller_label="Opt. certified-synthesis"
+            controller_label=""
         )
 
         print("\n" + "=" * 80)

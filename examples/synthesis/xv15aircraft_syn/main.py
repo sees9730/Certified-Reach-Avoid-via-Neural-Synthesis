@@ -1,26 +1,27 @@
-from __future__ import annotations
+"""
+XV-15 aircraft tiltrotor control synthesis with neural certificates.
 
-import math
+This module implements control synthesis for the XV-15 aircraft model
+using neural certificate learning with CROWN bounds.
+"""
 import argparse
+import math
+import sys
+import time
 from pathlib import Path
 from typing import Optional, Callable, Tuple
 
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import time
-import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.patches import Polygon, Arc
 
-# -----------------------------------------------------------------------------
-# Repo paths (match your Lorentz script)
-# -----------------------------------------------------------------------------
-ROOT = Path(__file__).resolve().parents[3]   # repo_root
+ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 OUTPUT_DIR = HERE / "outputs"
-import sys
 sys.path.insert(0, str(ROOT))
 
 from src.hyperparameters import Hyperparameters
@@ -41,23 +42,18 @@ from src.training_utils import (
 )
 from src.save_load_utils import save_eval_bundle, load_eval_bundle, log_loaded_training_epochs, enable_terminal_logging
 from src.utils import cleanup_and_setup_directories
-from src.visualization import (
-    create_summary_plots
-)
+from src.visualization import create_summary_plots
 
 torch.manual_seed(0)
 np.random.seed(0)
 
+# Physical constants
 DEG = np.pi / 180.0
-pi = np.pi
-RHO = 1.225
-G = 9.81
+RHO = 1.225  # Air density (kg/m^3)
+G = 9.81     # Gravitational acceleration (m/s^2)
 
-
-# =============================================================================
-# XV-15 constants + ranges (from your test_dynamics snippet)
-# =============================================================================
 class XV15Constants:
+    """Physical constants for the XV-15 tiltrotor aircraft."""
     MASS: float = 5900.0
     WING_AREA: float = 15.7
     AOA_MAX: float = 16.0 * DEG
@@ -66,36 +62,28 @@ class XV15Constants:
 
 
 def relu_clamp_min(v: torch.Tensor) -> torch.Tensor:
+    """Identity function for velocity (clamping disabled)."""
     return v
-    # vmin = float(XV15Constants.VELOCITY_HORIZONTAL_MIN_SAFE)
-    # return vmin + F.relu(v - vmin)          # equals v for v>=vmin, equals vmin otherwise
 
 
 class XV15AeroCoefficients:
-    WP_LIFT_LINEAR_COEFF_CRUISE = np.array([0.0849, 0.3482])  # [c1, c0]
-    WP_LIFT_LINEAR_COEFF_HOVER  = np.array([0.0646, 0.2709])
-    WP_DRAG_COEFF_CRUISE = np.array([0.00042143, 0.0030, 0.0218])  # [a2,a1,a0]
-    WP_DRAG_COEFF_HOVER  = np.array([0.000473216, 0.00343, 0.2165])
+    """Aerodynamic coefficients for XV-15 wing-pylon lift and drag."""
+    WP_LIFT_LINEAR_COEFF_CRUISE = np.array([0.0849, 0.3482])      # [c1, c0]
+    WP_LIFT_LINEAR_COEFF_HOVER = np.array([0.0646, 0.2709])       # [c1, c0]
+    WP_DRAG_COEFF_CRUISE = np.array([0.00042143, 0.0030, 0.0218]) # [a2, a1, a0]
+    WP_DRAG_COEFF_HOVER = np.array([0.000473216, 0.00343, 0.2165]) # [a2, a1, a0]
 
 
-# =============================================================================
-# Differentiable (torch) klinear aero + drift
-# =============================================================================
 class XV15KLinearAeroTorch(nn.Module):
     """
-    Torch aero consistent with source:
+    Differentiable aerodynamics model for XV-15 using kLinear interpolation.
 
-    lift_coeff_wing_pylon (kLinear):
-      aoa_deg = RAD2DEG * aoa
-      tilt_angle_ratio = tilt_angle * 2/pi
-      CL_cruise = c1_c * aoa_deg + c0_c
-      CL_hover  = c1_h * aoa_deg + c0_h
-      CL = CL_cruise*(1-r) + CL_hover*r
+    Lift coefficient (kLinear):
+        CL = CL_cruise * (1 - r) + CL_hover * r
+        where r = tilt_angle * 2/pi
 
-    drag_coeff_wing_pylon (quadratic):
-      CD_cruise = a2_c*aoa_deg^2 + a1_c*aoa_deg + a0_c
-      CD_hover  = a2_h*aoa_deg^2 + a1_h*aoa_deg + a0_h
-      CD = CD_cruise*(1-r) + CD_hover*r
+    Drag coefficient (quadratic):
+        CD = CD_cruise * (1 - r) + CD_hover * r
     """
     def __init__(self):
         super().__init__()
@@ -119,29 +107,33 @@ class XV15KLinearAeroTorch(nn.Module):
     def forces(
         self,
         v: torch.Tensor,
-        aoa: torch.Tensor,        # alpha in your notation
-        tilt_angle: torch.Tensor  # beta in your notation
+        aoa: torch.Tensor,
+        tilt_angle: torch.Tensor
     ) -> tuple[torch.Tensor, torch.Tensor]:
+        """
+        Compute aerodynamic lift and drag forces.
 
-        # aoa_deg = RAD2DEG * aoa  (RAD2DEG = 1/DEG)
+        Args:
+            v: Velocity (m/s)
+            aoa: Angle of attack alpha (radians)
+            tilt_angle: Tilt angle beta (radians)
+
+        Returns:
+            L: Lift force (N)
+            D: Drag force (N)
+        """
+
         aoa_deg = aoa / DEG
-
-        # tilt_angle_ratio = tilt_angle * 2/pi
         tilt_ratio = tilt_angle * (2.0 / np.pi)
 
-        # NOTE: for strict consistency with source, do NOT clamp tilt_ratio.
-        # If your tilt_angle can leave [0, pi/2], then tilt_ratio leaves [0,1]
-        # exactly like the source would.
-
-        # ---- Lift coefficient (kLinear) ----
+        # Lift coefficient (kLinear)
         c1_c, c0_c = self.wp_lift_lin_cruise[0], self.wp_lift_lin_cruise[1]
         c1_h, c0_h = self.wp_lift_lin_hover[0], self.wp_lift_lin_hover[1]
         CL_cruise = c1_c * aoa_deg + c0_c
         CL_hover  = c1_h * aoa_deg + c0_h
         CL = CL_cruise * (1.0 - tilt_ratio) + CL_hover * tilt_ratio
 
-        # ---- Drag coefficient (quadratic) ----
-        # drag_coeff_wing_pylon_cruise = a2*aoa_deg^2 + a1*aoa_deg + a0
+        # Drag coefficient (quadratic)
         a2_c, a1_c, a0_c = self.wp_drag_cruise[0], self.wp_drag_cruise[1], self.wp_drag_cruise[2]
         a2_h, a1_h, a0_h = self.wp_drag_hover[0], self.wp_drag_hover[1], self.wp_drag_hover[2]
 
@@ -149,7 +141,7 @@ class XV15KLinearAeroTorch(nn.Module):
         CD_hover  = a2_h * (aoa_deg ** 2) + a1_h * aoa_deg + a0_h
         CD = CD_cruise * (1.0 - tilt_ratio) + CD_hover * tilt_ratio
 
-        # ---- Forces ----
+        # Compute forces
         q = 0.5 * RHO * v * v
         L = q * XV15Constants.WING_AREA * CL
         D = q * XV15Constants.WING_AREA * CD
@@ -159,7 +151,7 @@ class XV15KLinearAeroTorch(nn.Module):
 @torch.no_grad()
 def find_xv15_equilibrium_for_tilt_min_thrust(
     beta_eq_deg: float,
-    aero: torch.nn.Module,  # must provide aero.forces(v, alpha, beta) -> (L,D)
+    aero: torch.nn.Module,
     *,
     v_min: float = 0.5,
     v_max: float = 70.0,
@@ -168,47 +160,49 @@ def find_xv15_equilibrium_for_tilt_min_thrust(
     alpha_min_deg: float = -16.0,
     alpha_max_deg: float = 16.0,
     mass: float = 5900.0,
-    thrust_max: float | None = None,  # default: mass*g*1.8
+    thrust_max: float | None = None,
     n_v: int = 220,
     n_gamma: int = 81,
-    # bisection settings
     bisect_max_iter: int = 70,
     bisect_tol: float = 1e-10,
-    # numerical safety
     cos_min: float = 1e-6,
-    # tie-break weights (VERY small; only used when thrust ties numerically)
     tie_gamma_w: float = 1e-6,
     tie_alpha_w: float = 1e-6,
     tie_v_w: float = 1e-9,
-    # selection tolerance
     cost_tie_tol: float = 1e-12,
     device: str | torch.device = "cpu",
     dtype: torch.dtype = torch.float32,
 ):
     """
-    Find an equilibrium (x_eq, u_eq) for the XV-15 drift with fixed tilt angle beta = beta_eq_deg,
-    while MINIMIZING thrust T.
+    Find equilibrium point for XV-15 by minimizing thrust at fixed tilt angle.
 
-    Equilibrium conditions (delta = 0 enforced):
-      v_dot     = 0
-      gamma_dot = 0
-      beta_dot  = delta = 0
-
-    Unknowns we search over:
-      v in [v_min, v_max], gamma in [gamma_min, gamma_max]
-    For each (v,gamma), solve alpha from:
-      (D + m g sin(gamma)) * tan(alpha+beta) + L - m g cos(gamma) = 0
-    Then compute thrust from v_dot = 0:
-      T = (D + m g sin(gamma)) / cos(alpha+beta)
-
-    Objective:
-      minimize T (equivalently minimize T/(m g)).
-      Tiny tie-breakers prefer smaller |gamma|, then |alpha|, then smaller v.
+    Args:
+        beta_eq_deg: Fixed tilt angle in degrees
+        aero: Aerodynamics module with forces(v, alpha, beta) method
+        v_min: Minimum velocity search bound
+        v_max: Maximum velocity search bound
+        gamma_min_deg: Minimum flight path angle in degrees
+        gamma_max_deg: Maximum flight path angle in degrees
+        alpha_min_deg: Minimum angle of attack in degrees
+        alpha_max_deg: Maximum angle of attack in degrees
+        mass: Aircraft mass (kg)
+        thrust_max: Maximum thrust (default: mass*g*1.8)
+        n_v: Number of velocity grid points
+        n_gamma: Number of gamma grid points
+        bisect_max_iter: Maximum bisection iterations
+        bisect_tol: Bisection tolerance
+        cos_min: Numerical safety threshold for cos(alpha+beta)
+        tie_gamma_w: Tie-break weight for gamma
+        tie_alpha_w: Tie-break weight for alpha
+        tie_v_w: Tie-break weight for velocity
+        cost_tie_tol: Cost equality tolerance
+        device: Torch device
+        dtype: Torch dtype
 
     Returns:
-      x_eq: torch.Tensor (3,) = [v, gamma, beta]
-      u_eq: torch.Tensor (3,) = [T, alpha, 0]
-      info: dict diagnostics
+        x_eq: Equilibrium state [v, gamma, beta]
+        u_eq: Equilibrium control [T, alpha, 0]
+        info: Diagnostic information dictionary
     """
     beta = float(beta_eq_deg) * DEG
     gamma_min = float(gamma_min_deg) * DEG
@@ -326,9 +320,7 @@ def find_xv15_equilibrium_for_tilt_min_thrust(
             feasible_v_min = min(feasible_v_min, float(v_val))
             feasible_v_max = max(feasible_v_max, float(v_val))
 
-            # -------------------------
-            # OBJECTIVE: minimize thrust
-            # -------------------------
+            # objective is to minimize thrust
             T_norm = float(T_val) / (mass * G)
             cost = T_norm
 
@@ -401,11 +393,17 @@ def find_xv15_equilibrium_for_tilt_min_thrust(
 
 
 class XV15EqMLPControl(nn.Module):
+    """
+    Equilibrium-based MLP controller for XV-15.
+
+    Produces control u(x) that exactly matches u_eq at x_eq, with smooth
+    bounded outputs using sigmoid/tanh squashing.
+    """
     def __init__(
         self,
         *,
-        x_eq: torch.Tensor,   # (3,)
-        u_eq: torch.Tensor,   # (3,) [T, alpha, delta]
+        x_eq: torch.Tensor,
+        u_eq: torch.Tensor,
         T_min: float,
         T_max: float,
         alpha_max: float,
@@ -416,9 +414,25 @@ class XV15EqMLPControl(nn.Module):
         k_alpha: float = 1.0,
         k_delta: float = 1.0,
     ):
+        """
+        Initialize equilibrium-based controller.
+
+        Args:
+            x_eq: Equilibrium state (3,) [v, gamma, beta]
+            u_eq: Equilibrium control (3,) [T, alpha, delta]
+            T_min: Minimum thrust
+            T_max: Maximum thrust
+            alpha_max: Maximum angle of attack magnitude
+            delta_max: Maximum tilt rate magnitude
+            hidden_dim: Hidden layer dimension
+            act: Activation function ('tanh' or 'relu')
+            k_T: Thrust squashing steepness
+            k_alpha: Alpha squashing steepness
+            k_delta: Delta squashing steepness
+        """
         super().__init__()
 
-        # --- MLP with NO biases => MLP(0)=0 exactly ---
+        # MLP with no biases ensures MLP(0) = 0 exactly
         self.fc1 = nn.Linear(3, hidden_dim, bias=False)
         self.fc2 = nn.Linear(hidden_dim, 3, bias=False)
 
@@ -429,18 +443,18 @@ class XV15EqMLPControl(nn.Module):
         else:
             raise ValueError("act must be 'tanh' or 'relu'")
 
-        # bounds
+        # Control bounds
         self.register_buffer("T_min", torch.tensor(float(T_min), dtype=torch.float32))
         self.register_buffer("T_max", torch.tensor(float(T_max), dtype=torch.float32))
         self.register_buffer("alpha_max", torch.tensor(float(alpha_max), dtype=torch.float32))
         self.register_buffer("delta_max", torch.tensor(float(delta_max), dtype=torch.float32))
 
-        # squash steepness
+        # Squashing function steepness
         self.register_buffer("k_T", torch.tensor(float(k_T), dtype=torch.float32))
         self.register_buffer("k_alpha", torch.tensor(float(k_alpha), dtype=torch.float32))
         self.register_buffer("k_delta", torch.tensor(float(k_delta), dtype=torch.float32))
 
-        # ---- keep your scaling logic ----
+        # Scaling factors
         self.register_buffer(
             "e_scale",
             torch.tensor([1.0 / T_max, 1.0 / alpha_max, 1.0 / delta_max], dtype=torch.float32),
@@ -450,21 +464,27 @@ class XV15EqMLPControl(nn.Module):
             torch.tensor([T_max, alpha_max, delta_max], dtype=torch.float32),
         )
 
-        # will be set in set_equilibrium()
         self.set_equilibrium(x_eq, u_eq)
 
     @staticmethod
     def _logit(p: torch.Tensor) -> torch.Tensor:
-        # p must be in (0,1)
+        """Logit function: inverse of sigmoid (p must be in (0,1))."""
         return torch.log(p) - torch.log1p(-p)
 
     @staticmethod
     def _atanh(y: torch.Tensor) -> torch.Tensor:
-        # y must be in (-1,1)
+        """Inverse hyperbolic tangent (y must be in (-1,1))."""
         return 0.5 * (torch.log1p(y) - torch.log1p(-y))
 
     @torch.no_grad()
     def set_equilibrium(self, x_eq: torch.Tensor, u_eq: torch.Tensor):
+        """
+        Set equilibrium point and compute inverse transformations.
+
+        Args:
+            x_eq: Equilibrium state (3,)
+            u_eq: Equilibrium control (3,)
+        """
         x_eq = x_eq.detach().to(dtype=torch.float32).view(3)
         u_eq = u_eq.detach().to(dtype=torch.float32).view(3)
 
@@ -475,12 +495,10 @@ class XV15EqMLPControl(nn.Module):
             self.register_buffer("x_eq", x_eq)
             self.register_buffer("u_eq", u_eq)
 
-        # --- compute z_eq so that squash(z_eq) == u_eq exactly ---
+        # Compute z_eq so that squash(z_eq) == u_eq exactly
         T_eq, a_eq, d_eq = self.u_eq[0], self.u_eq[1], self.u_eq[2]
         T_min, T_max = self.T_min, self.T_max
         amax, dmax = self.alpha_max, self.delta_max
-
-        # must be strictly interior; otherwise exact inverse doesn't exist
         if not (float(T_min) < float(T_eq) < float(T_max)):
             raise ValueError(f"T_eq must satisfy T_min < T_eq < T_max. Got {float(T_eq)}.")
         if not (abs(float(a_eq)) < float(amax)):
@@ -489,9 +507,9 @@ class XV15EqMLPControl(nn.Module):
             raise ValueError(f"Need |delta_eq| < delta_max. Got {float(d_eq)}.")
 
         spanT = (T_max - T_min)
-        pT = (T_eq - T_min) / spanT              # in (0,1)
+        pT = (T_eq - T_min) / spanT
         zT_eq = self._logit(pT)
-        za_eq = self._atanh(a_eq / amax)         # in R
+        za_eq = self._atanh(a_eq / amax)
         zd_eq = self._atanh(d_eq / dmax)
 
         z_eq = torch.stack([zT_eq, za_eq, zd_eq]).to(dtype=torch.float32)
@@ -501,18 +519,12 @@ class XV15EqMLPControl(nn.Module):
         else:
             self.register_buffer("z_eq", z_eq)
 
-        # --- slope matching at equilibrium ---
-        # We choose dz = du_phys / slope_eq so that near eq:
-        #   u ≈ u_eq + du_phys   (first-order identity)
+        # Slope matching at equilibrium for first-order identity
         kT = float(self.k_T)
         ka = float(self.k_alpha)
         kd = float(self.k_delta)
-
-        # thrust slope: dT/dz at eq
         p = float(pT)
         slope_T = float(spanT) * kT * (p * (1.0 - p))
-
-        # angle slopes: d(alpha)/dz at eq
         a_norm = float(a_eq / amax)
         d_norm = float(d_eq / dmax)
         slope_a = float(amax) * ka * (1.0 - a_norm * a_norm)
@@ -528,22 +540,30 @@ class XV15EqMLPControl(nn.Module):
             self.register_buffer("inv_slope_eq", inv_slope)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # 1) normalized error
-        e = x - self.x_eq.unsqueeze(0)                 # (N,3)
-        e_scaled = e * self.e_scale.unsqueeze(0)       # (N,3)
+        """
+        Compute control u(x) from state x.
 
-        # 2) normalized control
-        du_hat = self.fc2(self.act(self.fc1(e_scaled)))  # (N,3), du_hat(0)=0 exactly
+        Args:
+            x: State (N, 3)
 
-        # 3) physical offset (your logic)
-        du_phys = du_hat * self.du_scale.unsqueeze(0)    # (N,3)
+        Returns:
+            u: Control (N, 3) [T, alpha, delta]
+        """
+        # Normalized error
+        e = x - self.x_eq.unsqueeze(0)
+        e_scaled = e * self.e_scale.unsqueeze(0)
 
-        # 4) convert physical offset -> latent offset (slope-matched)
-        dz = du_phys * self.inv_slope_eq.unsqueeze(0)    # (N,3)
+        # Normalized control (MLP ensures zero at equilibrium)
+        du_hat = self.fc2(self.act(self.fc1(e_scaled)))
 
-        z = self.z_eq.unsqueeze(0) + dz                  # (N,3)
+        # Physical offset
+        du_phys = du_hat * self.du_scale.unsqueeze(0)
 
-        # 5) squash (bounded, smooth, no clamp)
+        # Convert to latent offset (slope-matched)
+        dz = du_phys * self.inv_slope_eq.unsqueeze(0)
+        z = self.z_eq.unsqueeze(0) + dz
+
+        # Apply smooth squashing functions
         T = self.T_min + (self.T_max - self.T_min) * torch.sigmoid(self.k_T * z[:, 0])
         alpha = self.alpha_max * torch.tanh(self.k_alpha * z[:, 1])
         delta = self.delta_max * torch.tanh(self.k_delta * z[:, 2])
@@ -562,7 +582,7 @@ class XV15EqMLPControl(nn.Module):
         Verify numerically that u(x_eq) == u_eq (within tolerance).
         """
         x = self.x_eq.view(1, 3)
-        u = self.forward(x)                # (1,3)
+        u = self.forward(x) # (1,3)
         ueq = self.u_eq.view(1, 3)
 
         ok = torch.allclose(u, ueq, atol=atol, rtol=rtol)
@@ -578,24 +598,23 @@ class XV15EqMLPControl(nn.Module):
 
 
 class ConstantControl(nn.Module):
-    """u(x) == u_eq for all x. Returns shape (N,3)."""
+    """Constant controller that returns u_eq for all states."""
     def __init__(self, u_eq: torch.Tensor):
         super().__init__()
         u_eq = torch.as_tensor(u_eq, dtype=torch.float32).reshape(3)
         self.register_buffer("u_eq", u_eq)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # x: (N,3) -> (N,3)
+        """Return constant control for all states."""
         return self.u_eq.unsqueeze(0).expand(x.shape[0], -1)
 
 
 class ClosedLoopDrift(nn.Module):
     """
-    Closed-loop XV-15 drift: x_dot = f(x, u(x)), where
-      x = [v, gamma, beta]
-      u(x) = [T, alpha, delta]
+    Closed-loop XV-15 dynamics: x_dot = f(x, u(x)).
 
-    IMPORTANT: This is NOT additive like Lorenz.
+    State: x = [v, gamma, beta]
+    Control: u = [T, alpha, delta]
     """
     def __init__(
         self,
@@ -610,18 +629,24 @@ class ClosedLoopDrift(nn.Module):
         self.v_min_safe = float(v_min_safe)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # x: (N,3) [v,gamma,beta]
+        """
+        Compute state derivative x_dot = f(x, u(x)).
+
+        Args:
+            x: State (N, 3) [v, gamma, beta]
+
+        Returns:
+            x_dot: State derivative (N, 3)
+        """
         v = x[:, 0]
         gamma = x[:, 1]
         beta = x[:, 2]
 
-        # controller output u(x) should be (N,3) = [T, alpha, delta]
         u = self.controller(x)
         T = u[:, 0]
         alpha = u[:, 1]
         delta = u[:, 2]
 
-        # v_safe = torch.clamp(v, min=self.v_min_safe)
         v_safe = relu_clamp_min(v)
 
         L, D = self.aero.forces(v_safe, alpha, beta)
@@ -637,36 +662,43 @@ class ClosedLoopDrift(nn.Module):
 
 def animate_xv15_aircraft_state_control(
     *,
-    f_cl_module,               # ClosedLoopDrift(aero, u_nn): x_dot = f(x)
-    # u_nn,                      # controller: u(x) = [T, alpha, delta]
+    f_cl_module,
     g_fn=None,
-    init_range: np.ndarray,    # (3,2) in (v,gamma,beta)
-    goal_range: np.ndarray,    # (3,2) in (v,gamma,beta)
-    full_range: np.ndarray,    # (3,2) in (v,gamma,beta)
-    unsafe_boxes: np.ndarray,  # (K*3,2) or (K,3,2) or (3,2) in (v,gamma,beta)
+    init_range: np.ndarray,
+    goal_range: np.ndarray,
+    full_range: np.ndarray,
+    unsafe_boxes: np.ndarray,
     device: str = "cpu",
     dt: float = 0.02,
     T: float = 12.0,
     seed: int = 0,
     v_safe_min: float = 0.5,
-    # visualization
     plane_len: float | None = None,
     show_angle_arcs: bool = True,
-    save_path: str | None = None,   # e.g. "outputs/xv15_anim.mp4" (needs ffmpeg)
+    save_path: str | None = None,
     show: bool = True,
     controller_label: str | None = None,
 ):
     """
-    Layout (3 columns, left column has 2 rows):
-      LEFT-TOP: aircraft animation in x-z (NO init/goal/unsafe boxes here)
-      LEFT-BOT: 3D state trajectory (v, gamma, beta) with init/goal boxes + unsafe union boxes
-      MIDDLE:   3 rows state vs time (v, gamma, beta) + shaded bands for init/goal/unsafe when limited
-      RIGHT:    3 rows control vs time (T, alpha, delta)
+    Animate XV-15 aircraft trajectory with state and control plots.
 
-    Notes:
-      - state is (v,gamma,beta). position reconstructed by integrating:
-          xdot = v cos(gamma), zdot = v sin(gamma)
-      - unsafe is treated as UNION of axis-aligned boxes in state space.
+    Args:
+        f_cl_module: Closed-loop dynamics module
+        g_fn: Optional generator function
+        init_range: Initial region bounds (3, 2)
+        goal_range: Goal region bounds (3, 2)
+        full_range: Full state space bounds (3, 2)
+        unsafe_boxes: Unsafe region boxes (K*3, 2) or (K, 3, 2) or (3, 2)
+        device: Torch device
+        dt: Time step for integration
+        T: Total simulation time
+        seed: Random seed
+        v_safe_min: Minimum safe velocity
+        plane_len: Aircraft visualization length
+        show_angle_arcs: Whether to show angle arcs in visualization
+        save_path: Path to save animation (requires ffmpeg)
+        show: Whether to display animation
+        controller_label: Label for controller in plots
     """
 
     rng = np.random.default_rng(seed)
@@ -692,14 +724,7 @@ def animate_xv15_aircraft_state_control(
 
     unsafeK = _as_union_boxes(unsafe_boxes)  # (K,3,2)
 
-    def _sample_in_box(box_3x2: np.ndarray, N: int) -> np.ndarray:
-        low = box_3x2[:, 0]
-        high = box_3x2[:, 1]
-        return rng.uniform(low, high, size=(N, 3)).astype(np.float32)
-
-    # -----------------------------------------
-    # Rollout (main trajectory)
-    # -----------------------------------------
+    # Sample initial condition
     x0 = np.array([
         rng.uniform(init_range[0, 0], init_range[0, 1]),
         rng.uniform(init_range[1, 0], init_range[1, 1]),
@@ -717,7 +742,6 @@ def animate_xv15_aircraft_state_control(
     P[0] = np.array([0.0, 0.0], dtype=np.float32)
 
     f_cl_module.eval()
-    # u_nn.eval()
 
     with torch.no_grad():
         for k in range(N - 1):
@@ -726,23 +750,14 @@ def animate_xv15_aircraft_state_control(
             uk = f_cl_module.controller(xk_t).detach().cpu().numpy().reshape(3)
             xdot = f_cl_module(xk_t).detach().cpu().numpy().reshape(3)
 
-            xnext = X[k] + dt * xdot
-
-            # keep v positive-ish for plotting/position integration
-            # xnext[0] = max(float(v_safe_min), float(xnext[0]))
-            # clamp to full range for sanity
-            # xnext = np.minimum(np.maximum(xnext, full_range[:, 0]), full_range[:, 1])
             if g_fn is None:
-                # Deterministic Euler
                 xnext = X[k] + dt * xdot
             else:
-                # Euler–Maruyama: x_{k+1} = x_k + f(x_k) dt + g(x_k) dW
-                # with dW ~ sqrt(dt) * N(0, I)
-                gk = g_fn(xk_t).detach().cpu().numpy().reshape(3)  # (3,) diagonal coeffs
-                dW = (np.sqrt(dt) * rng.standard_normal(3)).astype(np.float32)  # (3,)
+                gk = g_fn(xk_t).detach().cpu().numpy().reshape(3)
+                dW = (np.sqrt(dt) * rng.standard_normal(3)).astype(np.float32)
                 xnext = X[k] + dt * xdot + gk * dW
 
-            # integrate position from current (v, gamma)
+            # Integrate position from current velocity and flight path angle
             v_k = float(X[k, 0])
             g_k = float(X[k, 1])
             P[k + 1] = P[k] + dt * np.array([v_k * np.cos(g_k), v_k * np.sin(g_k)], dtype=np.float32)
@@ -751,9 +766,7 @@ def animate_xv15_aircraft_state_control(
             U[k] = uk
         U[-1] = U[-2]
 
-    # -----------------------------------------
-    # Helpers for state-space boxes + bands
-    # -----------------------------------------
+    # Helper functions
     def _is_tighter(rng_1d: np.ndarray, full_1d: np.ndarray, eps: float = 1e-9) -> bool:
         return (rng_1d[0] > full_1d[0] + eps) or (rng_1d[1] < full_1d[1] - eps)
 
@@ -822,9 +835,7 @@ def animate_xv15_aircraft_state_control(
         pad = 0.10 * (y1 - y0)
         ax.set_ylim(y0 - pad, y1 + pad)
 
-    # -----------------------------------------
-    # 3D box drawing helpers
-    # -----------------------------------------
+    # Helpers
     def _draw_box3d(ax3d, box3x2, *, lw=1.5, color="k", alpha=1.0):
         """
         Draw a 3D axis-aligned box as wireframe in (v, gamma, beta).
@@ -858,17 +869,14 @@ def animate_xv15_aircraft_state_control(
                 lw=lw, color=color, alpha=alpha
             )
 
-    # -----------------------------------------
-    # Figure layout: 6 rows x 3 cols
-    # Left column uses rows [0:3] for aircraft, [3:6] for 3D state
-    # -----------------------------------------
+    # Layout
     fig = plt.figure(figsize=(18, 9))
     title = "XV-15 rollout: state + control + geometry"
     if controller_label:
         title += f"  |  Controller: {controller_label}"
 
     fig.suptitle(title, fontsize=14, y=0.98)
-    fig.subplots_adjust(top=0.92)  # leave room for the suptitle
+    fig.subplots_adjust(top=0.92)
 
     gs = fig.add_gridspec(
         6, 3,
@@ -889,9 +897,7 @@ def animate_xv15_aircraft_state_control(
     ax_ua = fig.add_subplot(gs[2:4, 2], sharex=ax_uT)
     ax_ud = fig.add_subplot(gs[4:6, 2], sharex=ax_uT)
 
-    # -----------------------------------------
-    # LEFT-TOP: aircraft (x-z)
-    # -----------------------------------------
+    # Aircraft x-z plot
     ax_air.set_title("Aircraft (x–z)")
     ax_air.set_xlabel("x")
     ax_air.set_ylabel("z")
@@ -954,9 +960,7 @@ def animate_xv15_aircraft_state_control(
         q = p + s * np.array([np.cos(theta), np.sin(theta)], dtype=np.float32)
         return np.array([p[0], q[0]]), np.array([p[1], q[1]])
 
-    # -----------------------------------------
-    # LEFT-BOT: 3D state (v, gamma, beta) + boxes
-    # -----------------------------------------
+    # 3D states
     ax_3d.set_title("State trajectory (v, γ, β) + init/goal/unsafe boxes")
     ax_3d.set_xlabel("v")
     ax_3d.set_ylabel("gamma")
@@ -983,9 +987,7 @@ def animate_xv15_aircraft_state_control(
     ax_3d.set_zlim(float(full_range[2, 0]), float(full_range[2, 1]))
     ax_3d.view_init(elev=22, azim=-55)
 
-    # -----------------------------------------
-    # MIDDLE: states vs time (with bands)
-    # -----------------------------------------
+    # States
     ax_sv.set_title("States vs time")
     ax_sv.set_ylabel("v")
     ax_sg.set_ylabel("gamma")
@@ -1010,9 +1012,7 @@ def animate_xv15_aircraft_state_control(
     if len(handles) > 0:
         ax_sv.legend(loc="upper right", framealpha=0.85)
 
-    # -----------------------------------------
-    # RIGHT: controls vs time
-    # -----------------------------------------
+    # Controls
     ax_uT.set_title("Controls vs time")
     ax_uT.set_ylabel("T")
     ax_ua.set_ylabel("alpha")
@@ -1026,9 +1026,7 @@ def animate_xv15_aircraft_state_control(
     _set_ylim(ax_ud, U[:, 2])
     ax_uT.set_xlim(0, float(T))
 
-    # -----------------------------------------
-    # Time-series lines (3 + 3)
-    # -----------------------------------------
+    # Time series
     lv, = ax_sv.plot([], [], lw=2)
     lg, = ax_sg.plot([], [], lw=2)
     lb, = ax_sb.plot([], [], lw=2)
@@ -1037,9 +1035,7 @@ def animate_xv15_aircraft_state_control(
     la, = ax_ua.plot([], [], lw=2)
     ld, = ax_ud.plot([], [], lw=2)
 
-    # -----------------------------------------
-    # Animation init/update
-    # -----------------------------------------
+    # Animate
     def init_anim():
         traj_line.set_data([], [])
         pt_line.set_data([], [])
@@ -1153,14 +1149,14 @@ def animate_xv15_aircraft_state_control(
             line3d, pt3d
         )
 
-    frame_skip = 20          # show 1 out of every 5 steps  (5x faster)
+    frame_skip = 20
     frames = range(0, N, frame_skip)
     ani = FuncAnimation(
         fig,
         update,
         frames=frames,
         init_func=init_anim,
-        interval=30,   # can keep this, or lower it too
+        interval=30,
         blit=False,
     )
 
@@ -1175,19 +1171,37 @@ def animate_xv15_aircraft_state_control(
 
 def mc_reach_avoid(
     *,
-    f_cl_module,              # torch module: xdot = f(x), x shape (1,3)
-    g_fn=None,                # torch callable: g(x) -> (3,) or (1,3); if None => deterministic
-    init_range: np.ndarray,   # (3,2)
-    goal_range: np.ndarray,   # (3,2)
-    full_range: np.ndarray,   # (3,2)
-    unsafe_boxes: np.ndarray, # (K*3,2) or (K,3,2) or (3,2)
+    f_cl_module,
+    g_fn=None,
+    init_range: np.ndarray,
+    goal_range: np.ndarray,
+    full_range: np.ndarray,
+    unsafe_boxes: np.ndarray,
     N_trials: int = 200,
     dt: float = 0.02,
     T: float = 12.0,
     seed: int = 0,
     device: str = "cpu",
 ):
-    """Monte-Carlo reach-avoid probability over [0,T]. Uses ONLY numpy RNG (seeded)."""
+    """
+    Monte Carlo estimation of reach-avoid probability.
+
+    Args:
+        f_cl_module: Closed-loop dynamics module
+        g_fn: Optional diffusion function for stochastic dynamics
+        init_range: Initial region bounds (3, 2)
+        goal_range: Goal region bounds (3, 2)
+        full_range: Full state space bounds (3, 2)
+        unsafe_boxes: Unsafe region boxes
+        N_trials: Number of Monte Carlo trials
+        dt: Time step
+        T: Simulation horizon
+        seed: Random seed
+        device: Torch device
+
+    Returns:
+        Dictionary with reach-avoid probability and trial statistics
+    """
 
     rng = np.random.default_rng(seed)
 
@@ -1196,7 +1210,6 @@ def mc_reach_avoid(
     full_range = np.asarray(full_range, np.float32)
     ub = np.asarray(unsafe_boxes, np.float32)
 
-    # unsafe -> (K,3,2)
     if ub.ndim == 2:
         ub = ub[None, ...] if ub.shape == (3, 2) else ub.reshape(-1, 3, 2)
 
@@ -1217,16 +1230,13 @@ def mc_reach_avoid(
     successes = 0
     with torch.no_grad():
         for _ in range(N_trials):
-            # sample x0 in init
             x = np.array([rng.uniform(*init_range[d]) for d in range(3)], dtype=np.float32)
 
             failed = False
             for _k in range(N_steps - 1):
-                # fail if outside full or unsafe
                 if (not in_box(x, full_range)) or in_unsafe(x):
                     failed = True
                     break
-                # succeed if in goal
                 if in_box(x, goal_range):
                     break
 
@@ -1249,7 +1259,6 @@ def mc_reach_avoid(
         "N_trials": int(N_trials),
     }
 
-
 def pretrain_network_samples(
     model,
     x_goal_range,
@@ -1262,10 +1271,10 @@ def pretrain_network_samples(
     lr=0.01,
     device='cpu',
     control_net=None,
-    n_each: int = 400,   # samples per region per epoch
+    n_each: int = 400,
     lambda_w = 1.0,
-    save_v_path=None,            # NEW
-    save_control_path=None,      # NEW
+    save_v_path=None,
+    save_control_path=None,
 ):
     """
     Pre-train V network using sampled points to match constraint structure.
@@ -1281,9 +1290,9 @@ def pretrain_network_samples(
       - unsafe-range: enforce v(x) >= pretrain_unsafe_target
       - optional phi loss on x_others: enforce phi(x) <= 0
     """
-    print("\n" + "="*80)
-    print("PRE-TRAINING: Constraint-Structured Initialization (Sample-Based)")
-    print("="*80)
+    print("\n" + "="*20)
+    print("Pre-Training: Constraint-Structured Initialization (Sample-Based)")
+    print("="*20)
 
     opt_params = list(model.parameters())
     if control_net is not None:
@@ -1320,9 +1329,7 @@ def pretrain_network_samples(
         """x_batch: (N,D), box: (D,2) -> mask: (N,)"""
         return ((x_batch >= box[:, 0]) & (x_batch <= box[:, 1])).all(dim=1)
 
-    # -----------------------------
-    # Unsafe region: allow union of boxes
-    # -----------------------------
+    # Union of unsafe boxes
     def _unsafe_to_boxes(x_unsafe) -> torch.Tensor:
         """
         Returns unsafe_boxes as torch.Tensor of shape (K,D,2).
@@ -1348,7 +1355,7 @@ def pretrain_network_samples(
 
         raise ValueError(f"x_unsafe_range must be (D,2), (K,D,2), or (K*D,2); got {tuple(t.shape)}")
 
-    unsafe_boxes = _unsafe_to_boxes(x_unsafe_range)  # (K,D,2)
+    unsafe_boxes = _unsafe_to_boxes(x_unsafe_range)
     K_unsafe = int(unsafe_boxes.shape[0])
 
     def _in_unsafe_union(x_batch: torch.Tensor) -> torch.Tensor:
@@ -1393,9 +1400,7 @@ def pretrain_network_samples(
             reg = reg + (p ** 2).sum()
         return reg
 
-    # -----------------------------
     # Training loop
-    # -----------------------------
     for epoch in range(num_epochs):
         model.train()
         if control_net is not None:
@@ -1403,28 +1408,27 @@ def pretrain_network_samples(
         if GV_net is not None:
             GV_net.train()
 
-        # 1) full-range samples -> enforce v(x) >= 0
+        # Full-range samples -> enforce v(x) >= 0
         x_full = torch.rand(n_each, D, device=device) * span + low
         v_full = model(x_full).squeeze(-1)
         v_loss_full = F.relu(0.0 - v_full).sum()
 
-        # 2) init-range samples -> enforce v(x) <= 1
+        # Init-range samples -> enforce v(x) <= 1
         x_init = _sample_in_box(init_t, n_each)
         v_init = model(x_init).squeeze(-1)
         v_loss_init = F.relu(v_init - 1.0).sum()
 
-        # 3) unsafe-range samples -> enforce v(x) >= pretrain_unsafe_target
+        # Unsafe-range samples -> enforce v(x) >= pretrain_unsafe_target
         x_unsafe = _sample_in_unsafe_union(int(n_each/6))
         v_unsafe = model(x_unsafe).squeeze(-1)
-        v_loss_unsafe = F.relu(params.constraints.pretrain_unsafe_target - v_unsafe).sum()
+        v_loss_unsafe = F.relu(params.constraints.beta_ra - v_unsafe).sum()
 
-        # 4) goal-range samples -> enforce v(x) <= 1.0
+        # Goal-range samples -> enforce v(x) => 0.0
         x_goal = _sample_in_box(goal_t, n_each)
         v_goal = model(x_goal).squeeze(-1)
         v_loss_inside_goal = F.relu(0.0 - v_goal).sum()
-        # miv_v_goal = torch.min(v_goal)
 
-        # 5) samples inside full-range but outside (goal ∪ unsafe) -> enforce v(x) >= 0.0
+        # Samples inside full-range but outside (goal ∪ unsafe) -> enforce v(x) >= 0.0
         x_others_list = []
         need = n_each
         max_tries = 20
@@ -1449,7 +1453,7 @@ def pretrain_network_samples(
         v_others = model(x_others).squeeze(-1)
         v_loss_others = F.relu(v_eq - v_others).sum()
 
-        # Total V loss (v_loss_inside_goal and v_loss_others are not used anymore)
+        # Total V loss
         loss_v = (v_loss_full
             + v_loss_init
             + v_loss_unsafe
@@ -1457,19 +1461,17 @@ def pretrain_network_samples(
             + v_loss_others
         )
 
-        # Phi loss on SAME x_others -> enforce phi(x) <= 0
-        loss_phi = torch.tensor(0.0, device=device)
+        # Phi loss on same x_others -> enforce phi(x) <= 0
+        loss_gv = torch.tensor(0.0, device=device)
         if GV_net is not None and x_others.numel() > 0:
             x_phi = x_others.detach().clone().requires_grad_(True)
             phi_output = GV_net(x_phi).squeeze(-1)
-            loss_phi = F.relu(phi_output).sum()
+            loss_gv = F.relu(phi_output).sum()
 
-        total_loss = loss_v + loss_phi
+        total_loss = loss_v + loss_gv
 
         # Add regularization for V network
         reg_w = _l2_weight_penalty(model, exclude_bias=True)
-        reg_w_control = _l2_weight_penalty(control_net, exclude_bias=True)
-        # print(reg_w)
         total_loss = total_loss + lambda_w * (reg_w)
 
         # Track best
@@ -1482,23 +1484,9 @@ def pretrain_network_samples(
         # Logging
         if epoch % 100 == 0:
             if GV_net is not None:
-                print(
-                    f"  Epoch [{epoch}/{num_epochs}]: "
-                    f"V={loss_v.item():.3f} "
-                    f"(full={v_loss_full.item():.3f}, init={v_loss_init.item():.3f}, "
-                    f"unsafe={v_loss_unsafe.item():.3f}, "
-                    f"goal={v_loss_inside_goal.item():.3f}), {v_loss_others.item():.3f}"
-                    f"Φ={loss_phi.item():.3e}, Reg={reg_w.item():.3f}, {reg_w_control.item():.3f}, Total={total_loss.item():.3e}"
-                )
-                print(model(model.input_offset))
+                print(f"Epoch {epoch} | V_loss={loss_v.item():8.4f} | GV_loss={loss_gv.item():8.4f}")
             else:
-                print(
-                    f"  Epoch [{epoch}/{num_epochs}]: "
-                    f"V={loss_v.item():.6f} "
-                    f"(full={v_loss_full.item():.3f}, init={v_loss_init.item():.3f}, "
-                    f"unsafe={v_loss_unsafe.item():.3f}, "
-                    f"goal={v_loss_inside_goal.item():.3f})"
-                )
+                print(f"Epoch {epoch} | V_loss={loss_v.item():8.4f}")
 
         # Optimize/update networks
         optimizer.zero_grad()
@@ -1512,7 +1500,7 @@ def pretrain_network_samples(
             control_net.load_state_dict(best_control_state)
         print(f"\n  Best loss: {best_loss:.6f}")
 
-        # NEW: save best pretrained weights (state_dict)
+        # Save best pretrained weights (state_dict)
         if save_v_path is not None:
             torch.save(best_model_state, save_v_path)
             print(f"  Saved pretrained V_net to: {save_v_path}")
@@ -1520,25 +1508,24 @@ def pretrain_network_samples(
             torch.save(best_control_state, save_control_path)
             print(f"  Saved pretrained Controller_net to: {save_control_path}")
 
-    print("="*80)
+    print("="*20)
     networks_trained = ["V"]
     if GV_net is not None:
         networks_trained.append("GV (Φ)")
     if control_net is not None:
         networks_trained.append("Controller")
     print(f"Pre-training complete. {' + '.join(networks_trained)} initialized.")
-    print("="*80 + "\n")
+    print("="*20 + "\n")
 
 
 def train_network_bounds(
     V_net,
     GV_net,
     region_cells: dict,
-    regions: Regions,
     params: Hyperparameters,
     device: str = 'cpu',
-    visualize_interval: int = 5000,
-    control_net: nn.Module = None
+    control_net: nn.Module = None,
+    start_time: float = None
 ):
     """
     Train the value network using CROWN bounds.
@@ -1547,15 +1534,13 @@ def train_network_bounds(
         V_net: Value network
         GV_net: Generator network
         region_cells: Dictionary of discretized cells
-        regions: Regions object
         params: Hyperparameters
         device: Device for training
-        visualize_interval: Interval for visualization (0 to disable)
         control_net: if this is provided, then we do [control synthesis]
     """
-    print("\n" + "="*80)
-    print("BOUND-BASED TRAINING (using CROWN)")
-    print("="*80)
+    print("\n" + "="*20)
+    print("Bound-Based Training")
+    print("="*20)
 
     # Move models to device
     V_net = V_net.to(device)
@@ -1567,7 +1552,7 @@ def train_network_bounds(
         V_net.eval()
         with torch.no_grad():
             x0 = V_net.input_offset.to(device=device, dtype=next(V_net.parameters()).dtype)
-            y0 = V_net(x0).item()  # (out,) or scalar-ish
+            y0 = V_net(x0).item()
             print(f"[Check] epoch={epoch:06d}  {y0:.3e} ")
         V_net.train()
 
@@ -1586,7 +1571,7 @@ def train_network_bounds(
     total_cells_V = len(all_cells_V)
     print(f"  Total V cells: {total_cells_V}")
 
-    # Prepare ALL input bounds at once (matching original)
+    # Prepare all input bounds at once
     print("\nPreparing concatenated input bounds for V network...")
     if total_cells_V > 0:
         input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device, input_dim=params.network.n_inputs)
@@ -1594,7 +1579,7 @@ def train_network_bounds(
         input_lowers_all = torch.empty(0, params.network.n_inputs, device=device)
         input_uppers_all = torch.empty(0, params.network.n_inputs, device=device)
 
-    # Create ONE big CROWN cache for ALL V cells (matching original!)
+    # Create one big CROWN cache for ALL V cells
     print(f"\nInitializing CROWN cache for ALL {total_cells_V} V cells...")
     crown_cache_all = SymbolicCROWNCache(
         model=V_net,
@@ -1603,7 +1588,7 @@ def train_network_bounds(
         device=device
     )
 
-    # Create CROWN cache for generator (Phi) - separate cache
+    # Create CROWN cache for generator (Phi)
     crown_cache_phi = None
     input_lowers_gen = None
     input_uppers_gen = None
@@ -1619,27 +1604,24 @@ def train_network_bounds(
         # Prepare generator input bounds
         input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], device, input_dim=params.network.n_inputs)
 
-    learnable_beta_s = None
     beta_s_value = params.constraints.beta_s
     print(f"\nUsing CONSTANT beta_s = {beta_s_value}")
     opt_params = list(V_net.parameters())
-    # [control synthesis]
     if control_net is not None:
         opt_params += list(control_net.parameters())
 
     optimizer = torch.optim.Adam(opt_params, lr=params.training.learning_rate)
 
-    # Scheduler (matching testing_simple3.py)
+    # Scheduler
     scheduler = torch.optim.lr_scheduler.StepLR(
         optimizer,
-        step_size=1000,   # every 2000 epochs
-        gamma=0.95         # multiply lr by 0.5
+        step_size=1000,
+        gamma=0.95
     )
 
     # Training loop
     loss_history = []
     refinement_epochs = {'outside': [], 'generator': []}
-    start_time = time.time()
     final_beta_s = params.constraints.beta_s 
     # Compute total loss from bounds
     loss_kwargs = {
@@ -1654,14 +1636,14 @@ def train_network_bounds(
 
         optimizer.zero_grad()
         if params.compute_V:
-            # Compute bounds for ALL V cells at once (matching original!)
+            # Compute bounds for ALL V cells at once
             if total_cells_V > 0:
                 v_lowers_all, v_uppers_all = crown_cache_all.compute_bounds(input_lowers_all, input_uppers_all)
             else:
                 v_lowers_all = torch.tensor([], device=device)
                 v_uppers_all = torch.tensor([], device=device)
 
-            # Split bounds by region (matching original's split_bounds_by_region)
+            # Split bounds by region
             bounds = {}
             cell_idx = 0
             for name in region_order_V:
@@ -1693,13 +1675,7 @@ def train_network_bounds(
                 current_gen_weight = 0.0
                 num_total_failing = 0
 
-        # Get current beta_s value (learnable or constant)
-        if learnable_beta_s is not None:
-            current_beta_s = learnable_beta_s.value
-        else:
-            current_beta_s = beta_s_value
-
-        # Update loss kwargs with current bounds (reuse pre-allocated dict)
+        # Update loss kwargs with current bounds
         if params.compute_V:
             loss_kwargs['beta_ra'] = params.constraints.beta_ra
             loss_kwargs['V_goal_lower'] = bounds['goal'][0]
@@ -1739,9 +1715,6 @@ def train_network_bounds(
                 else:
                     bounds_updated[name] = (torch.tensor([], device=device), torch.tensor([], device=device))
 
-        # Get current beta_s value for constraint checks
-        beta_s_check = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
-
         # Adaptive refinement for V outside region cells
         needs_cache_rebuild = False
         if params.compute_V and len(bounds_updated['outside'][0]) > 0:
@@ -1755,9 +1728,6 @@ def train_network_bounds(
                 REFINE_FACTOR = 2
                 MAX_CELLS = 40000
 
-                # if epoch > 2500:
-                #     REFINE_INTERVAL = 50
-
                 if ((epoch + 1) % REFINE_INTERVAL == 0 and
                     len(region_cells['outside']) < MAX_CELLS):
                     new_cells, num_refined = refine_failing_cells(
@@ -1767,7 +1737,7 @@ def train_network_bounds(
                         scores=-bounds_updated['outside'][0]
                     )
                     region_cells['outside'] = new_cells
-                    print(f"[Refine-Outside] Epoch {epoch+1}: {num_outside_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
+                    print(f"Refining outside cells: {num_outside_failing} failing, refined {num_refined} cells, {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['outside'].append(epoch + 1)
 
@@ -1777,30 +1747,27 @@ def train_network_bounds(
                     region_cells['outside'],
                     outside_failing_mask_relax,
                     max_passes=4,
-                    max_merges=None,   # cap work; set None for full greedy
+                    max_merges=None,
                     seed=0,
                     eps=1e-6,
                 )
                 region_cells['outside'] = merged_cells
-                print(f"[Merge-Outside] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+                
+                print(f"Merging outside cells: merged {num_merges} pairs, {len(merged_cells)} total")
                 needs_cache_rebuild = True
 
-        # Adaptive refinement for generator cells (before optimizer step)
+        # Adaptive refinement for generator cells
         if params.compute_GV:
             if (epoch >= params.training.generator_start_epoch and
                 params.training.generator_weight > 0 and
                 crown_cache_phi is not None and
                 num_total_failing > 0):
 
-                # Refinement parameters (matching testing_simple3.py)
-                REFINE_INTERVAL = 500  # Refine every 100k epochs
-                REFINE_FACTOR = 2  # Split into 2x2 subcells
-                MAX_CELLS = 100000  # Don't refine if we already have too many cells
+                # Refinement parameters
+                REFINE_INTERVAL = 500
+                REFINE_FACTOR = 2
+                MAX_CELLS = 100000
                 N_TO_REFINE = 100
-
-                # # Adjust interval for later epochs
-                # if epoch > 2500:
-                #     REFINE_INTERVAL = 250
 
                 # Check if it's time to refine
                 if ((epoch + 1) % REFINE_INTERVAL == 0 and
@@ -1813,7 +1780,7 @@ def train_network_bounds(
                         scores=phi_uppers,
                     )
                     region_cells['generator'] = new_cells
-                    print(f"[Refine-Generator] Epoch {epoch+1}: {num_total_failing} failing → refined {num_refined} cells → {len(new_cells)} total")
+                    print(f"Refining generator cells: {num_total_failing} failing, refined {num_refined} cells, {len(new_cells)} total")
                     needs_cache_rebuild = True
                     refinement_epochs['generator'].append(epoch + 1)
             
@@ -1823,28 +1790,18 @@ def train_network_bounds(
                     region_cells['generator'],
                     phi_upper_failing_mask_relax,
                     max_passes=8,
-                    max_merges=None,   # cap work; set None for full greedy
+                    max_merges=None,
                     seed=0,
                     eps=1e-6,
                 )
                 region_cells['generator'] = merged_cells
-                print(f"[Merge-Generator] Epoch {epoch+1}: merged {num_merges} pairs → {len(merged_cells)} total")
+                print(f"Merging generator cells: merged {num_merges} pairs, {len(merged_cells)} total")
                 needs_cache_rebuild = True
 
         # Logging
         if epoch % 10 == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
-            # Add beta_s to loss dict for logging
-            if learnable_beta_s is not None:
-                beta_s_log = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
-                print(f"Epoch [{epoch}/{params.training.num_epochs}]: Loss={total_loss.item():.4f}, β_s={beta_s_log:.4f}")
             print_loss_summary(epoch, loss_dict, compute_V=params.compute_V, compute_GV=params.compute_GV)
-            # if control_net is not None:
-            #     for name, param in control_net.named_parameters():
-            #         if param.requires_grad:
-            #             print(f" [Controller Params] {name} = {param.data}")
             loss_dict['epoch'] = epoch
-            if learnable_beta_s is not None:
-                loss_dict['beta_s'] = beta_s_log
             loss_history.append(loss_dict.copy())
 
         # Early stopping check
@@ -1852,7 +1809,6 @@ def train_network_bounds(
             # Check V constraints
             all_satisfied = True
             if params.compute_V:
-                show = (epoch % 10 == 0)
                 _, goal_satisfied = compute_loss_goal_bounds(bounds_updated["goal"][0])
                 unsafe_satisfied = (bounds_updated['unsafe'][0].min() >= params.constraints.beta_ra)
                 init_satisfied = (bounds_updated['init'][1].max() <= 1.0)
@@ -1866,9 +1822,9 @@ def train_network_bounds(
 
             # Early stop if all active constraints are satisfied
             if all_satisfied:
-                print("\n" + "="*80)
-                print("ALL CONSTRAINTS SATISFIED - EARLY STOPPING!")
-                print("="*80)
+                print("\n" + "="*20)
+                print("All Constraints Satisfied - Early Stopping!")
+                print("="*20)
                 print(f"Training converged at epoch {epoch}")
 
                 # Print relevant losses
@@ -1892,7 +1848,6 @@ def train_network_bounds(
         # Detailed evaluation and visualization
         if (epoch % 500 == 0) or epoch == params.training.num_epochs - 1:
             print(f"\nEpoch {epoch} - Detailed Evaluation:")
-            # For evaluation, we can just create temporary caches (not in the hot path)
             results = evaluate_constraints(
                 V_net, GV_net, region_cells,
                 crown_cache_all=crown_cache_all,
@@ -1903,37 +1858,17 @@ def train_network_bounds(
                 beta_ra=params.constraints.beta_ra,
                 device=device,
             )
-            print_constraint_summary(results, prefix="  ")
-
-            # Print bound statistics
-            if params.compute_V:
-                if len(bounds['goal'][0]) > 0:
-                    print(f"  Goal bounds: V ∈ [{bounds['goal'][0].min().item():.3f}, {bounds['goal'][1].max().item():.3f}]")
-                if len(bounds['unsafe'][0]) > 0:
-                    print(f"  Unsafe bounds: V ∈ [{bounds['unsafe'][0].min().item():.3f}, {bounds['unsafe'][1].max().item():.3f}]")
-            if params.compute_GV:
-                if len(phi_uppers) > 0:
-                    print(f"  Generator bounds: Φ ∈ [{phi_uppers.min().item():.6e}, {phi_uppers.max().item():.6e}]")
-                    failing_cells = (phi_uppers > 0).sum().item()
-                    print(f"  Generator failing cells: {failing_cells}/{len(phi_uppers)} ({100*failing_cells/len(phi_uppers):.1f}%)")
-            print()
-            # Visualize progress
+            print_constraint_summary(results, prefix="")
         
-        # _log_V_zero_at_offset(V_net, epoch, device, every=10, atol=1e-6)  # before step
         # Optimizer step
         optimizer.step()
         scheduler.step()
-        _log_V_zero_at_offset(V_net, epoch, device, every=10, atol=1e-6)  # before step
+        _log_V_zero_at_offset(V_net, epoch, device, every=10, atol=1e-6)
 
-        # Rebuild CROWN caches after optimizer step if needed (after adaptive refinement)
-        # if params.compute_GV:
+        # Rebuild CROWN caches after optimizer step if needed
         if True:
             if needs_cache_rebuild:
-                # with torch.no_grad():
-                print(f"  Rebuilding CROWN caches with new generator cells...")
-
-                # Rebuild V cache with all cells (in order: init, goal, unsafe, outside)
-                # Note: generator cells are NOT included in V cache
+                # Rebuild V cache with all cells
                 all_cells_V = []
                 for name in region_order_V:
                     all_cells_V.extend(region_cells[name])
@@ -1942,7 +1877,7 @@ def train_network_bounds(
                 input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device, input_dim=params.network.n_inputs)
 
                 # Rebuild V CROWN cache
-                print(f"    Rebuilding V cache with {total_cells_V} cells...")
+                print(f"Rebuilding V cache with {total_cells_V} cells...")
                 crown_cache_all = SymbolicCROWNCache(
                     model=V_net,
                     num_cells=total_cells_V,
@@ -1950,9 +1885,9 @@ def train_network_bounds(
                     device=device
                 )
 
-                # Rebuild Phi CROWN cache (only for generator region)
+                # Rebuild Phi CROWN cache
                 num_generator_cells = len(region_cells['generator'])
-                print(f"    Rebuilding Phi cache with {num_generator_cells} cells...")
+                print(f"Rebuilding Phi cache with {num_generator_cells} cells...")
                 crown_cache_phi = SymbolicCROWNCache_Phi(
                     phi_module=GV_net,
                     num_cells=num_generator_cells,
@@ -1973,15 +1908,10 @@ def train_network_bounds(
                     all_cells_V.extend(region_cells[name])
                     input_lowers_all, input_uppers_all =  prepare_cell_bounds(all_cells_V, device, input_dim=params.network.n_inputs)
 
-                print(f"  Caches rebuilt successfully!")
+                print(f"Caches rebuilt successfully!")
 
     elapsed_time = time.time() - start_time
     print(f"\nTraining completed in {elapsed_time:.2f} seconds ({elapsed_time/60:.2f} minutes)")
-
-    # Return final beta_s value along with loss history
-    # final_beta_s = current_beta_s.item() if isinstance(current_beta_s, torch.Tensor) else current_beta_s
-    # if learnable_beta_s is not None:
-    #     print(f"\nFinal learned β_s = {final_beta_s:.4f}")
 
     return loss_history, final_beta_s, refinement_epochs
 
@@ -2030,11 +1960,11 @@ def check_gv_matches_autograd_full_range(
     V_net,
     GV_net,
     dynamics,
-    full_range,                       # np.ndarray or torch.Tensor with shape (D,2)
+    full_range,
     *,
-    num_points: int = 512,            # how many samples in full_range
+    num_points: int = 512,
     seed: int = 0,
-    batch_size: int = 128,            # autograd Hessian diag is expensive; batch it
+    batch_size: int = 128,
     device: str | torch.device = "cpu",
     dtype: torch.dtype = torch.float32,
     report_topk: int = 10,
@@ -2047,7 +1977,7 @@ def check_gv_matches_autograd_full_range(
     """
     torch.manual_seed(seed)
 
-    # --- prepare bounds ---
+    # Convert to tensor
     if not isinstance(full_range, torch.Tensor):
         full_range_t = torch.tensor(full_range, device=device, dtype=dtype)
     else:
@@ -2058,19 +1988,19 @@ def check_gv_matches_autograd_full_range(
     lo = full_range_t[:, 0]
     hi = full_range_t[:, 1]
 
-    # --- sample uniformly in full_range ---
+    # Sample points
     x_all = lo.unsqueeze(0) + (hi - lo).unsqueeze(0) * torch.rand(num_points, D, device=device, dtype=dtype)
 
-    # --- get f,g once ---
+    # Get dynamics
     f = dynamics.get_f()
     g = dynamics.get_g()
 
-    # --- storage for errors ---
+    # Store top-k worst offenders
     errs = []
     gv_fast_list = []
     gv_auto_list = []
 
-    # --- loop in batches (avoid huge graphs) ---
+    # Loop in batches
     num_batches = (num_points + batch_size - 1) // batch_size
 
     for bi in range(num_batches):
@@ -2079,7 +2009,7 @@ def check_gv_matches_autograd_full_range(
         x = x_all[s:e]  # (B,D)
         B = x.shape[0]
 
-        # ----- fast GV (no grad) -----
+        # Fast setup
         with torch.no_grad():
             gv_fast = GV_net(x)
             if gv_fast.dim() == 2 and gv_fast.shape[1] == 1:
@@ -2088,7 +2018,7 @@ def check_gv_matches_autograd_full_range(
                 gv_fast = gv_fast.view(-1)
             gv_fast = gv_fast.detach()
 
-        # ----- autograd GV -----
+        # Auto-grad setup
         x_req = x.clone().detach().requires_grad_(True)
 
         V_out = V_net(x_req)
@@ -2152,21 +2082,21 @@ def check_gv_matches_autograd_full_range(
         gv_auto = ((fx * gradV) + 0.5 * (gdiag * Hdiag)).sum(dim=1)  # (B,)
         gv_auto = gv_auto.detach()
 
-        # ----- compare -----
+        # Error
         err = (gv_fast - gv_auto).abs()  # (B,)
 
         errs.append(err.cpu())
         gv_fast_list.append(gv_fast.cpu())
         gv_auto_list.append(gv_auto.cpu())
 
-        # free graph ASAP
+        # Free graph ASAP
         del x_req, Vs, V_out, gradV, Hdiag, fx, gdiag, gv_auto
 
-    errs = torch.cat(errs, dim=0)                 # (N,)
+    errs = torch.cat(errs, dim=0) # (N,)
     gv_fast_all = torch.cat(gv_fast_list, dim=0)  # (N,)
     gv_auto_all = torch.cat(gv_auto_list, dim=0)  # (N,)
 
-    # --- stats ---
+    # Summary stats
     max_err = float(errs.max())
     mean_err = float(errs.mean())
     med_err = float(errs.median())
@@ -2174,12 +2104,12 @@ def check_gv_matches_autograd_full_range(
 
     print("=== GV vs Autograd check over full_range ===")
     print(f"samples: {num_points}, batch_size: {batch_size}, D: {D}")
-    print(f"max |diff|  = {max_err}")
-    print(f"mean|diff|  = {mean_err}")
-    print(f"median|diff|= {med_err}")
-    print(f"p95 |diff|  = {p95}")
+    print(f"max |diff| = {max_err}")
+    print(f"mean |diff| = {mean_err}")
+    print(f"median |diff| = {med_err}")
+    print(f"p95 |diff| = {p95}")
 
-    # --- worst offenders ---
+    # Worst offenders
     k = min(report_topk, errs.numel())
     top_err, top_idx = torch.topk(errs, k=k, largest=True)
     print(f"\nTop-{k} worst errors:")
@@ -2199,32 +2129,23 @@ def check_gv_matches_autograd_full_range(
         "stats": {"max": max_err, "mean": mean_err, "median": med_err, "p95": p95},
     }
 
-
-# =============================================================================
-# Main
-# =============================================================================
 def main():
+    """Main entry point for XV-15 control synthesis."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--train", type=int, default=1, choices=[0, 1],
                         help="1: train + save bundle, 0: load bundle + eval/plot")
     args = parser.parse_args()
 
-    print("=" * 80)
-    print("XV-15 CERTIFICATE-BASED CONTROL SYNTHESIS (V + Phi)")
-    print("=" * 80)
+    print("=" * 20)
+    print("XV-15 Control Synthesis")
+    print("=" * 20)
 
-    # -------------------------------------------------------------------------
-    # 1) Hyperparameters (clone your Lorentz defaults, then adjust)
-    # -------------------------------------------------------------------------
+    # === Hyperparameters ===
     params = Hyperparameters.default()
 
     params.network.n_inputs = 3
     params.network.n_hidden_1 = 64
     params.network.n_hidden_2 = 64
-
-    # Scaling: pick something roughly comparable to variable ranges
-    # v ~ [20,100] (span 80), gamma ~ [-0.26,0.26], beta ~ [0,1.57]
-    # scale choices affect training conditioning; tune if needed.
     params.network.input_scale = [100.0, 20*DEG, 90*DEG]
     params.network.scale_factor = 20.0
 
@@ -2241,11 +2162,13 @@ def main():
     params.compute_V = True
     params.compute_GV = True
 
+    params.training.enable_pretraining = True
+    params.training.pretrain_epochs = 15000
+    params.training.pretrain_lr = 0.01
+
     device = params.training.device
 
-    # -------------------------------------------------------------------------
-    # 3) Regions (init, goal, unsafe union, full)
-    # -------------------------------------------------------------------------
+    # === Regions ===
     full_range = np.array([
         [0.5, 100.0], # airspeed
         [-20.0 * DEG, 20.0 * DEG], # flight path angle
@@ -2313,42 +2236,30 @@ def main():
     unsafe_max_beta_reg = Region(unsafe_max_beta)
     unsafe_min_vel_reg = Region(unsafe_min_vel)
     unsafe_max_vel_reg = Region(unsafe_max_vel)
-    # unsafe_max_vel_dn_reg = Region(unsafe_max_vel_dn)
 
     unsafe = Region.union(unsafe_up_reg, unsafe_dn_reg, 
                           unsafe_min_beta_reg, unsafe_max_beta_reg,
                           unsafe_min_vel_reg, unsafe_max_vel_reg)
     regions = Regions(init=init, goal=goal, unsafe=unsafe, full=full)
 
-    # Discretization: start modest; refine happens during training
+    # === Discretization ===
     params.discretization.n_goal = 32
     params.discretization.n_outside_goal = 8
     params.discretization.n_generator = 4
     params.discretization.n_unsafe = 16
     params.discretization.n_init = 28
 
-    # -------------------------------------------------------------------------
-    # 2) Dynamics (closed-loop, torch, differentiable)
-    # -------------------------------------------------------------------------
-    # Create diffusion coefficients as a persistent tensor to avoid TracerWarnings
+    # === Dynamics ===
     g_coeffs = torch.tensor([0.5, 0.1 * DEG, 0.1 * DEG], dtype=torch.float32)
 
     def g(x: torch.Tensor) -> torch.Tensor:
-        """
-        Diffusion term g(x) that is constant: [1.0, 1.0, 1.0] for every x.
-
-        If x has shape (D,), returns (D,).
-        If x has shape (N, D), returns (N, D) with each row [1.0, 1.0, 1.0].
-        """
+        """Constant diffusion term."""
         base = g_coeffs.to(device=x.device, dtype=x.dtype)
-
         if x.dim() == 1:
-            # x is shape (D,)
             return base
         elif x.dim() == 2:
-            # x is shape (N, D)
             N = x.shape[0]
-            return base.unsqueeze(0).expand(N, -1)  # (N, D)
+            return base.unsqueeze(0).expand(N, -1)
         else:
             raise ValueError(f"g(x) expects x of shape (D,) or (N, D), got {tuple(x.shape)}")
 
@@ -2381,9 +2292,7 @@ def main():
     f_cl_module = ClosedLoopDrift(aero=aero, controller=u_nn).to(device)
     dynamics = Dynamics.dynamics(f=f_cl_module, g=g, state_dim=3)
 
-    # -------------------------------------------------------------------------
-    # 4) Networks (V and GV)
-    # -------------------------------------------------------------------------
+    # === Networks ===
     input_offset = [x_eq[0], x_eq[1], x_eq[2]]
     output_offset = np.float32(0.1)
     V_net = create_V(params.network, input_offset=input_offset, output_offset=output_offset)
@@ -2414,36 +2323,25 @@ def main():
         use_radial_generator=False,
     )
 
-    # -------------------------------------------------------------------------
-    # 6) Pretrain + train (or load)
-    # -------------------------------------------------------------------------
-    params.constraints.pretrain_goal_target = params.constraints.beta_s
-    params.constraints.pretrain_unsafe_target = params.constraints.beta_ra
-    params.constraints.pretrain_init_target = 1.0
-    params.constraints.pretrain_phi_target = 0.0
+    # === Pretraining ===
     bundle_path = OUTPUT_DIR / "eval_bundle.pth"
 
     if args.train == 1:
         cleanup_and_setup_directories(["results", "training_progress"])
         enable_terminal_logging(OUTPUT_DIR / "terminal_log.txt")
-        print(f"\n{dynamics}")
-        print(f"\nUsing device: {device}")
 
-        ENABLE_PRETRAINING = True
-        PRETRAIN_EPOCHS = 15000
-        PRETRAIN_LR = 0.01
-
-        if ENABLE_PRETRAINING:
+        if params.training.enable_pretraining:
+            start_time = time.time()
             pretrain_network_samples(
                 model=V_net,
                 x_goal_range=goal_range,
-                x_unsafe_range=unsafe_range,     # pass first unsafe piece
+                x_unsafe_range=unsafe_range,
                 x_init_range=init_range,
                 x_range=full_range,
                 params=params,
                 GV_net=GV_net,
-                num_epochs=PRETRAIN_EPOCHS,
-                lr=PRETRAIN_LR,
+                num_epochs=params.training.pretrain_epochs,
+                lr=params.training.pretrain_lr,
                 device=device,
                 control_net=u_nn,
                 lambda_w=1e-3,
@@ -2451,7 +2349,6 @@ def main():
                 save_v_path= OUTPUT_DIR / "V_pretrained.pth",
                 save_control_path= OUTPUT_DIR / "controller_pretrained.pth"
             )
-            print("Pretraining completed.\n")
 
         V_net.load_state_dict(torch.load(OUTPUT_DIR / "V_pretrained.pth", map_location=device))
         u_nn.load_state_dict(torch.load(OUTPUT_DIR / "controller_pretrained.pth", map_location=device))
@@ -2460,16 +2357,15 @@ def main():
             V_net=V_net,
             GV_net=GV_net,
             region_cells=region_cells,
-            regions=regions,
             params=params,
             device=device,
-            visualize_interval=1000,
-            control_net=u_nn,  # CONTROL SYNTHESIS
+            control_net=u_nn,
+            start_time=start_time
         )
 
-        print("\n" + "=" * 80)
-        print("FINAL EVALUATION")
-        print("=" * 80)
+        print("\n" + "=" * 20)
+        print("Final Evaluation")
+        print("=" * 20)
 
         results = evaluate_constraints(
             V_net, GV_net, region_cells,
@@ -2478,9 +2374,9 @@ def main():
         )
         print_constraint_summary(results)
 
-        print("\n" + "=" * 80)
-        print("CREATING FINAL VISUALIZATIONS")
-        print("=" * 80)
+        print("\n" + "=" * 20)
+        print("Creating Final Visualizations")
+        print("=" * 20)
 
         create_summary_plots(
             V_net=V_net,
@@ -2495,9 +2391,9 @@ def main():
             output_dir="results"
         )
 
-        print("\n" + "=" * 80)
-        print("SAVING EVAL BUNDLE")
-        print("=" * 80)
+        print("\n" + "=" * 20)
+        print("Saving Eval Bundle")
+        print("=" * 20)
 
         save_eval_bundle(
             OUTPUT_DIR,
@@ -2514,9 +2410,9 @@ def main():
         )
 
     else:
-        print("\n" + "=" * 80)
-        print("LOADING SAVED BUNDLE (skip training)")
-        print("=" * 80)
+        print("\n" + "=" * 20)
+        print("Loading Saved Eval Bundle")
+        print("=" * 20)
 
         bundle = load_eval_bundle(bundle_path, map_location="cpu")
 
@@ -2593,9 +2489,9 @@ def main():
             controller_label="certified-synthesis"
         )
 
-        print("\n" + "=" * 80)
+        print("\n" + "=" * 20)
         print("Monte Carlo results")
-        print("=" * 80)
+        print("=" * 20)
 
         # monte-carlo (open-loop)
         mc = mc_reach_avoid(
@@ -2648,9 +2544,9 @@ def main():
         print("Synthesized Control")
         print(mc)
 
-        print("\n" + "=" * 80)
+        print("\n" + "=" * 20)
         print("Recreating Plots")
-        print("=" * 80)
+        print("=" * 20)
 
         # re-render plots
         dynamics = Dynamics.dynamics(f=f_cl_module, g=g, state_dim=3)
@@ -2682,14 +2578,14 @@ def main():
                 device=device,
             )
 
-        print("\n" + "=" * 80)
-        print("FINAL EVALUATION (LOADED)")
-        print("=" * 80)
+        print("\n" + "=" * 20)
+        print("Final Evaluation (Loaded)")
+        print("=" * 20)
         print_constraint_summary(results)
 
-        print("\n" + "=" * 80)
-        print("CREATING FINAL VISUALIZATIONS (LOADED)")
-        print("=" * 80)
+        print("\n" + "=" * 20)
+        print("Creating Final Visualizations (Loaded)")
+        print("=" * 20)
         log_loaded_training_epochs(loss_history)
 
         create_summary_plots(

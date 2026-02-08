@@ -27,6 +27,9 @@ sys.path.insert(0, str(ROOT))
 
 from src.control_network import LorentzLinearControlNN
 from src.save_load_utils import load_eval_bundle
+from src.network import create_V
+from src.hyperparameters import Hyperparameters
+from animate_minimal import animate_nonlinear3d_minimal
 
 
 # ----------------------------
@@ -197,7 +200,16 @@ def load_control_net(bundle_path, device="cpu"):
     print_net_params(control_net, full_tensor=True)
 
     control_net.eval()
-    return control_net
+    return control_net, bundle
+
+
+def load_V_net(bundle, device="cpu"):
+    """Load the value function network from the eval bundle."""
+    params = Hyperparameters.from_dict(bundle["hyperparameters"])
+    V_net = create_V(params.network).to(device)
+    V_net.load_state_dict(bundle["V_state_dict"])
+    V_net.eval()
+    return V_net
 
 
 def get_u(x_vec: np.ndarray, controller=None) -> np.ndarray:
@@ -336,12 +348,12 @@ def test_single_traj_run(controller=None, T=10.0, seed=None, n_traj: int = 5):
     ax.set_zlabel(r"$x_3$")
 
     # Draw region boxes
-    _draw_box_3d(ax, full_range, alpha=0.0, lw=1.5, linestyle="-", label=r"$X$")
-    _draw_box_3d(ax, init_range, color="green", alpha=0.10, lw=1.2, linestyle="--", label=r"$X_{\mathrm{init}}$")
-    _draw_box_3d(ax, goal_range, color="blue", alpha=0.10, lw=1.2, linestyle="-", label=r"$X_{\mathrm{goal}}$")
+    _draw_box_3d(ax, full_range, alpha=0.0, lw=1.5, linestyle="-")#, label=r"$X$")
+    _draw_box_3d(ax, init_range, color="seagreen", alpha=0.10, lw=1.2, linestyle="--")#, label=r"Init")
+    _draw_box_3d(ax, goal_range, color="darkgoldenrod", alpha=0.10, lw=1.2, linestyle="-")#, label=r"Goal")
 
     # UPDATED: draw unsafe as union of boxes (matches main.py)
-    _draw_unsafe_union_3d(ax, unsafe_range, color="red", alpha=0.12, lw=1.2, linestyle="-", label=r"$X_{\mathrm{unsafe}}$")
+    _draw_unsafe_union_3d(ax, unsafe_range, color="firebrick", alpha=0.12, lw=1.2, linestyle="-", label=r"Unsafe")
 
     # Text overlays
     time_text = ax.text2D(0.02, 0.95, "", transform=ax.transAxes)
@@ -514,18 +526,99 @@ def test_mc(controller=None, controller_label=None):
         print(f"  {k}: {v}")
 
 
+class ClosedLoopDriftModule(torch.nn.Module):
+    """Wrapper for closed-loop dynamics with controller."""
+    def __init__(self, controller):
+        super().__init__()
+        self.controller = controller
+
+    def forward(self, x):
+        """Return closed-loop drift f(x) + u(x)."""
+        u = self.controller(x)
+        # Open-loop dynamics
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        x3 = x[:, 2]
+        f1 = -10.0 * x1 + 10.0 * x2
+        f2 = -x1 * x3 + 28.0 * x1 - x2
+        f3 = x1 * x2 - (8.0 / 3.0) * x3
+        f = torch.stack([f1, f2, f3], dim=1)
+        return f + u
+
+
+class OpenLoopDriftModule(torch.nn.Module):
+    """Wrapper for open-loop dynamics (no control)."""
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, x):
+        """Return open-loop drift f(x)."""
+        x1 = x[:, 0]
+        x2 = x[:, 1]
+        x3 = x[:, 2]
+        f1 = -10.0 * x1 + 10.0 * x2
+        f2 = -x1 * x3 + 28.0 * x1 - x2
+        f3 = x1 * x2 - (8.0 / 3.0) * x3
+        return torch.stack([f1, f2, f3], dim=1)
+
+
+def g_diffusion(x: torch.Tensor) -> torch.Tensor:
+    """Diagonal diffusion vector (3,)."""
+    g_coeffs = torch.tensor([0.1, 0.1, 0.1], dtype=torch.float32, device=x.device)
+    if x.dim() == 1:
+        return g_coeffs
+    elif x.dim() == 2:
+        N = x.shape[0]
+        return g_coeffs.unsqueeze(0).expand(N, -1)
+    else:
+        raise ValueError(f"g expects x of shape (D,) or (N, D), got {tuple(x.shape)}")
+
+
 def main():
-    test_single_traj_run(controller=None, n_traj=20)
+    # test_single_traj_run(controller=None, n_traj=5)
 
-    control_net = load_control_net(OUTPUT_DIR / "eval_bundle.pth")
-    test_single_traj_run(controller=control_net, n_traj=20)
+    # control_net = load_control_net(OUTPUT_DIR / "eval_bundle.pth")
+    # test_single_traj_run(controller=control_net, n_traj=5)
 
-    control_net_opt = load_control_net(OUTPUT_DIR / "eval_bundle_opt.pth")
-    test_single_traj_run(controller=control_net, n_traj=20)
+    control_net, bundle = load_control_net(OUTPUT_DIR / "eval_bundle_opt.pth")
+    V_net = load_V_net(bundle)
+    # test_single_traj_run(controller=control_net, n_traj=5)
 
-    test_mc(controller=None)
-    test_mc(controller=control_net, controller_label="SAT")
-    test_mc(controller=control_net_opt, controller_label="Opt-SAT")
+    # test_mc(controller=None)
+    # test_mc(controller=control_net, controller_label="SAT")
+    # test_mc(controller=control_net_opt, controller_label="Opt-SAT")
+
+    # ====================================================================
+    # MINIMAL ANIMATION
+    # ====================================================================
+    print("\n" + "="*20)
+    print("GENERATING MINIMAL ANIMATION")
+    print("="*20)
+
+    # Create dynamics modules
+    f_cl_module = ClosedLoopDriftModule(control_net)
+    f_open_module = OpenLoopDriftModule()
+
+    # Generate animation with both controlled and uncontrolled trajectories
+    animate_nonlinear3d_minimal(
+        f_cl_module=f_cl_module,
+        f_open_module=f_open_module,
+        g_fn=g_diffusion,
+        init_range=init_range,
+        goal_range=goal_range,
+        full_range=full_range,
+        unsafe_boxes=unsafe_range,
+        V_net=V_net,
+        device="cpu",
+        dt=0.01,
+        T=10.0,
+        seed=0,
+        save_path=None,
+        save_final_frame=HERE / "results" / "animation_minimal.pdf",
+        show=True,
+        controller_label="",
+        n_trajectories=10,
+    )
 
 
 if __name__ == "__main__":
