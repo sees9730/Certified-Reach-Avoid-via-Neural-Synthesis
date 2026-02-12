@@ -338,14 +338,7 @@ def train_network_bounds(
                 if sat_dict['generator'] is False:
                     all_satisfied = False
 
-            # Check if beta_ra is greater than 20.0, if not, increase it
-            # if bounds_updated['unsafe'][0].min() > params.constraints.beta_ra and params.constraints.beta_ra < 20.0:
-            if params.constraints.beta_ra < 20.0 and all_satisfied:
-                params.constraints.beta_ra += 0.2
-                all_satisfied = False
-                # Print updated beta_ra
-                print(f"Incremented beta_ra to {params.constraints.beta_ra:.2f}")
-            elif all_satisfied:
+            if all_satisfied:
                 print(f"beta_ra reached maximum of {params.constraints.beta_ra:.2f}")
 
             # Early stop if all active constraints are satisfied
