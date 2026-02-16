@@ -1,9 +1,42 @@
-## How to Run
-Go into each example/ and run: python main.py --train=1 to train; python main.py --train=0 to evaluate and visualize using pre-trained networks.
+# Neural Certificate
 
-## Structure
-Each example/ has outputs/eval_bundle.pth that saves all the objects, and outputs/terminal_log.txt that log the training.
-Each example/ has results/ that summarize the last epoch of the training
+<!-- Add your demo gif here -->
+![Demo](examples/synthesis/xv15aircraft_syn/results_opt/animation_synthesis_opt.gif)
 
-## Notes
-The inv_pend_veri has not been SAT yet.
+Learning neural certificates and controllers for stochastic systems with hard constraints. This is the code repository for our paper **"Training with Hard Constraints: Learning Neural Certificates and Controllers for SDEs"** submitted to Neus 2026.
+
+We use interval bound propagation and adaptive partitioning to train neural networks that certify reach-avoid specifications for stochastic differential equations (SDEs). The framework supports both verification (certifying existing systems) and synthesis (learning provably safe controllers).
+
+## Getting Started
+
+**Python Version:** 3.11.14
+
+### Installation
+
+```bash
+pip install -r requirements.txt
+```
+
+### Running Examples
+
+```bash
+cd examples/synthesis/inv_pend_syn_unsafe  # or any other example
+python3 main.py
+```
+
+The training will start and outputs will be saved in that example's `outputs/` folder.
+
+## What You'll Find
+
+Each example directory contains:
+- `main.py` - The main script to run
+- `outputs/eval_bundle.pth` - Saved model and training objects
+- `outputs/terminal_log.txt` - Training logs
+- `results/` - Summary visualizations from the last training epoch
+
+## Examples
+
+The repository includes two types of examples:
+
+- **Synthesis** (`examples/synthesis/`) - Control synthesis examples
+- **Verification** (`examples/verification/`) - Verification examples

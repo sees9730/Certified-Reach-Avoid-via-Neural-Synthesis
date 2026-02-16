@@ -62,7 +62,7 @@ def train_network_bounds(
     # Move models to device
     V_net = V_net.to(params.training.device)
 
-    # Collect ALL cells in the same order as original (init, goal, unsafe, outside, generator)
+    # Collect all cells 
     print("=== Total cells per region for V ===")
     cell_counts_V = {}
     region_order_V = ['init', 'goal', 'unsafe', 'outside']
@@ -125,7 +125,7 @@ def train_network_bounds(
     # Scheduler is optional and created via factory function from main.py
     scheduler = create_scheduler(optimizer) if create_scheduler is not None else None
 
-    # Pre-compute region slice indices for fast bound splitting (avoids loop overhead)
+    # Pre-compute region slice indices for fast bound splitting
     region_slice_indices = {}
     start_idx = 0
     for name in region_order_V:
@@ -157,17 +157,16 @@ def train_network_bounds(
         V_net.train()
 
         optimizer.zero_grad()
-        t0 = time.time()
 
         if params.compute_V:
-            # Compute bounds for ALL V cells at once (matching original!)
+            # Compute bounds for ALL V cells at once
             if total_cells_V > 0:
                 v_lowers_all, v_uppers_all = crown_cache_all.compute_bounds(input_lowers_all, input_uppers_all)
             else:
                 v_lowers_all = empty_tensor
                 v_uppers_all = empty_tensor
 
-            # Split bounds by region using pre-computed indices (reuse dict)
+            # Split bounds by region using pre-computed indices
             for name in region_order_V:
                 start, end = region_slice_indices[name]
                 if start < end:
@@ -194,7 +193,7 @@ def train_network_bounds(
                 current_gen_weight = 0.0
                 num_total_failing = 0
 
-        # Update loss kwargs with current bounds (reuse pre-allocated dict)
+        # Update loss kwargs with current bounds
         if params.compute_V:
             loss_kwargs['beta_ra'] = params.constraints.beta_ra
             loss_kwargs['V_goal_lower'] = bounds['goal'][0]
@@ -220,7 +219,7 @@ def train_network_bounds(
                 v_lowers_all_updated = empty_tensor
                 v_uppers_all_updated = empty_tensor
 
-            # Split updated bounds by region using pre-computed indices (reuse dict)
+            # Split updated bounds by region using pre-computed indices
             for name in region_order_V:
                 start, end = region_slice_indices[name]
                 if start < end:
@@ -397,7 +396,8 @@ def train_network_bounds(
             visualize_training_progress(
                 V_net, GV_net, regions, region_cells,
                 epoch=epoch,
-                output_dir="training_progress"
+                output_dir="training_progress",
+                beta_ra=params.constraints.beta_ra
             )
 
         # Optimizer step
