@@ -33,6 +33,7 @@ Each example directory contains:
 - `outputs/eval_bundle.pth` - Saved model and training objects
 - `outputs/terminal_log.txt` - Training logs
 - `results/` - Summary visualizations from the last training epoch
+- `test` and/or `opt` python files - To test the SAT certificate and/or controller
 
 ## Examples
 
@@ -40,3 +41,5 @@ The repository includes two types of examples:
 
 - **Synthesis** (`examples/synthesis/`) - Control synthesis examples
 - **Verification** (`examples/verification/`) - Verification examples
+
+It also includes the AAAI Neural Continuous-Time Supermartingale Certificates code by Neustroev et al. under `third_party/sumi-lab`
