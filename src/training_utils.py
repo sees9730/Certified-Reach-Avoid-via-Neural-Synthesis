@@ -10,7 +10,9 @@ This module provides:
 import torch
 import torch.nn.functional as F
 import numpy as np
+import itertools
 from typing import List, Tuple, Union, Optional
+from types import SimpleNamespace
 
 # Set up directories
 from pathlib import Path
@@ -21,6 +23,9 @@ sys.path.insert(0, str(ROOT))
 from src.crown_bounds import SymbolicCROWNCache, SymbolicCROWNCache_Phi, prepare_cell_bounds
 from src.discretization import discretize_region
 from src.regions import Region
+from src.dynamics import Dynamics
+from src.phi_module import create_GV
+from src.set_values import InvertedPendulumSetDrift, ClosedLoopSetValuedDrift
 
 
 def sample_from_cells(
@@ -231,13 +236,28 @@ def evaluate_constraints(
     crown_cache_phi=None,
     input_bounds_all=None,
     cell_counts_V: dict = None,
-    input_bounds_gen=None
+    input_bounds_gen=None,
+    theta_ranges: dict = None,
+    theta_grid_splits=None,
+    adv_delta: float = 1e-4,
 ) -> dict:
     """
     Evaluate constraint satisfaction using CROWN bounds.
 
     Dimension-generic: infers input_dim from provided bounds or region_cells.
     """
+
+    if theta_ranges is not None and theta_grid_splits is not None:
+        return evaluate_constraints_theta_grid(
+            V_net=V_net,
+            GV_net=GV_net,
+            region_cells=region_cells,
+            beta_ra=beta_ra,
+            theta_ranges=theta_ranges,
+            theta_grid_splits=theta_grid_splits,
+            device=device,
+            adv_delta=adv_delta,
+        )
 
     V_net.eval()
 
@@ -377,6 +397,157 @@ def evaluate_constraints(
     }
 
     V_net.train()
+    return results
+
+
+def build_theta_grid_cells(theta_ranges: dict, theta_grid_splits, device: str = "cpu"):
+    """
+    Build axis-aligned theta cells from parameter ranges.
+
+    theta_ranges keys: "g", "L", "b", "m"
+    theta_grid_splits: iterable of length 4
+    """
+    keys = ("g", "L", "b", "m")
+    if len(theta_grid_splits) != 4:
+        raise ValueError(f"theta_grid_splits must be length 4, got {len(theta_grid_splits)}")
+
+    edges = {}
+    for i, k in enumerate(keys):
+        lo = float(theta_ranges[k][0])
+        hi = float(theta_ranges[k][1])
+        n = int(theta_grid_splits[i])
+        if n <= 1 or hi <= lo:
+            edges[k] = torch.tensor([lo, hi], dtype=torch.float32, device=device)
+        else:
+            edges[k] = torch.linspace(lo, hi, steps=n + 1, dtype=torch.float32, device=device)
+
+    boxes = []
+    ranges = [range(edges[k].numel() - 1) for k in keys]
+    for idx in itertools.product(*ranges):
+        lo_box, hi_box = {}, {}
+        valid = True
+        for d, k in enumerate(keys):
+            l = float(edges[k][idx[d]].item())
+            h = float(edges[k][idx[d] + 1].item())
+            if h < l:
+                valid = False
+                break
+            lo_box[k], hi_box[k] = l, h
+        if valid:
+            boxes.append((lo_box, hi_box))
+    return boxes
+
+
+def evaluate_constraints_theta_grid(
+    V_net,
+    GV_net,
+    region_cells: dict,
+    beta_ra: float,
+    theta_ranges: dict,
+    theta_grid_splits,
+    device: str = "cpu",
+    adv_delta: float = 1e-4,
+) -> dict:
+    """
+    Evaluate constraints, with generator evaluated over theta-grid cells:
+      max_j sum_i ReLU(Phi_upper_i(theta_cell_j) + delta)
+    """
+    # Keep V-constraint evaluation identical to existing path.
+    region_cells_v = dict(region_cells)
+    region_cells_v["generator"] = []
+    results = evaluate_constraints(
+        V_net=V_net,
+        GV_net=GV_net,
+        region_cells=region_cells_v,
+        beta_ra=beta_ra,
+        device=device,
+    )
+
+    gen_cells = region_cells.get("generator", [])
+    if len(gen_cells) == 0:
+        results.update({
+            "generator_satisfied": True,
+            "Phi_min": 0.0,
+            "Phi_max": 0.0,
+            "Phi_mean": 0.0,
+            "num_failing_cells": 0,
+            "theta_cell_worst_idx": -1,
+            "theta_cell_worst_lo": None,
+            "theta_cell_worst_hi": None,
+            "theta_cell_worst_obj": 0.0,
+            "theta_grid_n_eval": 0,
+        })
+        return results
+
+    input_dim = int(gen_cells[0][0].numel())
+    in_lo_gen, in_hi_gen = prepare_cell_bounds(gen_cells, device=device, input_dim=input_dim)
+    theta_boxes = build_theta_grid_cells(theta_ranges, theta_grid_splits, device=device)
+
+    # Rebuild a Phi module per theta cell (constant-theta-in-cell interpretation).
+    g_fn = GV_net.dynamics.get_g()
+    f_orig = GV_net.dynamics.get_f()
+    net_cfg = SimpleNamespace(
+        scale_factor=float(GV_net.scale_factor.detach().cpu().item()),
+        input_scale=GV_net.input_scale.detach().cpu().tolist(),
+    )
+
+    best_idx = -1
+    best_obj = float("-inf")
+    best_phi_upper = None
+    best_lo = None
+    best_hi = None
+
+    with torch.no_grad():
+        for j, (lo, hi) in enumerate(theta_boxes):
+            f_ol = InvertedPendulumSetDrift(
+                g_range=(lo["g"], hi["g"]),
+                L_range=(lo["L"], hi["L"]),
+                b_range=(lo["b"], hi["b"]),
+                m_range=(lo["m"], hi["m"]),
+            ).to(device)
+            if hasattr(f_orig, "controller"):
+                f_cl = ClosedLoopSetValuedDrift(f_ol, f_orig.controller).to(device)
+            else:
+                f_cl = f_ol
+
+            dyn = Dynamics.dynamics(f=f_cl, g=g_fn, state_dim=input_dim)
+            GV_theta = create_GV(V_net=V_net, dynamics=dyn, network_config=net_cfg, verify=False).to(device)
+            cache_phi = SymbolicCROWNCache_Phi(GV_theta, len(gen_cells), input_dim=input_dim, device=device)
+            phi_upper_j = cache_phi.compute_bounds(in_lo_gen, in_hi_gen)
+            obj_j = float(F.relu(phi_upper_j + float(adv_delta)).sum().item())
+
+            if obj_j > best_obj:
+                best_obj = obj_j
+                best_idx = j
+                best_phi_upper = phi_upper_j.detach().clone()
+                best_lo, best_hi = lo, hi
+
+    if best_phi_upper is None:
+        results.update({
+            "generator_satisfied": True,
+            "Phi_min": 0.0,
+            "Phi_max": 0.0,
+            "Phi_mean": 0.0,
+            "num_failing_cells": 0,
+            "theta_cell_worst_idx": -1,
+            "theta_cell_worst_lo": None,
+            "theta_cell_worst_hi": None,
+            "theta_cell_worst_obj": 0.0,
+            "theta_grid_n_eval": int(len(theta_boxes)),
+        })
+        return results
+
+    num_failing = int((best_phi_upper > 0.0).sum().item())
+    results["generator_satisfied"] = bool(best_obj <= 0.0)
+    results["Phi_min"] = float(best_phi_upper.min().item())
+    results["Phi_max"] = float(best_phi_upper.max().item())
+    results["Phi_mean"] = float(best_phi_upper.mean().item())
+    results["num_failing_cells"] = num_failing
+    results["theta_cell_worst_idx"] = int(best_idx)
+    results["theta_cell_worst_lo"] = best_lo
+    results["theta_cell_worst_hi"] = best_hi
+    results["theta_cell_worst_obj"] = float(best_obj)
+    results["theta_grid_n_eval"] = int(len(theta_boxes))
     return results
 
 

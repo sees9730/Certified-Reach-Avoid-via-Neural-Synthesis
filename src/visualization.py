@@ -425,13 +425,19 @@ def visualize_training_progress(
 def plot_constraint_regions(
     V_net,
     regions: Regions,
-    beta_s: float,
+    beta_s: Optional[float],
     beta_ra: float,
     filename: Optional[str] = None,
     resolution: int = 100,
     figsize: Tuple[int, int] = (10, 8)
 ):
     V_net.eval()
+    if beta_s is not None:
+        if isinstance(beta_s, torch.Tensor):
+            beta_s = float(beta_s.detach().cpu().item())
+        else:
+            beta_s = float(beta_s)
+    beta_ra = float(beta_ra)
 
     full_bounds = regions.full.bounds
     D = full_bounds.shape[0]
@@ -470,8 +476,9 @@ def plot_constraint_regions(
         fig.colorbar(contour, ax=ax, label=f"V({_format_dim_label(x_dim)}, {_format_dim_label(y_dim)})")
 
         # constraint contours
-        ax.contour(X, Y, V_grid, levels=[beta_s / 2.0], colors='cyan', linewidths=2, linestyles='--')
-        ax.contour(X, Y, V_grid, levels=[beta_s], colors='yellow', linewidths=2, linestyles='--')
+        if beta_s is not None:
+            ax.contour(X, Y, V_grid, levels=[beta_s / 2.0], colors='cyan', linewidths=2, linestyles='--')
+            ax.contour(X, Y, V_grid, levels=[beta_s], colors='yellow', linewidths=2, linestyles='--')
         ax.contour(X, Y, V_grid, levels=[1.0], colors='green', linewidths=2, linestyles='--')
         ax.contour(X, Y, V_grid, levels=[beta_ra], colors='orange', linewidths=2, linestyles='--')
 
@@ -598,7 +605,7 @@ def create_summary_plots(
     GV_net,
     regions: Regions,
     region_cells: dict,
-    beta_s: float,
+    beta_s: Optional[float],
     beta_ra: float,
     loss_history: Optional[List[dict]] = None,
     refinement_epochs: Optional[dict] = None,

@@ -120,11 +120,24 @@ class GV(nn.Module):
         Hdiag = (self.scale_factor * inv_scale_sq) * (cross + direct).sum(dim=1)  # (N,D)
 
         # drift and diffusion terms - compute and fuse in one pass
-        fx = self._evaluate_f_fast(x)  # (N,D)
-        g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
+        # fx = self._evaluate_f_fast(x)  # (N,D)
+        # g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
 
-        # Fuse: out = (fx * dVdx).sum() + 0.5 * (g_diag_sq * Hdiag).sum()
-        out = ((fx * dVdx) + (0.5 * g_diag_sq * Hdiag)).sum(dim=1, keepdim=True)  # (N,1)
+        # # Fuse: out = (fx * dVdx).sum() + 0.5 * (g_diag_sq * Hdiag).sum()
+        # out = ((fx * dVdx) + (0.5 * g_diag_sq * Hdiag)).sum(dim=1, keepdim=True)  # (N,1)
+        # --- drift contribution ---
+        if hasattr(self.f, "support") and callable(getattr(self.f, "support")):
+            # worst-case drift dot grad: (N,1)
+            drift_term = self.f.support(x, dVdx)
+        else:
+            fx = self._evaluate_f_fast(x)  # (N,D)
+            drift_term = (fx * dVdx).sum(dim=1, keepdim=True)
+
+        # --- diffusion contribution (same as before) ---
+        g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
+        diff_term = (0.5 * g_diag_sq * Hdiag).sum(dim=1, keepdim=True)
+
+        out = drift_term + diff_term
 
         return out.squeeze(0) if was_1d else out
 
@@ -466,12 +479,25 @@ class GV_offset(nn.Module):
         Hdiag = (self.scale_factor * inv_scale_sq) * (cross + direct).sum(dim=1)  # (N,D)
 
         # drift and diffusion terms - compute and fuse in one pass
-        fx = self._evaluate_f_fast(x)  # (N,D)
+        # fx = self._evaluate_f_fast(x)  # (N,D)
+        # g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
+
+        # # Fuse: out = (fx * dVdx).sum() + 0.5 * (g_diag_sq * Hdiag).sum()
+        # out = ((fx * dVdx) + (0.5 * g_diag_sq * Hdiag)).sum(dim=1, keepdim=True)  # (N,1)
+
+        if hasattr(self.f, "support") and callable(getattr(self.f, "support")):
+            # worst-case drift dot grad: (N,1)
+            drift_term = self.f.support(x, dVdx)
+        else:
+            fx = self._evaluate_f_fast(x)  # (N,D)
+            drift_term = (fx * dVdx).sum(dim=1, keepdim=True)
+
+        # --- diffusion contribution (same as before) ---
         g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
+        diff_term = (0.5 * g_diag_sq * Hdiag).sum(dim=1, keepdim=True)
 
-        # Fuse: out = (fx * dVdx).sum() + 0.5 * (g_diag_sq * Hdiag).sum()
-        out = ((fx * dVdx) + (0.5 * g_diag_sq * Hdiag)).sum(dim=1, keepdim=True)  # (N,1)
-
+        out = drift_term + diff_term
+        
         return out.squeeze(0) if was_1d else out
 
     # -------------------------

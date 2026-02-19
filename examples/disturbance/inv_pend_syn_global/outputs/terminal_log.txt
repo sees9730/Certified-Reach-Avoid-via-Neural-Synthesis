@@ -1,0 +1,1819 @@
+
+====================
+Pre-training using samples
+====================
+GV pre-training enabled
+Epoch 0 | V_loss=37053.9453 | GV_loss= 86.2235
+Epoch 100 | V_loss=14117.7090 | GV_loss=268.6301
+Epoch 200 | V_loss=5889.2124 | GV_loss=225.9193
+Epoch 300 | V_loss=512.1566 | GV_loss=423.6141
+Epoch 400 | V_loss=131.8039 | GV_loss= 85.0800
+Epoch 500 | V_loss= 41.3279 | GV_loss=  3.9970
+Epoch 600 | V_loss= 16.2987 | GV_loss= 35.3856
+Epoch 700 | V_loss= 24.7153 | GV_loss=  6.0547
+Epoch 800 | V_loss= 15.5224 | GV_loss=  3.3419
+Epoch 900 | V_loss= 23.0684 | GV_loss= 10.7524
+Epoch 1000 | V_loss=163.2829 | GV_loss= 20.4872
+Epoch 1100 | V_loss= 15.3292 | GV_loss= 19.1900
+Epoch 1200 | V_loss= 10.9108 | GV_loss=  0.3739
+Epoch 1300 | V_loss= 10.7757 | GV_loss=  6.9148
+Epoch 1400 | V_loss=  5.4803 | GV_loss=  5.1708
+Epoch 1500 | V_loss=  5.4765 | GV_loss=  7.8716
+Epoch 1600 | V_loss=  4.3122 | GV_loss=  4.3475
+Epoch 1700 | V_loss=  6.6918 | GV_loss=  2.0875
+Epoch 1800 | V_loss=  2.7170 | GV_loss=  5.2357
+Epoch 1900 | V_loss=  5.5146 | GV_loss=  0.0239
+Epoch 2000 | V_loss=  5.6583 | GV_loss=  0.0000
+Epoch 2100 | V_loss=  2.1417 | GV_loss=  2.8105
+Epoch 2200 | V_loss=  4.0134 | GV_loss=  0.6911
+Epoch 2300 | V_loss=  2.2645 | GV_loss=  4.1068
+Epoch 2400 | V_loss=  0.0321 | GV_loss=  0.0000
+Epoch 2500 | V_loss=  2.2755 | GV_loss=  0.0417
+Epoch 2600 | V_loss=  4.1426 | GV_loss=  0.9925
+Epoch 2700 | V_loss= 39.1606 | GV_loss=  3.4602
+Epoch 2800 | V_loss=  5.4793 | GV_loss= 24.2845
+Epoch 2900 | V_loss=  2.5708 | GV_loss=  0.0000
+Epoch 3000 | V_loss=  7.3820 | GV_loss=  2.8865
+Epoch 3100 | V_loss=  4.8223 | GV_loss=  0.8849
+Epoch 3200 | V_loss=  2.6345 | GV_loss=  0.0000
+Epoch 3300 | V_loss=  6.6047 | GV_loss=  2.2071
+Epoch 3400 | V_loss=  1.5913 | GV_loss=  1.0655
+Epoch 3500 | V_loss=  0.8015 | GV_loss=  0.6295
+Epoch 3600 | V_loss=  1.4822 | GV_loss=  0.0000
+Epoch 3700 | V_loss=  1.2551 | GV_loss=  0.1140
+Epoch 3800 | V_loss=  0.7955 | GV_loss=  0.1123
+Epoch 3900 | V_loss= 38.7973 | GV_loss=  3.3277
+Epoch 4000 | V_loss=141.1975 | GV_loss=  0.3105
+Epoch 4100 | V_loss=  0.7105 | GV_loss=  0.0000
+Epoch 4200 | V_loss=  0.7819 | GV_loss=  0.1296
+Epoch 4300 | V_loss=  0.3002 | GV_loss=  0.1269
+Epoch 4400 | V_loss=  0.6611 | GV_loss=  0.0191
+Epoch 4500 | V_loss=  0.7495 | GV_loss=  0.0000
+Epoch 4600 | V_loss=  1.0391 | GV_loss=  0.1885
+Epoch 4700 | V_loss=  1.3629 | GV_loss=  0.0400
+Epoch 4800 | V_loss= 10.6385 | GV_loss=  8.6185
+Epoch 4900 | V_loss=  0.2348 | GV_loss=  0.0000
+
+Best loss: 42.059063
+Saved pretrained V_net to: /Users/chko1829/src/Projects/ML/CRANS/Certified-Reach-Avoid-via-Neural-Synthesis/examples/disturbance/inv_pend_syn_global/outputs/V_pretrained.pth
+Saved pretrained Controller_net to: /Users/chko1829/src/Projects/ML/CRANS/Certified-Reach-Avoid-via-Neural-Synthesis/examples/disturbance/inv_pend_syn_global/outputs/controller_pretrained.pth
+Pre-training complete. V + GV + Controller initialized.
+
+====================
+Bound-based training (constant theta_f adversary)
+====================
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Built 8 theta-cell GV caches
+Epoch     0 | Total: 8472.0430 | Goal:   0.0000 | Unsafe: 127.5081 | Init:   5.7870 | Outside:  66.7535 | Gen: 8271.9941 | Time: 115.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8271.994141
+Epoch    10 | Total: 4509.9512 | Goal:   0.0000 | Unsafe: 1505.9487 | Init:   7.5041 | Outside:  35.4329 | Gen: 2961.0654 | Time: 116.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2961.065430
+Epoch    20 | Total: 3533.9724 | Goal:   0.0000 | Unsafe: 1260.2910 | Init:  83.9565 | Outside:  18.3375 | Gen: 2171.3875 | Time: 117.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2171.387451
+Epoch    30 | Total: 2634.1233 | Goal:   0.0000 | Unsafe: 639.0684 | Init:  67.5237 | Outside:  15.9739 | Gen: 1911.5574 | Time: 119.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1911.557373
+Epoch    40 | Total: 2060.2368 | Goal:   0.0000 | Unsafe: 409.1590 | Init:  19.2455 | Outside:  21.3713 | Gen: 1610.4611 | Time: 120.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1610.461060
+Epoch    50 | Total: 1684.9120 | Goal:   0.0000 | Unsafe: 357.2215 | Init:  50.4861 | Outside:  18.2478 | Gen: 1258.9567 | Time: 122.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1258.956665
+Epoch    60 | Total: 1414.1606 | Goal:   0.0000 | Unsafe: 225.6618 | Init:  53.5767 | Outside:  18.1781 | Gen: 1116.7441 | Time: 123.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1116.744141
+Epoch    70 | Total: 1206.7255 | Goal:   0.0000 | Unsafe: 182.1247 | Init:  31.0925 | Outside:  20.7495 | Gen: 972.7588 | Time: 124.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=972.758789
+Epoch    80 | Total: 1046.6521 | Goal:   0.0000 | Unsafe: 149.4966 | Init:  27.6753 | Outside:  20.6453 | Gen: 848.8350 | Time: 126.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=848.834961
+Epoch    90 | Total:  921.2804 | Goal:   0.0000 | Unsafe: 111.4704 | Init:  26.8232 | Outside:  19.6525 | Gen: 763.3343 | Time: 127.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=763.334290
+Epoch   100 | Total:  830.2252 | Goal:   0.0000 | Unsafe:  79.6391 | Init:  21.7992 | Outside:  20.6355 | Gen: 708.1514 | Time: 128.6s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=708.151367
+Epoch   110 | Total:  756.2131 | Goal:   0.0000 | Unsafe:  76.6602 | Init:  17.2034 | Outside:  19.0254 | Gen: 643.3241 | Time: 129.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=643.324097
+Epoch   120 | Total:  694.6944 | Goal:   0.0000 | Unsafe:  71.8852 | Init:  14.2841 | Outside:  18.2849 | Gen: 590.2402 | Time: 131.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=590.240234
+Epoch   130 | Total:  635.6254 | Goal:   0.0000 | Unsafe:  55.2751 | Init:  15.3472 | Outside:  17.7957 | Gen: 547.2075 | Time: 132.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=547.207458
+Epoch   140 | Total:  585.5312 | Goal:   0.0000 | Unsafe:  45.5384 | Init:  14.2174 | Outside:  17.2013 | Gen: 508.5742 | Time: 133.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=508.574219
+Epoch   150 | Total:  538.8176 | Goal:   0.0000 | Unsafe:  40.1527 | Init:  13.6518 | Outside:  16.1485 | Gen: 468.8646 | Time: 135.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=468.864594
+Epoch   160 | Total:  497.4561 | Goal:   0.0000 | Unsafe:  38.1443 | Init:  11.9509 | Outside:  15.5275 | Gen: 431.8334 | Time: 137.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=431.833435
+Epoch   170 | Total:  456.1188 | Goal:   0.0000 | Unsafe:  34.6299 | Init:  11.0152 | Outside:  14.7303 | Gen: 395.7434 | Time: 138.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=395.743378
+Epoch   180 | Total:  419.4748 | Goal:   0.0000 | Unsafe:  32.2643 | Init:   9.5024 | Outside:  14.4559 | Gen: 363.2523 | Time: 139.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=363.252258
+Epoch   190 | Total:  386.6293 | Goal:   0.0000 | Unsafe:  32.8997 | Init:   8.8424 | Outside:  13.7374 | Gen: 331.1499 | Time: 140.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=331.149872
+Epoch   200 | Total:  354.1971 | Goal:   0.0000 | Unsafe:  28.8028 | Init:   8.2697 | Outside:  13.6111 | Gen: 303.5135 | Time: 142.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=303.513489
+Epoch   210 | Total:  331.8122 | Goal:   0.0000 | Unsafe:  31.4709 | Init:   8.9689 | Outside:  12.2349 | Gen: 279.1375 | Time: 143.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=279.137482
+Epoch   220 | Total:  308.7823 | Goal:   0.0000 | Unsafe:  19.5764 | Init:   7.8778 | Outside:  13.4752 | Gen: 267.8529 | Time: 145.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=267.852875
+Epoch   230 | Total:  287.8117 | Goal:   0.0000 | Unsafe:  15.5625 | Init:   8.1536 | Outside:  13.0339 | Gen: 251.0616 | Time: 146.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=251.061646
+Epoch   240 | Total:  273.5906 | Goal:   0.0000 | Unsafe:  22.6068 | Init:   5.7124 | Outside:  12.0715 | Gen: 233.1999 | Time: 147.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=233.199921
+Epoch   250 | Total:  257.1938 | Goal:   0.0000 | Unsafe:  14.6800 | Init:   4.8357 | Outside:  12.8225 | Gen: 224.8557 | Time: 149.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=224.855652
+Epoch   260 | Total:  244.9387 | Goal:   0.0000 | Unsafe:  15.8209 | Init:   7.9740 | Outside:  11.0511 | Gen: 210.0927 | Time: 150.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=210.092743
+Epoch   270 | Total:  230.4645 | Goal:   0.0000 | Unsafe:  12.2426 | Init:   5.0266 | Outside:  12.1930 | Gen: 201.0023 | Time: 151.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=201.002319
+Epoch   280 | Total:  217.4805 | Goal:   0.0000 | Unsafe:  11.4782 | Init:   4.9561 | Outside:  11.8286 | Gen: 189.2176 | Time: 153.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=189.217590
+Epoch   290 | Total:  204.7543 | Goal:   0.0000 | Unsafe:  11.5054 | Init:   5.2396 | Outside:  11.6882 | Gen: 176.3213 | Time: 155.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=176.321259
+Epoch   300 | Total:  197.1567 | Goal:   0.0000 | Unsafe:  11.3630 | Init:   4.7371 | Outside:  11.6401 | Gen: 169.4165 | Time: 156.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=169.416519
+Epoch   310 | Total:  186.7321 | Goal:   0.0000 | Unsafe:   9.6994 | Init:   3.3943 | Outside:  11.7634 | Gen: 161.8750 | Time: 158.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=161.874969
+Epoch   320 | Total:  180.0524 | Goal:   0.0000 | Unsafe:  10.4109 | Init:   6.2779 | Outside:   9.1903 | Gen: 154.1733 | Time: 159.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=154.173279
+Epoch   330 | Total:  172.6956 | Goal:   0.0000 | Unsafe:   6.3051 | Init:   3.2501 | Outside:  10.8149 | Gen: 152.3256 | Time: 161.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=152.325577
+Epoch   340 | Total:  163.8240 | Goal:   0.0000 | Unsafe:   8.0773 | Init:   3.5404 | Outside:   9.9205 | Gen: 142.2858 | Time: 162.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=142.285767
+Epoch   350 | Total:  157.6637 | Goal:   0.0000 | Unsafe:   5.5697 | Init:   4.0769 | Outside:   9.4824 | Gen: 138.5347 | Time: 164.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=138.534729
+Epoch   360 | Total:  151.6764 | Goal:   0.0000 | Unsafe:   6.7520 | Init:   3.2365 | Outside:   9.4193 | Gen: 132.2686 | Time: 166.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=132.268646
+Epoch   370 | Total:  146.5428 | Goal:   0.0000 | Unsafe:   5.1388 | Init:   3.2815 | Outside:   9.0423 | Gen: 129.0802 | Time: 167.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=129.080185
+Epoch   380 | Total:  143.7009 | Goal:   0.0000 | Unsafe:   8.4582 | Init:   4.0695 | Outside:   7.2888 | Gen: 123.8845 | Time: 169.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=123.884514
+Epoch   390 | Total:  138.7366 | Goal:   0.0000 | Unsafe:   6.1159 | Init:   2.5697 | Outside:   8.4849 | Gen: 121.5660 | Time: 170.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=121.566040
+Epoch   400 | Total:  133.0823 | Goal:   0.0000 | Unsafe:   4.6149 | Init:   3.3470 | Outside:   7.9040 | Gen: 117.2164 | Time: 172.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=117.216354
+Epoch   410 | Total:  128.1769 | Goal:   0.0000 | Unsafe:   3.6770 | Init:   3.1883 | Outside:   7.7925 | Gen: 113.5192 | Time: 173.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=113.519180
+Epoch   420 | Total:  124.2775 | Goal:   0.0000 | Unsafe:   3.8404 | Init:   2.6398 | Outside:   7.5394 | Gen: 110.2579 | Time: 175.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=110.257950
+Epoch   430 | Total:  120.4179 | Goal:   0.0000 | Unsafe:   3.2227 | Init:   3.1871 | Outside:   6.9697 | Gen: 107.0383 | Time: 176.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=107.038330
+Epoch   440 | Total:  116.9560 | Goal:   0.0000 | Unsafe:   3.9601 | Init:   2.3803 | Outside:   7.0382 | Gen: 103.5775 | Time: 178.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=103.577492
+Epoch   450 | Total:  113.3711 | Goal:   0.0000 | Unsafe:   3.4897 | Init:   2.5041 | Outside:   6.6547 | Gen: 100.7225 | Time: 179.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=100.722534
+Epoch   460 | Total:  110.8754 | Goal:   0.0000 | Unsafe:   3.8167 | Init:   4.8042 | Outside:   4.9205 | Gen:  97.3340 | Time: 181.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=97.333954
+Epoch   470 | Total:  107.0699 | Goal:   0.0000 | Unsafe:   3.0395 | Init:   3.1168 | Outside:   5.9145 | Gen:  94.9991 | Time: 182.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=94.999069
+Epoch   480 | Total:  103.7107 | Goal:   0.0000 | Unsafe:   3.1469 | Init:   1.7008 | Outside:   6.3447 | Gen:  92.5182 | Time: 184.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=92.518242
+Epoch   490 | Total:  100.7624 | Goal:   0.0000 | Unsafe:   3.3126 | Init:   1.9100 | Outside:   5.7905 | Gen:  89.7493 | Time: 185.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=89.749313
+Refining outside cells: 13 failing, refined 13 cells, 167 total
+Refining generator cells: 20 failing, refined 20 cells, 412 total
+Rebuilt V cache with 3317 cells
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=412, theta_cells=8
+Merging outside cells: merged 141 pairs, 26 total
+Merging generator cells: merged 0 pairs, 412 total
+Rebuilt V cache with 3176 cells
+Epoch   500 | Total:   51.6646 | Goal:   0.0000 | Unsafe:   2.8305 | Init:   2.1459 | Outside:   8.1831 | Gen:  38.5052 | Time: 192.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=38.505245
+Epoch   510 | Total:   47.6548 | Goal:   0.0000 | Unsafe:   1.2030 | Init:   2.6461 | Outside:   5.4327 | Gen:  38.3731 | Time: 194.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=38.373093
+Epoch   520 | Total:   46.7678 | Goal:   0.0000 | Unsafe:   1.5527 | Init:   0.6005 | Outside:   6.5438 | Gen:  38.0708 | Time: 196.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=38.070778
+Epoch   530 | Total:   44.0406 | Goal:   0.0000 | Unsafe:   0.1846 | Init:   1.4145 | Outside:   6.5466 | Gen:  35.8950 | Time: 198.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=35.894970
+Epoch   540 | Total:   42.2845 | Goal:   0.0000 | Unsafe:   0.2562 | Init:   1.4780 | Outside:   6.3615 | Gen:  34.1888 | Time: 199.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=34.188843
+Epoch   550 | Total:   41.1157 | Goal:   0.0000 | Unsafe:   0.3457 | Init:   1.3461 | Outside:   6.1454 | Gen:  33.2785 | Time: 201.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=33.278492
+Epoch   560 | Total:   44.1289 | Goal:   0.0000 | Unsafe:   2.1717 | Init:   1.8801 | Outside:   5.6941 | Gen:  34.3830 | Time: 203.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=34.382973
+Epoch   570 | Total:   41.3759 | Goal:   0.0154 | Unsafe:   0.0000 | Init:   0.7834 | Outside:   7.3739 | Gen:  33.2033 | Time: 204.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=33.203331
+Epoch   580 | Total:   39.5939 | Goal:   0.0000 | Unsafe:   1.2463 | Init:   0.9004 | Outside:   5.5974 | Gen:  31.8498 | Time: 206.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=31.849792
+Epoch   590 | Total:   38.1487 | Goal:   0.0000 | Unsafe:   0.4188 | Init:   0.8331 | Outside:   6.0045 | Gen:  30.8922 | Time: 208.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=30.892235
+Epoch   600 | Total:   39.9040 | Goal:   0.0000 | Unsafe:   1.9071 | Init:   1.6044 | Outside:   5.1613 | Gen:  31.2312 | Time: 210.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=31.231216
+Epoch   610 | Total:   39.8531 | Goal:   0.0024 | Unsafe:   0.0000 | Init:   1.1161 | Outside:   6.6640 | Gen:  32.0705 | Time: 212.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=32.070534
+Epoch   620 | Total:   36.9657 | Goal:   0.0000 | Unsafe:   1.2370 | Init:   1.1980 | Outside:   4.8701 | Gen:  29.6606 | Time: 213.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=29.660645
+Epoch   630 | Total:   40.6160 | Goal:   0.0000 | Unsafe:   0.0802 | Init:   0.9483 | Outside:   5.9982 | Gen:  33.5892 | Time: 215.5s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=33.589172
+Epoch   640 | Total:   37.3582 | Goal:   0.0000 | Unsafe:   1.5106 | Init:   1.0489 | Outside:   4.7968 | Gen:  30.0018 | Time: 217.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=30.001848
+Epoch   650 | Total:   38.6683 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.6156 | Outside:   5.8518 | Gen:  31.2009 | Time: 218.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=31.200893
+Epoch   660 | Total:   36.3551 | Goal:   0.0000 | Unsafe:   1.1748 | Init:   2.0675 | Outside:   4.4565 | Gen:  28.6564 | Time: 220.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=28.656357
+Epoch   670 | Total:   38.0144 | Goal:   0.0000 | Unsafe:   2.1260 | Init:   0.5498 | Outside:   5.2203 | Gen:  30.1183 | Time: 222.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=30.118340
+Epoch   680 | Total:   34.3860 | Goal:   0.0000 | Unsafe:   0.2727 | Init:   0.9403 | Outside:   5.0400 | Gen:  28.1331 | Time: 223.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=28.133066
+Epoch   690 | Total:   33.2695 | Goal:   0.0000 | Unsafe:   0.5232 | Init:   1.0272 | Outside:   4.7676 | Gen:  26.9516 | Time: 225.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=26.951565
+Epoch   700 | Total:   34.6908 | Goal:   0.0000 | Unsafe:   1.1043 | Init:   1.1916 | Outside:   5.0259 | Gen:  27.3689 | Time: 226.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=27.368921
+Epoch   710 | Total:   35.4871 | Goal:   0.0000 | Unsafe:   1.7075 | Init:   1.4835 | Outside:   3.5217 | Gen:  28.7744 | Time: 227.9s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=28.774387
+Epoch   720 | Total:   32.5910 | Goal:   0.0000 | Unsafe:   0.0692 | Init:   0.8403 | Outside:   5.0287 | Gen:  26.6528 | Time: 229.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=26.652790
+Epoch   730 | Total:   30.6225 | Goal:   0.0000 | Unsafe:   0.4251 | Init:   1.0660 | Outside:   4.2859 | Gen:  24.8455 | Time: 230.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=24.845512
+Epoch   740 | Total:   33.0631 | Goal:   0.0000 | Unsafe:   0.4774 | Init:   1.2410 | Outside:   4.4926 | Gen:  26.8521 | Time: 232.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=26.852104
+Epoch   750 | Total:   31.7015 | Goal:   0.0000 | Unsafe:   1.3985 | Init:   0.9921 | Outside:   4.2919 | Gen:  25.0189 | Time: 233.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=25.018909
+Epoch   760 | Total:   31.7901 | Goal:   0.0000 | Unsafe:   2.3935 | Init:   1.0775 | Outside:   3.6545 | Gen:  24.6647 | Time: 234.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=24.664692
+Epoch   770 | Total:   30.0781 | Goal:   0.0000 | Unsafe:   0.0413 | Init:   1.0501 | Outside:   4.1358 | Gen:  24.8509 | Time: 236.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=24.850929
+Epoch   780 | Total:   30.2509 | Goal:   0.0000 | Unsafe:   1.0552 | Init:   0.9802 | Outside:   4.0391 | Gen:  24.1763 | Time: 237.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=24.176321
+Epoch   790 | Total:   29.3786 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.6149 | Outside:   3.9940 | Gen:  23.7697 | Time: 240.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=23.769722
+Epoch   800 | Total:   30.9218 | Goal:   0.0000 | Unsafe:   1.3206 | Init:   0.9398 | Outside:   4.0573 | Gen:  24.6041 | Time: 241.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=24.604071
+Epoch   810 | Total:   27.9578 | Goal:   0.0097 | Unsafe:   0.1324 | Init:   0.7000 | Outside:   4.2462 | Gen:  22.8695 | Time: 243.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=22.869505
+Epoch   820 | Total:   28.1244 | Goal:   0.0000 | Unsafe:   1.0587 | Init:   0.5820 | Outside:   3.7583 | Gen:  22.7254 | Time: 245.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=22.725357
+Epoch   830 | Total:   28.3219 | Goal:   0.0000 | Unsafe:   0.3859 | Init:   1.1224 | Outside:   3.8874 | Gen:  22.9262 | Time: 247.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=22.926161
+Epoch   840 | Total:   28.1034 | Goal:   0.0000 | Unsafe:   1.2485 | Init:   1.2179 | Outside:   3.1057 | Gen:  22.5313 | Time: 249.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=22.531349
+Epoch   850 | Total:   30.1169 | Goal:   0.0317 | Unsafe:   0.3673 | Init:   0.8006 | Outside:   4.2571 | Gen:  24.6603 | Time: 250.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=24.660311
+Epoch   860 | Total:   28.8288 | Goal:   0.0000 | Unsafe:   0.2939 | Init:   0.5898 | Outside:   3.5731 | Gen:  24.3720 | Time: 252.1s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=24.371960
+Epoch   870 | Total:   27.0777 | Goal:   0.0000 | Unsafe:   0.4122 | Init:   0.8012 | Outside:   3.7018 | Gen:  22.1625 | Time: 253.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=22.162510
+Epoch   880 | Total:   27.0122 | Goal:   0.0000 | Unsafe:   0.6371 | Init:   0.5686 | Outside:   3.5544 | Gen:  22.2521 | Time: 254.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=22.252094
+Epoch   890 | Total:   25.4711 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.7448 | Outside:   3.3801 | Gen:  21.3462 | Time: 256.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=21.346199
+Epoch   900 | Total:   26.3750 | Goal:   0.0000 | Unsafe:   0.2093 | Init:   0.5990 | Outside:   3.7252 | Gen:  21.8415 | Time: 258.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=21.841516
+Epoch   910 | Total:   27.0324 | Goal:   0.0000 | Unsafe:   1.2392 | Init:   0.9842 | Outside:   3.0772 | Gen:  21.7318 | Time: 260.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=21.731798
+Epoch   920 | Total:   25.3767 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.9238 | Outside:   3.4581 | Gen:  20.9948 | Time: 262.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=20.994816
+Epoch   930 | Total:   27.7672 | Goal:   0.0000 | Unsafe:   1.0024 | Init:   1.2278 | Outside:   3.2954 | Gen:  22.2417 | Time: 263.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=22.241652
+Epoch   940 | Total:   34.3883 | Goal:   0.0000 | Unsafe:   1.2116 | Init:   1.5859 | Outside:   1.9656 | Gen:  29.6251 | Time: 264.8s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=29.625095
+Epoch   950 | Total:   26.4869 | Goal:   0.0480 | Unsafe:   0.0215 | Init:   0.7592 | Outside:   3.6140 | Gen:  22.0442 | Time: 266.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=22.044231
+Epoch   960 | Total:   25.3982 | Goal:   0.0000 | Unsafe:   1.4738 | Init:   1.0377 | Outside:   2.4461 | Gen:  20.4405 | Time: 267.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=20.440540
+Epoch   970 | Total:   23.7423 | Goal:   0.0000 | Unsafe:   0.1520 | Init:   0.7583 | Outside:   3.0335 | Gen:  19.7986 | Time: 269.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=19.798584
+Epoch   980 | Total:   23.5722 | Goal:   0.0000 | Unsafe:   0.0515 | Init:   0.6146 | Outside:   3.0078 | Gen:  19.8982 | Time: 271.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=19.898232
+Epoch   990 | Total:   22.8750 | Goal:   0.0000 | Unsafe:   0.1242 | Init:   0.8766 | Outside:   2.6307 | Gen:  19.2435 | Time: 273.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=19.243469
+Refining outside cells: 9 failing, refined 9 cells, 53 total
+Refining generator cells: 16 failing, refined 16 cells, 460 total
+Rebuilt V cache with 3203 cells
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=460, theta_cells=8
+Epoch  1000 | Total:   22.2826 | Goal:   0.0000 | Unsafe:   0.0774 | Init:   0.5729 | Outside:   4.8158 | Gen:  16.8165 | Time: 281.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=16.816467
+Merging outside cells: merged 15 pairs, 38 total
+Merging generator cells: merged 0 pairs, 460 total
+Rebuilt V cache with 3188 cells
+Epoch  1010 | Total:   20.1931 | Goal:   0.0000 | Unsafe:   0.8299 | Init:   1.4553 | Outside:   2.4588 | Gen:  15.4492 | Time: 282.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=15.449186
+Epoch  1020 | Total:   20.4715 | Goal:   0.0000 | Unsafe:   0.8122 | Init:   0.9871 | Outside:   3.1740 | Gen:  15.4983 | Time: 284.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=15.498313
+Epoch  1030 | Total:   19.7087 | Goal:   0.0000 | Unsafe:   0.3438 | Init:   1.7592 | Outside:   2.5412 | Gen:  15.0644 | Time: 286.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=15.064400
+Epoch  1040 | Total:   19.7471 | Goal:   0.0000 | Unsafe:   0.3414 | Init:   1.1752 | Outside:   3.0286 | Gen:  15.2020 | Time: 288.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=15.201986
+Epoch  1050 | Total:   18.8650 | Goal:   0.0000 | Unsafe:   0.4040 | Init:   1.1830 | Outside:   2.5762 | Gen:  14.7019 | Time: 290.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=14.701858
+Epoch  1060 | Total:   19.1244 | Goal:   0.0000 | Unsafe:   0.6393 | Init:   1.1535 | Outside:   2.5061 | Gen:  14.8256 | Time: 292.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=14.825591
+Epoch  1070 | Total:   19.6477 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.1106 | Outside:   3.2789 | Gen:  15.2582 | Time: 293.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=15.258241
+Epoch  1080 | Total:   21.0324 | Goal:   0.0000 | Unsafe:   1.4463 | Init:   1.6562 | Outside:   1.9435 | Gen:  15.9864 | Time: 295.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=15.986403
+Epoch  1090 | Total:   35.6007 | Goal:   0.0000 | Unsafe:  14.0358 | Init:   4.4472 | Outside:   0.1570 | Gen:  16.9606 | Time: 297.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=16.960596
+Epoch  1100 | Total:   25.7855 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.9856 | Outside:   4.5303 | Gen:  20.2696 | Time: 299.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=20.269590
+Epoch  1110 | Total:   21.9482 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.6458 | Outside:   2.8786 | Gen:  18.4238 | Time: 300.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=18.423805
+Epoch  1120 | Total:   20.7681 | Goal:   0.0000 | Unsafe:   1.0020 | Init:   0.9785 | Outside:   1.8792 | Gen:  16.9083 | Time: 302.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=16.908312
+Epoch  1130 | Total:   18.1023 | Goal:   0.0000 | Unsafe:   0.2070 | Init:   0.9802 | Outside:   2.4979 | Gen:  14.4172 | Time: 303.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=14.417196
+Epoch  1140 | Total:   17.9045 | Goal:   0.0000 | Unsafe:   0.7529 | Init:   0.9241 | Outside:   1.7760 | Gen:  14.4514 | Time: 305.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=14.451371
+Epoch  1150 | Total:   18.1220 | Goal:   0.0000 | Unsafe:   0.1188 | Init:   0.9847 | Outside:   2.1570 | Gen:  14.8614 | Time: 307.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=14.861382
+Epoch  1160 | Total:   16.9646 | Goal:   0.0000 | Unsafe:   0.4824 | Init:   0.8739 | Outside:   1.7070 | Gen:  13.9013 | Time: 308.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.901300
+Epoch  1170 | Total:   16.5149 | Goal:   0.0000 | Unsafe:   0.0461 | Init:   0.8832 | Outside:   1.8935 | Gen:  13.6921 | Time: 310.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.692053
+Epoch  1180 | Total:   16.8977 | Goal:   0.0000 | Unsafe:   0.3003 | Init:   0.7542 | Outside:   1.8621 | Gen:  13.9811 | Time: 312.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.981117
+Epoch  1190 | Total:   16.4745 | Goal:   0.0000 | Unsafe:   0.3180 | Init:   0.9429 | Outside:   1.5554 | Gen:  13.6582 | Time: 314.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.658244
+Epoch  1200 | Total:   16.0587 | Goal:   0.0000 | Unsafe:   0.0749 | Init:   0.9183 | Outside:   1.6868 | Gen:  13.3787 | Time: 315.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.378710
+Epoch  1210 | Total:   16.5271 | Goal:   0.0000 | Unsafe:   0.3719 | Init:   0.7729 | Outside:   1.5572 | Gen:  13.8251 | Time: 317.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.825108
+Epoch  1220 | Total:   16.5538 | Goal:   0.0000 | Unsafe:   0.7153 | Init:   0.7449 | Outside:   1.3622 | Gen:  13.7315 | Time: 319.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.731504
+Epoch  1230 | Total:   15.7711 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.0219 | Outside:   1.4083 | Gen:  13.3409 | Time: 320.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.340880
+Epoch  1240 | Total:   15.6035 | Goal:   0.0000 | Unsafe:   0.1245 | Init:   0.5497 | Outside:   1.6260 | Gen:  13.3032 | Time: 322.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.303240
+Epoch  1250 | Total:   17.3009 | Goal:   0.0000 | Unsafe:   0.5168 | Init:   0.4146 | Outside:   1.9336 | Gen:  14.4358 | Time: 324.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=14.435770
+Epoch  1260 | Total:   16.6798 | Goal:   0.0000 | Unsafe:   0.6304 | Init:   0.6138 | Outside:   1.5180 | Gen:  13.9175 | Time: 326.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.917521
+Epoch  1270 | Total:   15.7036 | Goal:   0.0000 | Unsafe:   0.0055 | Init:   0.7102 | Outside:   1.8444 | Gen:  13.1435 | Time: 328.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.143538
+Epoch  1280 | Total:   17.7612 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3146 | Outside:   1.7384 | Gen:  15.7082 | Time: 329.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=15.708168
+Epoch  1290 | Total:   17.1778 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.5409 | Outside:   1.5546 | Gen:  15.0823 | Time: 331.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=15.082294
+Epoch  1300 | Total:   17.5794 | Goal:   0.0000 | Unsafe:   0.8921 | Init:   1.0816 | Outside:   1.1373 | Gen:  14.4684 | Time: 333.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=14.468403
+Epoch  1310 | Total:   18.6018 | Goal:   0.0000 | Unsafe:   4.2340 | Init:   0.3802 | Outside:   0.5755 | Gen:  13.4121 | Time: 335.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.412138
+Epoch  1320 | Total:   18.3254 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.8231 | Outside:   2.0184 | Gen:  15.4839 | Time: 336.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=15.483852
+Epoch  1330 | Total:   18.6363 | Goal:   0.0000 | Unsafe:   0.0373 | Init:   0.6131 | Outside:   2.4240 | Gen:  15.5619 | Time: 338.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=15.561856
+Epoch  1340 | Total:   14.3923 | Goal:   0.0000 | Unsafe:   0.2976 | Init:   0.7063 | Outside:   0.6466 | Gen:  12.7419 | Time: 340.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.741863
+Epoch  1350 | Total:   14.7749 | Goal:   0.0000 | Unsafe:   0.0511 | Init:   0.4684 | Outside:   1.1507 | Gen:  13.1048 | Time: 342.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.104752
+Epoch  1360 | Total:   13.9497 | Goal:   0.0000 | Unsafe:   0.0293 | Init:   0.6791 | Outside:   0.7483 | Gen:  12.4929 | Time: 344.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.492947
+Epoch  1370 | Total:   13.9624 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.6042 | Outside:   0.8938 | Gen:  12.4644 | Time: 346.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.464408
+Epoch  1380 | Total:   13.7684 | Goal:   0.0000 | Unsafe:   0.1414 | Init:   0.4947 | Outside:   0.7798 | Gen:  12.3525 | Time: 347.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.352455
+Epoch  1390 | Total:   13.5767 | Goal:   0.0000 | Unsafe:   0.1488 | Init:   0.5434 | Outside:   0.7151 | Gen:  12.1694 | Time: 349.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.169420
+Epoch  1400 | Total:   13.5895 | Goal:   0.0000 | Unsafe:   0.2535 | Init:   0.6725 | Outside:   0.6016 | Gen:  12.0619 | Time: 352.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.061925
+Epoch  1410 | Total:   13.2886 | Goal:   0.0000 | Unsafe:   0.1528 | Init:   0.6684 | Outside:   0.5818 | Gen:  11.8855 | Time: 353.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=11.885529
+Epoch  1420 | Total:   13.3263 | Goal:   0.0000 | Unsafe:   0.1353 | Init:   0.5951 | Outside:   0.5666 | Gen:  12.0292 | Time: 355.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.029237
+Epoch  1430 | Total:   13.7792 | Goal:   0.0000 | Unsafe:   0.1308 | Init:   0.6267 | Outside:   0.6689 | Gen:  12.3529 | Time: 357.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.352942
+Epoch  1440 | Total:   14.1068 | Goal:   0.0000 | Unsafe:   0.7227 | Init:   0.4923 | Outside:   0.6400 | Gen:  12.2519 | Time: 358.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.251860
+Epoch  1450 | Total:   13.3992 | Goal:   0.0000 | Unsafe:   0.0929 | Init:   0.3750 | Outside:   0.8578 | Gen:  12.0734 | Time: 360.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.073444
+Epoch  1460 | Total:   13.2035 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.7617 | Outside:   0.5834 | Gen:  11.8584 | Time: 362.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=11.858386
+Epoch  1470 | Total:   13.5409 | Goal:   0.0000 | Unsafe:   0.2124 | Init:   0.3942 | Outside:   0.4202 | Gen:  12.5141 | Time: 364.7s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.514051
+Epoch  1480 | Total:   12.6978 | Goal:   0.0000 | Unsafe:   0.1036 | Init:   0.3809 | Outside:   0.7139 | Gen:  11.4994 | Time: 366.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=11.499396
+Epoch  1490 | Total:   13.6914 | Goal:   0.0000 | Unsafe:   1.0607 | Init:   0.5834 | Outside:   0.3050 | Gen:  11.7424 | Time: 368.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=11.742353
+Refining outside cells: 10 failing, refined 10 cells, 68 total
+Refining generator cells: 30 failing, refined 30 cells, 550 total
+Rebuilt V cache with 3218 cells
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=550, theta_cells=8
+Epoch  1500 | Total:   12.9757 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.5129 | Outside:   0.5024 | Gen:  11.9605 | Time: 376.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=11.960506
+Merging outside cells: merged 0 pairs, 68 total
+Merging generator cells: merged 0 pairs, 550 total
+Epoch  1510 | Total:   16.0158 | Goal:   0.0000 | Unsafe:   0.0335 | Init:   1.6764 | Outside:   0.7161 | Gen:  13.5898 | Time: 378.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.589798
+Epoch  1520 | Total:   13.2347 | Goal:   0.0000 | Unsafe:   0.1548 | Init:   0.3309 | Outside:   0.2202 | Gen:  12.5289 | Time: 380.4s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.528872
+Epoch  1530 | Total:   12.2897 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.7555 | Outside:   0.1657 | Gen:  11.3685 | Time: 382.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=11.368549
+Epoch  1540 | Total:   11.5726 | Goal:   0.0000 | Unsafe:   0.1218 | Init:   0.3274 | Outside:   0.0679 | Gen:  11.0554 | Time: 385.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=11.055432
+Epoch  1550 | Total:   11.5898 | Goal:   0.0000 | Unsafe:   0.0150 | Init:   0.4810 | Outside:   0.1856 | Gen:  10.9083 | Time: 386.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.908281
+Epoch  1560 | Total:   10.7904 | Goal:   0.0000 | Unsafe:   0.1934 | Init:   0.2560 | Outside:   0.1643 | Gen:  10.1766 | Time: 388.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.176624
+Epoch  1570 | Total:   11.4663 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3119 | Outside:   0.5790 | Gen:  10.5754 | Time: 390.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.575384
+Epoch  1580 | Total:   15.0463 | Goal:   0.0000 | Unsafe:   1.0890 | Init:   0.5153 | Outside:   0.1167 | Gen:  13.3253 | Time: 392.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.325258
+Epoch  1590 | Total:   11.8707 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.7213 | Outside:   0.5185 | Gen:  10.6309 | Time: 394.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.630922
+Epoch  1600 | Total:   11.9819 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1964 | Outside:   0.7355 | Gen:  11.0499 | Time: 396.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=11.049947
+Epoch  1610 | Total:   11.2834 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3801 | Outside:   0.2432 | Gen:  10.6601 | Time: 398.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.660110
+Epoch  1620 | Total:   10.0776 | Goal:   0.0000 | Unsafe:   0.0979 | Init:   0.2027 | Outside:   0.1713 | Gen:   9.6057 | Time: 399.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.605717
+Epoch  1630 | Total:   10.3734 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.4060 | Outside:   0.1066 | Gen:   9.8608 | Time: 401.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.860836
+Epoch  1640 | Total:   11.2764 | Goal:   0.0000 | Unsafe:   0.9245 | Init:   0.1786 | Outside:   0.0560 | Gen:  10.1172 | Time: 403.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.117244
+Epoch  1650 | Total:   10.9471 | Goal:   0.0000 | Unsafe:   0.3903 | Init:   0.1599 | Outside:   0.1657 | Gen:  10.2311 | Time: 406.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.231060
+Epoch  1660 | Total:    9.9556 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1665 | Outside:   0.3124 | Gen:   9.4767 | Time: 407.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.476721
+Epoch  1670 | Total:    9.6344 | Goal:   0.0000 | Unsafe:   0.0294 | Init:   0.0429 | Outside:   0.3210 | Gen:   9.2410 | Time: 410.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.241047
+Epoch  1680 | Total:   10.6124 | Goal:   0.0000 | Unsafe:   0.7688 | Init:   0.0946 | Outside:   0.0947 | Gen:   9.6544 | Time: 412.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.654387
+Epoch  1690 | Total:   10.0821 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3124 | Outside:   0.2267 | Gen:   9.5430 | Time: 415.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.542990
+Epoch  1700 | Total:    9.9131 | Goal:   0.0000 | Unsafe:   0.1303 | Init:   0.2560 | Outside:   0.0000 | Gen:   9.5268 | Time: 417.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.526782
+Epoch  1710 | Total:   11.6904 | Goal:   0.0000 | Unsafe:   0.0984 | Init:   0.6785 | Outside:   0.0386 | Gen:  10.8748 | Time: 419.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.874783
+Epoch  1720 | Total:    9.7988 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3099 | Outside:   0.0465 | Gen:   9.4424 | Time: 422.1s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.442414
+Epoch  1730 | Total:    9.5886 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2331 | Outside:   0.0558 | Gen:   9.2997 | Time: 424.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.299662
+Epoch  1740 | Total:    9.4462 | Goal:   0.0000 | Unsafe:   0.0407 | Init:   0.2061 | Outside:   0.1156 | Gen:   9.0839 | Time: 426.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.083892
+Epoch  1750 | Total:    9.2625 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0883 | Outside:   0.2628 | Gen:   8.9114 | Time: 429.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.911383
+Epoch  1760 | Total:   10.0571 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2915 | Outside:   0.0981 | Gen:   9.6675 | Time: 431.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.667494
+Epoch  1770 | Total:   10.2133 | Goal:   0.0000 | Unsafe:   0.3869 | Init:   0.0951 | Outside:   0.0773 | Gen:   9.6540 | Time: 433.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.653970
+Epoch  1780 | Total:   10.3272 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1020 | Outside:   0.4926 | Gen:   9.7327 | Time: 435.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.732658
+Epoch  1790 | Total:    9.8912 | Goal:   0.0000 | Unsafe:   0.1782 | Init:   0.0415 | Outside:   0.1500 | Gen:   9.5216 | Time: 438.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.521551
+Epoch  1800 | Total:   10.2797 | Goal:   0.0000 | Unsafe:   0.0721 | Init:   0.1794 | Outside:   0.0278 | Gen:  10.0004 | Time: 440.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.000387
+Epoch  1810 | Total:    9.8361 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1053 | Outside:   0.1820 | Gen:   9.5488 | Time: 442.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.548832
+Epoch  1820 | Total:    9.5095 | Goal:   0.0000 | Unsafe:   0.3304 | Init:   0.1627 | Outside:   0.0000 | Gen:   9.0164 | Time: 444.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.016403
+Epoch  1830 | Total:   10.8080 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1924 | Outside:   0.0393 | Gen:  10.5763 | Time: 446.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.576315
+Epoch  1840 | Total:    9.5768 | Goal:   0.0000 | Unsafe:   0.1000 | Init:   0.2605 | Outside:   0.0000 | Gen:   9.2164 | Time: 448.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.216358
+Epoch  1850 | Total:    9.5195 | Goal:   0.0000 | Unsafe:   0.1482 | Init:   0.0744 | Outside:   0.0080 | Gen:   9.2889 | Time: 451.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.288858
+Epoch  1860 | Total:    9.7108 | Goal:   0.0000 | Unsafe:   0.6312 | Init:   0.0948 | Outside:   0.0000 | Gen:   8.9848 | Time: 453.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.984780
+Epoch  1870 | Total:    9.2206 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3212 | Outside:   0.0691 | Gen:   8.8303 | Time: 455.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.830273
+Epoch  1880 | Total:   10.6897 | Goal:   0.0000 | Unsafe:   0.0431 | Init:   0.2439 | Outside:   0.0073 | Gen:  10.3954 | Time: 457.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.395411
+Epoch  1890 | Total:   11.6691 | Goal:   0.0000 | Unsafe:   0.5399 | Init:   0.1662 | Outside:   0.0000 | Gen:  10.9631 | Time: 459.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.963053
+Epoch  1900 | Total:    9.1062 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2548 | Outside:   0.0404 | Gen:   8.8111 | Time: 461.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.811054
+Epoch  1910 | Total:   10.3908 | Goal:   0.0000 | Unsafe:   0.1747 | Init:   0.1245 | Outside:   0.1114 | Gen:   9.9802 | Time: 463.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.980214
+Epoch  1920 | Total:   10.7152 | Goal:   0.0000 | Unsafe:   0.2937 | Init:   0.4221 | Outside:   0.0475 | Gen:   9.9519 | Time: 466.3s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.951947
+Epoch  1930 | Total:    9.4290 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0680 | Outside:   0.0532 | Gen:   9.3078 | Time: 468.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.307773
+Epoch  1940 | Total:   11.4846 | Goal:   0.0000 | Unsafe:   0.6343 | Init:   0.0618 | Outside:   0.0000 | Gen:  10.7885 | Time: 470.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.788477
+Epoch  1950 | Total:    9.6756 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.4734 | Outside:   0.0319 | Gen:   9.1703 | Time: 473.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.170338
+Epoch  1960 | Total:   10.0543 | Goal:   0.0000 | Unsafe:   0.8442 | Init:   0.2069 | Outside:   0.0000 | Gen:   9.0032 | Time: 475.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.003172
+Epoch  1970 | Total:   10.1860 | Goal:   0.0000 | Unsafe:   0.0854 | Init:   0.3023 | Outside:   0.0387 | Gen:   9.7596 | Time: 477.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.759573
+Epoch  1980 | Total:    9.5150 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1222 | Outside:   0.0643 | Gen:   9.3285 | Time: 479.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.328490
+Epoch  1990 | Total:   12.8513 | Goal:   0.0000 | Unsafe:   3.0514 | Init:   0.1386 | Outside:   0.0000 | Gen:   9.6613 | Time: 481.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.661309
+Refining generator cells: 54 failing, refined 54 cells, 712 total
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=712, theta_cells=8
+Epoch  2000 | Total:   12.2490 | Goal:   0.0000 | Unsafe:   1.4776 | Init:   0.4815 | Outside:   0.0000 | Gen:  10.2899 | Time: 489.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.289921
+Merging outside cells: merged 0 pairs, 68 total
+Merging generator cells: merged 0 pairs, 712 total
+Epoch  2010 | Total:   19.7874 | Goal:   0.0000 | Unsafe:   2.8345 | Init:   0.3793 | Outside:   0.0000 | Gen:  16.5736 | Time: 492.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=16.573612
+Epoch  2020 | Total:   12.0778 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.5911 | Outside:   0.4211 | Gen:  11.0656 | Time: 494.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=11.065570
+Epoch  2030 | Total:   10.2909 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1034 | Outside:   0.0700 | Gen:  10.1175 | Time: 497.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.117548
+Epoch  2040 | Total:    8.7620 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0394 | Outside:   0.0257 | Gen:   8.6970 | Time: 499.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.696970
+Epoch  2050 | Total:    7.9397 | Goal:   0.0000 | Unsafe:   0.0905 | Init:   0.0735 | Outside:   0.0020 | Gen:   7.7737 | Time: 502.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.773731
+Epoch  2060 | Total:    7.3259 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0210 | Outside:   0.0159 | Gen:   7.2890 | Time: 505.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.289012
+Epoch  2070 | Total:    8.2025 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0605 | Outside:   0.0830 | Gen:   8.0590 | Time: 508.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.059008
+Epoch  2080 | Total:   11.7118 | Goal:   0.0000 | Unsafe:   0.7043 | Init:   0.0666 | Outside:   0.0000 | Gen:  10.9409 | Time: 510.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.940891
+Epoch  2090 | Total:   12.4110 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.7682 | Outside:   0.0000 | Gen:  11.6428 | Time: 513.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=11.642771
+Epoch  2100 | Total:   11.2700 | Goal:   0.0000 | Unsafe:   0.0685 | Init:   0.2285 | Outside:   0.3903 | Gen:  10.5826 | Time: 515.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.582636
+Epoch  2110 | Total:    8.6662 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2719 | Outside:   0.0000 | Gen:   8.3944 | Time: 518.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.394364
+Epoch  2120 | Total:    7.1368 | Goal:   0.0000 | Unsafe:   0.0627 | Init:   0.0068 | Outside:   0.0085 | Gen:   7.0588 | Time: 520.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.058824
+Epoch  2130 | Total:   13.8449 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:  13.8449 | Time: 523.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.844939
+Epoch  2140 | Total:   11.2191 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2176 | Outside:   0.0000 | Gen:  11.0014 | Time: 525.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=11.001433
+Epoch  2150 | Total:    8.6584 | Goal:   0.0000 | Unsafe:   0.1163 | Init:   0.2436 | Outside:   0.0000 | Gen:   8.2985 | Time: 528.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.298550
+Epoch  2160 | Total:    7.5806 | Goal:   0.0000 | Unsafe:   0.1628 | Init:   0.0184 | Outside:   0.0000 | Gen:   7.3994 | Time: 531.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.399377
+Epoch  2170 | Total:    7.0999 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0584 | Outside:   0.0133 | Gen:   7.0282 | Time: 533.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.028159
+Epoch  2180 | Total:    6.6921 | Goal:   0.0000 | Unsafe:   0.0334 | Init:   0.0215 | Outside:   0.0000 | Gen:   6.6372 | Time: 536.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.637232
+Epoch  2190 | Total:    8.4131 | Goal:   0.0000 | Unsafe:   0.0661 | Init:   0.0117 | Outside:   0.0146 | Gen:   8.3207 | Time: 538.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.320652
+Epoch  2200 | Total:    8.9472 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2987 | Outside:   0.4224 | Gen:   8.2261 | Time: 540.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.226130
+Epoch  2210 | Total:    7.2232 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0637 | Outside:   0.0159 | Gen:   7.1435 | Time: 543.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.143516
+Epoch  2220 | Total:    8.3198 | Goal:   0.0000 | Unsafe:   0.8007 | Init:   0.0000 | Outside:   0.0125 | Gen:   7.5067 | Time: 545.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.506670
+Epoch  2230 | Total:    7.9358 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.6304 | Outside:   0.0082 | Gen:   7.2972 | Time: 548.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.297151
+Epoch  2240 | Total:    6.5007 | Goal:   0.0000 | Unsafe:   0.1027 | Init:   0.0045 | Outside:   0.0601 | Gen:   6.3334 | Time: 550.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.333390
+Epoch  2250 | Total:    8.5752 | Goal:   0.0000 | Unsafe:   0.9769 | Init:   0.0753 | Outside:   0.0000 | Gen:   7.5230 | Time: 553.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.523026
+Epoch  2260 | Total:    8.0620 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.4596 | Outside:   0.0013 | Gen:   7.6011 | Time: 555.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.601139
+Epoch  2270 | Total:    6.4522 | Goal:   0.0000 | Unsafe:   0.0073 | Init:   0.0229 | Outside:   0.0158 | Gen:   6.4062 | Time: 558.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.406223
+Epoch  2280 | Total:    7.8892 | Goal:   0.0000 | Unsafe:   0.5402 | Init:   0.1477 | Outside:   0.0000 | Gen:   7.2013 | Time: 561.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.201281
+Epoch  2290 | Total:    7.1690 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2041 | Outside:   0.4638 | Gen:   6.5012 | Time: 563.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.501151
+Epoch  2300 | Total:    6.1940 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0607 | Outside:   0.0000 | Gen:   6.1333 | Time: 566.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.133305
+Epoch  2310 | Total:    7.5874 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1240 | Outside:   0.1067 | Gen:   7.3567 | Time: 569.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.356702
+Epoch  2320 | Total:    8.6963 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3642 | Outside:   0.0000 | Gen:   8.3322 | Time: 571.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.332158
+Epoch  2330 | Total:    6.4474 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0652 | Outside:   0.0000 | Gen:   6.3822 | Time: 573.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.382158
+Epoch  2340 | Total:    7.7309 | Goal:   0.0000 | Unsafe:   0.5127 | Init:   0.0718 | Outside:   0.0000 | Gen:   7.1463 | Time: 576.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.146305
+Epoch  2350 | Total:    6.8610 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1677 | Outside:   0.0023 | Gen:   6.6911 | Time: 579.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.691050
+Epoch  2360 | Total:    8.2583 | Goal:   0.0000 | Unsafe:   1.1666 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.0917 | Time: 581.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.091742
+Epoch  2370 | Total:    8.9111 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.7798 | Outside:   0.1929 | Gen:   7.9383 | Time: 584.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.938346
+Epoch  2380 | Total:    6.6515 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0368 | Outside:   0.0237 | Gen:   6.5909 | Time: 586.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.590915
+Epoch  2390 | Total:    5.9473 | Goal:   0.0000 | Unsafe:   0.1125 | Init:   0.0097 | Outside:   0.0000 | Gen:   5.8251 | Time: 589.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.825061
+Epoch  2400 | Total:    8.4726 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.0495 | Outside:   0.0000 | Gen:   7.4231 | Time: 591.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.423055
+Epoch  2410 | Total:    7.1889 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2237 | Outside:   0.0141 | Gen:   6.9511 | Time: 594.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.951056
+Epoch  2420 | Total:    6.1040 | Goal:   0.0000 | Unsafe:   0.0246 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.0794 | Time: 597.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.079423
+Epoch  2430 | Total:    5.7655 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.7655 | Time: 599.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.765469
+Epoch  2440 | Total:    9.3454 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.9726 | Outside:   0.0000 | Gen:   7.3728 | Time: 602.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.372823
+Epoch  2450 | Total:    6.8661 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0889 | Outside:   0.0000 | Gen:   6.7772 | Time: 604.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.777185
+Epoch  2460 | Total:    5.7013 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0121 | Gen:   5.6892 | Time: 607.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.689215
+Epoch  2470 | Total:    6.8980 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1224 | Outside:   0.0000 | Gen:   6.7757 | Time: 609.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.775679
+Epoch  2480 | Total:    6.0063 | Goal:   0.0000 | Unsafe:   0.0876 | Init:   0.1557 | Outside:   0.0000 | Gen:   5.7630 | Time: 611.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.762992
+Epoch  2490 | Total:    5.7512 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0555 | Outside:   0.0000 | Gen:   5.6957 | Time: 614.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.695650
+Refining generator cells: 90 failing, refined 90 cells, 982 total
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=982, theta_cells=8
+Epoch  2500 | Total:    5.7625 | Goal:   0.0000 | Unsafe:   0.0043 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.7582 | Time: 621.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.758243
+Merging outside cells: merged 0 pairs, 68 total
+Merging generator cells: merged 0 pairs, 982 total
+Epoch  2510 | Total:    7.3929 | Goal:   0.0000 | Unsafe:   0.6418 | Init:   0.2247 | Outside:   0.0000 | Gen:   6.5265 | Time: 625.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.526450
+Epoch  2520 | Total:    5.8094 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3299 | Outside:   0.0000 | Gen:   5.4795 | Time: 628.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.479548
+Epoch  2530 | Total:    5.3614 | Goal:   0.0000 | Unsafe:   0.3761 | Init:   0.0082 | Outside:   0.0000 | Gen:   4.9771 | Time: 631.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.977143
+Epoch  2540 | Total:    6.2416 | Goal:   0.0000 | Unsafe:   0.3364 | Init:   0.1074 | Outside:   0.0000 | Gen:   5.7979 | Time: 635.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.797904
+Epoch  2550 | Total:    6.6431 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.5824 | Outside:   0.0000 | Gen:   6.0607 | Time: 638.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.060712
+Epoch  2560 | Total:    7.6681 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0021 | Outside:   0.0000 | Gen:   7.6660 | Time: 641.2s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.666021
+Epoch  2570 | Total:   10.0099 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.7855 | Outside:   0.0000 | Gen:   9.2244 | Time: 644.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=9.224421
+Epoch  2580 | Total:    7.5376 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1175 | Outside:   0.1214 | Gen:   7.2987 | Time: 647.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.298655
+Epoch  2590 | Total:    5.8308 | Goal:   0.0000 | Unsafe:   0.1633 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.6675 | Time: 650.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.667531
+Epoch  2600 | Total:    4.8781 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0053 | Outside:   0.0000 | Gen:   4.8728 | Time: 652.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.872784
+Epoch  2610 | Total:    4.9741 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0336 | Outside:   0.0000 | Gen:   4.9405 | Time: 655.8s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.940494
+Epoch  2620 | Total:    5.4851 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3729 | Outside:   0.0000 | Gen:   5.1122 | Time: 658.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.112230
+Epoch  2630 | Total:    4.8313 | Goal:   0.0000 | Unsafe:   0.1211 | Init:   0.0856 | Outside:   0.0000 | Gen:   4.6246 | Time: 661.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.624551
+Epoch  2640 | Total:    7.4274 | Goal:   0.0000 | Unsafe:   0.3439 | Init:   1.0399 | Outside:   0.0000 | Gen:   6.0436 | Time: 664.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.043568
+Epoch  2650 | Total:    6.0157 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0886 | Outside:   0.3461 | Gen:   5.5810 | Time: 667.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.581027
+Epoch  2660 | Total:    4.7807 | Goal:   0.0000 | Unsafe:   0.3844 | Init:   0.0000 | Outside:   0.0078 | Gen:   4.3886 | Time: 670.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.388555
+Epoch  2670 | Total:    4.5882 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0799 | Gen:   4.5083 | Time: 673.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.508301
+Epoch  2680 | Total:    4.5462 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0005 | Outside:   0.0000 | Gen:   4.5456 | Time: 676.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.545613
+Epoch  2690 | Total:    4.3297 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0028 | Outside:   0.0000 | Gen:   4.3269 | Time: 679.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.326875
+Refining outside cells: 3 failing, refined 3 cells, 77 total
+Rebuilt V cache with 3227 cells
+Epoch  2700 | Total:    4.3769 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.3769 | Time: 682.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.376860
+Epoch  2710 | Total:    4.7711 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.4258 | Outside:   0.0000 | Gen:   4.3454 | Time: 686.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.345373
+Epoch  2720 | Total:    7.6078 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.4672 | Outside:   0.0000 | Gen:   6.1406 | Time: 689.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.140635
+Epoch  2730 | Total:    5.1718 | Goal:   0.0000 | Unsafe:   0.1464 | Init:   0.2679 | Outside:   0.0000 | Gen:   4.7575 | Time: 692.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.757472
+Epoch  2740 | Total:    5.3022 | Goal:   0.0000 | Unsafe:   0.1194 | Init:   0.7406 | Outside:   0.0000 | Gen:   4.4421 | Time: 696.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.442150
+Epoch  2750 | Total:    4.6419 | Goal:   0.0000 | Unsafe:   0.1759 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.4660 | Time: 699.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.466035
+Epoch  2760 | Total:    4.5826 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0893 | Outside:   0.0000 | Gen:   4.4933 | Time: 702.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.493313
+Epoch  2770 | Total:    9.8053 | Goal:   0.0000 | Unsafe:   3.0032 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.8022 | Time: 706.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.802161
+Epoch  2780 | Total:    8.8983 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1126 | Outside:   2.0495 | Gen:   6.7362 | Time: 709.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.736225
+Epoch  2790 | Total:    5.3028 | Goal:   0.0000 | Unsafe:   0.4919 | Init:   0.0267 | Outside:   0.0000 | Gen:   4.7843 | Time: 712.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.784274
+Epoch  2800 | Total:    4.4522 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0950 | Outside:   0.0000 | Gen:   4.3571 | Time: 715.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.357119
+Epoch  2810 | Total:    5.4916 | Goal:   0.0000 | Unsafe:   0.1114 | Init:   0.2580 | Outside:   0.0000 | Gen:   5.1222 | Time: 718.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.122219
+Epoch  2820 | Total:    4.5429 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1742 | Outside:   0.0000 | Gen:   4.3687 | Time: 721.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.368714
+Epoch  2830 | Total:    4.5317 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.2838 | Gen:   4.2479 | Time: 725.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.247912
+Epoch  2840 | Total:    4.5334 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1813 | Outside:   0.0000 | Gen:   4.3521 | Time: 728.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.352121
+Epoch  2850 | Total:    4.6637 | Goal:   0.0000 | Unsafe:   0.3455 | Init:   0.0000 | Outside:   0.0679 | Gen:   4.2503 | Time: 731.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.250309
+Epoch  2860 | Total:    5.2383 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.9892 | Outside:   0.0000 | Gen:   4.2491 | Time: 734.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.249099
+Epoch  2870 | Total:    3.8942 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.8942 | Time: 737.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.894189
+Epoch  2880 | Total:    3.8661 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.8661 | Time: 740.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.866111
+Epoch  2890 | Total:    4.2359 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0171 | Outside:   0.0000 | Gen:   4.2188 | Time: 743.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.218815
+Epoch  2900 | Total:    7.7823 | Goal:   0.0000 | Unsafe:   1.5609 | Init:   0.2920 | Outside:   0.0000 | Gen:   5.9294 | Time: 746.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.929401
+Epoch  2910 | Total:    5.7883 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2447 | Outside:   0.1742 | Gen:   5.3694 | Time: 749.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.369418
+Epoch  2920 | Total:    9.0508 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0698 | Outside:   0.0000 | Gen:   8.9810 | Time: 752.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=8.980993
+Epoch  2930 | Total:    7.6092 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.4434 | Outside:   0.0000 | Gen:   7.1658 | Time: 755.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.165753
+Epoch  2940 | Total:    7.9112 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.5133 | Outside:   0.0000 | Gen:   6.3979 | Time: 758.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.397879
+Epoch  2950 | Total:    6.1180 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0703 | Outside:   0.0000 | Gen:   6.0476 | Time: 761.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.047649
+Epoch  2960 | Total:    5.0461 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.0461 | Time: 764.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.046131
+Epoch  2970 | Total:    8.3381 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0079 | Outside:   1.0177 | Gen:   7.3125 | Time: 767.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.312543
+Epoch  2980 | Total:    6.6071 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1220 | Outside:   0.4836 | Gen:   6.0015 | Time: 770.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.001540
+Epoch  2990 | Total:    4.9306 | Goal:   0.0000 | Unsafe:   0.0248 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.9058 | Time: 773.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.905808
+Refining generator cells: 152 failing, refined 152 cells, 1438 total
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=1438, theta_cells=8
+Epoch  3000 | Total:    4.9038 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.9038 | Time: 782.6s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.903820
+Merging outside cells: merged 1 pairs, 76 total
+Merging generator cells: merged 0 pairs, 1438 total
+Rebuilt V cache with 3226 cells
+Epoch  3010 | Total:    6.0273 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.9439 | Outside:   0.0000 | Gen:   5.0834 | Time: 786.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.083428
+Epoch  3020 | Total:    4.5455 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0071 | Gen:   4.5384 | Time: 790.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.538380
+Epoch  3030 | Total:    4.1975 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3388 | Outside:   0.0000 | Gen:   3.8587 | Time: 794.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.858677
+Epoch  3040 | Total:    4.0070 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0473 | Outside:   0.0000 | Gen:   3.9597 | Time: 799.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.959668
+Epoch  3050 | Total:    3.6004 | Goal:   0.0000 | Unsafe:   0.0206 | Init:   0.0000 | Outside:   0.1755 | Gen:   3.4043 | Time: 803.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.404284
+Epoch  3060 | Total:    3.4853 | Goal:   0.0000 | Unsafe:   0.0865 | Init:   0.0480 | Outside:   0.0000 | Gen:   3.3509 | Time: 808.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.350852
+Epoch  3070 | Total:    3.6074 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0415 | Gen:   3.5658 | Time: 812.7s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.565844
+Epoch  3080 | Total:    3.4937 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0292 | Outside:   0.0066 | Gen:   3.4579 | Time: 817.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.457865
+Epoch  3090 | Total:    3.3141 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0018 | Outside:   0.0191 | Gen:   3.2932 | Time: 821.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.293159
+Refining outside cells: 15 failing, refined 15 cells, 121 total
+Rebuilt V cache with 3271 cells
+Epoch  3100 | Total:    3.6198 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0033 | Gen:   3.6165 | Time: 826.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.616469
+Epoch  3110 | Total:    6.2862 | Goal:   0.0000 | Unsafe:   0.7080 | Init:   0.0000 | Outside:   1.7926 | Gen:   3.7856 | Time: 830.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.785636
+Epoch  3120 | Total:    4.4727 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.4727 | Time: 834.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.472731
+Epoch  3130 | Total:    8.0836 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   4.3143 | Gen:   3.7694 | Time: 839.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.769363
+Epoch  3140 | Total:    3.7715 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0752 | Gen:   3.6962 | Time: 843.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.696241
+Epoch  3150 | Total:    6.0015 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.7923 | Outside:   0.0000 | Gen:   4.2092 | Time: 847.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.209202
+Epoch  3160 | Total:    4.2919 | Goal:   0.0000 | Unsafe:   0.1013 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.1906 | Time: 851.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.190573
+Epoch  3170 | Total:    6.6502 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   2.7782 | Outside:   0.0000 | Gen:   3.8720 | Time: 856.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.871960
+Epoch  3180 | Total:    6.6992 | Goal:   0.0000 | Unsafe:   2.4209 | Init:   0.0000 | Outside:   0.0000 | Gen:   4.2783 | Time: 860.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.278265
+Epoch  3190 | Total:    5.9179 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1700 | Outside:   0.0118 | Gen:   5.7361 | Time: 864.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.736079
+Epoch  3200 | Total:    5.1020 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1936 | Outside:   0.0000 | Gen:   4.9084 | Time: 867.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.908352
+Epoch  3210 | Total:    7.0885 | Goal:   0.0000 | Unsafe:   0.3229 | Init:   0.0000 | Outside:   2.7044 | Gen:   4.0612 | Time: 871.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.061193
+Epoch  3220 | Total:    3.9465 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3723 | Outside:   0.0000 | Gen:   3.5742 | Time: 876.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.574187
+Epoch  3230 | Total:    7.0174 | Goal:   0.0000 | Unsafe:   1.6189 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.3985 | Time: 880.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=5.398474
+Epoch  3240 | Total:    4.8423 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1658 | Outside:   0.0000 | Gen:   4.6766 | Time: 884.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.676566
+Epoch  3250 | Total:    6.0483 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   2.3989 | Outside:   0.0000 | Gen:   3.6494 | Time: 889.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.649397
+Epoch  3260 | Total:    4.4618 | Goal:   0.0000 | Unsafe:   0.5622 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.8995 | Time: 893.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.899536
+Epoch  3270 | Total:    5.3511 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.2886 | Outside:   0.0000 | Gen:   4.0625 | Time: 897.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.062461
+Epoch  3280 | Total:    3.2832 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0191 | Outside:   0.0000 | Gen:   3.2640 | Time: 901.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.264009
+Epoch  3290 | Total:    3.4026 | Goal:   0.0000 | Unsafe:   0.1721 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.2305 | Time: 905.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.230505
+Epoch  3300 | Total:    4.3156 | Goal:   0.0000 | Unsafe:   0.6773 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.6382 | Time: 909.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.638227
+Epoch  3310 | Total:    3.5926 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.5926 | Time: 913.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.592610
+Epoch  3320 | Total:    3.4701 | Goal:   0.0000 | Unsafe:   0.1380 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.3321 | Time: 918.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.332119
+Epoch  3330 | Total:    3.1986 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.1986 | Time: 922.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.198553
+Epoch  3340 | Total:    3.2856 | Goal:   0.0000 | Unsafe:   0.1457 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.1399 | Time: 927.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.139933
+Epoch  3350 | Total:    3.1427 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0068 | Outside:   0.0000 | Gen:   3.1359 | Time: 931.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.135919
+Epoch  3360 | Total:    3.0279 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.0279 | Time: 935.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.027868
+Epoch  3370 | Total:    3.1742 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.1742 | Time: 940.2s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.174189
+Epoch  3380 | Total:    2.9895 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0355 | Outside:   0.0000 | Gen:   2.9540 | Time: 944.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.953990
+Epoch  3390 | Total:    3.9175 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.9175 | Time: 948.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.917541
+Epoch  3400 | Total:    3.4894 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0619 | Outside:   0.0000 | Gen:   3.4276 | Time: 952.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.427564
+Epoch  3410 | Total:    3.4839 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.4043 | Outside:   0.0000 | Gen:   3.0795 | Time: 956.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.079531
+Epoch  3420 | Total:    3.5146 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.6964 | Outside:   0.0000 | Gen:   2.8182 | Time: 960.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.818209
+Epoch  3430 | Total:    3.0748 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.0748 | Time: 964.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.074786
+Epoch  3440 | Total:    6.5577 | Goal:   0.0000 | Unsafe:   0.3114 | Init:   0.0000 | Outside:   3.3656 | Gen:   2.8807 | Time: 968.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.880660
+Epoch  3450 | Total:    6.4873 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   3.5065 | Outside:   0.0000 | Gen:   2.9808 | Time: 972.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.980845
+Epoch  3460 | Total:    4.4150 | Goal:   0.0000 | Unsafe:   1.0386 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.3764 | Time: 976.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.376386
+Epoch  3470 | Total:    3.2852 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.2852 | Time: 980.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.285220
+Epoch  3480 | Total:    3.7536 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.6930 | Gen:   3.0606 | Time: 984.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.060554
+Epoch  3490 | Total:    4.1180 | Goal:   0.0000 | Unsafe:   0.5430 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.5750 | Time: 988.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.575013
+Refining generator cells: 263 failing, refined 263 cells, 2227 total
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=2227, theta_cells=8
+Epoch  3500 | Total:    3.0971 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.0971 | Time: 998.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.097094
+Merging outside cells: merged 0 pairs, 121 total
+Merging generator cells: merged 0 pairs, 2227 total
+Epoch  3510 | Total:    2.8797 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0023 | Outside:   0.0000 | Gen:   2.8774 | Time: 1004.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.877388
+Epoch  3520 | Total:    2.7288 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.7288 | Time: 1011.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.728827
+Epoch  3530 | Total:    3.8340 | Goal:   0.0000 | Unsafe:   0.0225 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.8114 | Time: 1017.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.811438
+Epoch  3540 | Total:    3.4618 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.4618 | Time: 1024.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.461843
+Epoch  3550 | Total:   75.9222 | Goal:   0.0000 | Unsafe:   3.0652 | Init:   0.7496 | Outside:   0.0000 | Gen:  72.1074 | Time: 1030.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=72.107437
+Epoch  3560 | Total:   13.4101 | Goal:   0.0000 | Unsafe:   0.8884 | Init:   0.1514 | Outside:   0.0000 | Gen:  12.3702 | Time: 1036.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=12.370190
+Epoch  3570 | Total:   13.4860 | Goal:   0.0000 | Unsafe:   0.2090 | Init:   0.2297 | Outside:   0.0000 | Gen:  13.0473 | Time: 1042.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=13.047278
+Epoch  3580 | Total:    7.9648 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0011 | Outside:   0.0000 | Gen:   7.9637 | Time: 1048.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.963681
+Epoch  3590 | Total:    5.1635 | Goal:   0.0000 | Unsafe:   0.0797 | Init:   0.0770 | Outside:   0.0214 | Gen:   4.9855 | Time: 1054.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.985470
+Refining outside cells: 5 failing, refined 5 cells, 136 total
+Refining generator cells: 49 failing, refined 49 cells, 2374 total
+Rebuilt V cache with 3286 cells
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=2374, theta_cells=8
+Epoch  3600 | Total:    4.3700 | Goal:   0.0000 | Unsafe:   0.1682 | Init:   0.0951 | Outside:   0.0000 | Gen:   4.1067 | Time: 1066.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.106739
+Epoch  3610 | Total:    3.8218 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.4946 | Outside:   0.0000 | Gen:   3.3272 | Time: 1073.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.327162
+Epoch  3620 | Total:    3.5401 | Goal:   0.0000 | Unsafe:   0.0324 | Init:   0.2782 | Outside:   0.0000 | Gen:   3.2295 | Time: 1079.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.229512
+Epoch  3630 | Total:    3.4551 | Goal:   0.0000 | Unsafe:   0.0082 | Init:   0.2464 | Outside:   0.0131 | Gen:   3.1875 | Time: 1086.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.187485
+Epoch  3640 | Total:    3.3103 | Goal:   0.0000 | Unsafe:   0.1277 | Init:   0.1061 | Outside:   0.0153 | Gen:   3.0612 | Time: 1092.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.061180
+Epoch  3650 | Total:    3.2602 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1567 | Outside:   0.1007 | Gen:   3.0028 | Time: 1098.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.002847
+Epoch  3660 | Total:    3.1849 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2092 | Outside:   0.0066 | Gen:   2.9690 | Time: 1105.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.969024
+Epoch  3670 | Total:    3.3468 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.4501 | Outside:   0.0000 | Gen:   2.8967 | Time: 1111.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.896713
+Epoch  3680 | Total:    3.2854 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1479 | Outside:   0.0000 | Gen:   3.1375 | Time: 1117.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.137497
+Epoch  3690 | Total:    3.0197 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1079 | Outside:   0.0287 | Gen:   2.8832 | Time: 1123.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.883167
+Refining outside cells: 1 failing, refined 1 cells, 139 total
+Refining generator cells: 80 failing, refined 80 cells, 2614 total
+Rebuilt V cache with 3289 cells
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=2614, theta_cells=8
+Epoch  3700 | Total:    2.9686 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3639 | Outside:   0.0000 | Gen:   2.6047 | Time: 1136.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.604740
+Epoch  3710 | Total:    2.6171 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1228 | Outside:   0.0000 | Gen:   2.4943 | Time: 1143.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.494323
+Epoch  3720 | Total:    2.7375 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.4083 | Outside:   0.0000 | Gen:   2.3292 | Time: 1150.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.329164
+Epoch  3730 | Total:    2.3990 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1204 | Outside:   0.0000 | Gen:   2.2786 | Time: 1157.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.278599
+Epoch  3740 | Total:    2.3951 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1190 | Outside:   0.0000 | Gen:   2.2761 | Time: 1164.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.276114
+Epoch  3750 | Total:    2.5173 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2781 | Outside:   0.0000 | Gen:   2.2391 | Time: 1171.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.239136
+Epoch  3760 | Total:    2.2994 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0528 | Outside:   0.0000 | Gen:   2.2465 | Time: 1178.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.246549
+Epoch  3770 | Total:    2.2838 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0665 | Outside:   0.0000 | Gen:   2.2172 | Time: 1184.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.217219
+Epoch  3780 | Total:    3.8330 | Goal:   0.0000 | Unsafe:   1.4373 | Init:   0.0245 | Outside:   0.0000 | Gen:   2.3712 | Time: 1191.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.371167
+Epoch  3790 | Total:    3.5038 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.5747 | Outside:   0.1868 | Gen:   2.7422 | Time: 1198.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.742212
+Refining generator cells: 158 failing, refined 158 cells, 3088 total
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=3088, theta_cells=8
+Epoch  3800 | Total:    2.6879 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1146 | Outside:   0.0000 | Gen:   2.5733 | Time: 1210.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.573288
+Epoch  3810 | Total:    2.1967 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0668 | Outside:   0.0288 | Gen:   2.1010 | Time: 1218.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.101020
+Epoch  3820 | Total:    2.2230 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.2741 | Outside:   0.0000 | Gen:   1.9489 | Time: 1227.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.948886
+Epoch  3830 | Total:    2.1482 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0415 | Outside:   0.0029 | Gen:   2.1038 | Time: 1235.6s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.103808
+Epoch  3840 | Total:    2.2446 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1019 | Outside:   0.0000 | Gen:   2.1427 | Time: 1243.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.142723
+Epoch  3850 | Total:    1.9648 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0635 | Outside:   0.0000 | Gen:   1.9012 | Time: 1251.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.901229
+Epoch  3860 | Total:    1.8441 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0207 | Outside:   0.0000 | Gen:   1.8234 | Time: 1260.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.823427
+Epoch  3870 | Total:    3.3288 | Goal:   0.0000 | Unsafe:   1.4753 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.8534 | Time: 1267.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.853427
+Epoch  3880 | Total:    3.9417 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1481 | Outside:   0.0000 | Gen:   3.7936 | Time: 1275.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.793641
+Epoch  3890 | Total:    3.1258 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.6647 | Outside:   0.0009 | Gen:   2.4602 | Time: 1283.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.460182
+Refining generator cells: 278 failing, refined 278 cells, 3922 total
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=3922, theta_cells=8
+Epoch  3900 | Total:    4.1268 | Goal:   0.0000 | Unsafe:   0.2027 | Init:   1.0242 | Outside:   0.0000 | Gen:   2.8998 | Time: 1297.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.899838
+Epoch  3910 | Total:    2.1596 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0189 | Gen:   2.1407 | Time: 1308.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.140690
+Epoch  3920 | Total:    6.9600 | Goal:   0.0000 | Unsafe:   0.1610 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.7991 | Time: 1318.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.799057
+Epoch  3930 | Total:   45.4684 | Goal:   0.0000 | Unsafe:   0.0000 | Init:  42.6282 | Outside:   0.0000 | Gen:   2.8402 | Time: 1327.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.840205
+Epoch  3940 | Total:   15.4434 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   8.5462 | Outside:   0.0000 | Gen:   6.8972 | Time: 1337.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.897185
+Epoch  3950 | Total:    8.7372 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.1015 | Outside:   0.0000 | Gen:   7.6357 | Time: 1347.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=7.635692
+Epoch  3960 | Total:    7.7662 | Goal:   1.4665 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   2.4603 | Gen:   3.8394 | Time: 1357.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.839426
+Epoch  3970 | Total:    3.4021 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.3670 | Outside:   0.0000 | Gen:   3.0350 | Time: 1367.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.035028
+Epoch  3980 | Total:    3.7581 | Goal:   0.0000 | Unsafe:   0.7434 | Init:   0.1300 | Outside:   0.0000 | Gen:   2.8847 | Time: 1378.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.884673
+Epoch  3990 | Total:    1.9287 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0073 | Outside:   0.0000 | Gen:   1.9214 | Time: 1388.7s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.921371
+Refining generator cells: 64 failing, refined 64 cells, 4114 total
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=4114, theta_cells=8
+Epoch  4000 | Total:    1.4955 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.4955 | Time: 1406.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.495452
+Merging outside cells: merged 3 pairs, 136 total
+Merging generator cells: merged 0 pairs, 4114 total
+Rebuilt V cache with 3286 cells
+Epoch  4010 | Total:    1.3956 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0219 | Outside:   0.0000 | Gen:   1.3737 | Time: 1416.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.373746
+Epoch  4020 | Total:    1.5157 | Goal:   0.0000 | Unsafe:   0.0306 | Init:   0.0857 | Outside:   0.0179 | Gen:   1.3815 | Time: 1427.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.381492
+Epoch  4030 | Total:    6.4585 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.7898 | Outside:   0.0000 | Gen:   4.6687 | Time: 1439.0s
+theta_cell_worst[7]: g[9.8100,9.8100] L[0.5750,0.6000] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.668694
+Epoch  4040 | Total:   34.1447 | Goal:   0.0000 | Unsafe:   1.1379 | Init:  26.4838 | Outside:   0.0000 | Gen:   6.5229 | Time: 1451.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=6.522921
+Epoch  4050 | Total:   10.3513 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1367 | Outside:   0.0000 | Gen:  10.2146 | Time: 1462.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=10.214550
+Epoch  4060 | Total:    4.1185 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0053 | Outside:   0.0000 | Gen:   4.1132 | Time: 1472.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.113240
+Epoch  4070 | Total:    3.2211 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   1.0561 | Outside:   0.0000 | Gen:   2.1650 | Time: 1483.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.164990
+Epoch  4080 | Total:    1.1937 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0037 | Gen:   1.1900 | Time: 1493.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.189955
+Epoch  4090 | Total:    1.8849 | Goal:   0.0000 | Unsafe:   0.2549 | Init:   0.2849 | Outside:   0.0000 | Gen:   1.3451 | Time: 1504.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.345081
+Refining outside cells: 18 failing, refined 18 cells, 190 total
+Refining generator cells: 107 failing, refined 107 cells, 4435 total
+Rebuilt V cache with 3340 cells
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=4435, theta_cells=8
+Epoch  4100 | Total:    3.2543 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0148 | Outside:   0.1697 | Gen:   3.0697 | Time: 1520.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=3.069699
+Epoch  4110 | Total:    2.0865 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1097 | Outside:   0.0000 | Gen:   1.9769 | Time: 1531.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.976897
+Epoch  4120 | Total:    1.5908 | Goal:   0.0000 | Unsafe:   0.1593 | Init:   0.3032 | Outside:   0.0000 | Gen:   1.1283 | Time: 1543.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.128273
+Epoch  4130 | Total:    2.2989 | Goal:   1.0381 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.2953 | Gen:   0.9656 | Time: 1554.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.965575
+Epoch  4140 | Total:    2.3847 | Goal:   0.7966 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.4540 | Gen:   1.1341 | Time: 1564.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.134056
+Epoch  4150 | Total:    9.2162 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   7.7459 | Outside:   0.0000 | Gen:   1.4704 | Time: 1574.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.470371
+Epoch  4160 | Total:    7.6790 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   5.0236 | Outside:   0.0000 | Gen:   2.6554 | Time: 1585.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=2.655431
+Epoch  4170 | Total:    9.9643 | Goal:   0.5318 | Unsafe:   2.3154 | Init:   0.0000 | Outside:   3.0063 | Gen:   4.1109 | Time: 1595.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=4.110879
+Epoch  4180 | Total:    1.6959 | Goal:   0.0000 | Unsafe:   0.0430 | Init:   0.2370 | Outside:   0.0000 | Gen:   1.4159 | Time: 1606.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.415916
+Epoch  4190 | Total:    1.1124 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.1124 | Time: 1617.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.112427
+Refining outside cells: 1 failing, refined 1 cells, 193 total
+Refining generator cells: 73 failing, refined 73 cells, 4654 total
+Rebuilt V cache with 3343 cells
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=4654, theta_cells=8
+Epoch  4200 | Total:    0.5828 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.5828 | Time: 1637.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.582790
+Epoch  4210 | Total:    0.5653 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.5653 | Time: 1649.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.565283
+Epoch  4220 | Total:    0.4641 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.4641 | Time: 1660.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.464105
+Epoch  4230 | Total:    1.3198 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.3198 | Time: 1672.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.319818
+Epoch  4240 | Total:    1.0716 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.0716 | Time: 1685.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=1.071646
+Epoch  4250 | Total:    0.6244 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0062 | Outside:   0.0000 | Gen:   0.6182 | Time: 1697.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.618160
+Epoch  4260 | Total:    0.4374 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.4374 | Time: 1708.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.437443
+Epoch  4270 | Total:    0.3944 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.3944 | Time: 1719.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.394379
+Epoch  4280 | Total:    0.3689 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0044 | Outside:   0.0022 | Gen:   0.3623 | Time: 1731.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.362280
+Epoch  4290 | Total:    0.3581 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0030 | Outside:   0.0067 | Gen:   0.3484 | Time: 1742.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.348383
+Refining generator cells: 37 failing, refined 37 cells, 4765 total
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=4765, theta_cells=8
+Epoch  4300 | Total:    0.2318 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.2318 | Time: 1761.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.231812
+Epoch  4310 | Total:    0.3237 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0743 | Outside:   0.0109 | Gen:   0.2386 | Time: 1773.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.238566
+Epoch  4320 | Total:    0.3508 | Goal:   0.0506 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0464 | Gen:   0.2538 | Time: 1785.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.253765
+Epoch  4330 | Total:    0.2914 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0124 | Outside:   0.0000 | Gen:   0.2791 | Time: 1797.1s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.279088
+Epoch  4340 | Total:    0.2375 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.2375 | Time: 1808.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.237503
+Epoch  4350 | Total:    0.1883 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.1883 | Time: 1820.6s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.188256
+Epoch  4360 | Total:    0.1622 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0092 | Gen:   0.1530 | Time: 1832.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.153026
+Epoch  4370 | Total:    0.1485 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.1485 | Time: 1843.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.148473
+Epoch  4380 | Total:    0.1532 | Goal:   0.0000 | Unsafe:   0.0114 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.1418 | Time: 1855.5s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.141770
+Epoch  4390 | Total:    0.1340 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0042 | Outside:   0.0000 | Gen:   0.1298 | Time: 1866.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.129796
+Refining outside cells: 1 failing, refined 1 cells, 196 total
+Refining generator cells: 42 failing, refined 42 cells, 4891 total
+Rebuilt V cache with 3346 cells
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=4891, theta_cells=8
+Epoch  4400 | Total:    0.0093 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0093 | Time: 1886.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.009292
+Epoch  4410 | Total:    0.0065 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0065 | Time: 1898.2s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.006476
+Epoch  4420 | Total:    0.0047 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0047 | Time: 1909.7s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.004736
+Epoch  4430 | Total:    0.0038 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0038 | Time: 1922.0s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.003824
+Epoch  4440 | Total:    0.0032 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0032 | Time: 1933.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.003173
+Epoch  4450 | Total:    0.0027 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0027 | Time: 1945.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.002747
+Epoch  4460 | Total:    0.0023 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0023 | Time: 1957.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.002330
+Epoch  4470 | Total:    0.0223 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0223 | Time: 1969.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.022348
+Epoch  4480 | Total:    0.0219 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0219 | Time: 1981.8s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.021913
+Epoch  4490 | Total:    0.0184 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0184 | Time: 1993.4s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.018384
+Refining generator cells: 20 failing, refined 20 cells, 4951 total
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Rebuilt generator caches: cells=4951, theta_cells=8
+Epoch  4500 | Total:    0.0005 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0005 | Time: 2013.3s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.000519
+Merging outside cells: merged 2 pairs, 194 total
+Merging generator cells: merged 0 pairs, 4951 total
+Rebuilt V cache with 3344 cells
+Epoch  4510 | Total:    0.0002 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0002 | Time: 2025.9s
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.000191
+
+====================
+All constraints satisfied, early stopping!
+====================
+Training complete in 2025.95s
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Phi initialized with:
+ input_scale: [6.2831854820251465, 20.0]
+ scale_factor: 20.0
+ f type: <class 'src.set_values.ClosedLoopSetValuedDrift'>
+ g type: <class 'function'>
+Goal:      PASS, V bounds: [  0.023,   1.252]
+Unsafe:    PASS, V bounds: [ 20.307, 148.542]
+Init:      PASS, V bounds: [  0.201,   0.996]
+Outside:   PASS, V bounds: [  0.003, 149.096]
+Generator: FAIL, GV bounds: [-483.010,  -0.000]
+theta_cell_worst[0]: g[9.8100,9.8100] L[0.4000,0.4250] b[0.1000,0.1000] m[0.1500,0.1500] obj=0.000021
+Saved eval bundle -> /Users/chko1829/src/Projects/ML/CRANS/Certified-Reach-Avoid-via-Neural-Synthesis/examples/disturbance/inv_pend_syn_global/outputs/eval_bundle.pth
+All plots saved to 'results/'
