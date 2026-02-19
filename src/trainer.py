@@ -396,8 +396,7 @@ def train_network_bounds(
             visualize_training_progress(
                 V_net, GV_net, regions, region_cells,
                 epoch=epoch,
-                output_dir="training_progress",
-                beta_ra=params.constraints.beta_ra
+                output_dir="training_progress"
             )
 
         # Optimizer step

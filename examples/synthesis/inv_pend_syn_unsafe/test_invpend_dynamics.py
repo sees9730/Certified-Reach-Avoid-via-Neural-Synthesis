@@ -26,7 +26,7 @@ from matplotlib.patches import Rectangle
 
 # Set up directories
 from pathlib import Path
-ROOT = Path(__file__).resolve().parents[1]   # repo_root
+ROOT = Path(__file__).resolve().parents[3]   # repo_root
 HERE = Path(__file__).resolve().parent
 OUTPUT_DIR = HERE / "outputs"
 import sys

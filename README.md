@@ -1,6 +1,5 @@
 # Neural Certificate
 
-<!-- Add your demo gif here -->
 ![Demo](examples/synthesis/xv15aircraft_syn/results_opt/animation_synthesis_opt.gif)
 
 Learning neural certificates and controllers for stochastic systems with hard constraints. This is the code repository for our paper **"Training with Hard Constraints: Learning Neural Certificates and Controllers for SDEs"** submitted to Neus 2026.
@@ -19,12 +18,32 @@ pip install -r requirements.txt
 
 ### Running Examples
 
+#### Option 1: Local Python Environment
+
 ```bash
 cd examples/synthesis/inv_pend_syn_unsafe  # or any other example
 python3 main.py
 ```
 
 The training will start and outputs will be saved in that example's `outputs/` folder.
+
+#### Option 2: Using Docker
+
+First, build the Docker image:
+
+```bash
+docker build -t crans .
+```
+
+Then run an example from the project **root** directory:
+
+```bash
+docker run -v $(pwd):/app \
+  -w /app/examples/verification/2D_gbm_veri \
+  crans python main.py
+```
+
+Replace `examples/verification/2D_gbm_veri` with any example path. The `-w` flag sets the working directory inside the container, ensuring outputs are saved in the correct example folder.
 
 ## What You'll Find
 
