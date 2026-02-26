@@ -24,11 +24,18 @@ class GV(nn.Module):
         V_net: nn.Module,
         dynamics: Dynamics,
         scale_factor: float = 1.0,
-        input_scale_init: float = None
+        input_scale_init: float = None,
+        include_time_derivative: bool = False,
+        time_index: int = 0,
     ):
         super().__init__()
         self.V_net = V_net
         self.dynamics = dynamics
+        self.include_time_derivative = include_time_derivative
+        self.time_index = time_index
+        self._input_dim = int(V_net.layer1.weight.shape[1])
+        if self.include_time_derivative and not (0 <= self.time_index < self._input_dim):
+            raise ValueError(f"time_index must be in [0, {self._input_dim}), got {self.time_index}")
 
         # Scale factor
         self.register_buffer("scale_factor", torch.tensor(scale_factor, dtype=torch.float32))
@@ -119,12 +126,32 @@ class GV(nn.Module):
         # Fuse final operations: scale * sum * inv_scale_sq
         Hdiag = (self.scale_factor * inv_scale_sq) * (cross + direct).sum(dim=1)  # (N,D)
 
-        # drift and diffusion terms - compute and fuse in one pass
-        fx = self._evaluate_f_fast(x)  # (N,D)
-        g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
+        if self.include_time_derivative:
+            # Use slice/concat instead of boolean-mask indexing (LiRPA/ONNX friendly).
+            if self.time_index == 0:
+                x_spatial = x[:, 1:]
+                dVdx_spatial = dVdx[:, 1:]
+                Hdiag_spatial = Hdiag[:, 1:]
+            elif self.time_index == D - 1:
+                x_spatial = x[:, :-1]
+                dVdx_spatial = dVdx[:, :-1]
+                Hdiag_spatial = Hdiag[:, :-1]
+            else:
+                x_spatial = torch.cat((x[:, :self.time_index], x[:, self.time_index + 1:]), dim=1)
+                dVdx_spatial = torch.cat((dVdx[:, :self.time_index], dVdx[:, self.time_index + 1:]), dim=1)
+                Hdiag_spatial = torch.cat((Hdiag[:, :self.time_index], Hdiag[:, self.time_index + 1:]), dim=1)
+            dVdt = dVdx[:, self.time_index:self.time_index + 1]
 
-        # Fuse: out = (fx * dVdx).sum() + 0.5 * (g_diag_sq * Hdiag).sum()
-        out = ((fx * dVdx) + (0.5 * g_diag_sq * Hdiag)).sum(dim=1, keepdim=True)  # (N,1)
+            fx = self._evaluate_f_fast(x_spatial)
+            g_diag_sq = self._compute_gg_diag_fast(x_spatial)  # (N,D-1)
+
+            # Finite-horizon RA condition: dV/dt + L_x V < 0
+            out = dVdt + ((fx * dVdx_spatial) + (0.5 * g_diag_sq * Hdiag_spatial)).sum(dim=1, keepdim=True)
+        else:
+            # drift and diffusion terms - compute and fuse in one pass
+            fx = self._evaluate_f_fast(x)  # (N,D)
+            g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
+            out = ((fx * dVdx) + (0.5 * g_diag_sq * Hdiag)).sum(dim=1, keepdim=True)  # (N,1)
 
         return out.squeeze(0) if was_1d else out
 
@@ -343,11 +370,18 @@ class GV_offset(nn.Module):
         scale_factor: float = 1.0,
         learnable_scale: bool = False,
         learnable_input_scale: bool = False,
-        input_scale_init: float = None
+        input_scale_init: float = None,
+        include_time_derivative: bool = False,
+        time_index: int = 0,
     ):
         super().__init__()
         self.V_net = V_net
         self.dynamics = dynamics
+        self.include_time_derivative = include_time_derivative
+        self.time_index = time_index
+        self._input_dim = int(V_net.layer1.weight.shape[1])
+        if self.include_time_derivative and not (0 <= self.time_index < self._input_dim):
+            raise ValueError(f"time_index must be in [0, {self._input_dim}), got {self.time_index}")
 
         # -------------------------
         # scale factor
@@ -465,12 +499,32 @@ class GV_offset(nn.Module):
         # Fuse final operations: scale * sum * inv_scale_sq
         Hdiag = (self.scale_factor * inv_scale_sq) * (cross + direct).sum(dim=1)  # (N,D)
 
-        # drift and diffusion terms - compute and fuse in one pass
-        fx = self._evaluate_f_fast(x)  # (N,D)
-        g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
+        if self.include_time_derivative:
+            # Use slice/concat instead of boolean-mask indexing (LiRPA/ONNX friendly).
+            if self.time_index == 0:
+                x_spatial = x[:, 1:]
+                dVdx_spatial = dVdx[:, 1:]
+                Hdiag_spatial = Hdiag[:, 1:]
+            elif self.time_index == D - 1:
+                x_spatial = x[:, :-1]
+                dVdx_spatial = dVdx[:, :-1]
+                Hdiag_spatial = Hdiag[:, :-1]
+            else:
+                x_spatial = torch.cat((x[:, :self.time_index], x[:, self.time_index + 1:]), dim=1)
+                dVdx_spatial = torch.cat((dVdx[:, :self.time_index], dVdx[:, self.time_index + 1:]), dim=1)
+                Hdiag_spatial = torch.cat((Hdiag[:, :self.time_index], Hdiag[:, self.time_index + 1:]), dim=1)
+            dVdt = dVdx[:, self.time_index:self.time_index + 1]
 
-        # Fuse: out = (fx * dVdx).sum() + 0.5 * (g_diag_sq * Hdiag).sum()
-        out = ((fx * dVdx) + (0.5 * g_diag_sq * Hdiag)).sum(dim=1, keepdim=True)  # (N,1)
+            fx = self._evaluate_f_fast(x_spatial)  # (N,D-1)
+            g_diag_sq = self._compute_gg_diag_fast(x_spatial)  # (N,D-1)
+
+            # Finite-horizon RA condition: dV/dt + L_x V < 0
+            out = dVdt + ((fx * dVdx_spatial) + (0.5 * g_diag_sq * Hdiag_spatial)).sum(dim=1, keepdim=True)
+        else:
+            # drift and diffusion terms - compute and fuse in one pass
+            fx = self._evaluate_f_fast(x)  # (N,D)
+            g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
+            out = ((fx * dVdx) + (0.5 * g_diag_sq * Hdiag)).sum(dim=1, keepdim=True)  # (N,1)
 
         return out.squeeze(0) if was_1d else out
 
@@ -668,7 +722,9 @@ def compute_GV_autograd(
     V_net: nn.Module,
     dynamics: Dynamics,
     x: torch.Tensor,
-    scale_factor: float = 1.0
+    scale_factor: float = 1.0,
+    include_time_derivative: bool = False,
+    time_index: int = 0,
 ) -> torch.Tensor:
     """
     Compute G[V] using PyTorch autograd for verification.
@@ -684,8 +740,11 @@ def compute_GV_autograd(
     """
     x = x.detach().requires_grad_(True)
 
-    # Compute V
-    x_norm = x / V_net.input_scale
+    # Compute V with the same normalization as the network variant.
+    if hasattr(V_net, "input_offset"):
+        x_norm = (x - V_net.input_offset.to(device=x.device, dtype=x.dtype)) / V_net.input_scale
+    else:
+        x_norm = x / V_net.input_scale
     h = V_net.activation_fn(V_net.layer1(x_norm))
     h = V_net.activation_fn(V_net.layer2(h))
     V = V_net.output(h)
@@ -706,22 +765,35 @@ def compute_GV_autograd(
 
     # Drift term
     f_fn = dynamics.get_f()
+    x_for_dynamics = x
+    dV_for_dynamics = dVdx
+    Hdiag_for_dynamics = H_diag if g_fn is not None else None
+    dVdt = None
+    if include_time_derivative:
+        spatial_mask = torch.ones(x.shape[1], dtype=torch.bool, device=x.device)
+        spatial_mask[time_index] = False
+        x_for_dynamics = x[:, spatial_mask]
+        dV_for_dynamics = dVdx[:, spatial_mask]
+        if Hdiag_for_dynamics is not None:
+            Hdiag_for_dynamics = Hdiag_for_dynamics[:, spatial_mask]
+        dVdt = dVdx[:, time_index:time_index + 1]
+
     if callable(f_fn):
-        fx = f_fn(x)
+        fx = f_fn(x_for_dynamics)
         if isinstance(fx, np.ndarray):
             fx = torch.from_numpy(fx).to(x.device, x.dtype)
     else:
         if isinstance(f_fn, np.ndarray):
             f_fn = torch.from_numpy(f_fn).to(x.device, x.dtype)
-        fx = x @ f_fn.T
-    drift_term = (dVdx * fx).sum(dim=1, keepdim=True)
+        fx = x_for_dynamics @ f_fn.T
+    drift_term = (dV_for_dynamics * fx).sum(dim=1, keepdim=True)
 
     if g_fn is None:
-        return drift_term
+        return drift_term + dVdt if include_time_derivative else drift_term
 
     # Diffusion term
     if callable(g_fn):
-        g_out = g_fn(x)
+        g_out = g_fn(x_for_dynamics)
         if isinstance(g_out, np.ndarray):
             g_out = torch.from_numpy(g_out).to(x.device, x.dtype)
         g_diag_sq = g_out.square() if g_out.dim() == 2 else g_out.square().sum(dim=2)
@@ -729,11 +801,13 @@ def compute_GV_autograd(
         if isinstance(g_fn, np.ndarray):
             g_fn = torch.from_numpy(g_fn).to(x.device, x.dtype)
         if isinstance(g_fn, torch.Tensor) and g_fn.dim() == 2:
-            g_diag_sq = g_fn.square().sum(dim=1).unsqueeze(0).expand_as(x)
+            g_diag_sq = g_fn.square().sum(dim=1).unsqueeze(0).expand_as(x_for_dynamics)
         else:
-            g_diag_sq = (g_fn ** 2) * torch.ones_like(x)
+            g_diag_sq = (g_fn ** 2) * torch.ones_like(x_for_dynamics)
 
-    diffusion_term = (0.5 * g_diag_sq * H_diag).sum(dim=1, keepdim=True)
+    diffusion_term = (0.5 * g_diag_sq * Hdiag_for_dynamics).sum(dim=1, keepdim=True)
+    if include_time_derivative:
+        return dVdt + drift_term + diffusion_term
     return drift_term + diffusion_term
 
 
@@ -751,8 +825,8 @@ def verify_GV(
     Args:
         phi_module: Analytical GV module
         dynamics: Dynamics object
-        x: Optional sample points (N, D). If None, random samples generated
-        n_samples: Number of random samples if x is None
+        x: Optional sample points (N, D). If None, deterministic probe points are generated
+        n_samples: Number of probe points if x is None
         tol: Numerical tolerance
         verbose: Print detailed comparison info
 
@@ -760,13 +834,25 @@ def verify_GV(
         True if match within tolerance, False otherwise
     """
     if x is None:
+        # Deterministic probe points: no RNG side-effect on training reproducibility.
         D = phi_module.V_net.layer1.weight.shape[1]
-        x = torch.randn(n_samples, D, dtype=torch.float32) * 10.0
+        ref_tensor = phi_module.V_net.layer1.weight
+        base = torch.linspace(
+            -3.0, 3.0, max(1, n_samples), device=ref_tensor.device, dtype=ref_tensor.dtype
+        )
+        x = torch.stack([(i + 1) * base / float(max(1, D)) for i in range(D)], dim=1)
 
     # Compute both versions
     with torch.no_grad():
         analytical = phi_module(x)
-    autograd = compute_GV_autograd(phi_module.V_net, dynamics, x, scale_factor=float(phi_module.scale_factor))
+    autograd = compute_GV_autograd(
+        phi_module.V_net,
+        dynamics,
+        x,
+        scale_factor=float(phi_module.scale_factor),
+        include_time_derivative=getattr(phi_module, "include_time_derivative", False),
+        time_index=getattr(phi_module, "time_index", 0),
+    )
 
     # Compare
     with torch.no_grad():
@@ -774,7 +860,8 @@ def verify_GV(
         max_diff = diff.max().item()
 
     if verbose:
-        print(f"Phi Verification {'PASSED' if max_diff <= tol else 'FAILED'}: max diff = {max_diff:.6e}")
+        phi_name = type(phi_module).__name__
+        print(f"{phi_name} verification {'PASSED' if max_diff <= tol else 'FAILED'}: max diff = {max_diff:.6e}")
 
     return max_diff <= tol
 
@@ -785,23 +872,34 @@ def create_GV(
     network_config,
     verify: bool = True,
     input_offset=None,
+    include_time_derivative: bool = False,
+    time_index: int = 0,
 ) -> GV:
-    if(input_offset is not None):
+    use_offset_phi = (input_offset is not None) or hasattr(V_net, "input_offset")
+    if use_offset_phi:
         phi = GV_offset(
             V_net=V_net,
             dynamics=dynamics,
             scale_factor=network_config.scale_factor,
-            input_scale_init=network_config.input_scale
+            input_scale_init=network_config.input_scale,
+            include_time_derivative=include_time_derivative,
+            time_index=time_index,
         )
     else:
         phi = GV(
             V_net=V_net,
             dynamics=dynamics,
             scale_factor=network_config.scale_factor,
-            input_scale_init=network_config.input_scale
+            input_scale_init=network_config.input_scale,
+            include_time_derivative=include_time_derivative,
+            time_index=time_index,
         )
 
+    # Single verification gate for both GV and GV_offset.
+    # If verify=True, compare analytical implementation vs autograd.
     if verify:
-        verify_GV(phi, dynamics)
+        ok = verify_GV(phi, dynamics)
+        if not ok:
+            raise ValueError(f"{type(phi).__name__} autograd verification failed.")
 
     return phi

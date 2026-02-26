@@ -10,7 +10,7 @@ This module provides functions to:
 
 import numpy as np
 import torch
-from typing import List, Tuple
+from typing import List, Tuple, Sequence, Union
 from itertools import product
 
 # Set up directories
@@ -21,11 +21,40 @@ sys.path.insert(0, str(ROOT))
 from src.regions import Region
 
 
-def discretize_region(region: Region, n_squares: int) -> List[Tuple[torch.Tensor, torch.Tensor]]:
+def _normalize_splits(
+    n_splits: Union[int, Sequence[int]],
+    D: int
+) -> List[int]:
+    """
+    Normalize split specification into per-dimension list of length D.
+    """
+    if isinstance(n_splits, int):
+        if n_splits < 1:
+            raise ValueError(f"n_splits must be >= 1, got {n_splits}")
+        return [int(n_splits)] * D
+
+    if len(n_splits) != D:
+        raise ValueError(f"Expected {D} split values, got {len(n_splits)}")
+
+    out: List[int] = []
+    for i, n in enumerate(n_splits):
+        n_i = int(n)
+        if n_i < 1:
+            raise ValueError(f"n_splits[{i}] must be >= 1, got {n_i}")
+        out.append(n_i)
+    return out
+
+
+def discretize_region(
+    region: Region,
+    n_squares: Union[int, Sequence[int]]
+) -> List[Tuple[torch.Tensor, torch.Tensor]]:
     """
     Discretize a region into an n_squares-per-dimension grid of cells.
 
-    For D dimensions, this yields n_squares^D cells per (non-union) rectangle.
+    For D dimensions:
+    - int n_squares: n_squares^D cells per rectangle
+    - list n_squares: prod(n_squares[d]) cells per rectangle
 
     For union regions, discretizes each component separately and combines.
     """
@@ -37,15 +66,24 @@ def discretize_region(region: Region, n_squares: int) -> List[Tuple[torch.Tensor
 
     bounds = region.bounds  # (D, 2)
     D = bounds.shape[0]
+    n_per_dim = _normalize_splits(n_squares, D)
 
-    # Edges for each dimension
-    edges = [
-        np.linspace(bounds[d, 0], bounds[d, 1], n_squares + 1, dtype=np.float32)
-        for d in range(D)
-    ]
+    # Edges for each dimension. For degenerate dimensions (low == high),
+    # keep a single interval to avoid generating duplicate zero-volume cells.
+    edges = []
+    index_ranges = []
+    for d in range(D):
+        low_d, high_d = bounds[d, 0], bounds[d, 1]
+        if np.isclose(low_d, high_d):
+            edges.append(np.array([low_d, high_d], dtype=np.float32))
+            index_ranges.append(range(1))
+        else:
+            n_d = n_per_dim[d]
+            edges.append(np.linspace(low_d, high_d, n_d + 1, dtype=np.float32))
+            index_ranges.append(range(n_d))
 
     cells: List[Tuple[torch.Tensor, torch.Tensor]] = []
-    for idx in product(range(n_squares), repeat=D):
+    for idx in product(*index_ranges):
         cell_lower = np.array([edges[d][idx[d]] for d in range(D)], dtype=np.float32)
         cell_upper = np.array([edges[d][idx[d] + 1] for d in range(D)], dtype=np.float32)
         cells.append((
@@ -318,25 +356,26 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
     region_cells = {}
 
     # Init region
-    print(f"Init region: {discretization_config.n_init} per-dim grid")
+    print(f"Init region: splits={discretization_config.n_init}")
     region_cells['init'] = discretize_region(regions.init, discretization_config.n_init)
     print(f" {len(region_cells['init'])} cells")
 
     # Goal region
-    print(f"Goal region: {discretization_config.n_goal} per-dim grid")
+    print(f"Goal region: splits={discretization_config.n_goal}")
     region_cells['goal'] = discretize_region(regions.goal, discretization_config.n_goal)
     print(f" {len(region_cells['goal'])} cells")
 
     # Unsafe region
-    print(f"Unsafe region: {discretization_config.n_unsafe} per-dim grid")
+    print(f"Unsafe region: splits={discretization_config.n_unsafe}")
     region_cells['unsafe'] = discretize_region(regions.unsafe, discretization_config.n_unsafe)
     print(f" {len(region_cells['unsafe'])} cells")
 
     # Outside goal (for V constraint)
-    print(f"Outside goal region: {discretization_config.n_outside_goal} per-dim per rectangle")
+    print(f"Outside goal region: splits={discretization_config.n_outside_goal} per rectangle")
     outside_goal_rects = compute_rectangular_partition_outside_goal(regions.full, regions.goal)
-    # Pre-allocate: each rectangle -> n_outside_goal^D cells
-    n_per_rect = discretization_config.n_outside_goal ** regions.full.bounds.shape[0]
+    # Pre-allocate: each rectangle -> prod(splits) cells
+    D = regions.full.bounds.shape[0]
+    n_per_rect = int(np.prod(_normalize_splits(discretization_config.n_outside_goal, D)))
     total_outside = n_per_rect * len(outside_goal_rects)
     region_cells['outside'] = [None] * total_outside
     idx = 0
@@ -397,12 +436,13 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
             first_cell = region_cells['generator'][0]
             print(f' First cell bounds: {first_cell[0].numpy()} to {first_cell[1].numpy()}')
     else:
-        print(f"Generator region: {discretization_config.n_generator} per-dim per rectangle")
+        print(f"Generator region: splits={discretization_config.n_generator} per rectangle")
         generator_rects = compute_rectangular_partition_outside_goal_and_unsafe(
             regions.full, regions.goal, regions.unsafe
         )
-        # Pre-allocate: each rectangle -> n_generator^D cells
-        n_per_rect = discretization_config.n_generator ** regions.full.bounds.shape[0]
+        # Pre-allocate: each rectangle -> prod(splits) cells
+        D = regions.full.bounds.shape[0]
+        n_per_rect = int(np.prod(_normalize_splits(discretization_config.n_generator, D)))
         total_gen = n_per_rect * len(generator_rects)
         region_cells['generator'] = [None] * total_gen
         idx = 0

@@ -10,12 +10,11 @@ This module provides:
 import torch
 import torch.nn.functional as F
 import numpy as np
-from typing import List, Tuple, Union, Optional
+from typing import List, Tuple, Union, Optional, Sequence
 
 # Set up directories
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]   # repo_root
-OUTPUT_DIR = ROOT / "gbm_veri"/ "outputs"
 import sys
 sys.path.insert(0, str(ROOT))
 from src.crown_bounds import SymbolicCROWNCache, SymbolicCROWNCache_Phi, prepare_cell_bounds
@@ -61,88 +60,61 @@ def sample_from_cells(
 def compute_loss_goal_bounds(
     V_lower: torch.Tensor
 ) -> torch.Tensor:
-    # FIXME: Add function signature
-
-    # Want V >= 0.0, so penalize V_lower < 0.0
+    """Goal constraint: enforce V >= 0 on all goal cells."""
     loss = torch.relu(0.0 - V_lower).sum()
-
-    # Check if goal is satisfied
-    if (loss <= 0.0):
-        sat = True
-    else:
-        sat = False
+    sat = bool(loss <= 0.0)
     return loss, sat
 
 def compute_loss_unsafe_bounds(
     V_lower: torch.Tensor,
     beta_ra: float
 ) -> torch.Tensor:
-    # FIXME: Add function signature
-
-    # Want V >= beta_ra, so penalize V_lower < beta_ra
+    """Unsafe constraint: enforce V >= beta_ra on all unsafe cells."""
     loss = F.relu(beta_ra - V_lower).sum()
-
-    # Check if unsafe is satisfied
-    if (loss <= 0.0):
-        sat = True
-    else:
-        sat = False
+    sat = bool(loss <= 0.0)
     return loss, sat
 
 def compute_loss_init_bounds(
     V_upper: torch.Tensor
 ) -> torch.Tensor:
-    # FIXME: Add function signature
-
-    # Want V <= 1.0, so penalize V_upper > 1.0
+    """Init constraint: enforce V <= 1 on all init cells."""
     loss = F.relu(V_upper - 1.0).sum()
-
-    # Check if init is satisfied
-    if (loss <= 0.0):
-        sat = True
-    else:
-        sat = False
+    sat = bool(loss <= 0.0)
     return loss, sat
 
 def compute_loss_outside_bounds(
     V_lower: torch.Tensor
 ) -> torch.Tensor:
-    # FIXME: Add function signature
-
-    # Want V >= 0.0, so penalize V_lower < 0.0
+    """Outside constraint: enforce V >= 0 on all outside cells."""
     loss = F.relu(0.0 - V_lower).sum()
-
-    # Check if outside is satisfied
-    if (loss <= 0.0):
-        sat = True
-    else:
-        sat = False
+    sat = bool(loss <= 0.0)
     return loss, sat
 
 def compute_loss_generator_bounds(
-    Phi_upper: torch.Tensor
+    Phi_upper: torch.Tensor,
+    generator_threshold: float = 0.0,
 ) -> torch.Tensor:
-    # FIXME: Add function signature
-
-    # Want Phi < 0, so penalize Phi_upper > 0
+    """Generator constraint: enforce Phi < generator_threshold on all cells."""
+    if Phi_upper is None or Phi_upper.numel() == 0:
+        device = Phi_upper.device if isinstance(Phi_upper, torch.Tensor) else "cpu"
+        return torch.tensor(0.0, device=device), False
     delta = 1e-4
-    loss = F.relu(Phi_upper + delta).sum() # Add delta to encourage extra push
-
-    # Check if generator is satisfied
-    if (Phi_upper.max() < 0.0):
-        sat = True
-    else:
-        sat = False
+    loss = F.relu(Phi_upper - float(generator_threshold) + delta).sum()
+    sat = bool(Phi_upper.max() < float(generator_threshold))
     return loss, sat
 
 def compute_total_loss_bounds(
     beta_ra: float,
     V_goal_lower: torch.Tensor = None,
     V_unsafe_lower: torch.Tensor = None,
+    V_unsafe_lower_tube: torch.Tensor = None,
+    V_unsafe_lower_terminal: torch.Tensor = None,
     V_init_upper: torch.Tensor = None,
     V_outside_lower: torch.Tensor = None,
     Phi_upper: torch.Tensor = None,
     generator_weight: float = 0.0,
+    generator_threshold: float = 0.0,
+    beta_ra_terminal: float = None,
     loss_weights: dict = None,
     device: str = 'cpu',
     compute_V: bool = True,
@@ -180,12 +152,28 @@ def compute_total_loss_bounds(
 
     # Compute individual losses and satisfactions
     if compute_V:
-        loss_unsafe, sat_unsafe = compute_loss_unsafe_bounds(V_unsafe_lower, beta_ra)
+        if V_unsafe_lower_tube is not None or V_unsafe_lower_terminal is not None:
+            if V_unsafe_lower_tube is None:
+                V_unsafe_lower_tube = torch.tensor([], device=device)
+            if V_unsafe_lower_terminal is None:
+                V_unsafe_lower_terminal = torch.tensor([], device=device)
+            if beta_ra_terminal is None:
+                beta_ra_terminal = beta_ra
+
+            loss_unsafe_tube, sat_unsafe_tube = compute_loss_unsafe_bounds(V_unsafe_lower_tube, beta_ra)
+            loss_unsafe_terminal, sat_unsafe_terminal = compute_loss_unsafe_bounds(V_unsafe_lower_terminal, beta_ra_terminal)
+            loss_unsafe = loss_unsafe_tube + loss_unsafe_terminal
+            sat_unsafe = sat_unsafe_tube and sat_unsafe_terminal
+        else:
+            loss_unsafe, sat_unsafe = compute_loss_unsafe_bounds(V_unsafe_lower, beta_ra)
         loss_goal, sat_goal = compute_loss_goal_bounds(V_goal_lower)
         loss_init, sat_init = compute_loss_init_bounds(V_init_upper)
         loss_outside, sat_outside = compute_loss_outside_bounds(V_outside_lower)
     if compute_GV:
-        loss_generator, sat_generator = compute_loss_generator_bounds(Phi_upper)
+        loss_generator, sat_generator = compute_loss_generator_bounds(
+            Phi_upper,
+            generator_threshold=generator_threshold
+        )
 
     # Combine losses
     total_loss = torch.tensor(0.0, device=device)
@@ -211,6 +199,11 @@ def compute_total_loss_bounds(
             'init': sat_init,
             'outside': sat_outside
         })
+        if V_unsafe_lower_tube is not None or V_unsafe_lower_terminal is not None:
+            loss_dict['unsafe_tube'] = loss_unsafe_tube.item()
+            loss_dict['unsafe_terminal'] = loss_unsafe_terminal.item()
+            sat_dict['unsafe_tube'] = sat_unsafe_tube
+            sat_dict['unsafe_terminal'] = sat_unsafe_terminal
 
     if compute_GV:
         total_loss += generator_weight * loss_generator
@@ -480,7 +473,7 @@ import torch
 def refine_failing_cells(
     region_cells: List[Tuple[torch.Tensor, torch.Tensor]],
     failing_mask: torch.Tensor,
-    refine_factor: int = 2,
+    refine_factor: Union[int, Sequence[int]] = 2,
     N_to_refine: int = 100,
     seed: Optional[int] = 0,
     scores: Optional[torch.Tensor] = None,
@@ -494,7 +487,9 @@ def refine_failing_cells(
     Args:
         region_cells: List of (lower, upper) cell bounds, each (D,)
         failing_mask: Boolean mask indicating which cells failed
-        refine_factor: Factor to subdivide cells (2 = split into refine_factor^D subcells)
+        refine_factor:
+            - int: isotropic split count per dimension
+            - sequence[int]: per-dimension split counts
         N_to_refine: Max number of failing cells to refine
         seed: Optional RNG seed for reproducibility (only used when scores is None)
         scores: Optional 1D tensor aligned with region_cells giving priority (higher = refine first)
@@ -535,12 +530,30 @@ def refine_failing_cells(
             refine_idxs = rng.choice(failing_idxs_t.tolist(), size=k, replace=False).tolist()
             refine_set = set(refine_idxs)
 
-    # Pre-allocate: estimate size (upper bound = unrefined + refined*refine_factor^D)
+    # Normalize refine factors once.
+    def _normalize_refine_splits(rf: Union[int, Sequence[int]], D: int) -> List[int]:
+        if isinstance(rf, int):
+            if rf < 1:
+                raise ValueError(f"refine_factor must be >= 1, got {rf}")
+            return [int(rf)] * D
+        if len(rf) != D:
+            raise ValueError(f"Expected {D} refine factors, got {len(rf)}")
+        out = []
+        for i, n in enumerate(rf):
+            n_i = int(n)
+            if n_i < 1:
+                raise ValueError(f"refine_factor[{i}] must be >= 1, got {n_i}")
+            out.append(n_i)
+        return out
+
+    # Pre-allocate: estimate size (upper bound = unrefined + refined*prod(refine_splits))
     n_cells = len(region_cells)
     n_refine = len(refine_set)
     if n_refine > 0:
         D = region_cells[0][0].reshape(-1).numel()
-        max_new_cells = (n_cells - n_refine) + n_refine * (refine_factor ** D)
+        refine_splits = _normalize_refine_splits(refine_factor, D)
+        growth = int(np.prod(refine_splits))
+        max_new_cells = (n_cells - n_refine) + n_refine * growth
     else:
         max_new_cells = n_cells
 
