@@ -96,7 +96,7 @@ def in_box(x1, x2, box):
 # Control Network
 def load_control_net(bundle_path, device="cpu"):
     bundle = load_eval_bundle(bundle_path, map_location="cpu")
-    rl_policy_net = InvertControlNN(input_dim=2, hidden_dim=8, output_dim=1)
+    rl_policy_net = InvertControlNN(hidden_dim=64)
     control_net = WrapperConterlNN(rl_policy_net).to(device)
     if bundle["control_state_dict"] is not None:
         control_net.load_state_dict(bundle["control_state_dict"])

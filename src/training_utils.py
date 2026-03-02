@@ -101,6 +101,7 @@ def compute_loss_generator_bounds(
     delta = 1e-4
     loss = F.relu(Phi_upper - float(generator_threshold) + delta).sum()
     sat = bool(Phi_upper.max() < float(generator_threshold))
+    print(Phi_upper.max())
     return loss, sat
 
 def compute_total_loss_bounds(

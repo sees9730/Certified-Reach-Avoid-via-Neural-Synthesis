@@ -26,6 +26,7 @@ from src.training_utils import (
 from src.visualization import visualize_training_progress
 from src.regions import Regions
 from src.hyperparameters import Hyperparameters
+from src.lp_solving import solve_last_layer_lp
 
 
 def _check_user_stop_command() -> bool:
@@ -176,11 +177,9 @@ def train_network_bounds(
         start_time = time.time()
     final_beta_s = None
     has_sat_certificate = False
-    has_stage3_sat_certificate = False
     stop_prompt_shown = False
     user_stop_requested = False
     latest_sat_checkpoint = None
-    latest_stage3_sat_checkpoint = None
     last_refine_epoch = {'goal': None, 'unsafe': None, 'init': None, 'outside': None, 'generator': None}
     last_refine_loss = {'goal': None, 'unsafe': None, 'init': None, 'outside': None, 'generator': None}
     simple_refine_mode = bool(getattr(params.refinement, "use_simple_refinement", False))
@@ -188,11 +187,10 @@ def train_network_bounds(
     simple_loss_improve_tol = float(getattr(params.refinement, "simple_loss_improve_tol", 0.01))
     simple_refine_budget = int(getattr(params.refinement, "simple_refine_budget", 100))
     simple_regions_per_trigger = int(getattr(params.refinement, "simple_regions_per_trigger", 2))
+    enable_force_refinement = bool(getattr(params.refinement, "enable_force_refinement", True))
     simple_last_refine_loss = None
-    stage3_force_refine_interval = int(getattr(params.refinement, "stage3_force_refine_interval", 1000))
-    stage3_window_start_epoch = None
-    stage3_window_start_beta = None
-    stage3_refined_in_window = False
+    stage2_force_refine_interval = int(getattr(params.refinement, "stage2_force_refine_interval", 0))
+    stage2_last_progress_epoch = None
     generator_after_v_sat = bool(getattr(params.training, "generator_after_v_sat", False))
     generator_ramp_epochs = int(getattr(params.training, "generator_ramp_epochs", 0))
     generator_target_weight = float(params.training.generator_weight)
@@ -204,17 +202,34 @@ def train_network_bounds(
     generator_threshold_step = float(getattr(params.training, "generator_threshold_step", 0.1))
     generator_threshold_step_fine = float(getattr(params.training, "generator_threshold_step_fine", 0.02))
     generator_threshold_switch = float(getattr(params.training, "generator_threshold_switch", 0.2))
-    generator_threshold_margin = 1e-3
+    use_last_layer_lp = bool(getattr(params.training, "use_last_layer_lp", False))
+    last_layer_lp_interval = int(getattr(params.training, "last_layer_lp_interval", 0))
+    last_layer_lp_max_cells = int(getattr(params.training, "last_layer_lp_max_cells", 5000))
+    last_layer_lp_timeout_sec = float(getattr(params.training, "last_layer_lp_timeout_sec", 30.0))
+    last_layer_lp_verbose = bool(getattr(params.training, "last_layer_lp_verbose", False))
+    verify_lp_apply_sat = bool(getattr(params.training, "verify_lp_apply_sat", True))
+    lp_eps_gen = 1e-4
     gv_phase_active = (not generator_after_v_sat)
     gv_phase_start_epoch = int(params.training.generator_start_epoch) if gv_phase_active else None
+    pending_lr_reset = False
+    base_lr = float(params.training.learning_rate)
+
+    def _current_stage_id() -> str:
+        """
+        Best-effort stage labeling for curriculum runs:
+          - stage1: V-only warmup before generator phase is enabled
+          - stage2: generator active
+        """
+        if not params.compute_GV:
+            return "v_only"
+        if generator_after_v_sat and not gv_phase_active:
+            return "stage1"
+        return "stage2"
 
     def _reset_v_refinement_baselines():
         """Reset V-region refinement baselines after a curriculum phase change."""
-        nonlocal simple_last_refine_loss, stage3_window_start_epoch, stage3_window_start_beta, stage3_refined_in_window
+        nonlocal simple_last_refine_loss
         simple_last_refine_loss = None
-        stage3_window_start_epoch = None
-        stage3_window_start_beta = None
-        stage3_refined_in_window = False
         for k in ('goal', 'unsafe', 'init', 'outside'):
             last_refine_loss[k] = None
             last_refine_epoch[k] = None
@@ -240,36 +255,31 @@ def train_network_bounds(
             return False
         return True
 
-    def _stage3_active() -> bool:
-        """Return True when training is in stage-3 (beta curriculum phase)."""
-        if not getattr(params.constraints, "use_beta_ra_curriculum", False):
-            return True
-        if params.compute_GV and use_gen_thresh_curr:
-            return (
-                generator_threshold_current is not None and
-                generator_threshold_current <= generator_threshold_final + 1e-8
-            )
-        return True
+    def _stage2_active() -> bool:
+        """Return True when training is in stage-2 (generator-active phase)."""
+        return params.compute_GV and gv_phase_active
 
     def _snapshot_region_cells(cells_dict: dict) -> dict:
         """Shallow-copy region cell lists (tuples/tensors are treated as immutable here)."""
         return {k: list(v) for k, v in cells_dict.items()}
 
     for epoch in range(params.training.num_epochs):
+        stage_id_before = _current_stage_id()
         if _check_user_stop_command():
-            if has_stage3_sat_certificate and latest_stage3_sat_checkpoint is not None:
+            if has_sat_certificate and latest_sat_checkpoint is not None:
                 print("\n" + "="*20)
                 print("User requested stop. Restoring latest SAT certificate and stopping.")
                 print("="*20)
                 user_stop_requested = True
                 break
-            print("Stop ignored: stage-3 SAT certificate/controller not available yet.")
+            print("Stop ignored: SAT certificate/controller not available yet.")
 
         V_net.train()
         needs_v_cache_rebuild = False
         needs_gv_cache_rebuild = False
 
         optimizer.zero_grad()
+        lp_solved_this_epoch = False
 
         if params.compute_V:
             # Compute bounds for ALL V cells at once
@@ -351,10 +361,272 @@ def train_network_bounds(
 
         total_loss, loss_dict, sat_dict = compute_total_loss_bounds(**loss_kwargs)
         total_loss_val = float(loss_dict['total'])
+        all_satisfied_current = True
+        if params.compute_V:
+            for key in ['goal', 'unsafe', 'init', 'outside']:
+                if sat_dict[key] is False:
+                    all_satisfied_current = False
+                    break
+        if params.compute_GV and sat_dict.get('generator', True) is False:
+            all_satisfied_current = False
+
+        # LP diagnostic must use the exact same model parameters and partitions as
+        # the SAT check above (before any LP-apply/refinement/optimizer update).
+        if use_last_layer_lp and all_satisfied_current:
+            beta_lp_diag = (
+                float(beta_ra_current)
+                if (getattr(params.constraints, "use_beta_ra_curriculum", False) and beta_ra_current is not None)
+                else float(params.constraints.beta_ra)
+            )
+            gen_th_diag = (
+                float(generator_threshold_current)
+                if (use_gen_thresh_curr and generator_threshold_current is not None)
+                else 0.0
+            )
+            lp_include_v_diag = bool(params.compute_V)
+            lp_include_g_diag = bool(params.compute_GV and can_start_gv and current_gen_weight > 0.0)
+            lp_diag_res = solve_last_layer_lp(
+                v_net=V_net,
+                gv_net=GV_net,
+                region_cells=region_cells,
+                beta_ra_target=beta_lp_diag,
+                generator_threshold=gen_th_diag,
+                eps_gen=lp_eps_gen,
+                include_v_constraints=lp_include_v_diag,
+                include_generator_constraints=lp_include_g_diag,
+                apply_solution=False,
+                device=params.training.device,
+                timeout_sec=last_layer_lp_timeout_sec,
+                verbose=last_layer_lp_verbose,
+            )
+            if not lp_diag_res.solved:
+                raise RuntimeError(
+                    "[LP-DIAG] Bound-loss is SAT but LP is infeasible on the same "
+                    "parameters/partitions. "
+                    f"epoch={epoch+1}, beta_ra_k={beta_lp_diag:.6f}, "
+                    f"gen_th={gen_th_diag:.6f}, eps_gen={lp_eps_gen:.6e}, "
+                    f"active(V={lp_include_v_diag}, G={lp_include_g_diag}), "
+                    f"lp_status={lp_diag_res.status}, msg={lp_diag_res.message}"
+                )
+            print(
+                f"[LP-DIAG] SAT epoch {epoch+1}: LP feasible "
+                f"(status={lp_diag_res.status}, t_opt={lp_diag_res.t_opt:.4e})."
+            )
+
+        # Optional LP step (order by design):
+        #   1) compute output-bound loss first
+        #   2) solve LP on last-layer features
+        #   3) if LP gives SAT parameters, use them and skip gradient step
+        #   4) otherwise restore and continue standard bound-loss gradient descent
+        if use_last_layer_lp and last_layer_lp_interval > 0 and ((epoch + 1) % last_layer_lp_interval == 0):
+            lp_include_v = bool(params.compute_V)
+            lp_include_g = bool(params.compute_GV and can_start_gv and current_gen_weight > 0.0)
+            total_lp_cells = 0
+            if lp_include_v:
+                total_lp_cells += (
+                    len(region_cells.get('goal', []))
+                    + len(region_cells.get('outside', []))
+                    + len(region_cells.get('unsafe', []))
+                    + len(region_cells.get('init', []))
+                )
+            if lp_include_g:
+                total_lp_cells += len(region_cells.get('generator', []))
+
+            if total_lp_cells <= last_layer_lp_max_cells:
+                beta_lp = (
+                    float(beta_ra_current)
+                    if (getattr(params.constraints, "use_beta_ra_curriculum", False) and beta_ra_current is not None)
+                    else float(params.constraints.beta_ra)
+                )
+                generator_threshold_lp = (
+                    float(generator_threshold_current)
+                    if (use_gen_thresh_curr and generator_threshold_current is not None)
+                    else 0.0
+                )
+                lp_res = solve_last_layer_lp(
+                    v_net=V_net,
+                    gv_net=GV_net,
+                    region_cells=region_cells,
+                    beta_ra_target=beta_lp,
+                    generator_threshold=generator_threshold_lp,
+                    eps_gen=lp_eps_gen,
+                    include_v_constraints=lp_include_v,
+                    include_generator_constraints=lp_include_g,
+                    apply_solution=True,
+                    device=params.training.device,
+                    timeout_sec=last_layer_lp_timeout_sec,
+                    verbose=last_layer_lp_verbose,
+                )
+
+                if lp_res.solved:
+                    # LP can update V last-layer parameters/buffers (e.g., output_offset).
+                    # Rebuild cached LiRPA models so subsequent bounds reflect updated values.
+                    if params.compute_V:
+                        total_cells_V = sum(len(region_cells[name]) for name in region_order_V)
+                        all_cells_V = [None] * total_cells_V
+                        idx = 0
+                        for name in region_order_V:
+                            cell_counts_V[name] = len(region_cells[name])
+                            for cell in region_cells[name]:
+                                all_cells_V[idx] = cell
+                                idx += 1
+                        input_lowers_all, input_uppers_all = prepare_cell_bounds(
+                            all_cells_V, params.training.device, input_dim=params.network.n_inputs
+                        )
+                        crown_cache_all = SymbolicCROWNCache(
+                            model=V_net,
+                            num_cells=total_cells_V,
+                            input_dim=params.network.n_inputs,
+                            device=params.training.device,
+                        )
+                        region_slice_indices = {}
+                        start_idx = 0
+                        for name in region_order_V:
+                            num = cell_counts_V[name]
+                            region_slice_indices[name] = (start_idx, start_idx + num)
+                            start_idx += num
+                    if params.compute_GV:
+                        total_cells_GV = len(region_cells['generator'])
+                        input_lowers_gen, input_uppers_gen = prepare_cell_bounds(
+                            region_cells['generator'], params.training.device, input_dim=params.network.n_inputs
+                        )
+                        crown_cache_phi = SymbolicCROWNCache_Phi(
+                            phi_module=GV_net,
+                            num_cells=total_cells_GV,
+                            input_dim=params.network.n_inputs,
+                            device=params.training.device,
+                        )
+
+                    # Recompute output bounds and loss after LP-updated last layer.
+                    if params.compute_V:
+                        if total_cells_V > 0:
+                            v_lowers_all, v_uppers_all = crown_cache_all.compute_bounds(input_lowers_all, input_uppers_all)
+                        else:
+                            v_lowers_all = empty_tensor
+                            v_uppers_all = empty_tensor
+                        for name in region_order_V:
+                            start, end = region_slice_indices[name]
+                            if start < end:
+                                bounds[name] = (v_lowers_all[start:end], v_uppers_all[start:end])
+                            else:
+                                bounds[name] = (empty_tensor, empty_tensor)
+                    if params.compute_GV:
+                        if can_start_gv:
+                            phi_uppers = crown_cache_phi.compute_bounds(input_lowers_gen, input_uppers_gen)
+                            generator_fail_threshold = (
+                                float(generator_threshold_current)
+                                if (use_gen_thresh_curr and generator_threshold_current is not None)
+                                else 0.0
+                            )
+                            phi_upper_failing_mask = phi_uppers > generator_fail_threshold
+                            num_total_failing = phi_upper_failing_mask.sum().item()
+
+                    if params.compute_V:
+                        loss_kwargs['V_goal_lower'] = bounds['goal'][0]
+                        if (getattr(params.constraints, "use_terminal_beta_curriculum", False)
+                            and not getattr(params.constraints, "use_beta_ra_curriculum", False)):
+                            n_unsafe_total = len(bounds['unsafe'][0])
+                            n_terminal = int(getattr(params.constraints, "unsafe_terminal_cell_count", 0))
+                            n_terminal = min(max(n_terminal, 0), n_unsafe_total)
+                            n_tube = n_unsafe_total - n_terminal
+                            loss_kwargs['V_unsafe_lower_tube'] = bounds['unsafe'][0][:n_tube]
+                            loss_kwargs['V_unsafe_lower_terminal'] = bounds['unsafe'][0][n_tube:]
+                            loss_kwargs['beta_ra_terminal'] = beta_ra_terminal_current
+                            loss_kwargs['V_unsafe_lower'] = None
+                        else:
+                            loss_kwargs['V_unsafe_lower'] = bounds['unsafe'][0]
+                            loss_kwargs['V_unsafe_lower_tube'] = None
+                            loss_kwargs['V_unsafe_lower_terminal'] = None
+                            loss_kwargs['beta_ra_terminal'] = None
+                        loss_kwargs['V_init_upper'] = bounds['init'][1]
+                        loss_kwargs['V_outside_lower'] = bounds['outside'][0]
+                    if params.compute_GV:
+                        loss_kwargs['Phi_upper'] = phi_uppers
+                        loss_kwargs['generator_threshold'] = generator_threshold_lp
+
+                    total_loss, loss_dict, sat_dict = compute_total_loss_bounds(**loss_kwargs)
+                    total_loss_val = float(loss_dict['total'])
+                    lp_v_sat = (
+                        (not lp_include_v) or
+                        (bool(sat_dict.get('goal', False))
+                         and bool(sat_dict.get('unsafe', False))
+                         and bool(sat_dict.get('init', False))
+                         and bool(sat_dict.get('outside', False)))
+                    )
+                    lp_g_sat = ((not lp_include_g) or bool(sat_dict.get('generator', False)))
+                    if verify_lp_apply_sat and not (lp_v_sat and lp_g_sat):
+                        unsafe_min = float(bounds['unsafe'][0].min().item()) if (params.compute_V and bounds['unsafe'][0].numel() > 0) else float('nan')
+                        init_max = float(bounds['init'][1].max().item()) if (params.compute_V and bounds['init'][1].numel() > 0) else float('nan')
+                        goal_min = float(bounds['goal'][0].min().item()) if (params.compute_V and bounds['goal'][0].numel() > 0) else float('nan')
+                        outside_min = float(bounds['outside'][0].min().item()) if (params.compute_V and bounds['outside'][0].numel() > 0) else float('nan')
+                        gen_max = float(phi_uppers.max().item()) if (params.compute_GV and phi_uppers.numel() > 0) else float('nan')
+                        raise RuntimeError(
+                            "[LP] Feasible LP solution did not satisfy active output-bound constraints after apply. "
+                            f"epoch={epoch+1}, status={lp_res.status}, beta_ra_k={beta_lp:.6f}, "
+                            f"gen_th={generator_threshold_lp:.6f}, eps_gen={lp_eps_gen:.6e}, "
+                            f"sat(goal={sat_dict.get('goal')}, unsafe={sat_dict.get('unsafe')}, "
+                            f"init={sat_dict.get('init')}, outside={sat_dict.get('outside')}, "
+                            f"generator={sat_dict.get('generator')}), "
+                            f"mins(goal={goal_min:.6f}, unsafe={unsafe_min:.6f}, outside={outside_min:.6f}), "
+                            f"max(init={init_max:.6f}, gen={gen_max:.6f})."
+                        )
+                    lp_solved_this_epoch = True
+                    print(
+                        f"[LP] solved at epoch {epoch+1}. "
+                        f"Applied LP solution to V last layer. "
+                        f"beta_ra_k={beta_lp:.4f}, gen_th={generator_threshold_lp:.4f}, "
+                        f"eps_gen={lp_eps_gen:.1e}, active(V={lp_include_v}, G={lp_include_g}), "
+                        f"status={lp_res.status}, t_opt={lp_res.t_opt:.4e}"
+                    )
+                else:
+                    print(f"[LP] skipped/failed at epoch {epoch+1}: {lp_res.message}")
+            elif last_layer_lp_verbose:
+                print(
+                    f"[LP] skipped at epoch {epoch+1}: total cells {total_lp_cells} > "
+                    f"last_layer_lp_max_cells {last_layer_lp_max_cells}"
+                )
+
         refinement_candidates = []
         pre_refine_all_satisfied = True
         forced_refinement_done = False
         refinement_done_this_epoch = False
+        threshold_decreased_this_epoch = False
+
+        def _pick_refinement_candidates():
+            refinement_candidates.sort(key=lambda c: c['severity'], reverse=True)
+            selected = refinement_candidates[:max(1, simple_regions_per_trigger)]
+            per_region_budget = max(1, simple_refine_budget // max(1, len(selected)))
+            return selected, per_region_budget
+
+        def _apply_refinement_candidates(selected, per_region_budget: int, epoch_1b: int, forced: bool):
+            nonlocal needs_v_cache_rebuild, needs_gv_cache_rebuild
+            nonlocal refinement_done_this_epoch, simple_last_refine_loss
+            for c in selected:
+                new_cells, num_refined = refine_failing_cells(
+                    region_cells[c['name']],
+                    c['failing_mask'],
+                    c['cfg'].refine_factor,
+                    N_to_refine=per_region_budget,
+                    scores=c['scores'],
+                )
+                region_cells[c['name']] = new_cells
+                if forced:
+                    print(
+                        f"Forced refining {c['name']} cells: {c['num_failing']} failing, "
+                        f"refined {num_refined} cells, {len(new_cells)} total"
+                    )
+                else:
+                    print(
+                        f"Refining {c['name']} cells (simple mode): {c['num_failing']} failing, "
+                        f"refined {num_refined} cells, {len(new_cells)} total"
+                    )
+                refinement_epochs[c['name']].append(epoch_1b)
+                if c['name'] == 'generator':
+                    needs_gv_cache_rebuild = True
+                else:
+                    needs_v_cache_rebuild = True
+                refinement_done_this_epoch = True
+            simple_last_refine_loss = None if forced else total_loss_val
         if params.compute_V:
             for key in ['goal', 'unsafe', 'init', 'outside']:
                 if sat_dict[key] is False:
@@ -374,7 +646,13 @@ def train_network_bounds(
             )
 
         # Backward pass
-        total_loss.backward()
+        if not lp_solved_this_epoch:
+            total_loss.backward()
+        elif last_layer_lp_verbose:
+            print(
+                f"[LP] epoch {epoch+1}: LP solution applied; "
+                "skipping gradient/backprop parameter update."
+            )
 
         # Reuse current-epoch V bounds for refinement/logging to avoid an extra
         # full bound pass per epoch (major runtime cost).
@@ -460,6 +738,23 @@ def train_network_bounds(
                         refinement_epochs['unsafe'].append(epoch + 1)
                         last_refine_epoch['unsafe'] = epoch + 1
                         last_refine_loss['unsafe'] = total_loss_val
+
+                if (v_cfg.enable_merging and
+                    (epoch + 1) % v_cfg.merge_interval == 0):
+                    # Unsafe constraint is V >= beta; use a relaxed failing threshold
+                    # beta + margin to protect near-boundary cells from being merged.
+                    unsafe_failing_mask_relax = bounds_updated['unsafe'][0] < (
+                        beta_unsafe_current + float(v_cfg.merge_relax_margin)
+                    )
+                    merged_cells, num_merges = merge_passing_neighbor_cells(
+                        region_cells['unsafe'],
+                        unsafe_failing_mask_relax,
+                        max_passes=v_cfg.merge_max_passes,
+                        max_merges=None,
+                    )
+                    region_cells['unsafe'] = merged_cells
+                    print(f"Merging unsafe cells: merged {num_merges} pairs, {len(merged_cells)} total")
+                    needs_v_cache_rebuild = True
 
             # Init: V in [0, 1]
             if len(bounds_updated['init'][0]) > 0 and len(bounds_updated['init'][1]) > 0:
@@ -572,63 +867,6 @@ def train_network_bounds(
                 print(f"Merging generator cells: merged {num_merges} pairs, {len(merged_cells)} total")
                 needs_gv_cache_rebuild = True
 
-        if (
-            stage3_force_refine_interval > 0
-            and _stage3_active()
-            and getattr(params.constraints, "use_beta_ra_curriculum", False)
-            and not skip_refinement_this_epoch
-        ):
-            epoch_1b = epoch + 1
-            current_beta_k = (
-                float(beta_ra_current)
-                if beta_ra_current is not None
-                else float(params.constraints.beta_ra)
-            )
-            if stage3_window_start_epoch is None:
-                stage3_window_start_epoch = epoch_1b
-                stage3_window_start_beta = current_beta_k
-                stage3_refined_in_window = False
-            if refinement_done_this_epoch:
-                stage3_refined_in_window = True
-
-            window_len = epoch_1b - stage3_window_start_epoch + 1
-            if window_len >= stage3_force_refine_interval:
-                beta_increased = current_beta_k > float(stage3_window_start_beta) + 1e-8
-                no_refine = not stage3_refined_in_window
-                if (no_refine or (not beta_increased)) and len(refinement_candidates) > 0:
-                    refinement_candidates.sort(key=lambda c: c['severity'], reverse=True)
-                    selected = refinement_candidates[:max(1, simple_regions_per_trigger)]
-                    per_region_budget = max(1, simple_refine_budget // max(1, len(selected)))
-                    reason = "no refinement" if no_refine else "beta_ra_k did not increase"
-                    print(
-                        f"Stage-3 forced refinement at epoch {epoch_1b} ({reason} in last {stage3_force_refine_interval} epochs)."
-                    )
-                    for c in selected:
-                        new_cells, num_refined = refine_failing_cells(
-                            region_cells[c['name']],
-                            c['failing_mask'],
-                            c['cfg'].refine_factor,
-                            N_to_refine=per_region_budget,
-                            scores=c['scores'],
-                        )
-                        region_cells[c['name']] = new_cells
-                        print(
-                            f"Forced refining {c['name']} cells: {c['num_failing']} failing, "
-                            f"refined {num_refined} cells, {len(new_cells)} total"
-                        )
-                        refinement_epochs[c['name']].append(epoch_1b)
-                        if c['name'] == 'generator':
-                            needs_gv_cache_rebuild = True
-                        else:
-                            needs_v_cache_rebuild = True
-                        refinement_done_this_epoch = True
-                    simple_last_refine_loss = None
-                    forced_refinement_done = True
-
-                stage3_window_start_epoch = epoch_1b + 1
-                stage3_window_start_beta = current_beta_k
-                stage3_refined_in_window = False
-
         if simple_refine_mode and not skip_refinement_this_epoch and not forced_refinement_done:
             epoch_1b = epoch + 1
             on_refine_tick = simple_refine_every > 0 and (epoch_1b % simple_refine_every == 0)
@@ -637,29 +875,8 @@ def train_network_bounds(
                 total_loss_val < simple_last_refine_loss * (1.0 - simple_loss_improve_tol)
             )
             if on_refine_tick and improved_enough and len(refinement_candidates) > 0:
-                refinement_candidates.sort(key=lambda c: c['severity'], reverse=True)
-                selected = refinement_candidates[:max(1, simple_regions_per_trigger)]
-                per_region_budget = max(1, simple_refine_budget // max(1, len(selected)))
-                for c in selected:
-                    new_cells, num_refined = refine_failing_cells(
-                        region_cells[c['name']],
-                        c['failing_mask'],
-                        c['cfg'].refine_factor,
-                        N_to_refine=per_region_budget,
-                        scores=c['scores'],
-                    )
-                    region_cells[c['name']] = new_cells
-                    print(
-                        f"Refining {c['name']} cells (simple mode): {c['num_failing']} failing, "
-                        f"refined {num_refined} cells, {len(new_cells)} total"
-                    )
-                    refinement_epochs[c['name']].append(epoch_1b)
-                    if c['name'] == 'generator':
-                        needs_gv_cache_rebuild = True
-                    else:
-                        needs_v_cache_rebuild = True
-                    refinement_done_this_epoch = True
-                simple_last_refine_loss = total_loss_val
+                selected, per_region_budget = _pick_refinement_candidates()
+                _apply_refinement_candidates(selected, per_region_budget, epoch_1b, forced=False)
 
         # Logging
         if epoch % params.logging.loss_log_interval == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
@@ -739,12 +956,9 @@ def train_network_bounds(
                 controller_ready = (
                     control_net is None or latest_sat_checkpoint['control_state_dict'] is not None
                 )
-                if _stage3_active() and controller_ready:
-                    has_stage3_sat_certificate = True
-                    latest_stage3_sat_checkpoint = latest_sat_checkpoint
-                    if not stop_prompt_shown:
-                        print("Stage-3 SAT certificate found. You can now type 'stop' + Enter to early stop.")
-                        stop_prompt_shown = True
+                if controller_ready and not stop_prompt_shown:
+                    print("SAT certificate found. You can now type 'stop' + Enter to early stop.")
+                    stop_prompt_shown = True
 
             if (params.compute_GV and gv_phase_active and use_gen_thresh_curr and all_satisfied):
                 if generator_threshold_current > generator_threshold_final + 1e-8:
@@ -761,6 +975,7 @@ def train_network_bounds(
                         generator_threshold_final,
                         current_generator_upper - dec_step
                     )
+                    threshold_decreased_this_epoch = True
                     # New generator threshold defines a new optimization phase; reset
                     # refinement improvement baselines so refinement can trigger again.
                     simple_last_refine_loss = None
@@ -770,6 +985,35 @@ def train_network_bounds(
                     print(f"Decremented generator_threshold_k to {generator_threshold_current:.4f}")
                 else:
                     print(f"generator_threshold_k reached target {generator_threshold_current:.4f}")
+
+            # Stage-2 watchdog:
+            # If there has been neither refinement nor threshold decrease for a fixed
+            # window, force refinement from the current candidates.
+            if enable_force_refinement and stage2_force_refine_interval > 0:
+                epoch_1b = epoch + 1
+                if _stage2_active() and not skip_refinement_this_epoch:
+                    if stage2_last_progress_epoch is None:
+                        stage2_last_progress_epoch = epoch_1b
+                    if refinement_done_this_epoch or threshold_decreased_this_epoch:
+                        stage2_last_progress_epoch = epoch_1b
+
+                    epochs_since_progress = epoch_1b - int(stage2_last_progress_epoch)
+                    if (
+                        epochs_since_progress >= stage2_force_refine_interval
+                        and (not forced_refinement_done)
+                        and len(refinement_candidates) > 0
+                    ):
+                        selected, per_region_budget = _pick_refinement_candidates()
+                        print(
+                            f"Stage-2 forced refinement at epoch {epoch_1b} "
+                            f"(no refinement/threshold decrease in last {stage2_force_refine_interval} epochs)."
+                        )
+                        _apply_refinement_candidates(selected, per_region_budget, epoch_1b, forced=True)
+                        forced_refinement_done = True
+                        stage2_last_progress_epoch = epoch_1b
+                else:
+                    # Reset watchdog when not in active stage-2.
+                    stage2_last_progress_epoch = None
 
             # Check if beta_ra is greater than 20.0, if not, increase it
             # if bounds_updated['unsafe'][0].min() > params.constraints.beta_ra and params.constraints.beta_ra < 20.0:
@@ -811,6 +1055,14 @@ def train_network_bounds(
                 print(f"Incremented beta_ra to {params.constraints.beta_ra:.2f}")
             elif all_satisfied:
                 print(f"beta_ra reached maximum of {params.constraints.beta_ra:.2f}")
+
+            stage_id_after = _current_stage_id()
+            if stage_id_after != stage_id_before:
+                pending_lr_reset = True
+                print(
+                    f"Stage transition {stage_id_before} -> {stage_id_after}; "
+                    f"will reset lr to {base_lr:.6g}."
+                )
 
             # Early stop if all active constraints are satisfied
             if all_satisfied:
@@ -864,16 +1116,24 @@ def train_network_bounds(
                 output_dir="training_progress"
             )
 
-        # Optimizer step
-        optimizer.step()
+        # Optimizer/scheduler step: skip when LP already produced a feasible
+        # last-layer solution this epoch.
+        if not lp_solved_this_epoch:
+            optimizer.step()
 
-        # Update scheduler after optimizer step
-        if scheduler is not None:
-            # ReduceLROnPlateau needs metrics, StepLR/etc don't
-            if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
-                scheduler.step(total_loss.item())
-            else:
-                scheduler.step()
+            # Update scheduler after optimizer step
+            if scheduler is not None:
+                # ReduceLROnPlateau needs metrics, StepLR/etc don't
+                if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+                    scheduler.step(total_loss.item())
+                else:
+                    scheduler.step()
+
+        if pending_lr_reset:
+            for group in optimizer.param_groups:
+                group['lr'] = base_lr
+            pending_lr_reset = False
+            print(f"Reinitialized learning rate to {base_lr:.6g} after stage switch.")
 
         # Rebuild CROWN caches after optimizer step if needed (after adaptive refinement)
         if needs_v_cache_rebuild:
@@ -920,24 +1180,24 @@ def train_network_bounds(
                 )
                 print(f"Rebuilt Phi cache with {total_cells_GV} cells")
 
-    if user_stop_requested and latest_stage3_sat_checkpoint is not None:
-        V_net.load_state_dict(latest_stage3_sat_checkpoint['V_state_dict'])
-        if GV_net is not None and latest_stage3_sat_checkpoint['GV_state_dict'] is not None:
-            GV_net.load_state_dict(latest_stage3_sat_checkpoint['GV_state_dict'])
-        if control_net is not None and latest_stage3_sat_checkpoint.get('control_state_dict') is not None:
-            control_net.load_state_dict(latest_stage3_sat_checkpoint['control_state_dict'])
-        restored_cells = latest_stage3_sat_checkpoint.get('region_cells')
+    if user_stop_requested and latest_sat_checkpoint is not None:
+        V_net.load_state_dict(latest_sat_checkpoint['V_state_dict'])
+        if GV_net is not None and latest_sat_checkpoint['GV_state_dict'] is not None:
+            GV_net.load_state_dict(latest_sat_checkpoint['GV_state_dict'])
+        if control_net is not None and latest_sat_checkpoint.get('control_state_dict') is not None:
+            control_net.load_state_dict(latest_sat_checkpoint['control_state_dict'])
+        restored_cells = latest_sat_checkpoint.get('region_cells')
         if restored_cells is not None:
             for k in list(region_cells.keys()):
                 if k in restored_cells:
                     region_cells[k] = list(restored_cells[k])
-        if latest_stage3_sat_checkpoint.get('beta_ra_k') is not None:
-            params.constraints.beta_ra = float(latest_stage3_sat_checkpoint['beta_ra_k'])
-        if latest_stage3_sat_checkpoint.get('beta_ra_terminal_k') is not None:
-            params.constraints.beta_ra_terminal_init = float(latest_stage3_sat_checkpoint['beta_ra_terminal_k'])
-        final_beta_s = latest_stage3_sat_checkpoint['beta_s']
+        if latest_sat_checkpoint.get('beta_ra_k') is not None:
+            params.constraints.beta_ra = float(latest_sat_checkpoint['beta_ra_k'])
+        if latest_sat_checkpoint.get('beta_ra_terminal_k') is not None:
+            params.constraints.beta_ra_terminal_init = float(latest_sat_checkpoint['beta_ra_terminal_k'])
+        final_beta_s = latest_sat_checkpoint['beta_s']
         print(
-            f"Loaded SAT certificate from epoch {latest_stage3_sat_checkpoint['epoch']} "
+            f"Loaded SAT certificate from epoch {latest_sat_checkpoint['epoch']} "
             f"(beta_s={final_beta_s:.4f}, beta_ra_k={params.constraints.beta_ra:.4f})"
         )
 

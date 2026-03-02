@@ -1,0 +1,1126 @@
+
+====================
+Pre-training using samples
+====================
+GV pre-training enabled
+Epoch 0 | V_loss=19835.8398 | GV_loss=179.1656
+
+Best loss: 1000.122131
+Saved pretrained V_net to: /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/synthesis/inv_pend_syn/outputs/V_pretrained.pth
+Saved pretrained Controller_net to: /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/synthesis/inv_pend_syn/outputs/controller_pretrained.pth
+Pre-training complete. V + GV + Controller initialized.
+
+====================
+Region Discretization
+====================
+Init region: splits=20
+ 400 cells
+Goal region: splits=20
+ 400 cells
+Unsafe region: splits=20
+ 2400 cells
+Outside goal region: splits=10 per rectangle
+ 800 cells
+Generator region: splits=2 per rectangle
+ 88 cells
+
+====================
+Bound-based training
+====================
+=== Total cells per region for V ===
+init: 400 cells
+goal: 400 cells
+unsafe: 2400 cells
+outside: 800 cells
+Total V cells: 4000
+Created CROWN cache for V with 4000 cells
+/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/src/phi_module.py:549: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  self._cached_scale_D == D
+Created 88 CROWN caches for GV
+tensor(649.5745, grad_fn=<MaxBackward1>)
+Epoch     0 | Total: 18072.5176 | Goal: 1159.5024 | Unsafe:   0.0000 | Init: 146.5278 | Outside: 2038.1920 | Gen: 14728.2949 | Time: 3.3s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+=== Detailed Evaluation ===
+Goal:      FAIL, V bounds: [ -7.127,  16.517] | 117/400 pass (29.2%)
+Unsafe:    FAIL, V bounds: [  3.260, 115.112] | 1786/2400 pass (74.4%)
+Init:      FAIL, V bounds: [ -5.002,   3.739] | 272/400 pass (68.0%)
+Outside:   FAIL, V bounds: [-15.664, 116.488] | 519/800 pass (64.9%)
+Generator: FAIL, GV bounds: [-89.771, 649.574] | 13/88 pass (14.8%)
+tensor(525.9518, grad_fn=<MaxBackward1>)
+tensor(443.2328, grad_fn=<MaxBackward1>)
+tensor(447.5156, grad_fn=<MaxBackward1>)
+tensor(432.1195, grad_fn=<MaxBackward1>)
+tensor(410.3997, grad_fn=<MaxBackward1>)
+tensor(387.9118, grad_fn=<MaxBackward1>)
+tensor(366.8455, grad_fn=<MaxBackward1>)
+tensor(346.2220, grad_fn=<MaxBackward1>)
+tensor(324.0921, grad_fn=<MaxBackward1>)
+tensor(300.3953, grad_fn=<MaxBackward1>)
+Epoch    10 | Total: 8698.5742 | Goal: 687.0387 | Unsafe:   0.0000 | Init: 439.6149 | Outside: 1093.3759 | Gen: 6478.5449 | Time: 3.5s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(275.8116, grad_fn=<MaxBackward1>)
+tensor(250.9509, grad_fn=<MaxBackward1>)
+tensor(226.9749, grad_fn=<MaxBackward1>)
+tensor(203.6896, grad_fn=<MaxBackward1>)
+tensor(182.5869, grad_fn=<MaxBackward1>)
+tensor(165.3422, grad_fn=<MaxBackward1>)
+tensor(152.5575, grad_fn=<MaxBackward1>)
+tensor(139.5501, grad_fn=<MaxBackward1>)
+tensor(126.5891, grad_fn=<MaxBackward1>)
+tensor(114.0298, grad_fn=<MaxBackward1>)
+Epoch    20 | Total: 3460.4102 | Goal: 334.3736 | Unsafe:   0.3190 | Init:  58.1048 | Outside: 549.2468 | Gen: 2518.3662 | Time: 3.7s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(102.1609, grad_fn=<MaxBackward1>)
+tensor(94.7896, grad_fn=<MaxBackward1>)
+tensor(88.0406, grad_fn=<MaxBackward1>)
+tensor(81.5590, grad_fn=<MaxBackward1>)
+tensor(75.1797, grad_fn=<MaxBackward1>)
+tensor(68.8276, grad_fn=<MaxBackward1>)
+tensor(62.7170, grad_fn=<MaxBackward1>)
+tensor(57.0002, grad_fn=<MaxBackward1>)
+tensor(51.6470, grad_fn=<MaxBackward1>)
+tensor(46.6405, grad_fn=<MaxBackward1>)
+Epoch    30 | Total: 1151.2834 | Goal: 106.7901 | Unsafe:   0.0000 | Init:  23.0587 | Outside: 160.9300 | Gen: 860.5046 | Time: 3.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(42.0625, grad_fn=<MaxBackward1>)
+tensor(37.8988, grad_fn=<MaxBackward1>)
+tensor(34.1964, grad_fn=<MaxBackward1>)
+tensor(30.9119, grad_fn=<MaxBackward1>)
+tensor(28.0384, grad_fn=<MaxBackward1>)
+tensor(25.5259, grad_fn=<MaxBackward1>)
+tensor(23.3293, grad_fn=<MaxBackward1>)
+tensor(21.4139, grad_fn=<MaxBackward1>)
+tensor(19.7873, grad_fn=<MaxBackward1>)
+tensor(18.3665, grad_fn=<MaxBackward1>)
+Epoch    40 | Total:  425.1038 | Goal:  28.0107 | Unsafe:   0.7870 | Init:   0.0000 | Outside:  50.6105 | Gen: 345.6956 | Time: 4.1s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(17.1237, grad_fn=<MaxBackward1>)
+tensor(16.0664, grad_fn=<MaxBackward1>)
+tensor(15.1969, grad_fn=<MaxBackward1>)
+tensor(14.4698, grad_fn=<MaxBackward1>)
+tensor(13.8790, grad_fn=<MaxBackward1>)
+tensor(13.4133, grad_fn=<MaxBackward1>)
+tensor(13.0601, grad_fn=<MaxBackward1>)
+tensor(12.8073, grad_fn=<MaxBackward1>)
+tensor(12.6388, grad_fn=<MaxBackward1>)
+tensor(12.5317, grad_fn=<MaxBackward1>)
+Epoch    50 | Total:  304.3479 | Goal:   4.1327 | Unsafe:  80.3624 | Init:   0.0000 | Outside:  21.0774 | Gen: 198.7753 | Time: 4.3s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(12.4685, grad_fn=<MaxBackward1>)
+tensor(12.4452, grad_fn=<MaxBackward1>)
+tensor(12.4497, grad_fn=<MaxBackward1>)
+tensor(12.4788, grad_fn=<MaxBackward1>)
+tensor(12.5253, grad_fn=<MaxBackward1>)
+tensor(12.5855, grad_fn=<MaxBackward1>)
+tensor(12.6530, grad_fn=<MaxBackward1>)
+tensor(12.7269, grad_fn=<MaxBackward1>)
+tensor(12.8244, grad_fn=<MaxBackward1>)
+tensor(12.9302, grad_fn=<MaxBackward1>)
+Epoch    60 | Total:  243.3267 | Goal:   2.3971 | Unsafe:  36.5724 | Init:   0.0000 | Outside:  17.5371 | Gen: 186.8201 | Time: 4.5s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(13.0476, grad_fn=<MaxBackward1>)
+tensor(13.1822, grad_fn=<MaxBackward1>)
+tensor(13.3299, grad_fn=<MaxBackward1>)
+tensor(13.4756, grad_fn=<MaxBackward1>)
+tensor(13.5938, grad_fn=<MaxBackward1>)
+tensor(13.6587, grad_fn=<MaxBackward1>)
+tensor(13.6590, grad_fn=<MaxBackward1>)
+tensor(13.5957, grad_fn=<MaxBackward1>)
+tensor(13.4784, grad_fn=<MaxBackward1>)
+tensor(13.3156, grad_fn=<MaxBackward1>)
+Epoch    70 | Total:  213.5586 | Goal:   4.2381 | Unsafe:   2.3526 | Init:   0.0000 | Outside:  19.0131 | Gen: 187.9547 | Time: 4.7s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(13.1130, grad_fn=<MaxBackward1>)
+tensor(12.8821, grad_fn=<MaxBackward1>)
+tensor(12.6344, grad_fn=<MaxBackward1>)
+tensor(12.3908, grad_fn=<MaxBackward1>)
+tensor(12.1685, grad_fn=<MaxBackward1>)
+tensor(11.9874, grad_fn=<MaxBackward1>)
+tensor(11.8518, grad_fn=<MaxBackward1>)
+tensor(11.7560, grad_fn=<MaxBackward1>)
+tensor(11.6936, grad_fn=<MaxBackward1>)
+tensor(11.6490, grad_fn=<MaxBackward1>)
+Epoch    80 | Total:  193.4079 | Goal:   3.1159 | Unsafe:   8.5785 | Init:   0.0000 | Outside:  16.7489 | Gen: 164.9646 | Time: 4.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(11.6074, grad_fn=<MaxBackward1>)
+tensor(11.5581, grad_fn=<MaxBackward1>)
+tensor(11.4946, grad_fn=<MaxBackward1>)
+tensor(11.4165, grad_fn=<MaxBackward1>)
+tensor(11.3351, grad_fn=<MaxBackward1>)
+tensor(11.2574, grad_fn=<MaxBackward1>)
+tensor(11.1917, grad_fn=<MaxBackward1>)
+tensor(11.1433, grad_fn=<MaxBackward1>)
+tensor(11.1154, grad_fn=<MaxBackward1>)
+tensor(11.0990, grad_fn=<MaxBackward1>)
+Epoch    90 | Total:  179.3871 | Goal:   1.3779 | Unsafe:  13.2995 | Init:   0.0000 | Outside:  13.6532 | Gen: 151.0565 | Time: 5.0s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(11.0877, grad_fn=<MaxBackward1>)
+tensor(11.0698, grad_fn=<MaxBackward1>)
+tensor(11.0420, grad_fn=<MaxBackward1>)
+tensor(10.9979, grad_fn=<MaxBackward1>)
+tensor(10.9379, grad_fn=<MaxBackward1>)
+tensor(10.8640, grad_fn=<MaxBackward1>)
+tensor(10.7775, grad_fn=<MaxBackward1>)
+tensor(10.6840, grad_fn=<MaxBackward1>)
+tensor(10.5862, grad_fn=<MaxBackward1>)
+tensor(10.4914, grad_fn=<MaxBackward1>)
+Epoch   100 | Total:  168.7065 | Goal:   1.1692 | Unsafe:  11.7013 | Init:   0.0000 | Outside:  12.7660 | Gen: 143.0700 | Time: 5.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(10.4036, grad_fn=<MaxBackward1>)
+tensor(10.3228, grad_fn=<MaxBackward1>)
+tensor(10.2539, grad_fn=<MaxBackward1>)
+tensor(10.1997, grad_fn=<MaxBackward1>)
+tensor(10.1585, grad_fn=<MaxBackward1>)
+tensor(10.1235, grad_fn=<MaxBackward1>)
+tensor(10.0903, grad_fn=<MaxBackward1>)
+tensor(10.0530, grad_fn=<MaxBackward1>)
+tensor(10.0117, grad_fn=<MaxBackward1>)
+tensor(9.9693, grad_fn=<MaxBackward1>)
+Epoch   110 | Total:  159.6332 | Goal:   1.2135 | Unsafe:   9.5836 | Init:   0.0000 | Outside:  12.3857 | Gen: 136.4505 | Time: 5.4s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(9.9445, grad_fn=<MaxBackward1>)
+tensor(9.9331, grad_fn=<MaxBackward1>)
+tensor(9.9264, grad_fn=<MaxBackward1>)
+tensor(9.9209, grad_fn=<MaxBackward1>)
+tensor(9.9105, grad_fn=<MaxBackward1>)
+tensor(9.8833, grad_fn=<MaxBackward1>)
+tensor(9.8476, grad_fn=<MaxBackward1>)
+tensor(9.8086, grad_fn=<MaxBackward1>)
+tensor(9.7688, grad_fn=<MaxBackward1>)
+tensor(9.7329, grad_fn=<MaxBackward1>)
+Epoch   120 | Total:  151.6828 | Goal:   0.7933 | Unsafe:  10.1380 | Init:   0.0000 | Outside:  11.2642 | Gen: 129.4874 | Time: 5.6s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(9.7018, grad_fn=<MaxBackward1>)
+tensor(9.6742, grad_fn=<MaxBackward1>)
+tensor(9.6455, grad_fn=<MaxBackward1>)
+tensor(9.6140, grad_fn=<MaxBackward1>)
+tensor(9.5777, grad_fn=<MaxBackward1>)
+tensor(9.5458, grad_fn=<MaxBackward1>)
+tensor(9.5149, grad_fn=<MaxBackward1>)
+tensor(9.4874, grad_fn=<MaxBackward1>)
+tensor(9.4649, grad_fn=<MaxBackward1>)
+tensor(9.4472, grad_fn=<MaxBackward1>)
+Epoch   130 | Total:  144.3055 | Goal:   0.6007 | Unsafe:  10.1899 | Init:   0.0000 | Outside:  10.5615 | Gen: 122.9533 | Time: 5.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(9.4246, grad_fn=<MaxBackward1>)
+tensor(9.3955, grad_fn=<MaxBackward1>)
+tensor(9.3582, grad_fn=<MaxBackward1>)
+tensor(9.3108, grad_fn=<MaxBackward1>)
+tensor(9.2689, grad_fn=<MaxBackward1>)
+tensor(9.2376, grad_fn=<MaxBackward1>)
+tensor(9.2149, grad_fn=<MaxBackward1>)
+tensor(9.1972, grad_fn=<MaxBackward1>)
+tensor(9.1844, grad_fn=<MaxBackward1>)
+tensor(9.1716, grad_fn=<MaxBackward1>)
+Epoch   140 | Total:  136.9277 | Goal:   0.5388 | Unsafe:   8.6954 | Init:   0.0000 | Outside:  10.1589 | Gen: 117.5346 | Time: 6.0s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(9.1531, grad_fn=<MaxBackward1>)
+tensor(9.1339, grad_fn=<MaxBackward1>)
+tensor(9.1201, grad_fn=<MaxBackward1>)
+tensor(9.1075, grad_fn=<MaxBackward1>)
+tensor(9.0943, grad_fn=<MaxBackward1>)
+tensor(9.1042, grad_fn=<MaxBackward1>)
+tensor(9.1026, grad_fn=<MaxBackward1>)
+tensor(9.0866, grad_fn=<MaxBackward1>)
+tensor(9.0982, grad_fn=<MaxBackward1>)
+tensor(9.0765, grad_fn=<MaxBackward1>)
+Epoch   150 | Total:  129.2308 | Goal:   0.4280 | Unsafe:   8.1567 | Init:   0.0000 | Outside:   9.6411 | Gen: 111.0049 | Time: 6.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(9.0635, grad_fn=<MaxBackward1>)
+tensor(9.0841, grad_fn=<MaxBackward1>)
+tensor(9.1150, grad_fn=<MaxBackward1>)
+tensor(9.1031, grad_fn=<MaxBackward1>)
+tensor(9.0296, grad_fn=<MaxBackward1>)
+tensor(9.0129, grad_fn=<MaxBackward1>)
+tensor(9.0185, grad_fn=<MaxBackward1>)
+tensor(9.0177, grad_fn=<MaxBackward1>)
+tensor(9.0029, grad_fn=<MaxBackward1>)
+tensor(8.9771, grad_fn=<MaxBackward1>)
+Epoch   160 | Total:  121.5367 | Goal:   0.3345 | Unsafe:   7.7603 | Init:   0.0000 | Outside:   9.1085 | Gen: 104.3334 | Time: 6.4s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(8.9508, grad_fn=<MaxBackward1>)
+tensor(8.9170, grad_fn=<MaxBackward1>)
+tensor(8.8785, grad_fn=<MaxBackward1>)
+tensor(8.8465, grad_fn=<MaxBackward1>)
+tensor(8.7657, grad_fn=<MaxBackward1>)
+tensor(8.7135, grad_fn=<MaxBackward1>)
+tensor(8.7086, grad_fn=<MaxBackward1>)
+tensor(8.7307, grad_fn=<MaxBackward1>)
+tensor(8.6954, grad_fn=<MaxBackward1>)
+tensor(8.6104, grad_fn=<MaxBackward1>)
+Epoch   170 | Total:  114.2691 | Goal:   0.2815 | Unsafe:   7.1248 | Init:   0.0000 | Outside:   8.6823 | Gen:  98.1805 | Time: 6.6s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(8.5754, grad_fn=<MaxBackward1>)
+tensor(8.5866, grad_fn=<MaxBackward1>)
+tensor(8.5598, grad_fn=<MaxBackward1>)
+tensor(8.5319, grad_fn=<MaxBackward1>)
+tensor(8.5039, grad_fn=<MaxBackward1>)
+tensor(8.4203, grad_fn=<MaxBackward1>)
+tensor(8.3923, grad_fn=<MaxBackward1>)
+tensor(8.4119, grad_fn=<MaxBackward1>)
+tensor(8.3324, grad_fn=<MaxBackward1>)
+tensor(8.2065, grad_fn=<MaxBackward1>)
+Epoch   180 | Total:  107.7766 | Goal:   0.2068 | Unsafe:   6.7893 | Init:   0.0000 | Outside:   8.2218 | Gen:  92.5586 | Time: 6.8s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(8.1798, grad_fn=<MaxBackward1>)
+tensor(8.2191, grad_fn=<MaxBackward1>)
+tensor(8.1793, grad_fn=<MaxBackward1>)
+tensor(8.0803, grad_fn=<MaxBackward1>)
+tensor(7.9685, grad_fn=<MaxBackward1>)
+tensor(8.0398, grad_fn=<MaxBackward1>)
+tensor(8.0773, grad_fn=<MaxBackward1>)
+tensor(8.0381, grad_fn=<MaxBackward1>)
+tensor(7.9320, grad_fn=<MaxBackward1>)
+tensor(7.8663, grad_fn=<MaxBackward1>)
+Epoch   190 | Total:  101.6103 | Goal:   0.1767 | Unsafe:   5.9165 | Init:   0.0000 | Outside:   7.9078 | Gen:  87.6093 | Time: 7.0s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(7.8635, grad_fn=<MaxBackward1>)
+tensor(7.8512, grad_fn=<MaxBackward1>)
+tensor(7.8160, grad_fn=<MaxBackward1>)
+tensor(7.7640, grad_fn=<MaxBackward1>)
+tensor(7.7699, grad_fn=<MaxBackward1>)
+tensor(7.6953, grad_fn=<MaxBackward1>)
+tensor(7.6836, grad_fn=<MaxBackward1>)
+tensor(7.6746, grad_fn=<MaxBackward1>)
+tensor(7.5789, grad_fn=<MaxBackward1>)
+Refining generator cells (simple mode): 41 failing, refined 25 cells, 163 total
+Refining outside cells (simple mode): 96 failing, refined 25 cells, 875 total
+Refining unsafe cells (simple mode): 111 failing, refined 25 cells, 2475 total
+Refining goal cells (simple mode): 36 failing, refined 25 cells, 475 total
+Rebuilt V cache with 4225 cells
+Rebuilt Phi cache with 163 cells
+tensor(2.8364, grad_fn=<MaxBackward1>)
+Epoch   200 | Total:   44.0400 | Goal:   0.0109 | Unsafe:   3.0526 | Init:   0.0000 | Outside:   4.1572 | Gen:  36.8192 | Time: 8.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(2.7106, grad_fn=<MaxBackward1>)
+tensor(2.6651, grad_fn=<MaxBackward1>)
+tensor(2.6837, grad_fn=<MaxBackward1>)
+tensor(2.7371, grad_fn=<MaxBackward1>)
+tensor(2.6569, grad_fn=<MaxBackward1>)
+tensor(2.5471, grad_fn=<MaxBackward1>)
+tensor(2.5470, grad_fn=<MaxBackward1>)
+tensor(2.6352, grad_fn=<MaxBackward1>)
+tensor(2.6392, grad_fn=<MaxBackward1>)
+tensor(2.5159, grad_fn=<MaxBackward1>)
+Epoch   210 | Total:   40.0817 | Goal:   0.0550 | Unsafe:   0.8098 | Init:   0.0000 | Outside:   4.1376 | Gen:  35.0794 | Time: 8.4s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(2.4665, grad_fn=<MaxBackward1>)
+tensor(2.4930, grad_fn=<MaxBackward1>)
+tensor(2.5738, grad_fn=<MaxBackward1>)
+tensor(2.5584, grad_fn=<MaxBackward1>)
+tensor(2.4652, grad_fn=<MaxBackward1>)
+tensor(2.4367, grad_fn=<MaxBackward1>)
+tensor(2.4828, grad_fn=<MaxBackward1>)
+tensor(2.5051, grad_fn=<MaxBackward1>)
+tensor(2.4654, grad_fn=<MaxBackward1>)
+tensor(2.4166, grad_fn=<MaxBackward1>)
+Epoch   220 | Total:   37.9080 | Goal:   0.0214 | Unsafe:   1.1657 | Init:   0.0000 | Outside:   3.8828 | Gen:  32.8381 | Time: 8.7s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(2.4109, grad_fn=<MaxBackward1>)
+tensor(2.4072, grad_fn=<MaxBackward1>)
+tensor(2.3970, grad_fn=<MaxBackward1>)
+tensor(2.3823, grad_fn=<MaxBackward1>)
+tensor(2.4050, grad_fn=<MaxBackward1>)
+tensor(2.4080, grad_fn=<MaxBackward1>)
+tensor(2.3988, grad_fn=<MaxBackward1>)
+tensor(2.3845, grad_fn=<MaxBackward1>)
+tensor(2.3804, grad_fn=<MaxBackward1>)
+tensor(2.3869, grad_fn=<MaxBackward1>)
+Epoch   230 | Total:   36.1954 | Goal:   0.0076 | Unsafe:   1.0809 | Init:   0.0000 | Outside:   3.7123 | Gen:  31.3946 | Time: 8.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(2.3920, grad_fn=<MaxBackward1>)
+tensor(2.3855, grad_fn=<MaxBackward1>)
+tensor(2.3696, grad_fn=<MaxBackward1>)
+tensor(2.3516, grad_fn=<MaxBackward1>)
+tensor(2.3396, grad_fn=<MaxBackward1>)
+tensor(2.3406, grad_fn=<MaxBackward1>)
+tensor(2.3378, grad_fn=<MaxBackward1>)
+tensor(2.2996, grad_fn=<MaxBackward1>)
+tensor(2.2728, grad_fn=<MaxBackward1>)
+tensor(2.2606, grad_fn=<MaxBackward1>)
+Epoch   240 | Total:   34.6865 | Goal:   0.0068 | Unsafe:   0.7850 | Init:   0.0000 | Outside:   3.6303 | Gen:  30.2644 | Time: 9.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(2.2594, grad_fn=<MaxBackward1>)
+tensor(2.2573, grad_fn=<MaxBackward1>)
+tensor(2.2543, grad_fn=<MaxBackward1>)
+tensor(2.2533, grad_fn=<MaxBackward1>)
+tensor(2.2290, grad_fn=<MaxBackward1>)
+tensor(2.2117, grad_fn=<MaxBackward1>)
+tensor(2.2026, grad_fn=<MaxBackward1>)
+tensor(2.1949, grad_fn=<MaxBackward1>)
+tensor(2.1856, grad_fn=<MaxBackward1>)
+tensor(2.1911, grad_fn=<MaxBackward1>)
+Epoch   250 | Total:   33.3215 | Goal:   0.0009 | Unsafe:   0.7068 | Init:   0.0000 | Outside:   3.4475 | Gen:  29.1662 | Time: 9.4s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(2.1593, grad_fn=<MaxBackward1>)
+tensor(2.1480, grad_fn=<MaxBackward1>)
+tensor(2.1514, grad_fn=<MaxBackward1>)
+tensor(2.1242, grad_fn=<MaxBackward1>)
+tensor(2.1015, grad_fn=<MaxBackward1>)
+tensor(2.1413, grad_fn=<MaxBackward1>)
+tensor(2.1463, grad_fn=<MaxBackward1>)
+tensor(2.1191, grad_fn=<MaxBackward1>)
+tensor(2.0835, grad_fn=<MaxBackward1>)
+tensor(2.1166, grad_fn=<MaxBackward1>)
+Epoch   260 | Total:   32.0542 | Goal:   0.0000 | Unsafe:   0.7120 | Init:   0.0000 | Outside:   3.2758 | Gen:  28.0665 | Time: 9.7s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(2.1150, grad_fn=<MaxBackward1>)
+tensor(2.0827, grad_fn=<MaxBackward1>)
+tensor(2.0613, grad_fn=<MaxBackward1>)
+tensor(2.0539, grad_fn=<MaxBackward1>)
+tensor(2.0761, grad_fn=<MaxBackward1>)
+tensor(2.0735, grad_fn=<MaxBackward1>)
+tensor(2.0399, grad_fn=<MaxBackward1>)
+tensor(2.0221, grad_fn=<MaxBackward1>)
+tensor(2.0792, grad_fn=<MaxBackward1>)
+tensor(2.1005, grad_fn=<MaxBackward1>)
+Epoch   270 | Total:   30.8342 | Goal:   0.0000 | Unsafe:   0.6557 | Init:   0.0000 | Outside:   3.1217 | Gen:  27.0568 | Time: 9.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(2.0716, grad_fn=<MaxBackward1>)
+tensor(2.0296, grad_fn=<MaxBackward1>)
+tensor(2.0109, grad_fn=<MaxBackward1>)
+tensor(2.0306, grad_fn=<MaxBackward1>)
+tensor(2.0277, grad_fn=<MaxBackward1>)
+tensor(2.0040, grad_fn=<MaxBackward1>)
+tensor(1.9995, grad_fn=<MaxBackward1>)
+tensor(2.0105, grad_fn=<MaxBackward1>)
+tensor(2.0290, grad_fn=<MaxBackward1>)
+tensor(2.0205, grad_fn=<MaxBackward1>)
+Epoch   280 | Total:   29.5584 | Goal:   0.0000 | Unsafe:   0.6359 | Init:   0.0000 | Outside:   3.0077 | Gen:  25.9148 | Time: 10.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.9940, grad_fn=<MaxBackward1>)
+tensor(1.9954, grad_fn=<MaxBackward1>)
+tensor(2.0090, grad_fn=<MaxBackward1>)
+tensor(1.9971, grad_fn=<MaxBackward1>)
+tensor(1.9650, grad_fn=<MaxBackward1>)
+tensor(1.9855, grad_fn=<MaxBackward1>)
+tensor(1.9842, grad_fn=<MaxBackward1>)
+tensor(1.9611, grad_fn=<MaxBackward1>)
+tensor(1.9567, grad_fn=<MaxBackward1>)
+tensor(1.9722, grad_fn=<MaxBackward1>)
+Epoch   290 | Total:   28.3125 | Goal:   0.0000 | Unsafe:   0.6333 | Init:   0.0000 | Outside:   2.8766 | Gen:  24.8026 | Time: 10.4s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.9676, grad_fn=<MaxBackward1>)
+tensor(1.9772, grad_fn=<MaxBackward1>)
+tensor(1.9651, grad_fn=<MaxBackward1>)
+tensor(1.9366, grad_fn=<MaxBackward1>)
+tensor(1.9338, grad_fn=<MaxBackward1>)
+tensor(1.9741, grad_fn=<MaxBackward1>)
+tensor(1.9872, grad_fn=<MaxBackward1>)
+tensor(1.8878, grad_fn=<MaxBackward1>)
+tensor(1.8968, grad_fn=<MaxBackward1>)
+tensor(1.9668, grad_fn=<MaxBackward1>)
+Epoch   300 | Total:   27.1302 | Goal:   0.0000 | Unsafe:   0.5675 | Init:   0.0000 | Outside:   2.7603 | Gen:  23.8024 | Time: 10.7s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.9163, grad_fn=<MaxBackward1>)
+tensor(1.9045, grad_fn=<MaxBackward1>)
+tensor(1.9500, grad_fn=<MaxBackward1>)
+tensor(1.9196, grad_fn=<MaxBackward1>)
+tensor(1.9478, grad_fn=<MaxBackward1>)
+tensor(1.9016, grad_fn=<MaxBackward1>)
+tensor(1.9153, grad_fn=<MaxBackward1>)
+tensor(1.9494, grad_fn=<MaxBackward1>)
+tensor(1.8690, grad_fn=<MaxBackward1>)
+tensor(1.9193, grad_fn=<MaxBackward1>)
+Epoch   310 | Total:   25.9195 | Goal:   0.0000 | Unsafe:   0.4935 | Init:   0.0000 | Outside:   2.6493 | Gen:  22.7767 | Time: 10.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.9151, grad_fn=<MaxBackward1>)
+tensor(1.8802, grad_fn=<MaxBackward1>)
+tensor(1.8752, grad_fn=<MaxBackward1>)
+tensor(1.9234, grad_fn=<MaxBackward1>)
+tensor(1.8556, grad_fn=<MaxBackward1>)
+tensor(1.9253, grad_fn=<MaxBackward1>)
+tensor(1.8623, grad_fn=<MaxBackward1>)
+tensor(1.8396, grad_fn=<MaxBackward1>)
+tensor(1.9714, grad_fn=<MaxBackward1>)
+tensor(1.9848, grad_fn=<MaxBackward1>)
+Epoch   320 | Total:   25.5076 | Goal:   0.0000 | Unsafe:   0.3949 | Init:   0.0000 | Outside:   2.4597 | Gen:  22.6530 | Time: 11.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.8405, grad_fn=<MaxBackward1>)
+tensor(1.9470, grad_fn=<MaxBackward1>)
+tensor(1.8440, grad_fn=<MaxBackward1>)
+tensor(1.9414, grad_fn=<MaxBackward1>)
+tensor(1.8864, grad_fn=<MaxBackward1>)
+tensor(1.8400, grad_fn=<MaxBackward1>)
+tensor(1.7956, grad_fn=<MaxBackward1>)
+tensor(1.9286, grad_fn=<MaxBackward1>)
+tensor(1.9265, grad_fn=<MaxBackward1>)
+tensor(1.8060, grad_fn=<MaxBackward1>)
+Epoch   330 | Total:   23.8331 | Goal:   0.0000 | Unsafe:   0.4459 | Init:   0.0000 | Outside:   2.3988 | Gen:  20.9883 | Time: 11.4s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.8646, grad_fn=<MaxBackward1>)
+tensor(1.7767, grad_fn=<MaxBackward1>)
+tensor(1.8842, grad_fn=<MaxBackward1>)
+tensor(1.8589, grad_fn=<MaxBackward1>)
+tensor(1.7446, grad_fn=<MaxBackward1>)
+tensor(1.7605, grad_fn=<MaxBackward1>)
+tensor(1.8098, grad_fn=<MaxBackward1>)
+tensor(1.7947, grad_fn=<MaxBackward1>)
+tensor(1.7220, grad_fn=<MaxBackward1>)
+tensor(1.7750, grad_fn=<MaxBackward1>)
+Epoch   340 | Total:   22.9244 | Goal:   0.0000 | Unsafe:   0.3833 | Init:   0.0000 | Outside:   2.2662 | Gen:  20.2749 | Time: 11.7s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.7624, grad_fn=<MaxBackward1>)
+tensor(1.7041, grad_fn=<MaxBackward1>)
+tensor(1.7769, grad_fn=<MaxBackward1>)
+tensor(1.7742, grad_fn=<MaxBackward1>)
+tensor(1.6868, grad_fn=<MaxBackward1>)
+tensor(1.7431, grad_fn=<MaxBackward1>)
+tensor(1.7390, grad_fn=<MaxBackward1>)
+tensor(1.6804, grad_fn=<MaxBackward1>)
+tensor(1.6602, grad_fn=<MaxBackward1>)
+tensor(1.7735, grad_fn=<MaxBackward1>)
+Epoch   350 | Total:   22.3854 | Goal:   0.0000 | Unsafe:   0.3303 | Init:   0.0000 | Outside:   2.1118 | Gen:  19.9433 | Time: 11.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.7777, grad_fn=<MaxBackward1>)
+tensor(1.6761, grad_fn=<MaxBackward1>)
+tensor(1.7005, grad_fn=<MaxBackward1>)
+tensor(1.6835, grad_fn=<MaxBackward1>)
+tensor(1.7124, grad_fn=<MaxBackward1>)
+tensor(1.6620, grad_fn=<MaxBackward1>)
+tensor(1.6571, grad_fn=<MaxBackward1>)
+tensor(1.6777, grad_fn=<MaxBackward1>)
+tensor(1.7049, grad_fn=<MaxBackward1>)
+tensor(1.6553, grad_fn=<MaxBackward1>)
+Epoch   360 | Total:   21.0307 | Goal:   0.0000 | Unsafe:   0.3307 | Init:   0.0000 | Outside:   2.0408 | Gen:  18.6593 | Time: 12.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.6448, grad_fn=<MaxBackward1>)
+tensor(1.6404, grad_fn=<MaxBackward1>)
+tensor(1.6579, grad_fn=<MaxBackward1>)
+tensor(1.6135, grad_fn=<MaxBackward1>)
+tensor(1.6358, grad_fn=<MaxBackward1>)
+tensor(1.6261, grad_fn=<MaxBackward1>)
+tensor(1.5912, grad_fn=<MaxBackward1>)
+tensor(1.6339, grad_fn=<MaxBackward1>)
+tensor(1.6107, grad_fn=<MaxBackward1>)
+tensor(1.5788, grad_fn=<MaxBackward1>)
+Epoch   370 | Total:   20.5863 | Goal:   0.0000 | Unsafe:   0.3497 | Init:   0.0000 | Outside:   2.0012 | Gen:  18.2354 | Time: 12.4s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.6188, grad_fn=<MaxBackward1>)
+tensor(1.6230, grad_fn=<MaxBackward1>)
+tensor(1.5687, grad_fn=<MaxBackward1>)
+tensor(1.5980, grad_fn=<MaxBackward1>)
+tensor(1.5970, grad_fn=<MaxBackward1>)
+tensor(1.5701, grad_fn=<MaxBackward1>)
+tensor(1.5817, grad_fn=<MaxBackward1>)
+tensor(1.5854, grad_fn=<MaxBackward1>)
+tensor(1.5623, grad_fn=<MaxBackward1>)
+tensor(1.6149, grad_fn=<MaxBackward1>)
+Epoch   380 | Total:   19.7331 | Goal:   0.0000 | Unsafe:   0.2701 | Init:   0.0000 | Outside:   1.8059 | Gen:  17.6570 | Time: 12.7s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.5916, grad_fn=<MaxBackward1>)
+tensor(1.5207, grad_fn=<MaxBackward1>)
+tensor(1.5563, grad_fn=<MaxBackward1>)
+tensor(1.5909, grad_fn=<MaxBackward1>)
+tensor(1.5586, grad_fn=<MaxBackward1>)
+tensor(1.5082, grad_fn=<MaxBackward1>)
+tensor(1.5458, grad_fn=<MaxBackward1>)
+tensor(1.5712, grad_fn=<MaxBackward1>)
+tensor(1.5308, grad_fn=<MaxBackward1>)
+tensor(1.5192, grad_fn=<MaxBackward1>)
+Epoch   390 | Total:   18.8240 | Goal:   0.0000 | Unsafe:   0.2686 | Init:   0.0000 | Outside:   1.7647 | Gen:  16.7906 | Time: 12.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(1.5813, grad_fn=<MaxBackward1>)
+tensor(1.5683, grad_fn=<MaxBackward1>)
+tensor(1.4944, grad_fn=<MaxBackward1>)
+tensor(1.5044, grad_fn=<MaxBackward1>)
+tensor(1.5896, grad_fn=<MaxBackward1>)
+tensor(1.5891, grad_fn=<MaxBackward1>)
+tensor(1.5116, grad_fn=<MaxBackward1>)
+tensor(1.4775, grad_fn=<MaxBackward1>)
+tensor(1.5285, grad_fn=<MaxBackward1>)
+Refining generator cells (simple mode): 34 failing, refined 33 cells, 262 total
+Refining outside cells (simple mode): 46 failing, refined 33 cells, 974 total
+Refining unsafe cells (simple mode): 23 failing, refined 23 cells, 2544 total
+Rebuilt V cache with 4393 cells
+Rebuilt Phi cache with 262 cells
+tensor(0.5086, grad_fn=<MaxBackward1>)
+Epoch   400 | Total:    3.8978 | Goal:   0.0000 | Unsafe:   0.0028 | Init:   0.0000 | Outside:   0.1096 | Gen:   3.7854 | Time: 14.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.4923, grad_fn=<MaxBackward1>)
+tensor(0.4711, grad_fn=<MaxBackward1>)
+tensor(0.4575, grad_fn=<MaxBackward1>)
+tensor(0.4606, grad_fn=<MaxBackward1>)
+tensor(0.4701, grad_fn=<MaxBackward1>)
+tensor(0.4587, grad_fn=<MaxBackward1>)
+tensor(0.4281, grad_fn=<MaxBackward1>)
+tensor(0.4008, grad_fn=<MaxBackward1>)
+tensor(0.3894, grad_fn=<MaxBackward1>)
+tensor(0.3825, grad_fn=<MaxBackward1>)
+Epoch   410 | Total:    2.7804 | Goal:   0.0000 | Unsafe:   0.0944 | Init:   0.0000 | Outside:   0.0923 | Gen:   2.5938 | Time: 14.5s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.3764, grad_fn=<MaxBackward1>)
+tensor(0.3634, grad_fn=<MaxBackward1>)
+tensor(0.3548, grad_fn=<MaxBackward1>)
+tensor(0.3589, grad_fn=<MaxBackward1>)
+tensor(0.3575, grad_fn=<MaxBackward1>)
+tensor(0.3566, grad_fn=<MaxBackward1>)
+tensor(0.3522, grad_fn=<MaxBackward1>)
+tensor(0.3553, grad_fn=<MaxBackward1>)
+tensor(0.3613, grad_fn=<MaxBackward1>)
+tensor(0.3586, grad_fn=<MaxBackward1>)
+Epoch   420 | Total:    2.5794 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.1015 | Gen:   2.4779 | Time: 14.8s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.3495, grad_fn=<MaxBackward1>)
+tensor(0.3490, grad_fn=<MaxBackward1>)
+tensor(0.3419, grad_fn=<MaxBackward1>)
+tensor(0.3447, grad_fn=<MaxBackward1>)
+tensor(0.3338, grad_fn=<MaxBackward1>)
+tensor(0.3501, grad_fn=<MaxBackward1>)
+tensor(0.3472, grad_fn=<MaxBackward1>)
+tensor(0.3514, grad_fn=<MaxBackward1>)
+tensor(0.3306, grad_fn=<MaxBackward1>)
+tensor(0.3460, grad_fn=<MaxBackward1>)
+Epoch   430 | Total:    2.4220 | Goal:   0.0000 | Unsafe:   0.0478 | Init:   0.0000 | Outside:   0.0995 | Gen:   2.2747 | Time: 15.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.3508, grad_fn=<MaxBackward1>)
+tensor(0.3519, grad_fn=<MaxBackward1>)
+tensor(0.3346, grad_fn=<MaxBackward1>)
+tensor(0.3531, grad_fn=<MaxBackward1>)
+tensor(0.3459, grad_fn=<MaxBackward1>)
+tensor(0.3628, grad_fn=<MaxBackward1>)
+tensor(0.3308, grad_fn=<MaxBackward1>)
+tensor(0.3530, grad_fn=<MaxBackward1>)
+tensor(0.3250, grad_fn=<MaxBackward1>)
+tensor(0.3505, grad_fn=<MaxBackward1>)
+Epoch   440 | Total:    2.3804 | Goal:   0.0000 | Unsafe:   0.0132 | Init:   0.0000 | Outside:   0.0984 | Gen:   2.2689 | Time: 15.5s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.3358, grad_fn=<MaxBackward1>)
+tensor(0.3304, grad_fn=<MaxBackward1>)
+tensor(0.3478, grad_fn=<MaxBackward1>)
+tensor(0.3386, grad_fn=<MaxBackward1>)
+tensor(0.3644, grad_fn=<MaxBackward1>)
+tensor(0.3303, grad_fn=<MaxBackward1>)
+tensor(0.3408, grad_fn=<MaxBackward1>)
+tensor(0.3259, grad_fn=<MaxBackward1>)
+tensor(0.3309, grad_fn=<MaxBackward1>)
+tensor(0.3330, grad_fn=<MaxBackward1>)
+Epoch   450 | Total:    2.2084 | Goal:   0.0000 | Unsafe:   0.0074 | Init:   0.0000 | Outside:   0.0838 | Gen:   2.1173 | Time: 15.8s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.3154, grad_fn=<MaxBackward1>)
+tensor(0.3281, grad_fn=<MaxBackward1>)
+tensor(0.3137, grad_fn=<MaxBackward1>)
+tensor(0.3265, grad_fn=<MaxBackward1>)
+tensor(0.3229, grad_fn=<MaxBackward1>)
+tensor(0.3141, grad_fn=<MaxBackward1>)
+tensor(0.3125, grad_fn=<MaxBackward1>)
+tensor(0.3219, grad_fn=<MaxBackward1>)
+tensor(0.3157, grad_fn=<MaxBackward1>)
+tensor(0.3150, grad_fn=<MaxBackward1>)
+Epoch   460 | Total:    2.1308 | Goal:   0.0000 | Unsafe:   0.0198 | Init:   0.0000 | Outside:   0.0885 | Gen:   2.0224 | Time: 16.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.3127, grad_fn=<MaxBackward1>)
+tensor(0.3130, grad_fn=<MaxBackward1>)
+tensor(0.3128, grad_fn=<MaxBackward1>)
+tensor(0.3193, grad_fn=<MaxBackward1>)
+tensor(0.3112, grad_fn=<MaxBackward1>)
+tensor(0.3243, grad_fn=<MaxBackward1>)
+tensor(0.3158, grad_fn=<MaxBackward1>)
+tensor(0.3133, grad_fn=<MaxBackward1>)
+tensor(0.3071, grad_fn=<MaxBackward1>)
+tensor(0.3106, grad_fn=<MaxBackward1>)
+Epoch   470 | Total:    2.0814 | Goal:   0.0000 | Unsafe:   0.0133 | Init:   0.0000 | Outside:   0.0783 | Gen:   1.9898 | Time: 16.5s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.3048, grad_fn=<MaxBackward1>)
+tensor(0.3093, grad_fn=<MaxBackward1>)
+tensor(0.3239, grad_fn=<MaxBackward1>)
+tensor(0.3274, grad_fn=<MaxBackward1>)
+tensor(0.3030, grad_fn=<MaxBackward1>)
+tensor(0.3203, grad_fn=<MaxBackward1>)
+tensor(0.3044, grad_fn=<MaxBackward1>)
+tensor(0.3143, grad_fn=<MaxBackward1>)
+tensor(0.3119, grad_fn=<MaxBackward1>)
+tensor(0.3054, grad_fn=<MaxBackward1>)
+Epoch   480 | Total:    2.0702 | Goal:   0.0000 | Unsafe:   0.0343 | Init:   0.0000 | Outside:   0.0779 | Gen:   1.9580 | Time: 16.8s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.3047, grad_fn=<MaxBackward1>)
+tensor(0.3104, grad_fn=<MaxBackward1>)
+tensor(0.3030, grad_fn=<MaxBackward1>)
+tensor(0.3103, grad_fn=<MaxBackward1>)
+tensor(0.3031, grad_fn=<MaxBackward1>)
+tensor(0.2972, grad_fn=<MaxBackward1>)
+tensor(0.3093, grad_fn=<MaxBackward1>)
+tensor(0.2994, grad_fn=<MaxBackward1>)
+tensor(0.3098, grad_fn=<MaxBackward1>)
+tensor(0.3057, grad_fn=<MaxBackward1>)
+Epoch   490 | Total:    2.0129 | Goal:   0.0000 | Unsafe:   0.0232 | Init:   0.0000 | Outside:   0.0695 | Gen:   1.9201 | Time: 17.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.2968, grad_fn=<MaxBackward1>)
+tensor(0.3046, grad_fn=<MaxBackward1>)
+tensor(0.3059, grad_fn=<MaxBackward1>)
+tensor(0.3098, grad_fn=<MaxBackward1>)
+tensor(0.2965, grad_fn=<MaxBackward1>)
+tensor(0.3122, grad_fn=<MaxBackward1>)
+tensor(0.3063, grad_fn=<MaxBackward1>)
+tensor(0.3232, grad_fn=<MaxBackward1>)
+tensor(0.3047, grad_fn=<MaxBackward1>)
+Set parameter Username
+Set parameter LicenseID to value 2785457
+Academic license - for non-commercial use only - expires 2027-02-27
+[LP] skipped/failed at epoch 500: LP has no feasible incumbent. status=3. current_param_violations: goal_lb(max_viol=0.000e+00, n_viol=0) | outside_lb(max_viol=1.142e-02, n_viol=11) | unsafe_lb(max_viol=7.430e-03, n_viol=2) | init_ub(max_viol=0.000e+00, n_viol=0) | gen_ub(max_viol=1.437e+00, n_viol=123)
+tensor(0.3112, grad_fn=<MaxBackward1>)
+Merging outside cells: merged 0 pairs, 974 total
+Merging generator cells: merged 0 pairs, 262 total
+Epoch   500 | Total:    2.0245 | Goal:   0.0000 | Unsafe:   0.0268 | Init:   0.0000 | Outside:   0.0870 | Gen:   1.9107 | Time: 23.5s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+Rebuilt V cache with 4393 cells
+Rebuilt Phi cache with 262 cells
+tensor(0.2989, grad_fn=<MaxBackward1>)
+tensor(0.3081, grad_fn=<MaxBackward1>)
+tensor(0.3116, grad_fn=<MaxBackward1>)
+tensor(0.2934, grad_fn=<MaxBackward1>)
+tensor(0.3112, grad_fn=<MaxBackward1>)
+tensor(0.2953, grad_fn=<MaxBackward1>)
+tensor(0.3129, grad_fn=<MaxBackward1>)
+tensor(0.2922, grad_fn=<MaxBackward1>)
+tensor(0.3103, grad_fn=<MaxBackward1>)
+tensor(0.2943, grad_fn=<MaxBackward1>)
+Epoch   510 | Total:    1.9455 | Goal:   0.0000 | Unsafe:   0.0251 | Init:   0.0000 | Outside:   0.0670 | Gen:   1.8533 | Time: 24.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.3123, grad_fn=<MaxBackward1>)
+tensor(0.3040, grad_fn=<MaxBackward1>)
+tensor(0.2898, grad_fn=<MaxBackward1>)
+tensor(0.3046, grad_fn=<MaxBackward1>)
+tensor(0.2885, grad_fn=<MaxBackward1>)
+tensor(0.2904, grad_fn=<MaxBackward1>)
+tensor(0.2941, grad_fn=<MaxBackward1>)
+tensor(0.2867, grad_fn=<MaxBackward1>)
+tensor(0.2966, grad_fn=<MaxBackward1>)
+tensor(0.2860, grad_fn=<MaxBackward1>)
+Epoch   520 | Total:    1.8753 | Goal:   0.0000 | Unsafe:   0.0247 | Init:   0.0000 | Outside:   0.0711 | Gen:   1.7795 | Time: 25.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.2891, grad_fn=<MaxBackward1>)
+tensor(0.2968, grad_fn=<MaxBackward1>)
+tensor(0.2861, grad_fn=<MaxBackward1>)
+tensor(0.2948, grad_fn=<MaxBackward1>)
+tensor(0.3001, grad_fn=<MaxBackward1>)
+tensor(0.3005, grad_fn=<MaxBackward1>)
+tensor(0.2914, grad_fn=<MaxBackward1>)
+tensor(0.3011, grad_fn=<MaxBackward1>)
+tensor(0.2886, grad_fn=<MaxBackward1>)
+tensor(0.2964, grad_fn=<MaxBackward1>)
+Epoch   530 | Total:    1.8849 | Goal:   0.0000 | Unsafe:   0.0080 | Init:   0.0000 | Outside:   0.0708 | Gen:   1.8061 | Time: 25.6s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.2833, grad_fn=<MaxBackward1>)
+tensor(0.2955, grad_fn=<MaxBackward1>)
+tensor(0.2883, grad_fn=<MaxBackward1>)
+tensor(0.3023, grad_fn=<MaxBackward1>)
+tensor(0.2864, grad_fn=<MaxBackward1>)
+tensor(0.2979, grad_fn=<MaxBackward1>)
+tensor(0.2872, grad_fn=<MaxBackward1>)
+tensor(0.2965, grad_fn=<MaxBackward1>)
+tensor(0.2867, grad_fn=<MaxBackward1>)
+tensor(0.2869, grad_fn=<MaxBackward1>)
+Epoch   540 | Total:    1.8484 | Goal:   0.0000 | Unsafe:   0.0404 | Init:   0.0000 | Outside:   0.0679 | Gen:   1.7401 | Time: 25.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.2886, grad_fn=<MaxBackward1>)
+tensor(0.2939, grad_fn=<MaxBackward1>)
+tensor(0.2874, grad_fn=<MaxBackward1>)
+tensor(0.2820, grad_fn=<MaxBackward1>)
+tensor(0.2803, grad_fn=<MaxBackward1>)
+tensor(0.2748, grad_fn=<MaxBackward1>)
+tensor(0.2752, grad_fn=<MaxBackward1>)
+tensor(0.2879, grad_fn=<MaxBackward1>)
+tensor(0.2809, grad_fn=<MaxBackward1>)
+tensor(0.2795, grad_fn=<MaxBackward1>)
+Epoch   550 | Total:    1.7811 | Goal:   0.0000 | Unsafe:   0.0218 | Init:   0.0000 | Outside:   0.0646 | Gen:   1.6947 | Time: 26.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.2803, grad_fn=<MaxBackward1>)
+tensor(0.2819, grad_fn=<MaxBackward1>)
+tensor(0.2750, grad_fn=<MaxBackward1>)
+tensor(0.2835, grad_fn=<MaxBackward1>)
+tensor(0.2835, grad_fn=<MaxBackward1>)
+tensor(0.2903, grad_fn=<MaxBackward1>)
+tensor(0.2745, grad_fn=<MaxBackward1>)
+tensor(0.2753, grad_fn=<MaxBackward1>)
+tensor(0.2812, grad_fn=<MaxBackward1>)
+tensor(0.2717, grad_fn=<MaxBackward1>)
+Epoch   560 | Total:    1.7355 | Goal:   0.0000 | Unsafe:   0.0092 | Init:   0.0000 | Outside:   0.0718 | Gen:   1.6546 | Time: 26.6s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.2735, grad_fn=<MaxBackward1>)
+tensor(0.2744, grad_fn=<MaxBackward1>)
+tensor(0.2877, grad_fn=<MaxBackward1>)
+tensor(0.2796, grad_fn=<MaxBackward1>)
+tensor(0.2981, grad_fn=<MaxBackward1>)
+tensor(0.3010, grad_fn=<MaxBackward1>)
+tensor(0.2710, grad_fn=<MaxBackward1>)
+tensor(0.2872, grad_fn=<MaxBackward1>)
+tensor(0.2748, grad_fn=<MaxBackward1>)
+tensor(0.2822, grad_fn=<MaxBackward1>)
+Epoch   570 | Total:    1.7493 | Goal:   0.0000 | Unsafe:   0.0146 | Init:   0.0000 | Outside:   0.0673 | Gen:   1.6675 | Time: 26.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.2724, grad_fn=<MaxBackward1>)
+tensor(0.2693, grad_fn=<MaxBackward1>)
+tensor(0.2725, grad_fn=<MaxBackward1>)
+tensor(0.2740, grad_fn=<MaxBackward1>)
+tensor(0.2738, grad_fn=<MaxBackward1>)
+tensor(0.2698, grad_fn=<MaxBackward1>)
+tensor(0.2707, grad_fn=<MaxBackward1>)
+tensor(0.2839, grad_fn=<MaxBackward1>)
+tensor(0.2678, grad_fn=<MaxBackward1>)
+tensor(0.2767, grad_fn=<MaxBackward1>)
+Epoch   580 | Total:    1.7662 | Goal:   0.0000 | Unsafe:   0.0440 | Init:   0.0000 | Outside:   0.0665 | Gen:   1.6557 | Time: 27.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.2798, grad_fn=<MaxBackward1>)
+tensor(0.2920, grad_fn=<MaxBackward1>)
+tensor(0.2813, grad_fn=<MaxBackward1>)
+tensor(0.2752, grad_fn=<MaxBackward1>)
+tensor(0.2817, grad_fn=<MaxBackward1>)
+tensor(0.2648, grad_fn=<MaxBackward1>)
+tensor(0.2832, grad_fn=<MaxBackward1>)
+tensor(0.2658, grad_fn=<MaxBackward1>)
+tensor(0.2686, grad_fn=<MaxBackward1>)
+tensor(0.2681, grad_fn=<MaxBackward1>)
+Epoch   590 | Total:    1.6430 | Goal:   0.0000 | Unsafe:   0.0170 | Init:   0.0000 | Outside:   0.0599 | Gen:   1.5661 | Time: 27.6s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.2749, grad_fn=<MaxBackward1>)
+tensor(0.2601, grad_fn=<MaxBackward1>)
+tensor(0.2665, grad_fn=<MaxBackward1>)
+tensor(0.2675, grad_fn=<MaxBackward1>)
+tensor(0.2697, grad_fn=<MaxBackward1>)
+tensor(0.2615, grad_fn=<MaxBackward1>)
+tensor(0.2741, grad_fn=<MaxBackward1>)
+tensor(0.2741, grad_fn=<MaxBackward1>)
+tensor(0.2608, grad_fn=<MaxBackward1>)
+Refining generator cells (simple mode): 18 failing, refined 18 cells, 316 total
+Refining outside cells (simple mode): 10 failing, refined 10 cells, 1004 total
+Refining unsafe cells (simple mode): 2 failing, refined 2 cells, 2550 total
+Rebuilt V cache with 4429 cells
+Rebuilt Phi cache with 316 cells
+tensor(0.0523, grad_fn=<MaxBackward1>)
+Epoch   600 | Total:    0.1425 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0008 | Gen:   0.1417 | Time: 29.0s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0507, grad_fn=<MaxBackward1>)
+tensor(0.0469, grad_fn=<MaxBackward1>)
+tensor(0.0440, grad_fn=<MaxBackward1>)
+tensor(0.0463, grad_fn=<MaxBackward1>)
+tensor(0.0488, grad_fn=<MaxBackward1>)
+tensor(0.0487, grad_fn=<MaxBackward1>)
+tensor(0.0466, grad_fn=<MaxBackward1>)
+tensor(0.0446, grad_fn=<MaxBackward1>)
+tensor(0.0485, grad_fn=<MaxBackward1>)
+tensor(0.0472, grad_fn=<MaxBackward1>)
+Epoch   610 | Total:    0.1183 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.1183 | Time: 29.3s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0449, grad_fn=<MaxBackward1>)
+tensor(0.0440, grad_fn=<MaxBackward1>)
+tensor(0.0443, grad_fn=<MaxBackward1>)
+tensor(0.0441, grad_fn=<MaxBackward1>)
+tensor(0.0434, grad_fn=<MaxBackward1>)
+tensor(0.0422, grad_fn=<MaxBackward1>)
+tensor(0.0406, grad_fn=<MaxBackward1>)
+tensor(0.0418, grad_fn=<MaxBackward1>)
+tensor(0.0418, grad_fn=<MaxBackward1>)
+tensor(0.0404, grad_fn=<MaxBackward1>)
+Epoch   620 | Total:    0.1055 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.1055 | Time: 29.7s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0386, grad_fn=<MaxBackward1>)
+tensor(0.0386, grad_fn=<MaxBackward1>)
+tensor(0.0374, grad_fn=<MaxBackward1>)
+tensor(0.0391, grad_fn=<MaxBackward1>)
+tensor(0.0417, grad_fn=<MaxBackward1>)
+tensor(0.0426, grad_fn=<MaxBackward1>)
+tensor(0.0417, grad_fn=<MaxBackward1>)
+tensor(0.0393, grad_fn=<MaxBackward1>)
+tensor(0.0370, grad_fn=<MaxBackward1>)
+tensor(0.0404, grad_fn=<MaxBackward1>)
+Epoch   630 | Total:    0.1028 | Goal:   0.0000 | Unsafe:   0.0093 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0935 | Time: 30.1s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0374, grad_fn=<MaxBackward1>)
+tensor(0.0398, grad_fn=<MaxBackward1>)
+tensor(0.0406, grad_fn=<MaxBackward1>)
+tensor(0.0458, grad_fn=<MaxBackward1>)
+tensor(0.0484, grad_fn=<MaxBackward1>)
+tensor(0.0473, grad_fn=<MaxBackward1>)
+tensor(0.0442, grad_fn=<MaxBackward1>)
+tensor(0.0395, grad_fn=<MaxBackward1>)
+tensor(0.0401, grad_fn=<MaxBackward1>)
+tensor(0.0418, grad_fn=<MaxBackward1>)
+Epoch   640 | Total:    0.1032 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0020 | Gen:   0.1011 | Time: 30.5s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0382, grad_fn=<MaxBackward1>)
+tensor(0.0410, grad_fn=<MaxBackward1>)
+tensor(0.0430, grad_fn=<MaxBackward1>)
+tensor(0.0411, grad_fn=<MaxBackward1>)
+tensor(0.0374, grad_fn=<MaxBackward1>)
+tensor(0.0366, grad_fn=<MaxBackward1>)
+tensor(0.0376, grad_fn=<MaxBackward1>)
+tensor(0.0358, grad_fn=<MaxBackward1>)
+tensor(0.0401, grad_fn=<MaxBackward1>)
+tensor(0.0421, grad_fn=<MaxBackward1>)
+Epoch   650 | Total:    0.0885 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0885 | Time: 30.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0419, grad_fn=<MaxBackward1>)
+tensor(0.0397, grad_fn=<MaxBackward1>)
+tensor(0.0356, grad_fn=<MaxBackward1>)
+tensor(0.0372, grad_fn=<MaxBackward1>)
+tensor(0.0388, grad_fn=<MaxBackward1>)
+tensor(0.0370, grad_fn=<MaxBackward1>)
+tensor(0.0352, grad_fn=<MaxBackward1>)
+tensor(0.0357, grad_fn=<MaxBackward1>)
+tensor(0.0453, grad_fn=<MaxBackward1>)
+tensor(0.0500, grad_fn=<MaxBackward1>)
+Epoch   660 | Total:    0.1119 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0033 | Gen:   0.1086 | Time: 31.2s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0443, grad_fn=<MaxBackward1>)
+tensor(0.0359, grad_fn=<MaxBackward1>)
+tensor(0.0407, grad_fn=<MaxBackward1>)
+tensor(0.0422, grad_fn=<MaxBackward1>)
+tensor(0.0384, grad_fn=<MaxBackward1>)
+tensor(0.0409, grad_fn=<MaxBackward1>)
+tensor(0.0449, grad_fn=<MaxBackward1>)
+tensor(0.0453, grad_fn=<MaxBackward1>)
+tensor(0.0424, grad_fn=<MaxBackward1>)
+tensor(0.0374, grad_fn=<MaxBackward1>)
+Epoch   670 | Total:    0.0840 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0840 | Time: 31.6s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0411, grad_fn=<MaxBackward1>)
+tensor(0.0430, grad_fn=<MaxBackward1>)
+tensor(0.0397, grad_fn=<MaxBackward1>)
+tensor(0.0377, grad_fn=<MaxBackward1>)
+tensor(0.0411, grad_fn=<MaxBackward1>)
+tensor(0.0407, grad_fn=<MaxBackward1>)
+tensor(0.0367, grad_fn=<MaxBackward1>)
+tensor(0.0359, grad_fn=<MaxBackward1>)
+tensor(0.0369, grad_fn=<MaxBackward1>)
+tensor(0.0349, grad_fn=<MaxBackward1>)
+Epoch   680 | Total:    0.0744 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0015 | Gen:   0.0729 | Time: 32.0s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0352, grad_fn=<MaxBackward1>)
+tensor(0.0371, grad_fn=<MaxBackward1>)
+tensor(0.0371, grad_fn=<MaxBackward1>)
+tensor(0.0339, grad_fn=<MaxBackward1>)
+tensor(0.0363, grad_fn=<MaxBackward1>)
+tensor(0.0352, grad_fn=<MaxBackward1>)
+tensor(0.0393, grad_fn=<MaxBackward1>)
+tensor(0.0383, grad_fn=<MaxBackward1>)
+tensor(0.0353, grad_fn=<MaxBackward1>)
+tensor(0.0363, grad_fn=<MaxBackward1>)
+Epoch   690 | Total:    0.0874 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0029 | Gen:   0.0845 | Time: 32.4s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0375, grad_fn=<MaxBackward1>)
+tensor(0.0413, grad_fn=<MaxBackward1>)
+tensor(0.0412, grad_fn=<MaxBackward1>)
+tensor(0.0373, grad_fn=<MaxBackward1>)
+tensor(0.0355, grad_fn=<MaxBackward1>)
+tensor(0.0368, grad_fn=<MaxBackward1>)
+tensor(0.0351, grad_fn=<MaxBackward1>)
+tensor(0.0360, grad_fn=<MaxBackward1>)
+tensor(0.0382, grad_fn=<MaxBackward1>)
+tensor(0.0385, grad_fn=<MaxBackward1>)
+Epoch   700 | Total:    0.0739 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0017 | Gen:   0.0722 | Time: 32.8s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0373, grad_fn=<MaxBackward1>)
+tensor(0.0343, grad_fn=<MaxBackward1>)
+tensor(0.0353, grad_fn=<MaxBackward1>)
+tensor(0.0353, grad_fn=<MaxBackward1>)
+tensor(0.0333, grad_fn=<MaxBackward1>)
+tensor(0.0385, grad_fn=<MaxBackward1>)
+tensor(0.0396, grad_fn=<MaxBackward1>)
+tensor(0.0365, grad_fn=<MaxBackward1>)
+tensor(0.0331, grad_fn=<MaxBackward1>)
+tensor(0.0366, grad_fn=<MaxBackward1>)
+Epoch   710 | Total:    0.0734 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0037 | Gen:   0.0697 | Time: 33.1s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0371, grad_fn=<MaxBackward1>)
+tensor(0.0377, grad_fn=<MaxBackward1>)
+tensor(0.0455, grad_fn=<MaxBackward1>)
+tensor(0.0474, grad_fn=<MaxBackward1>)
+tensor(0.0439, grad_fn=<MaxBackward1>)
+tensor(0.0361, grad_fn=<MaxBackward1>)
+tensor(0.0381, grad_fn=<MaxBackward1>)
+tensor(0.0350, grad_fn=<MaxBackward1>)
+tensor(0.0404, grad_fn=<MaxBackward1>)
+tensor(0.0413, grad_fn=<MaxBackward1>)
+Epoch   720 | Total:    0.0755 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0755 | Time: 33.5s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0382, grad_fn=<MaxBackward1>)
+tensor(0.0337, grad_fn=<MaxBackward1>)
+tensor(0.0358, grad_fn=<MaxBackward1>)
+tensor(0.0361, grad_fn=<MaxBackward1>)
+tensor(0.0340, grad_fn=<MaxBackward1>)
+tensor(0.0347, grad_fn=<MaxBackward1>)
+tensor(0.0369, grad_fn=<MaxBackward1>)
+tensor(0.0365, grad_fn=<MaxBackward1>)
+tensor(0.0341, grad_fn=<MaxBackward1>)
+tensor(0.0354, grad_fn=<MaxBackward1>)
+Epoch   730 | Total:    0.0730 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0034 | Gen:   0.0696 | Time: 33.9s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0366, grad_fn=<MaxBackward1>)
+tensor(0.0352, grad_fn=<MaxBackward1>)
+tensor(0.0353, grad_fn=<MaxBackward1>)
+tensor(0.0395, grad_fn=<MaxBackward1>)
+tensor(0.0415, grad_fn=<MaxBackward1>)
+tensor(0.0390, grad_fn=<MaxBackward1>)
+tensor(0.0347, grad_fn=<MaxBackward1>)
+tensor(0.0345, grad_fn=<MaxBackward1>)
+tensor(0.0371, grad_fn=<MaxBackward1>)
+tensor(0.0368, grad_fn=<MaxBackward1>)
+Epoch   740 | Total:    0.0701 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0041 | Gen:   0.0660 | Time: 34.3s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0342, grad_fn=<MaxBackward1>)
+tensor(0.0316, grad_fn=<MaxBackward1>)
+tensor(0.0346, grad_fn=<MaxBackward1>)
+tensor(0.0369, grad_fn=<MaxBackward1>)
+tensor(0.0388, grad_fn=<MaxBackward1>)
+tensor(0.0474, grad_fn=<MaxBackward1>)
+tensor(0.0504, grad_fn=<MaxBackward1>)
+tensor(0.0481, grad_fn=<MaxBackward1>)
+tensor(0.0411, grad_fn=<MaxBackward1>)
+tensor(0.0362, grad_fn=<MaxBackward1>)
+Epoch   750 | Total:    0.0705 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0022 | Gen:   0.0683 | Time: 34.6s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0405, grad_fn=<MaxBackward1>)
+tensor(0.0410, grad_fn=<MaxBackward1>)
+tensor(0.0379, grad_fn=<MaxBackward1>)
+tensor(0.0351, grad_fn=<MaxBackward1>)
+tensor(0.0400, grad_fn=<MaxBackward1>)
+tensor(0.0420, grad_fn=<MaxBackward1>)
+tensor(0.0387, grad_fn=<MaxBackward1>)
+tensor(0.0332, grad_fn=<MaxBackward1>)
+tensor(0.0360, grad_fn=<MaxBackward1>)
+tensor(0.0367, grad_fn=<MaxBackward1>)
+Epoch   760 | Total:    0.0746 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0041 | Gen:   0.0705 | Time: 35.0s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0347, grad_fn=<MaxBackward1>)
+tensor(0.0356, grad_fn=<MaxBackward1>)
+tensor(0.0401, grad_fn=<MaxBackward1>)
+tensor(0.0423, grad_fn=<MaxBackward1>)
+tensor(0.0377, grad_fn=<MaxBackward1>)
+tensor(0.0319, grad_fn=<MaxBackward1>)
+tensor(0.0349, grad_fn=<MaxBackward1>)
+tensor(0.0352, grad_fn=<MaxBackward1>)
+tensor(0.0331, grad_fn=<MaxBackward1>)
+tensor(0.0318, grad_fn=<MaxBackward1>)
+Epoch   770 | Total:    0.0651 | Goal:   0.0000 | Unsafe:   0.0008 | Init:   0.0000 | Outside:   0.0018 | Gen:   0.0625 | Time: 35.4s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0317, grad_fn=<MaxBackward1>)
+tensor(0.0332, grad_fn=<MaxBackward1>)
+tensor(0.0349, grad_fn=<MaxBackward1>)
+tensor(0.0352, grad_fn=<MaxBackward1>)
+tensor(0.0346, grad_fn=<MaxBackward1>)
+tensor(0.0344, grad_fn=<MaxBackward1>)
+tensor(0.0346, grad_fn=<MaxBackward1>)
+tensor(0.0351, grad_fn=<MaxBackward1>)
+tensor(0.0354, grad_fn=<MaxBackward1>)
+tensor(0.0339, grad_fn=<MaxBackward1>)
+Epoch   780 | Total:    0.0627 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0007 | Gen:   0.0620 | Time: 35.8s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0321, grad_fn=<MaxBackward1>)
+tensor(0.0301, grad_fn=<MaxBackward1>)
+tensor(0.0311, grad_fn=<MaxBackward1>)
+tensor(0.0358, grad_fn=<MaxBackward1>)
+tensor(0.0418, grad_fn=<MaxBackward1>)
+tensor(0.0390, grad_fn=<MaxBackward1>)
+tensor(0.0336, grad_fn=<MaxBackward1>)
+tensor(0.0321, grad_fn=<MaxBackward1>)
+tensor(0.0354, grad_fn=<MaxBackward1>)
+tensor(0.0414, grad_fn=<MaxBackward1>)
+Epoch   790 | Total:    0.0686 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0001 | Gen:   0.0686 | Time: 36.1s
+generator_weight_k: 1.0000
+beta_ra_k: 1.0000
+tensor(0.0419, grad_fn=<MaxBackward1>)
+tensor(0.0373, grad_fn=<MaxBackward1>)
+tensor(0.0308, grad_fn=<MaxBackward1>)
+tensor(0.0345, grad_fn=<MaxBackward1>)
+tensor(0.0352, grad_fn=<MaxBackward1>)
+tensor(0.0333, grad_fn=<MaxBackward1>)
+tensor(0.0327, grad_fn=<MaxBackward1>)
+tensor(0.0378, grad_fn=<MaxBackward1>)
+tensor(0.0399, grad_fn=<MaxBackward1>)
+Refining generator cells (simple mode): 3 failing, refined 3 cells, 325 total
+Refining outside cells (simple mode): 1 failing, refined 1 cells, 1007 total
+Rebuilt V cache with 4432 cells
+Rebuilt Phi cache with 325 cells
+tensor(-0.0011, grad_fn=<MaxBackward1>)
+Traceback (most recent call last):
+  File "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/synthesis/inv_pend_syn/main.py", line 110, in <module>
+    main()
+  File "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/synthesis/inv_pend_syn/main.py", line 55, in main
+    return run_training_path(
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/synthesis/inv_pend_syn/workflow.py", line 318, in run_training_path
+    loss_history, final_beta_s, refinement_epochs = train_network_bounds(
+                                                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/src/trainer.py", line 403, in train_network_bounds
+    raise RuntimeError(
+RuntimeError: [LP-DIAG] Bound-loss is SAT but LP is infeasible on the same parameters/partitions. epoch=801, beta_ra_k=1.000000, gen_th=0.000000, eps_gen=1.000000e-04, active(V=True, G=True), lp_status=3, msg=LP has no feasible incumbent. status=3. current_param_violations: goal_lb(max_viol=0.000e+00, n_viol=0) | outside_lb(max_viol=0.000e+00, n_viol=0) | unsafe_lb(max_viol=0.000e+00, n_viol=0) | init_ub(max_viol=0.000e+00, n_viol=0) | gen_ub(max_viol=1.409e+00, n_viol=185)

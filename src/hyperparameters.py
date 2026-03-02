@@ -91,6 +91,8 @@ class RefinementConfig:
     simple_loss_improve_tol: float = 0.01
     simple_refine_budget: int = 100
     simple_regions_per_trigger: int = 2
+    enable_force_refinement: bool = True
+    stage2_force_refine_interval: int = 0
     stage3_force_refine_interval: int = 1000
 
     # V region refinement
@@ -152,6 +154,12 @@ class TrainingConfig:
     generator_threshold_step: float = 0.1
     generator_threshold_step_fine: float = 0.02
     generator_threshold_switch: float = 0.2
+    use_last_layer_lp: bool = False
+    last_layer_lp_interval: int = 0
+    last_layer_lp_max_cells: int = 5000
+    last_layer_lp_timeout_sec: float = 30.0
+    last_layer_lp_verbose: bool = False
+    verify_lp_apply_sat: bool = True
 
 @dataclass
 class Hyperparameters:
@@ -214,6 +222,8 @@ class Hyperparameters:
             simple_loss_improve_tol=refinement_dict.get("simple_loss_improve_tol", defaults.simple_loss_improve_tol),
             simple_refine_budget=refinement_dict.get("simple_refine_budget", defaults.simple_refine_budget),
             simple_regions_per_trigger=refinement_dict.get("simple_regions_per_trigger", defaults.simple_regions_per_trigger),
+            enable_force_refinement=refinement_dict.get("enable_force_refinement", defaults.enable_force_refinement),
+            stage2_force_refine_interval=refinement_dict.get("stage2_force_refine_interval", defaults.stage2_force_refine_interval),
             stage3_force_refine_interval=refinement_dict.get("stage3_force_refine_interval", defaults.stage3_force_refine_interval),
             v_goal=v_goal,
             v_unsafe=v_unsafe,
@@ -281,6 +291,12 @@ class Hyperparameters:
                 'generator_threshold_step': self.training.generator_threshold_step,
                 'generator_threshold_step_fine': self.training.generator_threshold_step_fine,
                 'generator_threshold_switch': self.training.generator_threshold_switch,
+                'use_last_layer_lp': self.training.use_last_layer_lp,
+                'last_layer_lp_interval': self.training.last_layer_lp_interval,
+                'last_layer_lp_max_cells': self.training.last_layer_lp_max_cells,
+                'last_layer_lp_timeout_sec': self.training.last_layer_lp_timeout_sec,
+                'last_layer_lp_verbose': self.training.last_layer_lp_verbose,
+                'verify_lp_apply_sat': self.training.verify_lp_apply_sat,
             },
             'refinement': {
                 'use_simple_refinement': self.refinement.use_simple_refinement,
@@ -288,6 +304,8 @@ class Hyperparameters:
                 'simple_loss_improve_tol': self.refinement.simple_loss_improve_tol,
                 'simple_refine_budget': self.refinement.simple_refine_budget,
                 'simple_regions_per_trigger': self.refinement.simple_regions_per_trigger,
+                'enable_force_refinement': self.refinement.enable_force_refinement,
+                'stage2_force_refine_interval': self.refinement.stage2_force_refine_interval,
                 'stage3_force_refine_interval': self.refinement.stage3_force_refine_interval,
                 'v_goal': {
                     'enable_refinement': self.refinement.v_goal.enable_refinement,
