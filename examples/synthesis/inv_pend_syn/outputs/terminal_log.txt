@@ -1,0 +1,1423 @@
+
+====================
+Region Discretization
+====================
+Init region: splits=[8, 8]
+ 64 cells
+Goal region: splits=[8, 8]
+ 64 cells
+Unsafe region: splits=[8, 8]
+ 384 cells
+Outside goal region: splits=[2, 2] per rectangle
+ 32 cells
+Generator region: splits=[2, 2] per rectangle
+ 88 cells
+
+====================
+Bound-based training
+====================
+=== Total cells per region for V ===
+init: 64 cells
+goal: 64 cells
+unsafe: 384 cells
+outside: 32 cells
+Total V cells: 544
+Created CROWN cache for V with 544 cells
+/workspace/src/phi_module.py:549: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  self._cached_scale_D == D
+Created 88 CROWN caches for GV
+Epoch     0 | Total: 47166.3711 | Goal: 784.8556 | Unsafe: 861.7354 | Init: 492.9080 | Outside: 1831.4744 | Gen: 43195.3984 | Time: 2.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+=== Detailed Evaluation ===
+Goal:      FAIL, V bounds: [-14.139,  20.034] | 0/64 pass (0.0%)
+Unsafe:    FAIL, V bounds: [-25.579, 157.003] | 262/384 pass (68.2%)
+Init:      FAIL, V bounds: [ -8.785,   9.585] | 0/64 pass (0.0%)
+Outside:   FAIL, V bounds: [-95.887, 262.760] | 0/32 pass (0.0%)
+Generator: FAIL, GV bounds: [ 74.004, 1671.129] | 0/88 pass (0.0%)
+Epoch    10 | Total: 15690.7441 | Goal: 190.5308 | Unsafe: 2150.6682 | Init:   0.0000 | Outside: 678.1459 | Gen: 12671.3994 | Time: 2.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch    20 | Total: 6365.0308 | Goal:  56.2941 | Unsafe: 1627.0923 | Init:   0.0000 | Outside: 291.8213 | Gen: 4389.8232 | Time: 3.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch    30 | Total: 2220.8726 | Goal:  23.6165 | Unsafe: 685.7867 | Init:   3.5653 | Outside: 103.7053 | Gen: 1404.1987 | Time: 3.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch    40 | Total: 1204.3560 | Goal:  13.9921 | Unsafe: 530.1879 | Init:   1.8603 | Outside:  49.3094 | Gen: 609.0062 | Time: 3.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch    50 | Total:  935.6788 | Goal:  10.2054 | Unsafe: 511.1369 | Init:   0.0000 | Outside:  34.2142 | Gen: 380.1223 | Time: 4.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch    60 | Total:  834.1359 | Goal:   8.5910 | Unsafe: 492.2668 | Init:   0.0000 | Outside:  28.3344 | Gen: 304.9436 | Time: 4.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch    70 | Total:  755.9181 | Goal:   7.9079 | Unsafe: 454.8209 | Init:   0.0000 | Outside:  25.3217 | Gen: 267.8675 | Time: 4.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch    80 | Total:  683.5222 | Goal:   7.4777 | Unsafe: 412.9359 | Init:   0.0000 | Outside:  23.0912 | Gen: 240.0174 | Time: 5.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch    90 | Total:  612.1412 | Goal:   6.9836 | Unsafe: 374.8475 | Init:   0.0000 | Outside:  20.8417 | Gen: 209.4684 | Time: 5.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   100 | Total:  540.8698 | Goal:   6.9496 | Unsafe: 328.0308 | Init:   0.0000 | Outside:  19.8019 | Gen: 186.0874 | Time: 5.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   110 | Total:  471.4915 | Goal:   7.3911 | Unsafe: 276.8418 | Init:   0.0000 | Outside:  19.6252 | Gen: 167.6334 | Time: 6.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   120 | Total:  425.1070 | Goal:   7.2597 | Unsafe: 257.6103 | Init:   0.0000 | Outside:  19.1316 | Gen: 141.1054 | Time: 6.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   130 | Total:  388.1656 | Goal:   6.3510 | Unsafe: 255.8202 | Init:   0.0000 | Outside:  17.7363 | Gen: 108.2581 | Time: 6.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   140 | Total:  359.2797 | Goal:   5.8803 | Unsafe: 249.1184 | Init:   0.0000 | Outside:  16.8975 | Gen:  87.3834 | Time: 7.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   150 | Total:  333.7177 | Goal:   5.5379 | Unsafe: 240.7914 | Init:   0.0000 | Outside:  16.2749 | Gen:  71.1135 | Time: 7.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   160 | Total:  312.7009 | Goal:   5.3774 | Unsafe: 230.8744 | Init:   0.0000 | Outside:  15.8723 | Gen:  60.5768 | Time: 7.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   170 | Total:  299.1190 | Goal:   5.2102 | Unsafe: 222.9879 | Init:   0.0000 | Outside:  15.4184 | Gen:  55.5025 | Time: 8.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   180 | Total:  288.6259 | Goal:   4.9993 | Unsafe: 218.2827 | Init:   0.0000 | Outside:  14.9167 | Gen:  50.4273 | Time: 8.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   190 | Total:  279.8663 | Goal:   4.8238 | Unsafe: 213.7164 | Init:   0.0000 | Outside:  14.4360 | Gen:  46.8902 | Time: 8.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Refining generator cells (simple mode): 11 failing, refined 11 cells, 121 total
+Refining unsafe cells (simple mode): 104 failing, refined 25 cells, 459 total
+Refining outside cells (simple mode): 20 failing, refined 20 cells, 92 total
+Refining goal cells (simple mode): 53 failing, refined 25 cells, 139 total
+Rebuilt V cache with 754 cells
+/workspace/src/phi_module.py:549: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  self._cached_scale_D == D
+Rebuilt Phi cache with 121 cells
+Epoch   200 | Total:  419.0565 | Goal:   2.6655 | Unsafe: 403.2657 | Init:   0.0000 | Outside:  13.0037 | Gen:   0.1216 | Time: 10.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   210 | Total:  405.4711 | Goal:   3.1503 | Unsafe: 388.4158 | Init:   0.0000 | Outside:  13.2469 | Gen:   0.6581 | Time: 11.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   220 | Total:  389.4214 | Goal:   4.0355 | Unsafe: 368.9188 | Init:   0.0000 | Outside:  14.4189 | Gen:   2.0483 | Time: 11.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   230 | Total:  378.8039 | Goal:   4.7419 | Unsafe: 354.0835 | Init:   0.0000 | Outside:  15.0943 | Gen:   4.8842 | Time: 12.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   240 | Total:  367.6955 | Goal:   4.7729 | Unsafe: 340.1104 | Init:   0.0000 | Outside:  15.3234 | Gen:   7.4888 | Time: 12.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   250 | Total:  355.9429 | Goal:   5.0825 | Unsafe: 325.7097 | Init:   0.0000 | Outside:  15.6101 | Gen:   9.5407 | Time: 12.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   260 | Total:  342.0325 | Goal:   5.7003 | Unsafe: 306.2505 | Init:   0.0000 | Outside:  16.4968 | Gen:  13.5848 | Time: 13.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   270 | Total:  329.9205 | Goal:   6.4170 | Unsafe: 289.9893 | Init:   0.0001 | Outside:  17.5805 | Gen:  15.9337 | Time: 13.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   280 | Total:  318.0493 | Goal:   6.8177 | Unsafe: 274.9248 | Init:   0.2250 | Outside:  18.2481 | Gen:  17.8337 | Time: 14.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   290 | Total:  308.7150 | Goal:   7.4536 | Unsafe: 260.4085 | Init:   1.2594 | Outside:  19.2301 | Gen:  20.3634 | Time: 14.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   300 | Total:  301.5048 | Goal:   7.5627 | Unsafe: 255.1165 | Init:   1.6947 | Outside:  19.1644 | Gen:  17.9664 | Time: 14.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   310 | Total:  296.1643 | Goal:   7.5561 | Unsafe: 250.9180 | Init:   2.0042 | Outside:  18.9215 | Gen:  16.7645 | Time: 15.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   320 | Total:  291.5988 | Goal:   7.6269 | Unsafe: 245.7094 | Init:   2.7438 | Outside:  18.9270 | Gen:  16.5916 | Time: 15.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   330 | Total:  287.1151 | Goal:   7.7359 | Unsafe: 240.5655 | Init:   3.5536 | Outside:  18.9743 | Gen:  16.2858 | Time: 16.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   340 | Total:  282.2089 | Goal:   7.9972 | Unsafe: 234.5600 | Init:   4.6002 | Outside:  19.1808 | Gen:  15.8706 | Time: 16.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   350 | Total:  277.2291 | Goal:   8.3642 | Unsafe: 228.3388 | Init:   5.8952 | Outside:  19.4585 | Gen:  15.1725 | Time: 16.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   360 | Total:  272.8066 | Goal:   8.1703 | Unsafe: 224.5992 | Init:   6.5536 | Outside:  19.1332 | Gen:  14.3503 | Time: 17.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   370 | Total:  269.0100 | Goal:   8.0749 | Unsafe: 221.5768 | Init:   7.1328 | Outside:  18.8715 | Gen:  13.3539 | Time: 17.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   380 | Total:  265.2312 | Goal:   8.0511 | Unsafe: 217.6026 | Init:   7.9994 | Outside:  18.7338 | Gen:  12.8442 | Time: 18.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   390 | Total:  261.3427 | Goal:   8.1680 | Unsafe: 213.3124 | Init:   9.0689 | Outside:  18.7225 | Gen:  12.0709 | Time: 18.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Refining generator cells (simple mode): 14 failing, refined 14 cells, 163 total
+Refining unsafe cells (simple mode): 123 failing, refined 25 cells, 534 total
+Refining outside cells (simple mode): 39 failing, refined 25 cells, 167 total
+Refining init cells (simple mode): 45 failing, refined 25 cells, 139 total
+Rebuilt V cache with 979 cells
+Rebuilt Phi cache with 163 cells
+Epoch   400 | Total:  487.5176 | Goal:   8.2241 | Unsafe: 426.1204 | Init:  25.8269 | Outside:  27.3462 | Gen:   0.0000 | Time: 20.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   410 | Total:  449.4276 | Goal:   6.2014 | Unsafe: 418.3683 | Init:   2.0641 | Outside:  15.5905 | Gen:   7.2034 | Time: 21.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   420 | Total:  402.9378 | Goal:   9.4909 | Unsafe: 361.2594 | Init:   0.8263 | Outside:  14.7665 | Gen:  16.5948 | Time: 21.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   430 | Total:  372.5103 | Goal:  13.2660 | Unsafe: 302.5764 | Init:   2.3554 | Outside:  16.7214 | Gen:  37.5911 | Time: 22.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   440 | Total:  340.6879 | Goal:  11.3630 | Unsafe: 283.9486 | Init:   1.4070 | Outside:  13.7614 | Gen:  30.2079 | Time: 22.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   450 | Total:  309.6787 | Goal:  11.3571 | Unsafe: 244.9099 | Init:   1.9181 | Outside:  12.6971 | Gen:  38.7964 | Time: 22.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   460 | Total:  277.3289 | Goal:  11.6556 | Unsafe: 201.4997 | Init:   4.6783 | Outside:  12.0279 | Gen:  47.4675 | Time: 23.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   470 | Total:  245.4758 | Goal:  11.2281 | Unsafe: 170.5872 | Init:   3.9107 | Outside:  10.9275 | Gen:  48.8223 | Time: 23.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   480 | Total:  216.1992 | Goal:  10.9406 | Unsafe: 136.9141 | Init:   5.0198 | Outside:  10.3635 | Gen:  52.9612 | Time: 24.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   490 | Total:  189.9443 | Goal:  10.5794 | Unsafe: 111.1580 | Init:   5.8953 | Outside:   9.9458 | Gen:  52.3658 | Time: 24.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Merging outside cells: merged 128 pairs, 39 total
+Merging generator cells: merged 0 pairs, 163 total
+Epoch   500 | Total:  163.8750 | Goal:  10.3808 | Unsafe:  85.8880 | Init:   7.4561 | Outside:   9.5843 | Gen:  50.5658 | Time: 25.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+=== Detailed Evaluation ===
+Goal:      FAIL, V bounds: [ -0.278,   1.548] | 38/139 pass (27.3%)
+Unsafe:    FAIL, V bounds: [  1.651,  21.596] | 0/534 pass (0.0%)
+Init:      FAIL, V bounds: [  0.188,   1.274] | 74/139 pass (53.2%)
+Outside:   FAIL, V bounds: [ -0.870,  24.602] | 133/167 pass (79.6%)
+Generator: FAIL, GV bounds: [-86.201,   9.738] | 89/163 pass (54.6%)
+Rebuilt V cache with 851 cells
+Rebuilt Phi cache with 163 cells
+Epoch   510 | Total:  153.1290 | Goal:   9.4695 | Unsafe:  72.3082 | Init:   7.6775 | Outside:  21.6825 | Gen:  41.9914 | Time: 27.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   520 | Total:  131.2438 | Goal:   9.6639 | Unsafe:  51.8546 | Init:   7.5357 | Outside:  20.9783 | Gen:  41.2112 | Time: 27.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   530 | Total:  112.9641 | Goal:   8.7443 | Unsafe:  41.8532 | Init:   9.9674 | Outside:  19.4546 | Gen:  32.9446 | Time: 28.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   540 | Total:   99.3007 | Goal:   7.9498 | Unsafe:  37.2032 | Init:   9.4539 | Outside:  18.0346 | Gen:  26.6592 | Time: 28.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   550 | Total:   87.7812 | Goal:   7.1572 | Unsafe:  32.7123 | Init:   9.7595 | Outside:  16.6981 | Gen:  21.4541 | Time: 29.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   560 | Total:   78.8589 | Goal:   6.4230 | Unsafe:  30.4393 | Init:   9.4570 | Outside:  15.5048 | Gen:  17.0349 | Time: 29.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   570 | Total:   71.1677 | Goal:   6.0408 | Unsafe:  26.0705 | Init:  10.0050 | Outside:  14.6761 | Gen:  14.3753 | Time: 30.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   580 | Total:   64.9732 | Goal:   5.5694 | Unsafe:  23.2419 | Init:  10.6274 | Outside:  13.9186 | Gen:  11.6158 | Time: 30.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   590 | Total:   60.1804 | Goal:   5.4378 | Unsafe:  19.7306 | Init:  11.1413 | Outside:  13.4679 | Gen:  10.4027 | Time: 31.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Refining generator cells (simple mode): 11 failing, refined 11 cells, 196 total
+Refining outside cells (simple mode): 17 failing, refined 17 cells, 90 total
+Refining unsafe cells (simple mode): 63 failing, refined 25 cells, 609 total
+Refining init cells (simple mode): 77 failing, refined 25 cells, 214 total
+Rebuilt V cache with 1052 cells
+Rebuilt Phi cache with 196 cells
+Epoch   600 | Total:   55.7366 | Goal:   5.4655 | Unsafe:  11.5778 | Init:  27.1424 | Outside:  11.4415 | Gen:   0.1093 | Time: 33.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   610 | Total:   48.3852 | Goal:   6.4020 | Unsafe:  12.0921 | Init:  14.3047 | Outside:  11.7299 | Gen:   3.8566 | Time: 33.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   620 | Total:   43.7113 | Goal:   6.5340 | Unsafe:  11.6373 | Init:  12.8430 | Outside:  11.5308 | Gen:   1.1663 | Time: 34.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   630 | Total:   41.0231 | Goal:   6.1956 | Unsafe:  11.2113 | Init:  11.2462 | Outside:  11.0337 | Gen:   1.3363 | Time: 34.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   640 | Total:   38.8926 | Goal:   6.2213 | Unsafe:   9.1066 | Init:  11.1503 | Outside:  10.8447 | Gen:   1.5696 | Time: 35.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   650 | Total:   36.7503 | Goal:   6.0507 | Unsafe:   9.9290 | Init:   9.4190 | Outside:  10.5659 | Gen:   0.7857 | Time: 35.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   660 | Total:   34.9325 | Goal:   5.9774 | Unsafe:   8.4212 | Init:   9.2835 | Outside:  10.3801 | Gen:   0.8704 | Time: 36.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   670 | Total:   33.1989 | Goal:   5.8384 | Unsafe:   7.9318 | Init:   8.5072 | Outside:  10.1526 | Gen:   0.7689 | Time: 36.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   680 | Total:   31.5343 | Goal:   5.7871 | Unsafe:   7.7825 | Init:   7.2852 | Outside:  10.0049 | Gen:   0.6747 | Time: 37.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   690 | Total:   30.0071 | Goal:   5.7250 | Unsafe:   6.9770 | Init:   6.7922 | Outside:   9.8538 | Gen:   0.6592 | Time: 37.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   700 | Total:   28.6777 | Goal:   5.6899 | Unsafe:   6.2481 | Init:   6.2717 | Outside:   9.7248 | Gen:   0.7432 | Time: 38.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   710 | Total:   27.2876 | Goal:   5.6059 | Unsafe:   5.9843 | Init:   5.5078 | Outside:   9.5422 | Gen:   0.6474 | Time: 38.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   720 | Total:   26.0989 | Goal:   5.5457 | Unsafe:   5.9403 | Init:   4.5680 | Outside:   9.3826 | Gen:   0.6623 | Time: 39.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   730 | Total:   25.0397 | Goal:   5.2562 | Unsafe:   4.3301 | Init:   5.6603 | Outside:   9.0521 | Gen:   0.7410 | Time: 39.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   740 | Total:   24.0429 | Goal:   5.1091 | Unsafe:   4.7569 | Init:   4.5487 | Outside:   8.8396 | Gen:   0.7887 | Time: 40.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   750 | Total:   23.1878 | Goal:   5.0764 | Unsafe:   4.9580 | Init:   3.7518 | Outside:   8.7146 | Gen:   0.6871 | Time: 40.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   760 | Total:   22.3466 | Goal:   4.9880 | Unsafe:   4.1335 | Init:   3.9040 | Outside:   8.5544 | Gen:   0.7667 | Time: 41.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   770 | Total:   21.8750 | Goal:   4.9503 | Unsafe:   3.6825 | Init:   3.7226 | Outside:   8.4570 | Gen:   1.0626 | Time: 41.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   780 | Total:   21.0900 | Goal:   4.8360 | Unsafe:   4.0146 | Init:   3.1473 | Outside:   8.2952 | Gen:   0.7970 | Time: 42.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   790 | Total:   20.4090 | Goal:   4.6665 | Unsafe:   3.4979 | Init:   3.3050 | Outside:   8.0807 | Gen:   0.8588 | Time: 42.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Refining generator cells (simple mode): 3 failing, refined 3 cells, 205 total
+Refining outside cells (simple mode): 30 failing, refined 25 cells, 165 total
+Refining unsafe cells (simple mode): 34 failing, refined 25 cells, 684 total
+Refining goal cells (simple mode): 76 failing, refined 25 cells, 214 total
+Rebuilt V cache with 1277 cells
+Rebuilt Phi cache with 205 cells
+Epoch   800 | Total:   13.0558 | Goal:   4.9273 | Unsafe:   0.1599 | Init:   3.3934 | Outside:   4.5299 | Gen:   0.0453 | Time: 45.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   810 | Total:   11.6676 | Goal:   3.6144 | Unsafe:   1.4432 | Init:   2.2719 | Outside:   3.7188 | Gen:   0.6194 | Time: 46.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   820 | Total:   11.1775 | Goal:   3.7091 | Unsafe:   1.0452 | Init:   2.5558 | Outside:   3.7505 | Gen:   0.1170 | Time: 46.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   830 | Total:   10.6499 | Goal:   3.2325 | Unsafe:   1.7058 | Init:   2.2098 | Outside:   3.4280 | Gen:   0.0738 | Time: 47.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   840 | Total:   10.2365 | Goal:   3.3432 | Unsafe:   1.3364 | Init:   2.0757 | Outside:   3.4574 | Gen:   0.0239 | Time: 47.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   850 | Total:   10.1052 | Goal:   3.3563 | Unsafe:   1.7868 | Init:   1.4669 | Outside:   3.4514 | Gen:   0.0438 | Time: 48.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   860 | Total:    9.7845 | Goal:   3.1173 | Unsafe:   1.6267 | Init:   1.7495 | Outside:   3.2910 | Gen:   0.0000 | Time: 48.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   870 | Total:    9.6936 | Goal:   3.0777 | Unsafe:   1.8218 | Init:   1.5362 | Outside:   3.2578 | Gen:   0.0000 | Time: 49.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   880 | Total:    9.1108 | Goal:   2.9689 | Unsafe:   1.0715 | Init:   1.8651 | Outside:   3.1409 | Gen:   0.0643 | Time: 49.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   890 | Total:    8.9866 | Goal:   2.8439 | Unsafe:   0.8164 | Init:   2.2448 | Outside:   3.0458 | Gen:   0.0357 | Time: 50.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   900 | Total:    8.7239 | Goal:   2.8091 | Unsafe:   1.1036 | Init:   1.7148 | Outside:   3.0130 | Gen:   0.0835 | Time: 50.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   910 | Total:    8.5122 | Goal:   2.7971 | Unsafe:   1.1892 | Init:   1.4965 | Outside:   2.9864 | Gen:   0.0429 | Time: 51.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   920 | Total:    8.3654 | Goal:   2.5051 | Unsafe:   0.8007 | Init:   2.1419 | Outside:   2.7920 | Gen:   0.1258 | Time: 52.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   930 | Total:    8.2618 | Goal:   2.3820 | Unsafe:   0.8101 | Init:   2.0595 | Outside:   2.6989 | Gen:   0.3112 | Time: 52.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   940 | Total:    8.0066 | Goal:   2.6599 | Unsafe:   0.9281 | Init:   1.5760 | Outside:   2.8426 | Gen:   0.0000 | Time: 53.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   950 | Total:    7.8548 | Goal:   2.4325 | Unsafe:   1.4153 | Init:   1.2917 | Outside:   2.7153 | Gen:   0.0000 | Time: 53.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   960 | Total:    7.6030 | Goal:   2.0992 | Unsafe:   1.3126 | Init:   1.6602 | Outside:   2.5138 | Gen:   0.0171 | Time: 54.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   970 | Total:    7.4431 | Goal:   1.9625 | Unsafe:   0.9741 | Init:   2.0868 | Outside:   2.4197 | Gen:   0.0000 | Time: 54.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   980 | Total:    7.3873 | Goal:   2.4902 | Unsafe:   1.0961 | Init:   1.1223 | Outside:   2.6786 | Gen:   0.0000 | Time: 55.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch   990 | Total:    6.9657 | Goal:   2.1875 | Unsafe:   0.7552 | Init:   1.4326 | Outside:   2.4877 | Gen:   0.1027 | Time: 55.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Refining outside cells (simple mode): 36 failing, refined 25 cells, 240 total
+Refining unsafe cells (simple mode): 31 failing, refined 25 cells, 759 total
+Refining init cells (simple mode): 35 failing, refined 25 cells, 289 total
+Refining goal cells (simple mode): 124 failing, refined 25 cells, 289 total
+Rebuilt V cache with 1577 cells
+Epoch  1000 | Total:    6.0520 | Goal:   1.1018 | Unsafe:   0.0379 | Init:   4.0177 | Outside:   0.8947 | Gen:   0.0000 | Time: 56.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+=== Detailed Evaluation ===
+Goal:      FAIL, V bounds: [ -0.026,   0.882] | 186/289 pass (64.4%)
+Unsafe:    FAIL, V bounds: [  2.978,  20.728] | 0/759 pass (0.0%)
+Init:      FAIL, V bounds: [  0.137,   1.091] | 164/289 pass (56.7%)
+Outside:   FAIL, V bounds: [ -0.095,  23.105] | 202/240 pass (84.2%)
+Generator: FAIL, GV bounds: [-106.135,   3.986] | 114/205 pass (55.6%)
+Merging outside cells: merged 40 pairs, 200 total
+Merging generator cells: merged 0 pairs, 205 total
+Rebuilt V cache with 1537 cells
+Rebuilt Phi cache with 205 cells
+Epoch  1010 | Total:   25.4316 | Goal:   0.2366 | Unsafe:   0.3530 | Init:  21.9389 | Outside:   0.8680 | Gen:   2.0351 | Time: 59.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1020 | Total:   10.6449 | Goal:   1.6796 | Unsafe:   6.5178 | Init:   0.0387 | Outside:   2.4088 | Gen:   0.0000 | Time: 59.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1030 | Total:    6.3531 | Goal:   1.5689 | Unsafe:   2.3491 | Init:   0.1822 | Outside:   2.2529 | Gen:   0.0000 | Time: 60.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1040 | Total:    4.4799 | Goal:   1.1125 | Unsafe:   0.8400 | Init:   0.5108 | Outside:   1.7662 | Gen:   0.2504 | Time: 60.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1050 | Total:    4.0755 | Goal:   0.9284 | Unsafe:   0.6051 | Init:   0.8626 | Outside:   1.5827 | Gen:   0.0967 | Time: 61.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1060 | Total:    4.0512 | Goal:   0.8457 | Unsafe:   0.8880 | Init:   0.6065 | Outside:   1.5114 | Gen:   0.1996 | Time: 61.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1070 | Total:    3.8678 | Goal:   0.8049 | Unsafe:   0.7330 | Init:   0.7407 | Outside:   1.4571 | Gen:   0.1321 | Time: 62.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1080 | Total:    3.6607 | Goal:   0.7367 | Unsafe:   0.6602 | Init:   0.8341 | Outside:   1.3880 | Gen:   0.0418 | Time: 62.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1090 | Total:    3.5416 | Goal:   0.6635 | Unsafe:   0.4647 | Init:   1.0215 | Outside:   1.3043 | Gen:   0.0876 | Time: 63.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1100 | Total:    3.4836 | Goal:   0.6725 | Unsafe:   0.6418 | Init:   0.8557 | Outside:   1.3136 | Gen:   0.0000 | Time: 64.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1110 | Total:    3.3495 | Goal:   0.6316 | Unsafe:   0.6355 | Init:   0.7565 | Outside:   1.2646 | Gen:   0.0612 | Time: 64.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1120 | Total:    3.2361 | Goal:   0.6077 | Unsafe:   0.3762 | Init:   1.0026 | Outside:   1.2244 | Gen:   0.0252 | Time: 65.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1130 | Total:    3.3201 | Goal:   0.5326 | Unsafe:   0.2469 | Init:   1.2887 | Outside:   1.1401 | Gen:   0.1118 | Time: 65.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1140 | Total:    3.0725 | Goal:   0.4887 | Unsafe:   0.4193 | Init:   1.0577 | Outside:   1.1068 | Gen:   0.0000 | Time: 66.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1150 | Total:    3.0561 | Goal:   0.4488 | Unsafe:   0.4903 | Init:   1.0471 | Outside:   1.0672 | Gen:   0.0027 | Time: 66.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1160 | Total:    2.8718 | Goal:   0.4425 | Unsafe:   0.3908 | Init:   0.9561 | Outside:   1.0537 | Gen:   0.0287 | Time: 67.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1170 | Total:    2.9058 | Goal:   0.5015 | Unsafe:   0.3553 | Init:   0.9406 | Outside:   1.1015 | Gen:   0.0069 | Time: 67.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1180 | Total:    2.8087 | Goal:   0.5543 | Unsafe:   0.3773 | Init:   0.7339 | Outside:   1.1432 | Gen:   0.0000 | Time: 68.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1190 | Total:    2.7574 | Goal:   0.5214 | Unsafe:   0.4853 | Init:   0.6344 | Outside:   1.1163 | Gen:   0.0000 | Time: 68.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Refining generator cells (simple mode): 2 failing, refined 2 cells, 211 total
+Refining outside cells (simple mode): 30 failing, refined 25 cells, 275 total
+Refining unsafe cells (simple mode): 16 failing, refined 16 cells, 807 total
+Refining init cells (simple mode): 49 failing, refined 25 cells, 364 total
+Rebuilt V cache with 1735 cells
+Rebuilt Phi cache with 211 cells
+Epoch  1200 | Total:    1.9567 | Goal:   0.4683 | Unsafe:   0.0454 | Init:   1.3370 | Outside:   0.1060 | Gen:   0.0000 | Time: 70.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1210 | Total:   14.3841 | Goal:   0.2591 | Unsafe:   0.0000 | Init:  12.4589 | Outside:   0.0356 | Gen:   1.6305 | Time: 71.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1220 | Total:   21.3036 | Goal:   2.4745 | Unsafe:  16.5980 | Init:   0.0000 | Outside:   2.2312 | Gen:   0.0000 | Time: 72.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1230 | Total:    4.7017 | Goal:   0.2664 | Unsafe:   0.2669 | Init:   3.7788 | Outside:   0.0451 | Gen:   0.3444 | Time: 72.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1240 | Total:    3.3104 | Goal:   1.1835 | Unsafe:   1.4596 | Init:   0.0000 | Outside:   0.6673 | Gen:   0.0000 | Time: 73.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1250 | Total:    1.8633 | Goal:   0.3356 | Unsafe:   0.3360 | Init:   1.1047 | Outside:   0.0759 | Gen:   0.0111 | Time: 73.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1260 | Total:    1.0048 | Goal:   0.5885 | Unsafe:   0.1581 | Init:   0.0463 | Outside:   0.2118 | Gen:   0.0000 | Time: 74.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1270 | Total:    0.8995 | Goal:   0.4431 | Unsafe:   0.1765 | Init:   0.1448 | Outside:   0.1352 | Gen:   0.0000 | Time: 74.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1280 | Total:    0.8323 | Goal:   0.3895 | Unsafe:   0.1448 | Init:   0.1890 | Outside:   0.1073 | Gen:   0.0016 | Time: 75.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1290 | Total:    0.8220 | Goal:   0.3753 | Unsafe:   0.1450 | Init:   0.1176 | Outside:   0.1022 | Gen:   0.0819 | Time: 76.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1300 | Total:    0.7788 | Goal:   0.3849 | Unsafe:   0.1739 | Init:   0.0709 | Outside:   0.1103 | Gen:   0.0389 | Time: 76.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1310 | Total:    0.6832 | Goal:   0.2860 | Unsafe:   0.1026 | Init:   0.2210 | Outside:   0.0689 | Gen:   0.0046 | Time: 77.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1320 | Total:    0.7319 | Goal:   0.3014 | Unsafe:   0.1201 | Init:   0.2351 | Outside:   0.0752 | Gen:   0.0000 | Time: 77.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1330 | Total:    0.6638 | Goal:   0.3110 | Unsafe:   0.1031 | Init:   0.1728 | Outside:   0.0769 | Gen:   0.0000 | Time: 78.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1340 | Total:    0.6728 | Goal:   0.2938 | Unsafe:   0.0675 | Init:   0.2154 | Outside:   0.0702 | Gen:   0.0259 | Time: 78.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1350 | Total:    0.6383 | Goal:   0.3131 | Unsafe:   0.0772 | Init:   0.1449 | Outside:   0.0794 | Gen:   0.0237 | Time: 79.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1360 | Total:    0.5823 | Goal:   0.2563 | Unsafe:   0.0964 | Init:   0.1672 | Outside:   0.0624 | Gen:   0.0000 | Time: 80.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1370 | Total:    0.5861 | Goal:   0.2994 | Unsafe:   0.1069 | Init:   0.0989 | Outside:   0.0768 | Gen:   0.0040 | Time: 80.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1380 | Total:    0.7119 | Goal:   0.3702 | Unsafe:   0.1803 | Init:   0.0480 | Outside:   0.1098 | Gen:   0.0035 | Time: 81.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1390 | Total:    0.6594 | Goal:   0.3263 | Unsafe:   0.1128 | Init:   0.1327 | Outside:   0.0803 | Gen:   0.0075 | Time: 81.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Refining outside cells (simple mode): 10 failing, refined 10 cells, 305 total
+Refining init cells (simple mode): 24 failing, refined 24 cells, 436 total
+Refining unsafe cells (simple mode): 7 failing, refined 7 cells, 828 total
+Refining goal cells (simple mode): 61 failing, refined 25 cells, 364 total
+Rebuilt V cache with 1933 cells
+Epoch  1400 | Total:    0.5230 | Goal:   0.1187 | Unsafe:   0.0000 | Init:   0.3457 | Outside:   0.0015 | Gen:   0.0571 | Time: 82.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1410 | Total:    0.4539 | Goal:   0.1720 | Unsafe:   0.0000 | Init:   0.1275 | Outside:   0.0287 | Gen:   0.1258 | Time: 83.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1420 | Total:    0.2804 | Goal:   0.1650 | Unsafe:   0.0061 | Init:   0.0966 | Outside:   0.0126 | Gen:   0.0000 | Time: 83.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1430 | Total:    0.3424 | Goal:   0.1726 | Unsafe:   0.0000 | Init:   0.1567 | Outside:   0.0131 | Gen:   0.0000 | Time: 84.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1440 | Total:    0.4179 | Goal:   0.2096 | Unsafe:   0.1703 | Init:   0.0000 | Outside:   0.0380 | Gen:   0.0000 | Time: 85.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1450 | Total:    0.2313 | Goal:   0.1404 | Unsafe:   0.0641 | Init:   0.0005 | Outside:   0.0109 | Gen:   0.0154 | Time: 85.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1460 | Total:    0.3952 | Goal:   0.0678 | Unsafe:   0.0845 | Init:   0.1227 | Outside:   0.0000 | Gen:   0.1202 | Time: 86.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1470 | Total:    0.2055 | Goal:   0.1380 | Unsafe:   0.0499 | Init:   0.0006 | Outside:   0.0123 | Gen:   0.0046 | Time: 86.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1480 | Total:    0.1949 | Goal:   0.1084 | Unsafe:   0.0498 | Init:   0.0334 | Outside:   0.0033 | Gen:   0.0000 | Time: 87.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1490 | Total:    0.1388 | Goal:   0.0843 | Unsafe:   0.0198 | Init:   0.0301 | Outside:   0.0000 | Gen:   0.0046 | Time: 87.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1500 | Total:    0.1910 | Goal:   0.1095 | Unsafe:   0.0113 | Init:   0.0676 | Outside:   0.0027 | Gen:   0.0000 | Time: 88.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+=== Detailed Evaluation ===
+Goal:      FAIL, V bounds: [ -0.007,   0.812] | 331/364 pass (90.9%)
+Unsafe:    FAIL, V bounds: [  2.994,  21.387] | 0/828 pass (0.0%)
+Init:      FAIL, V bounds: [  0.133,   1.008] | 416/436 pass (95.4%)
+Outside:   FAIL, V bounds: [ -0.001,  27.856] | 303/305 pass (99.3%)
+Generator: FAIL, GV bounds: [-121.251,   3.913] | 118/211 pass (55.9%)
+Merging outside cells: merged 3 pairs, 302 total
+Merging generator cells: merged 0 pairs, 211 total
+Rebuilt V cache with 1930 cells
+Rebuilt Phi cache with 211 cells
+Epoch  1510 | Total:    0.1697 | Goal:   0.1171 | Unsafe:   0.0288 | Init:   0.0106 | Outside:   0.0133 | Gen:   0.0000 | Time: 90.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1520 | Total:    0.3235 | Goal:   0.1059 | Unsafe:   0.0618 | Init:   0.0030 | Outside:   0.0089 | Gen:   0.1439 | Time: 91.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1530 | Total:    0.2356 | Goal:   0.1513 | Unsafe:   0.0582 | Init:   0.0032 | Outside:   0.0230 | Gen:   0.0000 | Time: 91.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1540 | Total:    0.1498 | Goal:   0.1070 | Unsafe:   0.0134 | Init:   0.0213 | Outside:   0.0081 | Gen:   0.0000 | Time: 92.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1550 | Total:    0.1305 | Goal:   0.0800 | Unsafe:   0.0212 | Init:   0.0245 | Outside:   0.0048 | Gen:   0.0000 | Time: 92.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1560 | Total:    0.1257 | Goal:   0.0558 | Unsafe:   0.0295 | Init:   0.0189 | Outside:   0.0021 | Gen:   0.0194 | Time: 93.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1570 | Total:    0.1519 | Goal:   0.0841 | Unsafe:   0.0086 | Init:   0.0533 | Outside:   0.0058 | Gen:   0.0000 | Time: 94.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1580 | Total:    0.1524 | Goal:   0.0926 | Unsafe:   0.0000 | Init:   0.0390 | Outside:   0.0043 | Gen:   0.0165 | Time: 94.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1590 | Total:    0.1557 | Goal:   0.0581 | Unsafe:   0.0221 | Init:   0.0394 | Outside:   0.0017 | Gen:   0.0343 | Time: 95.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Refining unsafe cells (simple mode): 7 failing, refined 7 cells, 849 total
+Refining goal cells (simple mode): 32 failing, refined 25 cells, 439 total
+Refining outside cells (simple mode): 3 failing, refined 3 cells, 311 total
+Refining init cells (simple mode): 1 failing, refined 1 cells, 439 total
+Rebuilt V cache with 2038 cells
+Epoch  1600 | Total:    0.0778 | Goal:   0.0059 | Unsafe:   0.0000 | Init:   0.0001 | Outside:   0.0004 | Gen:   0.0713 | Time: 96.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1610 | Total:    0.0179 | Goal:   0.0104 | Unsafe:   0.0015 | Init:   0.0039 | Outside:   0.0021 | Gen:   0.0000 | Time: 96.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1620 | Total:    0.0102 | Goal:   0.0047 | Unsafe:   0.0055 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0000 | Time: 97.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1630 | Total:    0.0261 | Goal:   0.0025 | Unsafe:   0.0052 | Init:   0.0184 | Outside:   0.0000 | Gen:   0.0000 | Time: 98.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1640 | Total:    0.0350 | Goal:   0.0154 | Unsafe:   0.0053 | Init:   0.0101 | Outside:   0.0042 | Gen:   0.0000 | Time: 98.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1650 | Total:    0.0137 | Goal:   0.0076 | Unsafe:   0.0000 | Init:   0.0052 | Outside:   0.0009 | Gen:   0.0000 | Time: 99.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1660 | Total:    0.0191 | Goal:   0.0024 | Unsafe:   0.0100 | Init:   0.0067 | Outside:   0.0000 | Gen:   0.0000 | Time: 99.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1670 | Total:    0.0147 | Goal:   0.0056 | Unsafe:   0.0058 | Init:   0.0031 | Outside:   0.0002 | Gen:   0.0000 | Time: 100.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1680 | Total:    0.1767 | Goal:   0.0343 | Unsafe:   0.1243 | Init:   0.0000 | Outside:   0.0181 | Gen:   0.0000 | Time: 100.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1690 | Total:    0.0840 | Goal:   0.0126 | Unsafe:   0.0216 | Init:   0.0467 | Outside:   0.0031 | Gen:   0.0000 | Time: 101.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1700 | Total:    0.0159 | Goal:   0.0046 | Unsafe:   0.0054 | Init:   0.0060 | Outside:   0.0000 | Gen:   0.0000 | Time: 102.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1710 | Total:    0.0039 | Goal:   0.0037 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0002 | Time: 102.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1720 | Total:    0.0074 | Goal:   0.0062 | Unsafe:   0.0000 | Init:   0.0011 | Outside:   0.0001 | Gen:   0.0000 | Time: 103.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1730 | Total:    0.0046 | Goal:   0.0019 | Unsafe:   0.0003 | Init:   0.0023 | Outside:   0.0000 | Gen:   0.0000 | Time: 103.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1740 | Total:    0.0077 | Goal:   0.0068 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0010 | Gen:   0.0000 | Time: 104.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1750 | Total:    0.0193 | Goal:   0.0087 | Unsafe:   0.0003 | Init:   0.0089 | Outside:   0.0014 | Gen:   0.0000 | Time: 104.9s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1760 | Total:    0.0254 | Goal:   0.0103 | Unsafe:   0.0120 | Init:   0.0004 | Outside:   0.0027 | Gen:   0.0000 | Time: 105.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1770 | Total:    0.0062 | Goal:   0.0055 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0007 | Gen:   0.0000 | Time: 106.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1780 | Total:    0.0264 | Goal:   0.0085 | Unsafe:   0.0000 | Init:   0.0166 | Outside:   0.0013 | Gen:   0.0000 | Time: 106.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1790 | Total:    0.0509 | Goal:   0.0003 | Unsafe:   0.0164 | Init:   0.0342 | Outside:   0.0000 | Gen:   0.0000 | Time: 107.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Refining init cells (simple mode): 8 failing, refined 8 cells, 463 total
+Refining goal cells (simple mode): 6 failing, refined 6 cells, 457 total
+Rebuilt V cache with 2080 cells
+Epoch  1800 | Total:    0.0072 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0072 | Outside:   0.0000 | Gen:   0.0000 | Time: 108.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1810 | Total:    0.1755 | Goal:   0.0403 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0478 | Gen:   0.0874 | Time: 109.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1820 | Total:    0.0817 | Goal:   0.0000 | Unsafe:   0.0360 | Init:   0.0457 | Outside:   0.0000 | Gen:   0.0000 | Time: 109.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1830 | Total:    0.1062 | Goal:   0.0333 | Unsafe:   0.0209 | Init:   0.0000 | Outside:   0.0520 | Gen:   0.0000 | Time: 110.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1840 | Total:    3.2924 | Goal:   0.3834 | Unsafe:   2.3513 | Init:   0.0000 | Outside:   0.5577 | Gen:   0.0000 | Time: 110.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1850 | Total:    1.7825 | Goal:   0.3289 | Unsafe:   0.9338 | Init:   0.0000 | Outside:   0.5198 | Gen:   0.0000 | Time: 111.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1860 | Total:    4.8500 | Goal:   0.0019 | Unsafe:   0.0424 | Init:   4.8056 | Outside:   0.0000 | Gen:   0.0000 | Time: 111.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1870 | Total:    0.5204 | Goal:   0.0953 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.1376 | Gen:   0.2875 | Time: 112.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1880 | Total:    1.4396 | Goal:   0.2237 | Unsafe:   0.0104 | Init:   0.0000 | Outside:   0.4167 | Gen:   0.7888 | Time: 113.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1890 | Total:    3.4135 | Goal:   1.4944 | Unsafe:   0.0186 | Init:   0.0000 | Outside:   1.5393 | Gen:   0.3612 | Time: 113.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1900 | Total:    0.9627 | Goal:   0.3182 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.4534 | Gen:   0.1912 | Time: 114.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1910 | Total:    0.4259 | Goal:   0.1590 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.2143 | Gen:   0.0526 | Time: 114.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1920 | Total:    1.2959 | Goal:   0.5126 | Unsafe:   0.0373 | Init:   0.0000 | Outside:   0.7459 | Gen:   0.0000 | Time: 115.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1930 | Total:    0.2732 | Goal:   0.0311 | Unsafe:   0.1707 | Init:   0.0000 | Outside:   0.0714 | Gen:   0.0000 | Time: 116.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1940 | Total:    0.1370 | Goal:   0.0491 | Unsafe:   0.0177 | Init:   0.0000 | Outside:   0.0701 | Gen:   0.0000 | Time: 116.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1950 | Total:    0.0833 | Goal:   0.0084 | Unsafe:   0.0572 | Init:   0.0000 | Outside:   0.0177 | Gen:   0.0000 | Time: 117.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1960 | Total:    0.0287 | Goal:   0.0095 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0140 | Gen:   0.0053 | Time: 117.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1970 | Total:    0.0127 | Goal:   0.0043 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0083 | Gen:   0.0000 | Time: 118.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1980 | Total:    0.0219 | Goal:   0.0056 | Unsafe:   0.0070 | Init:   0.0000 | Outside:   0.0094 | Gen:   0.0000 | Time: 118.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Epoch  1990 | Total:    0.0198 | Goal:   0.0073 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0125 | Gen:   0.0000 | Time: 119.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+Refining outside cells (simple mode): 4 failing, refined 4 cells, 323 total
+Refining goal cells (simple mode): 6 failing, refined 6 cells, 475 total
+Rebuilt V cache with 2110 cells
+Epoch  2000 | Total:    0.0020 | Goal:   0.0000 | Unsafe:   0.0020 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0000 | Time: 120.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 4.0000
+beta_ra_k: 3.0000
+=== Detailed Evaluation ===
+Goal:      PASS, V bounds: [  0.001,   0.816] | 475/475 pass (100.0%)
+Unsafe:    FAIL, V bounds: [  2.999,  22.145] | 0/849 pass (0.0%)
+Init:      PASS, V bounds: [  0.128,   0.993] | 463/463 pass (100.0%)
+Outside:   PASS, V bounds: [  0.002,  28.658] | 323/323 pass (100.0%)
+Generator: FAIL, GV bounds: [-130.072,   3.980] | 118/211 pass (55.9%)
+Skipping refinement at epoch 2003: generator threshold will be decreased this epoch.
+Merging outside cells: merged 0 pairs, 323 total
+Decremented generator_threshold_k to 3.5000
+Rebuilt V cache with 2110 cells
+SMT solver [generator] @ epoch 2005: failing_total=6, selected=6 (top-violating), checked=6, unsat=6, sat=0, unknown=0, selected_score_range=[0.0678, 0.4218], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2006: failing_total=6, selected=6 (top-violating), checked=6, unsat=6, sat=0, unknown=0, selected_score_range=[0.0089, 0.3792], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2007: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.1163, 0.2953], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2008: failing_total=5, selected=5 (top-violating), checked=5, unsat=5, sat=0, unknown=0, selected_score_range=[0.0059, 0.3370], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2009: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0134, 0.3593], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2010: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0753, 0.3650], ce_added=0, ce_total=0
+Epoch  2010 | Total:    0.6252 | Goal:   0.0198 | Unsafe:   0.1400 | Init:   0.0000 | Outside:   0.0620 | Gen:   0.4035 | Time: 506.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2011: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0260, 0.3392], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2012: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0843, 0.3080], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2013: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.1366, 0.2865], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2014: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.1745, 0.2725], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2015: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.1938, 0.2646], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2016: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0325, 0.2621], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2017: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0211, 0.2701], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2018: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.1156, 0.2930], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2019: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0558, 0.3174], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2020: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0280, 0.3431], ce_added=0, ce_total=0
+Epoch  2020 | Total:    0.4589 | Goal:   0.0247 | Unsafe:   0.0153 | Init:   0.0193 | Outside:   0.0470 | Gen:   0.3526 | Time: 843.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2021: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0189, 0.3336], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2022: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0047, 0.2792], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2023: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0191, 0.2349], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2024: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0218, 0.2002], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2025: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0136, 0.1743], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2026: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0033, 0.1570], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2027: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1409, 0.1409], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2028: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0027, 0.1171], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2029: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1108, 0.1108], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2030: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0054, 0.0944], ce_added=0, ce_total=0
+Epoch  2030 | Total:    0.1897 | Goal:   0.0251 | Unsafe:   0.0287 | Init:   0.0000 | Outside:   0.0456 | Gen:   0.0903 | Time: 1123.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2031: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0048, 0.0853], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2032: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0823, 0.0823], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2033: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0026, 0.0739], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2034: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0659, 0.0659], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2035: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0023, 0.0520], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2036: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0038, 0.0446], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2037: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0369, 0.0412], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2038: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0378, 0.0378], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2040: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0115, 0.0115], ce_added=0, ce_total=0
+Epoch  2040 | Total:    0.1691 | Goal:   0.0161 | Unsafe:   0.0791 | Init:   0.0000 | Outside:   0.0452 | Gen:   0.0286 | Time: 1345.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2041: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0285, 0.0285], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2042: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0020, 0.0323], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2043: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0066, 0.0066], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2045: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0097, 0.0633], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2048: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0336, 0.0336], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2049: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0189, 0.0893], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2050: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0079, 0.0912], ce_added=0, ce_total=0
+Epoch  2050 | Total:    0.1494 | Goal:   0.0027 | Unsafe:   0.0145 | Init:   0.0978 | Outside:   0.0015 | Gen:   0.0330 | Time: 1508.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2051: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0329, 0.0329], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2060: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0226, 0.0226], ce_added=0, ce_total=0
+Epoch  2060 | Total:    0.1225 | Goal:   0.0049 | Unsafe:   0.0171 | Init:   0.0658 | Outside:   0.0000 | Gen:   0.0348 | Time: 1539.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2061: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0347, 0.0347], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2070: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0021, 0.0098], ce_added=0, ce_total=0
+Epoch  2070 | Total:    0.0804 | Goal:   0.0156 | Unsafe:   0.0391 | Init:   0.0000 | Outside:   0.0257 | Gen:   0.0000 | Time: 1584.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2078: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0424, 0.0424], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2079: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0516, 0.0516], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2080: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0147, 0.0147], ce_added=0, ce_total=0
+Epoch  2080 | Total:    0.1309 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.1309 | Outside:   0.0000 | Gen:   0.0000 | Time: 1630.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2082: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0586, 0.0586], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2085: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0232, 0.0232], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2086: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0269, 0.0269], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2087: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0016, 0.0016], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2088: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0004, 0.0004], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2089: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0048, 0.0048], ce_added=0, ce_total=0
+Epoch  2090 | Total:    0.0869 | Goal:   0.0122 | Unsafe:   0.0414 | Init:   0.0000 | Outside:   0.0333 | Gen:   0.0000 | Time: 1721.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2092: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0122, 0.0122], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2093: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0237, 0.0237], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2094: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0132, 0.0132], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2095: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0179, 0.0179], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2096: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0082, 0.0082], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2097: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0014, 0.0014], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2100: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0172, 0.0172], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2100: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0172, 0.0172], ce_added=0, ce_total=0
+Epoch  2100 | Total:    0.0504 | Goal:   0.0084 | Unsafe:   0.0125 | Init:   0.0000 | Outside:   0.0236 | Gen:   0.0059 | Time: 1843.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2101: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0058, 0.0058], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2104: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0053, 0.0053], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2105: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0065, 0.0065], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2110: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0324, 0.0391], ce_added=0, ce_total=0
+Epoch  2110 | Total:    0.0790 | Goal:   0.0000 | Unsafe:   0.0208 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0582 | Time: 1918.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2111: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0174, 0.0406], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2115: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0103, 0.0103], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2116: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0224, 0.0224], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2117: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0195, 0.0195], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2118: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0032, 0.0032], ce_added=0, ce_total=0
+Epoch  2120 | Total:    0.0028 | Goal:   0.0006 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0022 | Gen:   0.0000 | Time: 2009.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.5000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2123: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.0035, 0.0035], ce_added=0, ce_total=0
+Skipping refinement at epoch 2125: generator threshold will be decreased this epoch.
+Decremented generator_threshold_k to 3.0000
+SMT solver [generator] @ epoch 2127: failing_total=7, selected=7 (top-violating), checked=7, unsat=7, sat=0, unknown=0, selected_score_range=[0.0411, 0.4837], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2128: failing_total=7, selected=7 (top-violating), checked=7, unsat=7, sat=0, unknown=0, selected_score_range=[0.0131, 0.5113], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2129: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.2797, 0.5562], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2130: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.2764, 0.5403], ce_added=0, ce_total=0
+Epoch  2130 | Total:    1.5672 | Goal:   0.0049 | Unsafe:   0.1609 | Init:   0.0000 | Outside:   0.0142 | Gen:   1.3873 | Time: 2350.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2131: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.2669, 0.4971], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2132: failing_total=6, selected=6 (top-violating), checked=6, unsat=6, sat=0, unknown=0, selected_score_range=[0.0110, 0.4465], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2133: failing_total=6, selected=6 (top-violating), checked=6, unsat=6, sat=0, unknown=0, selected_score_range=[0.0529, 0.3953], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2134: failing_total=5, selected=5 (top-violating), checked=5, unsat=5, sat=0, unknown=0, selected_score_range=[0.0023, 0.4504], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2135: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.1935, 0.4762], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2136: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.1782, 0.4878], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2137: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.1771, 0.4887], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2138: failing_total=5, selected=5 (top-violating), checked=5, unsat=5, sat=0, unknown=0, selected_score_range=[0.0257, 0.4401], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2139: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.1092, 0.4028], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2140: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0510, 0.3507], ce_added=0, ce_total=0
+Epoch  2140 | Total:    1.1137 | Goal:   0.0238 | Unsafe:   0.2164 | Init:   0.0000 | Outside:   0.0477 | Gen:   0.8257 | Time: 3030.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2141: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1785, 0.3849], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2142: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0164, 0.4419], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2143: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0755, 0.4833], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2144: failing_total=5, selected=5 (top-violating), checked=5, unsat=5, sat=0, unknown=0, selected_score_range=[0.0624, 0.4610], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2145: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1728, 0.4033], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2146: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0225, 0.3503], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2147: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1493, 0.2803], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2148: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.1069, 0.2784], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2149: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0036, 0.2911], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2150: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1668, 0.2724], ce_added=0, ce_total=0
+Epoch  2150 | Total:    0.8667 | Goal:   0.0225 | Unsafe:   0.1822 | Init:   0.0000 | Outside:   0.0473 | Gen:   0.6146 | Time: 3576.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2151: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1801, 0.2443], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2152: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0813, 0.2299], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2153: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.1493, 0.2329], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2154: failing_total=5, selected=5 (top-violating), checked=5, unsat=5, sat=0, unknown=0, selected_score_range=[0.0066, 0.2373], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2155: failing_total=5, selected=5 (top-violating), checked=5, unsat=5, sat=0, unknown=0, selected_score_range=[0.0109, 0.2397], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2156: failing_total=5, selected=5 (top-violating), checked=5, unsat=5, sat=0, unknown=0, selected_score_range=[0.0038, 0.2404], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2157: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0018, 0.2387], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2158: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1011, 0.2362], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2159: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0864, 0.2294], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2160: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0818, 0.2271], ce_added=0, ce_total=0
+Epoch  2160 | Total:    0.9095 | Goal:   0.0394 | Unsafe:   0.3807 | Init:   0.0000 | Outside:   0.0833 | Gen:   0.4061 | Time: 4148.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2161: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0772, 0.1938], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2162: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0928, 0.1794], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2163: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1121, 0.1623], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2164: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1062, 0.1647], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2165: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0465, 0.1860], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2166: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0652, 0.2053], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2167: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0395, 0.1957], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2168: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0320, 0.1845], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2169: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0377, 0.1756], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2170: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0565, 0.1666], ce_added=0, ce_total=0
+Epoch  2170 | Total:    0.6492 | Goal:   0.0254 | Unsafe:   0.3498 | Init:   0.0000 | Outside:   0.0579 | Gen:   0.2161 | Time: 4662.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2171: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0175, 0.1402], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2172: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0647, 0.1415], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2173: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0157, 0.1634], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2174: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0139, 0.1489], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2175: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0591, 0.1728], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2176: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0550, 0.1889], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2177: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0214, 0.1871], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2178: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0242, 0.1617], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2179: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0032, 0.1564], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2180: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0095, 0.1808], ce_added=0, ce_total=0
+Epoch  2180 | Total:    0.3964 | Goal:   0.0093 | Unsafe:   0.1207 | Init:   0.0000 | Outside:   0.0306 | Gen:   0.2357 | Time: 5148.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2181: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0081, 0.1884], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2182: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0024, 0.1934], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2183: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0136, 0.1978], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2184: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0221, 0.1969], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2185: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0048, 0.1779], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2186: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1806, 0.1806], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2187: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0101, 0.1958], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2188: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0151, 0.1807], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2189: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0004, 0.1758], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2190: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1817, 0.1817], ce_added=0, ce_total=0
+Epoch  2190 | Total:    0.4146 | Goal:   0.0237 | Unsafe:   0.1676 | Init:   0.0000 | Outside:   0.0514 | Gen:   0.1718 | Time: 5501.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2191: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1717, 0.1717], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2192: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1788, 0.1788], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2193: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0136, 0.1971], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2194: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0063, 0.1877], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2195: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1826, 0.1826], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2196: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1923, 0.1923], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2197: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0018, 0.2075], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2198: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0223, 0.1789], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2199: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0069, 0.1849], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2200: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0277, 0.2147], ce_added=0, ce_total=0
+Refining unsafe cells (simple mode): 4 failing, refined 4 cells, 861 total
+Refining outside cells (simple mode): 9 failing, refined 9 cells, 350 total
+Refining goal cells (simple mode): 10 failing, refined 10 cells, 505 total
+SMT solver [generator] @ epoch 2200: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0277, 0.2147], ce_added=0, ce_total=0
+Rebuilt V cache with 2179 cells
+Epoch  2200 | Total:    1.0756 | Goal:   0.0000 | Unsafe:   0.0653 | Init:   0.6903 | Outside:   0.0000 | Gen:   0.3200 | Time: 5812.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2201: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0151, 0.2363], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2202: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1968, 0.1968], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2203: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1780, 0.1780], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2204: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0822, 0.2422], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2205: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0454, 0.2872], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2206: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.1008, 0.2365], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2207: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0395, 0.1983], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2208: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1174, 0.3345], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2209: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0151, 0.3949], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2210: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1555, 0.2824], ce_added=0, ce_total=0
+Epoch  2210 | Total:    7.2300 | Goal:   1.1187 | Unsafe:   4.5311 | Init:   0.0000 | Outside:   1.0348 | Gen:   0.5455 | Time: 6166.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2211: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1228, 0.2404], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2212: failing_total=5, selected=5 (top-violating), checked=5, unsat=5, sat=0, unknown=0, selected_score_range=[0.0157, 0.5089], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2213: failing_total=6, selected=6 (top-violating), checked=6, unsat=6, sat=0, unknown=0, selected_score_range=[0.0278, 0.7057], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2214: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.1869, 0.6836], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2215: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0704, 0.5952], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2216: failing_total=8, selected=8 (top-violating), checked=8, unsat=8, sat=0, unknown=0, selected_score_range=[0.0259, 1.0090], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2217: failing_total=8, selected=8 (top-violating), checked=8, unsat=8, sat=0, unknown=0, selected_score_range=[0.1026, 0.9763], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2218: failing_total=6, selected=6 (top-violating), checked=6, unsat=6, sat=0, unknown=0, selected_score_range=[0.0043, 0.5081], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2219: failing_total=5, selected=5 (top-violating), checked=5, unsat=5, sat=0, unknown=0, selected_score_range=[0.0175, 0.4389], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2220: failing_total=8, selected=8 (top-violating), checked=8, unsat=8, sat=0, unknown=0, selected_score_range=[0.0343, 0.7574], ce_added=0, ce_total=0
+Epoch  2220 | Total:   27.1743 | Goal:   0.0000 | Unsafe:   0.3892 | Init:  22.9395 | Outside:   0.0000 | Gen:   3.8457 | Time: 6977.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2221: failing_total=7, selected=7 (top-violating), checked=7, unsat=7, sat=0, unknown=0, selected_score_range=[0.0352, 1.3412], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2222: failing_total=6, selected=6 (top-violating), checked=6, unsat=6, sat=0, unknown=0, selected_score_range=[0.1326, 1.3686], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2223: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.1191, 1.0431], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2224: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.1050, 0.9935], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2225: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0552, 0.7170], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2226: failing_total=6, selected=6 (top-violating), checked=6, unsat=6, sat=0, unknown=0, selected_score_range=[0.0533, 0.4686], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2227: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0010, 0.3305], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2228: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0179, 0.2081], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2229: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0226, 0.2602], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2230: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0666, 0.3186], ce_added=0, ce_total=0
+Epoch  2230 | Total:    1.4579 | Goal:   0.0000 | Unsafe:   0.4880 | Init:   0.4010 | Outside:   0.0000 | Gen:   0.5689 | Time: 8567.8s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2231: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0059, 0.3497], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2232: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0197, 0.3411], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2233: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0186, 0.3267], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2234: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0037, 0.3048], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2235: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.2073, 0.3114], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2236: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.1381, 0.3205], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2237: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0472, 0.3251], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2238: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0650, 0.3230], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2239: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0885, 0.3175], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2240: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0392, 0.3188], ce_added=0, ce_total=0
+Epoch  2240 | Total:    0.6200 | Goal:   0.0364 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0935 | Gen:   0.4901 | Time: 8993.7s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2241: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0204, 0.3283], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2242: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.1038, 0.3391], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2243: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0239, 0.3530], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2244: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0222, 0.3610], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2245: failing_total=4, selected=4 (top-violating), checked=4, unsat=4, sat=0, unknown=0, selected_score_range=[0.0017, 0.3589], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2246: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0693, 0.3455], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2247: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0447, 0.3222], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2248: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0038, 0.2919], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2249: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2642, 0.2642], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2250: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2393, 0.2393], ce_added=0, ce_total=0
+Epoch  2250 | Total:    0.3937 | Goal:   0.0561 | Unsafe:   0.0195 | Init:   0.0000 | Outside:   0.1004 | Gen:   0.2177 | Time: 9361.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2251: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2176, 0.2176], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2252: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2044, 0.2044], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2253: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2000, 0.2000], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2254: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2016, 0.2016], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2255: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0164, 0.2040], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2256: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2147, 0.2147], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2257: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2229, 0.2229], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2258: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2289, 0.2289], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2259: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0099, 0.2335], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2260: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0058, 0.2358], ce_added=0, ce_total=0
+Epoch  2260 | Total:    0.3501 | Goal:   0.0449 | Unsafe:   0.0000 | Init:   0.0057 | Outside:   0.0653 | Gen:   0.2341 | Time: 9565.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2261: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2340, 0.2340], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2262: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2295, 0.2295], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2263: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2255, 0.2255], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2264: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2207, 0.2207], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2265: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2139, 0.2139], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2266: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.2065, 0.2065], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2267: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1990, 0.1990], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2268: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1910, 0.1910], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2269: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1825, 0.1825], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2270: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1737, 0.1737], ce_added=0, ce_total=0
+Epoch  2270 | Total:    0.2942 | Goal:   0.0295 | Unsafe:   0.0184 | Init:   0.0000 | Outside:   0.0589 | Gen:   0.1874 | Time: 9725.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2271: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0188, 0.1684], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2272: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1767, 0.1767], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2273: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1857, 0.1857], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2274: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1927, 0.1927], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2275: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1972, 0.1972], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2276: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1944, 0.1944], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2277: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1911, 0.1911], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2278: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1883, 0.1883], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2279: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0017, 0.1860], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2280: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1821, 0.1821], ce_added=0, ce_total=0
+Epoch  2280 | Total:    0.2249 | Goal:   0.0092 | Unsafe:   0.0170 | Init:   0.0000 | Outside:   0.0206 | Gen:   0.1781 | Time: 9913.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2281: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1780, 0.1780], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2282: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1730, 0.1730], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2283: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1602, 0.1602], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2284: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1471, 0.1471], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2285: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1379, 0.1379], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2286: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1392, 0.1392], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2287: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1427, 0.1427], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2288: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1448, 0.1448], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2289: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1284, 0.1284], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2290: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1205, 0.1205], ce_added=0, ce_total=0
+Epoch  2290 | Total:    0.2926 | Goal:   0.0229 | Unsafe:   0.0561 | Init:   0.0000 | Outside:   0.0556 | Gen:   0.1579 | Time: 10074.0s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2291: failing_total=3, selected=3 (top-violating), checked=3, unsat=3, sat=0, unknown=0, selected_score_range=[0.0155, 0.1248], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2292: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1440, 0.1440], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2293: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1600, 0.1600], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2294: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1537, 0.1537], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2295: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1498, 0.1498], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2296: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1572, 0.1572], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2297: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1747, 0.1747], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2298: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.1414, 0.1905], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2299: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1887, 0.1887], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2300: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1852, 0.1852], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2300: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1852, 0.1852], ce_added=0, ce_total=0
+Epoch  2300 | Total:    0.2025 | Goal:   0.0081 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0140 | Gen:   0.1804 | Time: 10295.2s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2301: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1803, 0.1803], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2302: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1745, 0.1745], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2303: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1682, 0.1682], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2304: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0010, 0.1589], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2305: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0398, 0.1603], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2306: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0176, 0.1657], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2307: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0207, 0.1671], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2308: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1661, 0.1661], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2309: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1680, 0.1680], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2310: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1749, 0.1749], ce_added=0, ce_total=0
+Epoch  2310 | Total:    0.2083 | Goal:   0.0017 | Unsafe:   0.0170 | Init:   0.0000 | Outside:   0.0069 | Gen:   0.1828 | Time: 10516.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2311: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1827, 0.1827], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2312: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1893, 0.1893], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2313: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1930, 0.1930], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2314: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1945, 0.1945], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2315: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1941, 0.1941], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2316: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1919, 0.1919], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2317: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1856, 0.1856], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2318: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1786, 0.1786], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2319: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1711, 0.1711], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2320: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1626, 0.1626], ce_added=0, ce_total=0
+Epoch  2320 | Total:    0.1760 | Goal:   0.0052 | Unsafe:   0.0056 | Init:   0.0000 | Outside:   0.0150 | Gen:   0.1502 | Time: 10677.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2321: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1501, 0.1501], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2322: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1404, 0.1404], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2323: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1332, 0.1332], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2324: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1231, 0.1231], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2325: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1166, 0.1166], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2326: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1141, 0.1141], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2327: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1093, 0.1093], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2328: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1102, 0.1102], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2329: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1111, 0.1111], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2330: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0043, 0.1121], ce_added=0, ce_total=0
+Epoch  2330 | Total:    0.1542 | Goal:   0.0053 | Unsafe:   0.0136 | Init:   0.0017 | Outside:   0.0152 | Gen:   0.1184 | Time: 10853.4s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2331: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0063, 0.1119], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2332: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1095, 0.1095], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2333: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1086, 0.1086], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2334: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1083, 0.1083], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2335: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1086, 0.1086], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2336: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1130, 0.1130], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2337: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1126, 0.1126], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2338: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1174, 0.1174], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2339: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0034, 0.1224], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2340: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1203, 0.1203], ce_added=0, ce_total=0
+Epoch  2340 | Total:    0.1525 | Goal:   0.0035 | Unsafe:   0.0155 | Init:   0.0000 | Outside:   0.0119 | Gen:   0.1216 | Time: 11057.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2341: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0015, 0.1199], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2342: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0044, 0.1322], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2343: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1338, 0.1338], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2344: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1363, 0.1363], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2345: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1397, 0.1397], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2346: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1438, 0.1438], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2347: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1459, 0.1459], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2348: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1406, 0.1406], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2349: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1372, 0.1372], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2350: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1354, 0.1354], ce_added=0, ce_total=0
+Epoch  2350 | Total:    0.1593 | Goal:   0.0023 | Unsafe:   0.0132 | Init:   0.0000 | Outside:   0.0087 | Gen:   0.1351 | Time: 11249.3s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2351: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1350, 0.1350], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2352: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1361, 0.1361], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2353: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1321, 0.1321], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2354: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1274, 0.1274], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2355: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0040, 0.1247], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2356: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1192, 0.1192], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2357: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1132, 0.1132], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2358: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1094, 0.1094], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2359: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1064, 0.1064], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2360: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1059, 0.1059], ce_added=0, ce_total=0
+Epoch  2360 | Total:    0.1434 | Goal:   0.0021 | Unsafe:   0.0203 | Init:   0.0058 | Outside:   0.0074 | Gen:   0.1079 | Time: 11426.1s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2361: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1078, 0.1078], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2362: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1091, 0.1091], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2363: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0174, 0.1127], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2364: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0106, 0.1125], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2365: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1101, 0.1101], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2366: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1108, 0.1108], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2367: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1069, 0.1069], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2368: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1101, 0.1101], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2369: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1122, 0.1122], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2370: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1137, 0.1137], ce_added=0, ce_total=0
+Epoch  2370 | Total:    0.1448 | Goal:   0.0008 | Unsafe:   0.0139 | Init:   0.0056 | Outside:   0.0046 | Gen:   0.1199 | Time: 11617.6s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2371: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1198, 0.1198], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2372: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1235, 0.1235], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2373: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1255, 0.1255], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2374: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1288, 0.1288], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2375: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1306, 0.1306], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2376: failing_total=2, selected=2 (top-violating), checked=2, unsat=2, sat=0, unknown=0, selected_score_range=[0.0086, 0.1309], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2377: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1300, 0.1300], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2378: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1274, 0.1274], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2379: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1259, 0.1259], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2380: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1236, 0.1236], ce_added=0, ce_total=0
+Epoch  2380 | Total:    0.1354 | Goal:   0.0002 | Unsafe:   0.0071 | Init:   0.0023 | Outside:   0.0038 | Gen:   0.1220 | Time: 11794.5s
+generator_weight_k: 1.0000
+generator_threshold_k: 3.0000
+beta_ra_k: 3.0000
+SMT solver [generator] @ epoch 2381: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1219, 0.1219], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2382: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1190, 0.1190], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2383: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1161, 0.1161], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2384: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1136, 0.1136], ce_added=0, ce_total=0
+SMT solver [generator] @ epoch 2385: failing_total=1, selected=1 (top-violating), checked=1, unsat=1, sat=0, unknown=0, selected_score_range=[0.1100, 0.1100], ce_added=0, ce_total=0

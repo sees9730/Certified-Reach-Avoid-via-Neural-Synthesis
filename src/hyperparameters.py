@@ -153,6 +153,26 @@ class TrainingConfig:
     generator_threshold_step_fine: float = 0.02
     generator_threshold_switch: float = 0.2
 
+    # Optional SMT-based cell filtering for bound-inconclusive V cells.
+    # If enabled, SMT checks a small subset of failing cells and re-labels
+    # cells as passing when no counterexample can exist in that cell.
+    enable_smt_cell_filter: bool = False
+    smt_cell_filter_start_epoch: int = 0
+    smt_cell_filter_interval: int = 200
+    smt_cell_filter_max_cells: int = 20
+    smt_cell_filter_timeout_ms: int = 200
+    smt_cell_filter_regions: List[str] = field(
+        default_factory=lambda: ["goal", "unsafe", "init", "outside", "generator"]
+    )
+    smt_check_all_regions_in_stage3: bool = True
+    smt_parallel_workers: int = 1
+    enable_smt_counterexample_replay: bool = False
+    smt_ce_replay_max_points_per_region: int = 256
+    smt_ce_replay_batch_size: int = 32
+    smt_ce_replay_noise_radius: float = 0.0
+    smt_ce_replay_weight_v: float = 0.2
+    smt_ce_replay_weight_gv: float = 0.2
+
 @dataclass
 class Hyperparameters:
     """
@@ -281,6 +301,20 @@ class Hyperparameters:
                 'generator_threshold_step': self.training.generator_threshold_step,
                 'generator_threshold_step_fine': self.training.generator_threshold_step_fine,
                 'generator_threshold_switch': self.training.generator_threshold_switch,
+                'enable_smt_cell_filter': self.training.enable_smt_cell_filter,
+                'smt_cell_filter_start_epoch': self.training.smt_cell_filter_start_epoch,
+                'smt_cell_filter_interval': self.training.smt_cell_filter_interval,
+                'smt_cell_filter_max_cells': self.training.smt_cell_filter_max_cells,
+                'smt_cell_filter_timeout_ms': self.training.smt_cell_filter_timeout_ms,
+                'smt_cell_filter_regions': self.training.smt_cell_filter_regions,
+                'smt_check_all_regions_in_stage3': self.training.smt_check_all_regions_in_stage3,
+                'smt_parallel_workers': self.training.smt_parallel_workers,
+                'enable_smt_counterexample_replay': self.training.enable_smt_counterexample_replay,
+                'smt_ce_replay_max_points_per_region': self.training.smt_ce_replay_max_points_per_region,
+                'smt_ce_replay_batch_size': self.training.smt_ce_replay_batch_size,
+                'smt_ce_replay_noise_radius': self.training.smt_ce_replay_noise_radius,
+                'smt_ce_replay_weight_v': self.training.smt_ce_replay_weight_v,
+                'smt_ce_replay_weight_gv': self.training.smt_ce_replay_weight_gv,
             },
             'refinement': {
                 'use_simple_refinement': self.refinement.use_simple_refinement,

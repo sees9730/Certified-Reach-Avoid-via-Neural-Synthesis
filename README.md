@@ -45,6 +45,60 @@ docker run -v $(pwd):/app \
 
 Replace `examples/verification/2D_gbm_veri` with any example path. The `-w` flag sets the working directory inside the container, ensuring outputs are saved in the correct example folder.
 
+### Docker + dReal Solver (Separate Workflow)
+
+Use this workflow when you want the dReal-enabled container build and run process.
+
+Build image:
+
+```bash
+docker buildx build --platform linux/amd64 --load -f Dockerfile.dreal4master -t cra-dreal-src .
+```
+
+Run any Python script in background:
+
+```bash
+docker rm -f myrun 2>/dev/null || true
+docker run -d --name myrun --platform linux/amd64 \
+  -v "$PWD":/workspace -w /workspace \
+  cra-dreal-src \
+  python3 -u path/to/script.py --arg1 ...
+```
+
+Example (`inv_pend_syn`):
+
+```bash
+docker rm -f invpend_run 2>/dev/null || true
+docker run -d --name invpend_run --platform linux/amd64 \
+  -v "$PWD":/workspace -w /workspace \
+  cra-dreal-src \
+  python3 -u examples/synthesis/inv_pend_syn/main.py --train 1
+```
+
+View logs:
+
+```bash
+docker logs -f invpend_run
+```
+
+Graceful stop:
+
+```bash
+docker stop -t 10 invpend_run
+```
+
+Force stop if stuck:
+
+```bash
+docker kill invpend_run
+```
+
+Remove container (to reuse name on rerun):
+
+```bash
+docker rm invpend_run
+```
+
 ## What You'll Find
 
 Each example directory contains:

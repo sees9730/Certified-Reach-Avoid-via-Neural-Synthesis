@@ -8,6 +8,8 @@ This module provides flexible network architectures with:
 - Output scaling
 """
 
+from __future__ import annotations
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
