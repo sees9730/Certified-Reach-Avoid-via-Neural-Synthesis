@@ -125,19 +125,26 @@ def compute_loss_outside_bounds(
     return loss, sat
 
 def compute_loss_generator_bounds(
-    Phi_upper: torch.Tensor
+    Phi_upper: torch.Tensor,
+    beta_ra,
+    V_generator_lower: torch.Tensor = None,
 ) -> torch.Tensor:
-    # FIXME: Add function signature
-
-    # Want Phi < 0, so penalize Phi_upper > 0
+    # Apply generator loss only on cells that are potentially below beta_ra.
+    # If V_lower >= beta_ra, treat that cell as inactive for generator training.
     delta = 1e-4
-    loss = F.relu(Phi_upper + delta).sum() # Add delta to encourage extra push
-
-    # Check if generator is satisfied
-    if (Phi_upper.max() < 0.0):
-        sat = True
+    if V_generator_lower is None or V_generator_lower.numel() == 0:
+        Phi_upper_active = Phi_upper
     else:
-        sat = False
+        active = V_generator_lower < beta_ra
+        Phi_upper_active = Phi_upper[active]
+
+    if Phi_upper_active.numel() == 0:
+        loss = torch.tensor(0.0, device=Phi_upper.device, dtype=Phi_upper.dtype)
+        sat = True
+        return loss, sat
+
+    loss = F.relu(Phi_upper_active + delta).sum()
+    sat = bool((Phi_upper_active.max() < 0.0).item())
     return loss, sat
 
 def compute_total_loss_bounds(
@@ -146,6 +153,7 @@ def compute_total_loss_bounds(
     V_unsafe_lower: torch.Tensor = None,
     V_init_upper: torch.Tensor = None,
     V_outside_lower: torch.Tensor = None,
+    V_generator_lower: torch.Tensor = None,
     Phi_upper: torch.Tensor = None,
     generator_weight: float = 0.0,
     loss_weights: dict = None,
@@ -190,7 +198,7 @@ def compute_total_loss_bounds(
         loss_init, sat_init = compute_loss_init_bounds(V_init_upper)
         loss_outside, sat_outside = compute_loss_outside_bounds(V_outside_lower)
     if compute_GV:
-        loss_generator, sat_generator = compute_loss_generator_bounds(Phi_upper)
+        loss_generator, sat_generator = compute_loss_generator_bounds(Phi_upper, beta_ra, V_generator_lower=V_generator_lower)
 
     # Combine losses
     total_loss = torch.tensor(0.0, device=device)
@@ -348,31 +356,40 @@ def evaluate_constraints(
             init_satisfied = True
             v_init_min = v_init_max = 0.0
 
-        # Generator: bounds only (universal)  GV(x) <= 0
+        # Generator: bounds GV(x) < 0 or V(x) >= beta_ra
         if len(region_cells['generator']) > 0:
-            if crown_cache_phi is not None:
-                if input_bounds_gen is not None:
-                    input_lowers, input_uppers = input_bounds_gen
-                else:
-                    input_lowers, input_uppers = prepare_cell_bounds(
-                        region_cells['generator'], device=device, input_dim=input_dim
-                    )
-                phi_uppers = crown_cache_phi.compute_bounds(input_lowers, input_uppers)
+            if input_bounds_gen is not None:
+                input_lowers, input_uppers = input_bounds_gen
             else:
-                cache_phi = SymbolicCROWNCache_Phi(GV_net, len(region_cells['generator']), input_dim=input_dim, device=device)
                 input_lowers, input_uppers = prepare_cell_bounds(
                     region_cells['generator'], device=device, input_dim=input_dim
                 )
+
+            if crown_cache_phi is not None:
+                phi_uppers = crown_cache_phi.compute_bounds(input_lowers, input_uppers)
+            else:
+                cache_phi = SymbolicCROWNCache_Phi(GV_net, len(region_cells['generator']), input_dim=input_dim, device=device)
                 phi_uppers = cache_phi.compute_bounds(input_lowers, input_uppers)
 
-            num_failing = (phi_uppers > 0.0).sum().item()
+            cache_v_gen = SymbolicCROWNCache(V_net, len(region_cells['generator']), input_dim=input_dim, device=device)
+            v_gen_lowers, _ = cache_v_gen.compute_bounds(input_lowers, input_uppers)
+            active_mask = v_gen_lowers < beta_ra
+            failing_mask = (phi_uppers > 0.0) & active_mask
+
+            num_failing = failing_mask.sum().item()
+            num_active = active_mask.sum().item()
             generator_satisfied = (num_failing == 0)
-            phi_min = phi_uppers.min().item()
-            phi_max = phi_uppers.max().item()
-            phi_mean = phi_uppers.mean().item()
+            if num_active > 0:
+                phi_active = phi_uppers[active_mask]
+                phi_min = phi_active.min().item()
+                phi_max = phi_active.max().item()
+                phi_mean = phi_active.mean().item()
+            else:
+                phi_min = phi_max = phi_mean = 0.0
         else:
             generator_satisfied = True
             num_failing = 0
+            num_active = 0
             phi_min = phi_max = phi_mean = 0.0
 
     results = {
@@ -393,7 +410,8 @@ def evaluate_constraints(
         'Phi_min': phi_min,
         'Phi_max': phi_max,
         'Phi_mean': phi_mean,
-        'num_failing_cells': num_failing
+        'num_failing_cells': num_failing,
+        'num_active_generator_cells': num_active,
     }
 
     V_net.train()
@@ -633,15 +651,17 @@ def print_constraint_summary(results: dict, prefix: str = "", bounds: dict = Non
 
     # Generator
     stats = ""
-    if phi_uppers is not None and len(phi_uppers) > 0:
-        stats = cell_stats('generator', phi_uppers < 0.0, len(phi_uppers))
-    elif region_cells and 'generator' in region_cells:
-        total_gen = len(region_cells['generator'])
+    # Prefer conditioned failing count from evaluate_constraints when available.
+    # This keeps printed stats consistent with generator_satisfied/num_failing_cells.
+    if region_cells and 'generator' in region_cells:
+        total_gen = int(results.get('num_active_generator_cells', len(region_cells['generator'])))
         failing = results['num_failing_cells']
         if total_gen > 0:
             passing = total_gen - failing
             pct = 100 * failing / total_gen
             stats = f" | {passing}/{total_gen} pass ({failing} fail, {pct:.1f}%)"
+    elif phi_uppers is not None and len(phi_uppers) > 0:
+        stats = cell_stats('generator', phi_uppers < 0.0, len(phi_uppers))
     print(f"{prefix}Generator: {status(results['generator_satisfied']):4s}, GV bounds: [{results['Phi_min']:7.3f}, {results['Phi_max']:7.3f}]{stats}")
 
 from typing import List, Tuple, Optional

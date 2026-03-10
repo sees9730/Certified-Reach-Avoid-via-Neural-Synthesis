@@ -439,7 +439,17 @@ def plot_constraint_regions(
             beta_s = float(beta_s)
     beta_ra = float(beta_ra)
 
-    full_bounds = regions.full.bounds
+    full_bounds = np.array(regions.full.bounds, dtype=np.float32, copy=True)
+    # Safety for time-dependent models: ensure plotting horizon is consistent
+    # with the loaded V network scale on the first input dimension.
+    try:
+        v_scale = getattr(V_net, "input_scale", None)
+        if v_scale is not None and len(v_scale) >= 1 and full_bounds.shape[0] >= 1:
+            horizon = float(v_scale[0].detach().cpu().item() if hasattr(v_scale[0], "detach") else v_scale[0])
+            if horizon > 0.0:
+                full_bounds[0, 1] = min(float(full_bounds[0, 1]), horizon)
+    except Exception:
+        pass
     D = full_bounds.shape[0]
     pairs = _get_plot_pairs(D)
 
@@ -605,8 +615,8 @@ def create_summary_plots(
     GV_net,
     regions: Regions,
     region_cells: dict,
-    beta_s: Optional[float],
     beta_ra: float,
+    beta_s: Optional[float] = None,
     loss_history: Optional[List[dict]] = None,
     refinement_epochs: Optional[dict] = None,
     results=None,

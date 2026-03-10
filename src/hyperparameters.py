@@ -33,16 +33,26 @@ class NetworkConfig:
 @dataclass
 class DiscretizationConfig:
     """Discretization parameters for different regions."""
+    axis_weights: list = field(default_factory=list)
+    max_region_budget: int = 0
+    max_generator_budget: int = 0
+    unit_lengths: list = field(default_factory=list)
     n_goal: int = 3
+    n_goal_budget: int = 0
     n_outside_goal: int = 3
+    n_outside_goal_budget: int = 0
     n_generator: int = 1 
+    n_generator_budget: int = 0
     n_unsafe: int = 3
+    n_unsafe_budget: int = 0
     n_init: int = 3
+    n_init_budget: int = 0
 
 @dataclass
 class ConstraintConfig:
     """Constraint parameters for training."""
     beta_ra: float = 20.0
+    beta_increment: float = 0.2
     all_v_lower_target: float = 0.0
 
 @dataclass
@@ -67,7 +77,16 @@ class RefinementConfigRegion:
 class RefinementConfig:
     """Adaptive refinement parameters for V and GV regions."""
     # V region refinement (outside, init, goal, unsafe)
+    v_goal: RefinementConfigRegion = field(default_factory=lambda: RefinementConfigRegion(
+        merge_relax_margin=0.3
+    ))
+    v_init: RefinementConfigRegion = field(default_factory=lambda: RefinementConfigRegion(
+        merge_relax_margin=0.3
+    ))
     v_outside: RefinementConfigRegion = field(default_factory=lambda: RefinementConfigRegion(
+        merge_relax_margin=0.3
+    ))
+    v_unsafe: RefinementConfigRegion = field(default_factory=lambda: RefinementConfigRegion(
         merge_relax_margin=0.3
     ))
 
@@ -120,6 +139,7 @@ class Hyperparameters:
     # Flags for what to compute
     compute_V: bool = True
     compute_GV: bool = True
+    include_time: bool = False
 
     @classmethod
     def default(cls):
@@ -143,9 +163,18 @@ class Hyperparameters:
         logging = _dc_from_dict(LoggingConfig, config_dict.get("logging"))
 
         refinement_dict = config_dict.get("refinement") or {}
+        v_goal = _dc_from_dict(RefinementConfigRegion, refinement_dict.get("v_goal"))
+        v_init = _dc_from_dict(RefinementConfigRegion, refinement_dict.get("v_init"))
         v_outside = _dc_from_dict(RefinementConfigRegion, refinement_dict.get("v_outside"))
+        v_unsafe = _dc_from_dict(RefinementConfigRegion, refinement_dict.get("v_unsafe"))
         gv_generator = _dc_from_dict(RefinementConfigRegion, refinement_dict.get("gv_generator"))
-        refinement = RefinementConfig(v_outside=v_outside, gv_generator=gv_generator)
+        refinement = RefinementConfig(
+            v_goal=v_goal,
+            v_init=v_init,
+            v_outside=v_outside,
+            v_unsafe=v_unsafe,
+            gv_generator=gv_generator,
+        )
 
         return cls(
             network=network,
@@ -156,6 +185,7 @@ class Hyperparameters:
             logging=logging,
             compute_V=config_dict.get("compute_V", True),
             compute_GV=config_dict.get("compute_GV", True),
+            include_time=config_dict.get("include_time", False),
         )
 
     def to_dict(self):
@@ -170,14 +200,24 @@ class Hyperparameters:
                 'scale_factor': self.network.scale_factor
             },
             'discretization': {
+                'axis_weights': self.discretization.axis_weights,
+                'max_region_budget': self.discretization.max_region_budget,
+                'max_generator_budget': self.discretization.max_generator_budget,
+                'unit_lengths': self.discretization.unit_lengths,
                 'n_goal': self.discretization.n_goal,
+                'n_goal_budget': self.discretization.n_goal_budget,
                 'n_outside_goal': self.discretization.n_outside_goal,
+                'n_outside_goal_budget': self.discretization.n_outside_goal_budget,
                 'n_generator': self.discretization.n_generator,
+                'n_generator_budget': self.discretization.n_generator_budget,
                 'n_unsafe': self.discretization.n_unsafe,
-                'n_init': self.discretization.n_init
+                'n_unsafe_budget': self.discretization.n_unsafe_budget,
+                'n_init': self.discretization.n_init,
+                'n_init_budget': self.discretization.n_init_budget,
             },
             'constraints': {
                 'beta_ra': self.constraints.beta_ra,
+                'beta_increment': self.constraints.beta_increment,
                 'all_v_lower_target': self.constraints.all_v_lower_target,
             },
             'training': {
@@ -193,6 +233,32 @@ class Hyperparameters:
                 'generator_start_epoch': self.training.generator_start_epoch
             },
             'refinement': {
+                'v_goal': {
+                    'enable_refinement': self.refinement.v_goal.enable_refinement,
+                    'refine_interval': self.refinement.v_goal.refine_interval,
+                    'refine_interval_late': self.refinement.v_goal.refine_interval_late,
+                    'late_epoch_threshold': self.refinement.v_goal.late_epoch_threshold,
+                    'refine_factor': self.refinement.v_goal.refine_factor,
+                    'max_cells': self.refinement.v_goal.max_cells,
+                    'N_to_refine': self.refinement.v_goal.N_to_refine,
+                    'enable_merging': self.refinement.v_goal.enable_merging,
+                    'merge_interval': self.refinement.v_goal.merge_interval,
+                    'merge_max_passes': self.refinement.v_goal.merge_max_passes,
+                    'merge_relax_margin': self.refinement.v_goal.merge_relax_margin
+                },
+                'v_init': {
+                    'enable_refinement': self.refinement.v_init.enable_refinement,
+                    'refine_interval': self.refinement.v_init.refine_interval,
+                    'refine_interval_late': self.refinement.v_init.refine_interval_late,
+                    'late_epoch_threshold': self.refinement.v_init.late_epoch_threshold,
+                    'refine_factor': self.refinement.v_init.refine_factor,
+                    'max_cells': self.refinement.v_init.max_cells,
+                    'N_to_refine': self.refinement.v_init.N_to_refine,
+                    'enable_merging': self.refinement.v_init.enable_merging,
+                    'merge_interval': self.refinement.v_init.merge_interval,
+                    'merge_max_passes': self.refinement.v_init.merge_max_passes,
+                    'merge_relax_margin': self.refinement.v_init.merge_relax_margin
+                },
                 'v_outside': {
                     'enable_refinement': self.refinement.v_outside.enable_refinement,
                     'refine_interval': self.refinement.v_outside.refine_interval,
@@ -205,6 +271,19 @@ class Hyperparameters:
                     'merge_interval': self.refinement.v_outside.merge_interval,
                     'merge_max_passes': self.refinement.v_outside.merge_max_passes,
                     'merge_relax_margin': self.refinement.v_outside.merge_relax_margin
+                },
+                'v_unsafe': {
+                    'enable_refinement': self.refinement.v_unsafe.enable_refinement,
+                    'refine_interval': self.refinement.v_unsafe.refine_interval,
+                    'refine_interval_late': self.refinement.v_unsafe.refine_interval_late,
+                    'late_epoch_threshold': self.refinement.v_unsafe.late_epoch_threshold,
+                    'refine_factor': self.refinement.v_unsafe.refine_factor,
+                    'max_cells': self.refinement.v_unsafe.max_cells,
+                    'N_to_refine': self.refinement.v_unsafe.N_to_refine,
+                    'enable_merging': self.refinement.v_unsafe.enable_merging,
+                    'merge_interval': self.refinement.v_unsafe.merge_interval,
+                    'merge_max_passes': self.refinement.v_unsafe.merge_max_passes,
+                    'merge_relax_margin': self.refinement.v_unsafe.merge_relax_margin
                 },
                 'gv_generator': {
                     'enable_refinement': self.refinement.gv_generator.enable_refinement,
@@ -227,7 +306,8 @@ class Hyperparameters:
                 'print_controller_interval': self.logging.print_controller_interval
             },
             'compute_V': self.compute_V,
-            'compute_GV': self.compute_GV
+            'compute_GV': self.compute_GV,
+            'include_time': self.include_time
         }
 
 

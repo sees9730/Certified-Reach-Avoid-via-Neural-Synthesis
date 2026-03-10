@@ -22,6 +22,7 @@ def save_eval_bundle(
     loss_history,
     refinement_epochs,
     results,
+    latest_sat_beta_ra=None,
     file_name="eval_bundle.pth"
 ):
     """
@@ -44,6 +45,7 @@ def save_eval_bundle(
         "loss_history": loss_history,
         "refinement_epochs": refinement_epochs,
         "final_results": results,
+        "latest_sat_beta_ra": float(latest_sat_beta_ra) if latest_sat_beta_ra is not None else None,
     }, bundle_path)
 
     print(f"Saved eval bundle -> {bundle_path}")
@@ -90,9 +92,10 @@ class Tee:
         for s in self.streams:
             s.flush()
 
-def enable_terminal_logging(log_path: Path):
+def enable_terminal_logging(log_path: Path, append: bool = False):
     log_path.parent.mkdir(parents=True, exist_ok=True)
-    log_f = open(log_path, "w", buffering=1)  # line-buffered
+    mode = "a" if append else "w"
+    log_f = open(log_path, mode, buffering=1)  # line-buffered
     sys.stdout = Tee(sys.__stdout__, log_f)
     sys.stderr = Tee(sys.__stderr__, log_f)
     import atexit
