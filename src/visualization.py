@@ -501,9 +501,9 @@ def plot_constraint_regions(
         lab_init  = "Init" if p == 0 else None
         lab_unsafe = "Unsafe" if p == 0 else None
         lab_goal  = "Goal" if p == 0 else None
+        _draw_region_proj(ax, regions.goal,   'blue',  lab_goal,  x_dim, y_dim)
         _draw_region_proj(ax, regions.init,   'green', lab_init,  x_dim, y_dim)
         _draw_region_proj(ax, regions.unsafe, 'red',   lab_unsafe, x_dim, y_dim)
-        _draw_region_proj(ax, regions.goal,   'blue',  lab_goal,  x_dim, y_dim)
 
         if p == 0:
             ax.legend(loc='upper right', fontsize=9)

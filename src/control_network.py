@@ -99,6 +99,13 @@ class WrapperConterlNN(nn.Module):
         u = torch.cat([zeros, self.M_mLsquare*u2], dim=-1)  # (N, 2)
         return u
 
+    def raw_control(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Return the policy output before wrapper scaling.
+        This is the control signal constrained by tanh in [-1, 1].
+        """
+        return self.policy_net(x)
+
 class SwapStateWrapper(nn.Module):
     """
     Wrap a policy that expects state=[angular_rate, angle]

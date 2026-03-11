@@ -25,12 +25,16 @@ class GV(nn.Module):
         dynamics: Dynamics,
         scale_factor: float = 1.0,
         input_scale_init: float = None,
-        include_time: bool = False
+        include_time: bool = False,
+        include_energy: bool = False,
     ):
         super().__init__()
         self.V_net = V_net
         self.dynamics = dynamics
         self.include_time = bool(include_time)
+        self.include_energy = bool(include_energy)
+        if self.include_time and self.include_energy:
+            raise ValueError("GV cannot use include_time and include_energy simultaneously")
 
         # Scale factor
         self.register_buffer("scale_factor", torch.tensor(scale_factor, dtype=torch.float32))
@@ -59,6 +63,7 @@ class GV(nn.Module):
         print(f" input_scale: {self.input_scale.detach().cpu().tolist() if self.input_scale.numel() > 1 else float(self.input_scale.detach().cpu())}")
         print(f" scale_factor: {self.scale_factor.detach().cpu()}")
         print(f" include_time: {self.include_time}")
+        print(f" include_energy: {self.include_energy}")
         print(f" f type: {type(self.f)}")
         print(f" g type: {type(self.g)}")
 
@@ -125,11 +130,19 @@ class GV(nn.Module):
             x_dyn = x[:, 1:]
             dVdx_dyn = dVdx[:, 1:]
             Hdiag_dyn = Hdiag[:, 1:]
+            extra_term = dVdt
+        elif self.include_energy:
+            dVdE = dVdx[:, :1]
+            x_dyn = x[:, 1:]
+            dVdx_dyn = dVdx[:, 1:]
+            Hdiag_dyn = Hdiag[:, 1:]
+            energy_rate = self._compute_energy_rate(x_dyn)
+            extra_term = dVdE * energy_rate
         else:
-            dVdt = None
             x_dyn = x
             dVdx_dyn = dVdx
             Hdiag_dyn = Hdiag
+            extra_term = None
 
         # --- drift contribution ---
         if hasattr(self.f, "support") and callable(getattr(self.f, "support")):
@@ -144,10 +157,26 @@ class GV(nn.Module):
         diff_term = (0.5 * g_diag_sq * Hdiag_dyn).sum(dim=1, keepdim=True)
 
         out = drift_term + diff_term
-        if dVdt is not None:
-            out = out + dVdt
+        if extra_term is not None:
+            out = out + extra_term
 
         return out.squeeze(0) if was_1d else out
+
+    def _compute_energy_rate(self, x_dyn: torch.Tensor) -> torch.Tensor:
+        """
+        Compute dE/dt = u^T u using the controller embedded in closed-loop drift.
+        """
+        if hasattr(self.f, "controller") and callable(getattr(self.f.controller, "forward", None)):
+            ctrl = self.f.controller
+            if hasattr(ctrl, "raw_control") and callable(getattr(ctrl, "raw_control")):
+                u_raw = ctrl.raw_control(x_dyn)
+            else:
+                u_raw = ctrl(x_dyn)
+            if u_raw.dim() == 1:
+                u_raw = u_raw.unsqueeze(1)
+            return (u_raw * u_raw).sum(dim=1, keepdim=True)
+        # Fallback: no controller attached in f; treat energy rate as zero.
+        return torch.zeros(x_dyn.shape[0], 1, device=x_dyn.device, dtype=x_dyn.dtype)
 
     # -------------------------
     # cached-scale helpers
@@ -365,11 +394,17 @@ class GV_offset(nn.Module):
         learnable_scale: bool = False,
         learnable_input_scale: bool = False,
         input_scale_init: float = None,
-        input_offset_init: torch.Tensor = None
+        input_offset_init: torch.Tensor = None,
+        include_time: bool = False,
+        include_energy: bool = False,
     ):
         super().__init__()
         self.V_net = V_net
         self.dynamics = dynamics
+        self.include_time = bool(include_time)
+        self.include_energy = bool(include_energy)
+        if self.include_time and self.include_energy:
+            raise ValueError("GV_offset cannot use include_time and include_energy simultaneously")
 
         # -------------------------
         # scale factor
@@ -423,6 +458,8 @@ class GV_offset(nn.Module):
         print("[PhiModule] Initialized with:")
         print(f"  scale_factor: {float(self.scale_factor.detach().cpu())}")
         print(f"  input_scale: {self.input_scale.detach().cpu().tolist() if self.input_scale.numel() > 1 else float(self.input_scale.detach().cpu())}")
+        print(f"  include_time: {self.include_time}")
+        print(f"  include_energy: {self.include_energy}")
         print(f"  f type: {type(self.f)}")
         print(f"  g type: {type(self.g)}")
 
@@ -497,20 +534,53 @@ class GV_offset(nn.Module):
         # # Fuse: out = (fx * dVdx).sum() + 0.5 * (g_diag_sq * Hdiag).sum()
         # out = ((fx * dVdx) + (0.5 * g_diag_sq * Hdiag)).sum(dim=1, keepdim=True)  # (N,1)
 
+        if self.include_time:
+            dVdt = dVdx[:, :1]
+            x_dyn = x[:, 1:]
+            dVdx_dyn = dVdx[:, 1:]
+            Hdiag_dyn = Hdiag[:, 1:]
+            extra_term = dVdt
+        elif self.include_energy:
+            dVdE = dVdx[:, :1]
+            x_dyn = x[:, 1:]
+            dVdx_dyn = dVdx[:, 1:]
+            Hdiag_dyn = Hdiag[:, 1:]
+            extra_term = dVdE * self._compute_energy_rate(x_dyn)
+        else:
+            x_dyn = x
+            dVdx_dyn = dVdx
+            Hdiag_dyn = Hdiag
+            extra_term = None
+
         if hasattr(self.f, "support") and callable(getattr(self.f, "support")):
             # worst-case drift dot grad: (N,1)
-            drift_term = self.f.support(x, dVdx)
+            drift_term = self.f.support(x_dyn, dVdx_dyn)
         else:
-            fx = self._evaluate_f_fast(x)  # (N,D)
-            drift_term = (fx * dVdx).sum(dim=1, keepdim=True)
+            fx = self._evaluate_f_fast(x_dyn)  # (N,D_dyn)
+            drift_term = (fx * dVdx_dyn).sum(dim=1, keepdim=True)
 
         # --- diffusion contribution (same as before) ---
-        g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
-        diff_term = (0.5 * g_diag_sq * Hdiag).sum(dim=1, keepdim=True)
+        g_diag_sq = self._compute_gg_diag_fast(x_dyn)  # (N,D_dyn)
+        diff_term = (0.5 * g_diag_sq * Hdiag_dyn).sum(dim=1, keepdim=True)
 
         out = drift_term + diff_term
+        if extra_term is not None:
+            out = out + extra_term
         
         return out.squeeze(0) if was_1d else out
+
+    def _compute_energy_rate(self, x_dyn: torch.Tensor) -> torch.Tensor:
+        """Compute dE/dt = u^T u (raw control if wrapper exposes it)."""
+        if hasattr(self.f, "controller") and callable(getattr(self.f.controller, "forward", None)):
+            ctrl = self.f.controller
+            if hasattr(ctrl, "raw_control") and callable(getattr(ctrl, "raw_control")):
+                u_raw = ctrl.raw_control(x_dyn)
+            else:
+                u_raw = ctrl(x_dyn)
+            if u_raw.dim() == 1:
+                u_raw = u_raw.unsqueeze(1)
+            return (u_raw * u_raw).sum(dim=1, keepdim=True)
+        return torch.zeros(x_dyn.shape[0], 1, device=x_dyn.device, dtype=x_dyn.dtype)
 
     # -------------------------
     # cached-scale helpers
@@ -760,11 +830,32 @@ def compute_GV_autograd(
         x_dyn = x[:, 1:]
         dVdx_dyn = dVdx[:, 1:]
         H_diag_dyn = H_diag[:, 1:] if g_fn is not None else None
+        extra_term = dVdt
+    elif getattr(phi_module, "include_energy", False):
+        if x.shape[1] < 2:
+            raise ValueError("include_energy=True requires input shape (N, 1 + state_dim)")
+        dVdE = dVdx[:, :1]
+        x_dyn = x[:, 1:]
+        dVdx_dyn = dVdx[:, 1:]
+        H_diag_dyn = H_diag[:, 1:] if g_fn is not None else None
+        f_fn_for_energy = dynamics.get_f()
+        if hasattr(f_fn_for_energy, "controller") and callable(getattr(f_fn_for_energy.controller, "forward", None)):
+            ctrl = f_fn_for_energy.controller
+            if hasattr(ctrl, "raw_control") and callable(getattr(ctrl, "raw_control")):
+                u_raw = ctrl.raw_control(x_dyn)
+            else:
+                u_raw = ctrl(x_dyn)
+            if u_raw.dim() == 1:
+                u_raw = u_raw.unsqueeze(1)
+            energy_rate = (u_raw * u_raw).sum(dim=1, keepdim=True)
+        else:
+            energy_rate = torch.zeros(x_dyn.shape[0], 1, device=x.device, dtype=x.dtype)
+        extra_term = dVdE * energy_rate
     else:
-        dVdt = None
         x_dyn = x
         dVdx_dyn = dVdx
         H_diag_dyn = H_diag if g_fn is not None else None
+        extra_term = None
 
     # Drift term
     f_fn = dynamics.get_f()
@@ -782,7 +873,7 @@ def compute_GV_autograd(
         drift_term = (dVdx_dyn * fx).sum(dim=1, keepdim=True)
 
     if g_fn is None:
-        return drift_term
+        return drift_term if extra_term is None else (drift_term + extra_term)
 
     # Diffusion term
     if callable(g_fn):
@@ -817,8 +908,8 @@ def compute_GV_autograd(
 
     diffusion_term = (0.5 * g_diag_sq * H_diag_dyn).sum(dim=1, keepdim=True)
     out = drift_term + diffusion_term
-    if dVdt is not None:
-        out = out + dVdt
+    if extra_term is not None:
+        out = out + extra_term
     return out
 
 
@@ -850,8 +941,9 @@ def verify_GV(
         rng = torch.Generator(device=x.device)
         rng.manual_seed(0)
         # Sample within bounded in-domain ranges inferred from input_scale.
-        # include_time=True: t in [0, input_scale[0]], spatial dims in [-scale, scale].
-        # include_time=False: all dims in [-scale, scale].
+        # include_time/include_energy=True: first dim in [0, input_scale[0]],
+        # remaining dims in [-scale, scale].
+        # otherwise: all dims in [-scale, scale].
         scale = torch.as_tensor(getattr(phi_module, "input_scale", torch.ones(D)), dtype=torch.float32).view(-1)
         if scale.numel() == 1:
             scale = scale.expand(D)
@@ -859,8 +951,9 @@ def verify_GV(
             scale = torch.ones(D, dtype=torch.float32) * 10.0
         scale = torch.clamp(scale.abs(), min=1e-6)
         include_time = bool(getattr(phi_module, "include_time", False))
+        include_energy = bool(getattr(phi_module, "include_energy", False))
         for d in range(D):
-            if include_time and d == 0:
+            if (include_time or include_energy) and d == 0:
                 x[:, d].uniform_(0.0, float(scale[d].item()), generator=rng)
             else:
                 s = float(scale[d].item())
@@ -892,6 +985,7 @@ def create_GV(
     verify: bool = True,
     input_offset=None,
     include_time: bool = False,
+    include_energy: bool = False,
 ) -> GV:
     if(input_offset is not None):
         phi = GV_offset(
@@ -899,7 +993,9 @@ def create_GV(
             dynamics=dynamics,
             scale_factor=network_config.scale_factor,
             input_scale_init=network_config.input_scale,
-            input_offset_init=input_offset
+            input_offset_init=input_offset,
+            include_time=include_time,
+            include_energy=include_energy,
         )
     else:
         phi = GV(
@@ -907,7 +1003,8 @@ def create_GV(
             dynamics=dynamics,
             scale_factor=network_config.scale_factor,
             input_scale_init=network_config.input_scale,
-            include_time=include_time
+            include_time=include_time,
+            include_energy=include_energy,
         )
 
     if verify:

@@ -21,7 +21,7 @@ OUTPUT_DIR = ROOT / "gbm_veri"/ "outputs"
 import sys
 sys.path.insert(0, str(ROOT))
 from src.crown_bounds import SymbolicCROWNCache, SymbolicCROWNCache_Phi, prepare_cell_bounds
-from src.discretization import discretize_region
+from src.discretization import discretize_region, discretize_region_with_splits
 from src.regions import Region
 from src.dynamics import Dynamics
 from src.phi_module import create_GV
@@ -739,6 +739,8 @@ def refine_failing_cells(
     insert_idx = 0
     num_refined = 0
 
+    eps = 1e-12
+
     for i, (cell_lower, cell_upper) in enumerate(region_cells):
         if i in refine_set:
             cell_lower = cell_lower.reshape(-1)
@@ -751,7 +753,10 @@ def refine_failing_cells(
             )
 
             cell_region = Region(cell_bounds)
-            refined = discretize_region(cell_region, refine_factor)
+            side_lengths = np.maximum(cell_bounds[:, 1] - cell_bounds[:, 0], 0.0)
+            # Do not split degenerate dimensions (e.g., [E_max, E_max]).
+            splits = [int(refine_factor) if float(side_lengths[d]) > eps else 1 for d in range(D)]
+            refined = discretize_region_with_splits(cell_region, splits)
             for cell in refined:
                 new_cells[insert_idx] = cell
                 insert_idx += 1
