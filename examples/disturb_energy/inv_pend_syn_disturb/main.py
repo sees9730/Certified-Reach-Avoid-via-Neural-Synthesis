@@ -15,24 +15,24 @@ Pipeline
 2) From nominal SAT checkpoint, choose one curriculum mode:
 - Beta curriculum (`beta_ra` increases):
   `python main.py --train 1 --curriculum_mode beta --resume_checkpoint outputs/resume_checkpoint.pth`
-- Time curriculum (`time_horizon` decreases in-loop):
-  `python main.py --train 1 --curriculum_mode time --resume_checkpoint outputs/resume_checkpoint.pth --time_horizon_step 0.5 --time_horizon_min 1.0`
+- Energy curriculum (`energy_max` decreases in-loop):
+  `python main.py --train 1 --curriculum_mode energy --resume_checkpoint outputs/resume_checkpoint.pth --energy_max_step 0.1 --energy_max_min 0.2`
 
 Optional stop/resume:
 - Beta: during training, type `stop` in terminal.
   Resume with:
   `python main.py --train 1 --curriculum_mode beta --resume_checkpoint outputs/beta_latest_resume_checkpoint.pth`
-- Time: during training, type `stop` in terminal.
+- Energy: during training, type `stop` in terminal.
   Resume with:
-  `python main.py --train 1 --curriculum_mode time --resume_checkpoint outputs/time_latest_resume_checkpoint.pth --time_horizon_step 0.5 --time_horizon_min 1.0`
+  `python main.py --train 1 --curriculum_mode energy --resume_checkpoint outputs/energy_latest_resume_checkpoint.pth --energy_max_step 0.1 --energy_max_min 0.2`
 
 Visualization:
 - Nominal:
   `python main.py --train 0`
 - Beta:
   `python main.py --train 0 --curriculum_mode beta`
-- Time:
-  `python main.py --train 0 --curriculum_mode time`
+- Energy:
+  `python main.py --train 0 --curriculum_mode energy`
 
 Outputs (default paths):
 - Nominal mode:
@@ -45,16 +45,15 @@ Outputs (default paths):
     - `outputs/beta_runs/results/`
     - `outputs/beta_runs/training_progress/`
   - rolling checkpoint `outputs/beta_latest_resume_checkpoint.pth`
-- Time mode:
-  - run artifacts in `outputs/time_runs/...` (single folder across stages):
-    - `outputs/time_runs/eval_bundle.pth`
-    - `outputs/time_runs/terminal_log.txt` (appended across stages)
-    - `outputs/time_runs/results/`
-    - `outputs/time_runs/training_progress/`
-  - rolling checkpoint `outputs/time_latest_resume_checkpoint.pth`
+- Energy mode:
+  - run artifacts in `outputs/energy_runs/...` (single folder across stages):
+    - `outputs/energy_runs/eval_bundle.pth`
+    - `outputs/energy_runs/terminal_log.txt` (appended across stages)
+    - `outputs/energy_runs/results/`
+    - `outputs/energy_runs/training_progress/`
+  - rolling checkpoint `outputs/energy_latest_resume_checkpoint.pth`
 """
 import argparse
-import statistics as stats
 import sys
 import time
 from pathlib import Path
@@ -66,7 +65,6 @@ import torch.nn.functional as F
 ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 OUTPUT_DIR = HERE / "outputs"
-WARMSTART_DIR = HERE / "outputs_warm"
 sys.path.insert(0, str(ROOT))
 
 from src.control_network import InvertControlNN, WrapperConterlNN
@@ -95,65 +93,9 @@ def debug_print_all_region_cells(region_cells: dict, label: str = "Region cells"
         debug_print_region_bounds(cells, label=f"{name} cells")
 
 
-def warm_start_from_spatial_bundle(
-    V_net,
-    control_net,
-    include_energy: bool,
-    bundle_path: Path,
-):
-    """
-    Warm-start temporal model from a previously trained spatial bound-training bundle.
-    - V_net: copy all matching tensors; if include_energy and input dim increased by 1,
-      map old layer1 weights to spatial columns (new[:, 1:] <- old[:, :]).
-    - control_net: load directly (same architecture).
-    """
-    if not bundle_path.exists():
-        print(f"[WarmStart] Bundle not found: {bundle_path}")
-        return False
-
-    bundle = torch.load(bundle_path, map_location="cpu")
-    v_old = bundle.get("V_state_dict", None)
-    u_old = bundle.get("control_state_dict", None)
-    if v_old is None:
-        print(f"[WarmStart] No V_state_dict in bundle: {bundle_path}")
-        return False
-
-    v_new = V_net.state_dict()
-    copied = 0
-    for k, v in v_old.items():
-        if k not in v_new:
-            continue
-        if k == "layer1.weight":
-            tgt = v_new[k]
-            if tgt.shape == v.shape:
-                v_new[k] = v
-                copied += 1
-            elif include_energy and tgt.shape[0] == v.shape[0] and tgt.shape[1] == v.shape[1] + 1:
-                # Keep time column as initialized; copy spatial columns.
-                tgt[:, 1:] = v
-                v_new[k] = tgt
-                copied += 1
-            continue
-
-        if v_new[k].shape == v.shape:
-            v_new[k] = v
-            copied += 1
-
-    V_net.load_state_dict(v_new, strict=False)
-    print(f"[WarmStart] Loaded V with {copied} matching tensors from: {bundle_path}")
-
-    if (u_old is not None) and (control_net is not None):
-        control_net.load_state_dict(u_old, strict=True)
-        print(f"[WarmStart] Loaded controller from: {bundle_path}")
-    else:
-        print("[WarmStart] Controller state missing; skipped controller load.")
-
-    return True
-
-
 def sync_regions_from_region_cells(regions: Regions, region_cells: dict, params) -> Regions:
     """
-    Rebuild region metadata from loaded cells and clip time bounds to current horizon.
+    Rebuild region metadata from loaded cells and clip first-dimension bounds to current horizon.
     """
     def _bounds(cells):
         if not cells:
@@ -408,28 +350,127 @@ def pretrain_network_samples(
     print(f"Pre-training complete. {' + '.join(networks_trained)} initialized.")
 
 
-def main(benchmark_mode=False):
+def resolve_mode_paths(mode: str):
+    if mode == "none":
+        return OUTPUT_DIR, Path("results"), Path("training_progress")
+    if mode == "energy":
+        out_dir = OUTPUT_DIR / "energy_runs"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        return out_dir, out_dir / "results", out_dir / "training_progress"
+    if mode == "beta":
+        out_dir = OUTPUT_DIR / "beta_runs"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        return out_dir, out_dir / "results", out_dir / "training_progress"
+    raise ValueError(f"Unsupported curriculum mode: {mode}")
+
+
+def apply_input_scale_to_models(params, V_net, GV_net):
+    with torch.no_grad():
+        v_scale = torch.as_tensor(
+            params.network.input_scale,
+            dtype=V_net.input_scale.dtype,
+            device=V_net.input_scale.device,
+        )
+        if V_net.input_scale.numel() == v_scale.numel():
+            V_net.input_scale.copy_(v_scale)
+        if GV_net.input_scale.numel() == v_scale.numel():
+            GV_net.input_scale.copy_(v_scale.to(device=GV_net.input_scale.device, dtype=GV_net.input_scale.dtype))
+            GV_net.input_scale_sq.copy_(GV_net.input_scale * GV_net.input_scale)
+        if hasattr(GV_net, "_cached_scale_D"):
+            GV_net._cached_scale_D = None
+        if hasattr(GV_net, "_cached_inv_scale"):
+            GV_net._cached_inv_scale = None
+        if hasattr(GV_net, "_cached_inv_scale_sq"):
+            GV_net._cached_inv_scale_sq = None
+
+
+def load_model_states_from_checkpoint(ckpt_path: Path, V_net, GV_net, u_nn):
+    if not ckpt_path.exists():
+        raise FileNotFoundError(f"Checkpoint not found: {ckpt_path}")
+    ckpt = torch.load(ckpt_path, map_location="cpu")
+    V_net.load_state_dict(ckpt["V_state_dict"], strict=True)
+    if ckpt.get("GV_state_dict") is not None:
+        GV_net.load_state_dict(ckpt["GV_state_dict"], strict=False)
+    if ckpt.get("control_state_dict") is not None:
+        u_nn.load_state_dict(ckpt["control_state_dict"], strict=True)
+    return ckpt
+
+
+def evaluate_and_visualize(
+    V_net,
+    GV_net,
+    regions,
+    region_cells,
+    params,
+    active_results_dir,
+    loss_history,
+    refinement_epochs,
+    final_beta_s=None,
+    results=None,
+    loaded_mode: bool = False,
+):
+    if loaded_mode:
+        print("\n" + "=" * 20)
+        print("Final Evaluation (loaded)")
+        print("=" * 20)
+    else:
+        print("\n" + "=" * 20)
+        print("Final Evaluation")
+        print("=" * 20)
+
+    latest_sat_beta_ra = getattr(params.training, "latest_sat_beta_ra", None)
+    if latest_sat_beta_ra is not None:
+        params.constraints.beta_ra = float(latest_sat_beta_ra)
+        tag = "[LoadMode]" if loaded_mode else "[FinalEval]"
+        print(f"{tag} Using latest SAT beta_ra={params.constraints.beta_ra:.4f}")
+
+    if results is None:
+        results = evaluate_constraints(
+            V_net,
+            GV_net,
+            region_cells,
+            beta_ra=params.constraints.beta_ra,
+            device=params.training.device,
+        )
+    print_constraint_summary(results)
+
+    print("\n" + "=" * 20)
+    print("Visualizations (loaded)" if loaded_mode else "Visualizations")
+    print("=" * 20)
+    if loaded_mode:
+        log_loaded_training_epochs(loss_history)
+
+    create_summary_plots(
+        V_net=V_net,
+        GV_net=GV_net,
+        regions=regions,
+        region_cells=region_cells,
+        beta_s=final_beta_s,
+        beta_ra=params.constraints.beta_ra,
+        loss_history=loss_history,
+        refinement_epochs=refinement_epochs,
+        results=results,
+        output_dir=str(active_results_dir),
+    )
+
+
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--train", type=int, default=1, choices=[0, 1],
                         help="1: train + save bundle, 0: load bundle + eval/plot")
-    parser.add_argument("--benchmark", type=int, default=0, choices=[0, 1],
-                        help="1: run benchmark (5 runs), 0: normal run")
     parser.add_argument("--resume_checkpoint", type=str, default="",
                         help="Path to resume checkpoint (.pth) saved at first SAT")
     parser.add_argument("--load_model_only_checkpoint", type=str, default="",
                         help="Path to checkpoint (.pth) to load V/GV/controller only (fresh optimizer/LR)")
-    parser.add_argument("--curriculum_mode", type=str, default=None, choices=["beta", "time"],
-                        help="Curriculum mode: beta (increase beta_ra) or time (decrease time_horizon across stages)")
+    parser.add_argument("--curriculum_mode", type=str, default=None, choices=["beta", "energy"],
+                        help="Curriculum mode: beta (increase beta_ra) or energy (decrease energy_max across stages)")
     parser.add_argument("--energy_max", type=float, default=None,
                         help="Override energy upper bound for this run")
-    parser.add_argument("--time_horizon_step", type=float, default=1.0,
-                        help="Time curriculum decrement step used inside trainer loop")
-    parser.add_argument("--time_horizon_min", type=float, default=None,
-                        help="Minimum time horizon target (used by time curriculum visualization gating)")
+    parser.add_argument("--energy_max_step", type=float, default=0.1,
+                        help="Energy curriculum decrement step used inside trainer loop")
+    parser.add_argument("--energy_max_min", type=float, default=None,
+                        help="Minimum energy_max target for energy curriculum")
     args = parser.parse_args()
-
-    if benchmark_mode:
-        args.benchmark = 1
 
     print("="*20)
     print("2D Inverted Pendulum Synthesis")
@@ -438,24 +479,7 @@ def main(benchmark_mode=False):
     training_time_result = None
 
     mode = (args.curriculum_mode if args.curriculum_mode is not None else "none")
-    if mode == "none":
-        active_output_dir = OUTPUT_DIR
-        active_results_dir = Path("results")
-        active_progress_dir = Path("training_progress")
-    elif mode == "time":
-        # Keep all time-curriculum stages in one folder (latest artifacts overwrite).
-        active_output_dir = OUTPUT_DIR / "time_runs"
-        active_results_dir = active_output_dir / "results"
-        active_progress_dir = active_output_dir / "training_progress"
-        active_output_dir.mkdir(parents=True, exist_ok=True)
-    elif mode == "beta":
-        # Keep all beta-curriculum runs in one folder (latest artifacts overwrite).
-        active_output_dir = OUTPUT_DIR / "beta_runs"
-        active_results_dir = active_output_dir / "results"
-        active_progress_dir = active_output_dir / "training_progress"
-        active_output_dir.mkdir(parents=True, exist_ok=True)
-    else:
-        raise ValueError(f"Unsupported curriculum mode: {mode}")
+    active_output_dir, active_results_dir, active_progress_dir = resolve_mode_paths(mode)
 
     # === Hyperparameters ===
     params = Hyperparameters.default()
@@ -500,8 +524,8 @@ def main(benchmark_mode=False):
     params.training.pretrain_n_samples = 1200
     params.training.curriculum_mode = mode
     params.training.time_user_stop = False
-    params.training.time_horizon_step = float(args.time_horizon_step)
-    params.training.time_horizon_min = (float(args.time_horizon_min) if args.time_horizon_min is not None else None)
+    params.training.energy_max_step = float(args.energy_max_step)
+    params.training.energy_max_min = (float(args.energy_max_min) if args.energy_max_min is not None else None)
     if mode == "none":
         params.training.resume_checkpoint_path = str(OUTPUT_DIR / "resume_checkpoint.pth")
     else:
@@ -548,7 +572,7 @@ def main(benchmark_mode=False):
     params.refinement.v_goal.late_epoch_threshold = 2500
     params.refinement.v_goal.refine_interval_late = 500
     params.refinement.v_goal.refine_factor = 2
-    params.refinement.v_goal.max_cells = 50000
+    params.refinement.v_goal.max_cells = 100000
     params.refinement.v_goal.N_to_refine = 100
     params.refinement.v_goal.enable_merging = False
 
@@ -557,13 +581,13 @@ def main(benchmark_mode=False):
     params.refinement.gv_generator.late_epoch_threshold = 3500
     params.refinement.gv_generator.refine_interval_late = 500
     params.refinement.gv_generator.refine_factor = 2
-    params.refinement.gv_generator.max_cells = 50000
+    params.refinement.gv_generator.max_cells = 100000
     params.refinement.gv_generator.N_to_refine = 100
     params.refinement.gv_generator.enable_merging = True
     params.refinement.gv_generator.merge_interval = 501
     params.refinement.gv_generator.merge_max_passes = 8
     params.refinement.gv_generator.merge_relax_margin = -500.0
-    params.refinement.refine_interval_after_first_sat = 100 # increase the refinement frequecny for all region after first SAT
+    params.refinement.refine_interval_after_first_sat = 500 # increase the refinement frequecny for all region after first SAT
 
     # === Dynamics ===
     rl_policy_net = InvertControlNN()
@@ -644,10 +668,8 @@ def main(benchmark_mode=False):
             box_i = terminal_unsafe_range[i * D_tot:(i + 1) * D_tot, :]
             unsafe_components.append(Region(box_i))
         print(f"[Energy] Added {K_term} terminal-energy unsafe boxes at E={energy_max}")
-
     unsafe = Region.union(*unsafe_components)
     full = Region(full_range)
-
     regions = Regions(init=init, goal=goal, unsafe=unsafe, full=full)
 
     # === Networks ===
@@ -665,19 +687,18 @@ def main(benchmark_mode=False):
         include_energy=params.include_energy
     )
 
-    # === Discretization ===
-    region_cells = discretize_regions(
-        regions,
-        params.discretization,
-        use_radial_generator=False
-    )
-    debug_print_all_region_cells(region_cells, label="Initial discretized region cells")
-
     bundle_path = active_output_dir / "eval_bundle.pth"
 
     if args.train == 1:
         cleanup_and_setup_directories([active_results_dir, active_progress_dir])
         enable_terminal_logging(active_output_dir / "terminal_log.txt", append=False)
+        # === Discretization ===
+        region_cells = discretize_regions(
+            regions,
+            params.discretization,
+            use_radial_generator=False
+        )
+        # debug_print_all_region_cells(region_cells, label="Initial discretized region cells")
 
         training_start_time = time.time()
         resumed_from_checkpoint = False
@@ -685,14 +706,7 @@ def main(benchmark_mode=False):
 
         if args.load_model_only_checkpoint:
             ckpt_path = Path(args.load_model_only_checkpoint)
-            if not ckpt_path.exists():
-                raise FileNotFoundError(f"Model-only checkpoint not found: {ckpt_path}")
-            ckpt = torch.load(ckpt_path, map_location="cpu")
-            V_net.load_state_dict(ckpt["V_state_dict"], strict=True)
-            if ckpt.get("GV_state_dict") is not None:
-                GV_net.load_state_dict(ckpt["GV_state_dict"], strict=False)
-            if ckpt.get("control_state_dict") is not None:
-                u_nn.load_state_dict(ckpt["control_state_dict"], strict=True)
+            _ = load_model_states_from_checkpoint(ckpt_path, V_net, GV_net, u_nn)
             model_loaded_only = True
             print("\n" + "="*20)
             print("Loaded model-only checkpoint")
@@ -702,14 +716,7 @@ def main(benchmark_mode=False):
 
         if args.resume_checkpoint:
             ckpt_path = Path(args.resume_checkpoint)
-            if not ckpt_path.exists():
-                raise FileNotFoundError(f"Resume checkpoint not found: {ckpt_path}")
-            ckpt = torch.load(ckpt_path, map_location="cpu")
-            V_net.load_state_dict(ckpt["V_state_dict"], strict=True)
-            if ckpt.get("GV_state_dict") is not None:
-                GV_net.load_state_dict(ckpt["GV_state_dict"], strict=False)
-            if ckpt.get("control_state_dict") is not None:
-                u_nn.load_state_dict(ckpt["control_state_dict"], strict=True)
+            ckpt = load_model_states_from_checkpoint(ckpt_path, V_net, GV_net, u_nn)
 
             if ckpt.get("region_cells") is not None:
                 region_cells = {
@@ -726,20 +733,7 @@ def main(benchmark_mode=False):
                 ckpt_network = ckpt_hparams.get("network", {})
                 if "input_scale" in ckpt_network:
                     params.network.input_scale = list(ckpt_network["input_scale"])
-                    # Keep loaded models consistent with resumed horizon/normalization.
-                    with torch.no_grad():
-                        v_scale = torch.as_tensor(params.network.input_scale, dtype=V_net.input_scale.dtype, device=V_net.input_scale.device)
-                        if V_net.input_scale.numel() == v_scale.numel():
-                            V_net.input_scale.copy_(v_scale)
-                        if GV_net.input_scale.numel() == v_scale.numel():
-                            GV_net.input_scale.copy_(v_scale.to(device=GV_net.input_scale.device, dtype=GV_net.input_scale.dtype))
-                            GV_net.input_scale_sq.copy_(GV_net.input_scale * GV_net.input_scale)
-                        if hasattr(GV_net, "_cached_scale_D"):
-                            GV_net._cached_scale_D = None
-                        if hasattr(GV_net, "_cached_inv_scale"):
-                            GV_net._cached_inv_scale = None
-                        if hasattr(GV_net, "_cached_inv_scale_sq"):
-                            GV_net._cached_inv_scale_sq = None
+                    apply_input_scale_to_models(params, V_net, GV_net)
                 ckpt_constraints = ckpt_hparams.get("constraints", {})
                 if "beta_ra" in ckpt_constraints:
                     params.constraints.beta_ra = float(ckpt_constraints["beta_ra"])
@@ -776,26 +770,16 @@ def main(benchmark_mode=False):
             )
         elif (not resumed_from_checkpoint) and (not model_loaded_only):
             print("\n" + "="*20)
-            print("Warm-start from previous bound model without time-dependency")
+            print("Pre-training disabled; loading local pretrained checkpoints")
             print("="*20)
-            spatial_bundle_path = WARMSTART_DIR / "eval_bundle.pth"
-            warm_start_ok = warm_start_from_spatial_bundle(
-                V_net=V_net,
-                control_net=u_nn,
-                include_energy=params.include_energy,
-                bundle_path=spatial_bundle_path,
-            )
-
-            if not warm_start_ok:
-                print("[WarmStart] Falling back to local pretrained checkpoints.")
-                v_pretrained = active_output_dir / "V_pretrained.pth"
-                c_pretrained = active_output_dir / "controller_pretrained.pth"
-                if not v_pretrained.exists():
-                    v_pretrained = OUTPUT_DIR / "V_pretrained.pth"
-                if not c_pretrained.exists():
-                    c_pretrained = OUTPUT_DIR / "controller_pretrained.pth"
-                V_net.load_state_dict(torch.load(v_pretrained, map_location="cpu"))
-                u_nn.load_state_dict(torch.load(c_pretrained, map_location="cpu"))
+            v_pretrained = active_output_dir / "V_pretrained.pth"
+            c_pretrained = active_output_dir / "controller_pretrained.pth"
+            if not v_pretrained.exists():
+                v_pretrained = OUTPUT_DIR / "V_pretrained.pth"
+            if not c_pretrained.exists():
+                c_pretrained = OUTPUT_DIR / "controller_pretrained.pth"
+            V_net.load_state_dict(torch.load(v_pretrained, map_location="cpu"))
+            u_nn.load_state_dict(torch.load(c_pretrained, map_location="cpu"))
 
         def create_scheduler(optimizer):
             return torch.optim.lr_scheduler.StepLR(
@@ -818,72 +802,18 @@ def main(benchmark_mode=False):
         training_end_time = time.time()
         total_training_time = training_end_time - training_start_time
 
-        # user_stop_requested = bool(getattr(params.training, "user_stop_requested", False))
-        # if mode in {"beta", "time"} and user_stop_requested:
-        #     print("\n" + "="*20)
-        #     print("Loading Latest SAT Bundle After User Stop")
-        #     print("="*20)
-        #     sat_bundle = load_eval_bundle(bundle_path, map_location="cpu")
-        #     params = Hyperparameters.from_dict(sat_bundle["hyperparameters"])
-        #     latest_sat_beta_ra = sat_bundle.get("latest_sat_beta_ra", None)
-        #     if latest_sat_beta_ra is not None:
-        #         params.constraints.beta_ra = float(latest_sat_beta_ra)
-        #     regions = Regions.from_dict(sat_bundle["regions"])
-        #     region_cells = sat_bundle["region_cells"]
-        #     V_net = create_V(params.network).to(params.training.device)
-        #     V_net.load_state_dict(sat_bundle["V_state_dict"])
-        #     rl_policy_net = InvertControlNN()
-        #     u_nn = WrapperConterlNN(rl_policy_net).to(params.training.device)
-        #     if sat_bundle["control_state_dict"] is not None:
-        #         u_nn.load_state_dict(sat_bundle["control_state_dict"])
-        #     f_cl_module = ClosedLoopSetValuedDrift(f_ol_set, u_nn).to(params.training.device)
-        #     dynamics = Dynamics.dynamics(f=f_cl_module, g=g, state_dim=state_dim)
-        #     GV_net = create_GV(
-        #         V_net=V_net,
-        #         dynamics=dynamics,
-        #         network_config=params.network,
-        #         include_time=False,
-        #         include_energy=getattr(params, "include_energy", False),
-        #     ).to(params.training.device)
-        #     if sat_bundle.get("GV_state_dict", None) is not None:
-        #         GV_net.load_state_dict(sat_bundle["GV_state_dict"], strict=False)
-        #     region_cells = {
-        #         k: [(lo.to(params.training.device), hi.to(params.training.device)) for (lo, hi) in v]
-        #         for k, v in region_cells.items()
-        #     }
-        #     loss_history = sat_bundle.get("loss_history", loss_history)
-        #     refinement_epochs = sat_bundle.get("refinement_epochs", refinement_epochs)
-        #     if sat_bundle.get("final_beta_s", None) is not None:
-        #         final_beta_s = sat_bundle["final_beta_s"]
-
-        print("\n" + "="*20)
-        print("Final Evaluation")
-        print("="*20)
-        latest_sat_beta_ra = getattr(params.training, "latest_sat_beta_ra", None)
-        if latest_sat_beta_ra is not None:
-            params.constraints.beta_ra = float(latest_sat_beta_ra)
-            print(f"[FinalEval] Using latest SAT beta_ra={params.constraints.beta_ra:.4f}")
-        results = evaluate_constraints(
-            V_net, GV_net, region_cells,
-            beta_ra=params.constraints.beta_ra,
-            device=params.training.device
-        )
-        print_constraint_summary(results)
-
-        print("\n" + "="*20)
-        print("Visualizations")
-        print("="*20)
-        create_summary_plots(
+        evaluate_and_visualize(
             V_net=V_net,
             GV_net=GV_net,
             regions=regions,
             region_cells=region_cells,
-            beta_s=final_beta_s,
-            beta_ra=params.constraints.beta_ra,
+            params=params,
+            active_results_dir=active_results_dir,
             loss_history=loss_history,
             refinement_epochs=refinement_epochs,
-            results=results,
-            output_dir=str(active_results_dir)
+            final_beta_s=final_beta_s,
+            results=None,
+            loaded_mode=False,
         )
         training_time_result = total_training_time
 
@@ -912,12 +842,10 @@ def main(benchmark_mode=False):
         regions = Regions.from_dict(bundle["regions"])
         region_cells = bundle["region_cells"]
 
-        V_net.load_state_dict(bundle["V_state_dict"])
-        u_nn.load_state_dict(bundle["control_state_dict"])
-        GV_net.load_state_dict(bundle["GV_state_dict"])
-        # Rebuild additive-disturbance dynamics in loaded mode.
-        f_cl_module = ClosedLoopSetValuedDrift(f_ol_set, u_nn).to(params.training.device)
-        dynamics = Dynamics.dynamics(f=f_cl_module, g=g, state_dim=state_dim)
+        V_net.load_state_dict(bundle["V_state_dict"], strict=True)
+        u_nn.load_state_dict(bundle["control_state_dict"], strict=True)
+        GV_net.load_state_dict(bundle["GV_state_dict"], strict=False)
+        apply_input_scale_to_models(params, V_net, GV_net)
 
         region_cells = {
             k: [(lo.to(params.training.device), hi.to(params.training.device)) for (lo, hi) in v]
@@ -929,86 +857,22 @@ def main(benchmark_mode=False):
         results = bundle.get("final_results", None)
         if results is None:
             print("No saved results found in bundle, recomputing evaluation...")
-            results = evaluate_constraints(
-                V_net, GV_net, region_cells,
-                beta_ra=params.constraints.beta_ra,
-                device=params.training.device
-            )
-
-        print("\n" + "="*20)
-        print("Final Evaluation (loaded)")
-        print("="*20)
-        print_constraint_summary(results)
-
-        print("\n" + "="*20)
-        print("Visualizations (loaded)")
-        print("="*20)
-        log_loaded_training_epochs(loss_history)
-
-        create_summary_plots(
+        evaluate_and_visualize(
             V_net=V_net,
             GV_net=GV_net,
             regions=regions,
             region_cells=region_cells,
-            beta_ra=params.constraints.beta_ra,
+            params=params,
+            active_results_dir=active_results_dir,
             loss_history=loss_history,
             refinement_epochs=refinement_epochs,
+            final_beta_s=None,
             results=results,
-            output_dir=str(active_results_dir)
+            loaded_mode=True,
         )
 
     return training_time_result
 
 
 if __name__ == '__main__':
-    import sys
-    is_benchmark = '--benchmark=1' in sys.argv or '--benchmark' in sys.argv and '1' in sys.argv
-
-    if is_benchmark:
-        n_runs = 2
-        times = []
-        cells = []
-
-        print("="*20)
-        print(f"Benchmark: {n_runs} runs")
-        print("="*20)
-
-        for i in range(n_runs):
-            print(f"\n*** Run {i+1}/{n_runs} ***")
-            training_time = main(benchmark_mode=True)
-            if training_time is not None:
-                times.append(training_time)
-
-            bundle_path = OUTPUT_DIR / "eval_bundle.pth"
-            if bundle_path.exists():
-                import torch
-                bundle = torch.load(bundle_path, map_location='cpu')
-                cell_counts = {
-                    'init': len(bundle['region_cells']['init']),
-                    'goal': len(bundle['region_cells']['goal']),
-                    'unsafe': len(bundle['region_cells']['unsafe']),
-                    'outside': len(bundle['region_cells']['outside']),
-                    'generator': len(bundle['region_cells']['generator']),
-                }
-                cell_counts['total_v'] = cell_counts['init'] + cell_counts['goal'] + cell_counts['unsafe'] + cell_counts['outside']
-                cell_counts['total'] = cell_counts['total_v'] + cell_counts['generator']
-                cells.append(cell_counts)
-
-        print("\n" + "="*20)
-        print("Benchmark Results")
-        print("="*20)
-        avg_time = stats.mean(times)
-        std_time = stats.stdev(times)
-        print(f"Training time (pretrain+train): {avg_time:.2f}s ± {std_time:.2f}s")
-        print(f"  Individual times: {[f'{t:.2f}s' for t in times]}")
-
-        if cells:
-            categories = ['init', 'goal', 'unsafe', 'outside', 'generator', 'total_v', 'total']
-            print("\nCell counts:")
-            for cat in categories:
-                values = [c[cat] for c in cells]
-                avg = stats.mean(values)
-                std = stats.stdev(values)
-                print(f"  {cat:12s}: {avg:.0f} ± {std:.0f}")
-    else:
-        main()
+    main()

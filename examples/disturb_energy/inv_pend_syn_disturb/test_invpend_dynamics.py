@@ -244,7 +244,7 @@ def test_single_traj_run(
                               # parametric: "none" | "uniform" | "corners"
     d=np.array([0.0, 0.0], dtype=float),  # bounds on w(t)
     param_ranges=None,        # dict: {"g":(lo,hi),"L":(lo,hi),"b":(lo,hi),"m":(lo,hi)}
-    param_time_varying=False, # False: sample once per trajectory (default, physical); True: resample each step
+    param_energy_varying=False, # False: sample once per trajectory (default, physical); True: resample each step
     device="cpu",
     plot_uncertainty=True,
     T=100.0,
@@ -328,13 +328,13 @@ def test_single_traj_run(
             else:
                 raise ValueError(f"Unknown additive mode: {mode}")
     elif shared_uncertainty and (unc_type == "parametric"):
-        if param_time_varying:
+        if param_energy_varying:
             p_shared = np.zeros((N, 4), dtype=float)
             for k in range(N):
                 p_shared[k] = sample_param_set(rng, mode, param_ranges)
         else:
             p_shared = sample_param_set(rng, mode, param_ranges)
-    elif (unc_type == "parametric") and (not shared_uncertainty) and (not param_time_varying):
+    elif (unc_type == "parametric") and (not shared_uncertainty) and (not param_energy_varying):
         p_traj = np.zeros((n_traj, 4), dtype=float)
         for i in range(n_traj):
             p_traj[i] = sample_param_set(rng, mode, param_ranges)
@@ -378,12 +378,12 @@ def test_single_traj_run(
                 if mode == "worstcase_V":
                     raise ValueError("mode='worstcase_V' is only supported for additive uncertainty.")
                 if shared_uncertainty:
-                    if param_time_varying:
+                    if param_energy_varying:
                         gk, Lk, bk, mk = p_shared[k]
                     else:
                         gk, Lk, bk, mk = p_shared
                 else:
-                    if param_time_varying:
+                    if param_energy_varying:
                         gk, Lk, bk, mk = sample_param_set(rng, mode, param_ranges)
                     else:
                         gk, Lk, bk, mk = p_traj[i]
@@ -453,7 +453,7 @@ def test_single_traj_run(
     rods = [ax_pend.plot([], [], lw=2)[0] for _ in range(n_traj)]
     bobs = [ax_pend.plot([], [], marker="o", markersize=6, linestyle="None")[0] for _ in range(n_traj)]
 
-    time_text = ax_pend.text(0.02, 0.95, "", transform=ax_pend.transAxes)
+    energy_text = ax_pend.text(0.02, 0.95, "", transform=ax_pend.transAxes)
     u_text = ax_pend.text(0.02, 0.88, "", transform=ax_pend.transAxes) if controller is not None else None
 
     # Phase axis setup (same as yours)
@@ -510,7 +510,7 @@ def test_single_traj_run(
 
     # u(t) subplot (rep traj only)
     ax_u.set_xlim(0.0, T)
-    ax_u.set_xlabel("time [s]")
+    ax_u.set_xlabel("energy [s]")
     ax_u.set_ylabel("u_torque")
     if controller is not None:
         u_min = float(u_torque_hist_all.min())
@@ -526,7 +526,7 @@ def test_single_traj_run(
     else:
         u_min, u_max = -1.0, 1.0
     ax_u.set_ylim(u_min, u_max)
-    ax_u.set_title("Control torque vs time (all trajs)")
+    ax_u.set_title("Control torque vs energy (all trajs)")
 
     u_lines   = [ax_u.plot([], [], lw=1.0)[0] for _ in range(n_traj)]
     u_markers = [ax_u.plot([], [], marker="o", markersize=3, linestyle="None")[0] for _ in range(n_traj)]
@@ -538,7 +538,7 @@ def test_single_traj_run(
         for ln, pt in zip(traj_lines, points):
             ln.set_data([], [])
             pt.set_data([], [])
-        time_text.set_text("")
+        energy_text.set_text("")
         if u_text is not None:
             u_text.set_text("")
         status_text.set_text("")
@@ -548,7 +548,7 @@ def test_single_traj_run(
 
         artists = (
             rods + bobs +
-            [time_text, status_text] +
+            [energy_text, status_text] +
             u_lines + u_markers +
             traj_lines + points
         )
@@ -579,7 +579,7 @@ def test_single_traj_run(
             if in_box(x1, x2, X_unsafe_1) or in_box(x1, x2, X_unsafe_2):
                 n_unsafe += 1
 
-        time_text.set_text(f"t = {t_grid[frame]:.2f}s")
+        energy_text.set_text(f"t = {t_grid[frame]:.2f}s")
 
         if u_text is not None:
             u_torque = u_torque_hist_all[pend_idx, frame]
@@ -595,7 +595,7 @@ def test_single_traj_run(
             u_lines[i].set_data(t_grid[:frame+1], ui[:frame+1])
             u_markers[i].set_data([t_now], [ui[frame]])
 
-        artists = rods + bobs + [time_text, status_text] + u_lines + u_markers + traj_lines + points
+        artists = rods + bobs + [energy_text, status_text] + u_lines + u_markers + traj_lines + points
         if u_text is not None:
             artists.append(u_text)
         return artists
@@ -607,7 +607,7 @@ def test_single_traj_run(
     plt.show()
 
     # ----------------------------
-    # Uncertainty time history (plot a few trajectories)
+    # Uncertainty energy history (plot a few trajectories)
     # ----------------------------
     if plot_uncertainty and (w_hist is not None):
         mshow = min(n_traj, unc_plot_max)
@@ -621,7 +621,7 @@ def test_single_traj_run(
         ax[1].axhline(-d[1], linestyle="--")
         ax[0].set_ylabel("w1(t)")
         ax[1].set_ylabel("w2(t)")
-        ax[1].set_xlabel("time (s)")
+        ax[1].set_xlabel("energy (s)")
         ax[0].grid(True)
         ax[1].grid(True)
         plt.tight_layout()
@@ -641,7 +641,7 @@ def test_single_traj_run(
             axp[j].axhline(hi, linestyle="--")
             axp[j].set_ylabel(labels[j])
             axp[j].grid(True)
-        axp[-1].set_xlabel("time (s)")
+        axp[-1].set_xlabel("energy (s)")
         plt.tight_layout()
         plt.show()
 
@@ -655,7 +655,7 @@ def estimate_reach_avoid_mc(
                               # parametric: "none" | "uniform" | "corners"
     d=np.array([0.0, 0.0], dtype=float),
     param_ranges=None,
-    param_time_varying=False, # False: sample once per trajectory/path; True: resample each step
+    param_energy_varying=False, # False: sample once per trajectory/path; True: resample each step
     device="cpu",
     # existing:
     n_mc=2000,
@@ -687,7 +687,7 @@ def estimate_reach_avoid_mc(
     N_mc = int(T_mc / dt_mc) + 1
     success = 0
     fail = 0
-    timeout = 0
+    energyout = 0
     example_paths = []
     u2_abs_sum = 0.0
     u2_abs_max = 0.0
@@ -701,7 +701,7 @@ def estimate_reach_avoid_mc(
         x1 = rng_mc.uniform(X_init_bounds["x1_min"], X_init_bounds["x1_max"])
         x2 = rng_mc.uniform(X_init_bounds["x2_min"], X_init_bounds["x2_max"])
         p_path = None
-        if unc_type == "parametric" and (not param_time_varying):
+        if unc_type == "parametric" and (not param_energy_varying):
             p_path = sample_param_set(rng_mc, mode, param_ranges)
 
         if return_example_paths and len(example_paths) < n_example_paths:
@@ -761,7 +761,7 @@ def estimate_reach_avoid_mc(
             elif unc_type == "parametric":
                 if mode == "worstcase_V":
                     raise ValueError("mode='worstcase_V' is only supported for additive uncertainty.")
-                if param_time_varying:
+                if param_energy_varying:
                     gk, Lk, bk, mk = sample_param_set(rng_mc, mode, param_ranges)
                 else:
                     gk, Lk, bk, mk = p_path
@@ -782,7 +782,7 @@ def estimate_reach_avoid_mc(
                 path[k+1] = [x1, x2]
 
         if not outcome_recorded:
-            timeout += 1
+            energyout += 1
             if return_example_paths and len(example_paths) < n_example_paths:
                 example_paths.append(path.copy())
 
@@ -791,11 +791,11 @@ def estimate_reach_avoid_mc(
         "n_mc": n_mc,
         "success": success,
         "fail": fail,
-        "timeout": timeout,
+        "energyout": energyout,
         "p_hat": p_hat,
         "success_rate": success / n_mc,
         "fail_rate": fail / n_mc,
-        "timeout_rate": timeout / n_mc,
+        "energyout_rate": energyout / n_mc,
         "u2_abs_mean": (u2_abs_sum / u_samples) if u_samples > 0 else 0.0,
         "u2_abs_max": u2_abs_max,
         "u_norm_mean": (u_norm_sum / u_samples) if u_samples > 0 else 0.0,
@@ -845,6 +845,7 @@ def run_mc_case(title, controller, d, mode, n_mc=100, T_mc=10.0, dt_mc=0.005, se
         seed_mc=seed_mc,
     )
     print(stats)
+    return stats
 
 
 def compare_control_effort_profiles(
@@ -885,19 +886,25 @@ def compare_control_effort_profiles(
     u_raw_hist = {}
     effort_hist = {}
     for name, controller in controllers.items():
-        u2 = np.zeros((n_traj, N), dtype=float)
-        u_raw = np.zeros((n_traj, N), dtype=float)
-        effort = np.zeros((n_traj, N), dtype=float)
+        # Use NaN so plots/means naturally stop after goal is reached.
+        u2 = np.full((n_traj, N), np.nan, dtype=float)
+        u_raw = np.full((n_traj, N), np.nan, dtype=float)
+        effort = np.full((n_traj, N), np.nan, dtype=float)
 
         for i in range(n_traj):
             x1, x2 = float(x0_all[i, 0]), float(x0_all[i, 1])
+            effort_acc = 0.0
             for k in range(N - 1):
+                # Stop control-effort accumulation/plot once goal is reached.
+                if in_box(x1, x2, X_goal_bounds):
+                    break
+
                 u = get_u(x1, x2, controller)
                 ur = get_u_raw(x1, x2, controller)
                 u2[i, k] = float(u[1])
                 u_raw[i, k] = float(ur[0]) if ur.size > 0 else 0.0
-                if k > 0:
-                    effort[i, k] = effort[i, k - 1] + (u_raw[i, k] ** 2) * dt
+                effort_acc += (u_raw[i, k] ** 2) * dt
+                effort[i, k] = effort_acc
 
                 drift = f(np.array([x1, x2], dtype=float), u)
                 if mode in ("uniform", "corners"):
@@ -911,12 +918,14 @@ def compare_control_effort_profiles(
                     x1 -= 4 * pi
                 elif x1 < -2 * pi:
                     x1 += 4 * pi
-
-            u = get_u(x1, x2, controller)
-            ur = get_u_raw(x1, x2, controller)
-            u2[i, -1] = float(u[1])
-            u_raw[i, -1] = float(ur[0]) if ur.size > 0 else 0.0
-            effort[i, -1] = effort[i, -2] if N > 1 else 0.0
+            # If goal was never reached, include the terminal sample too.
+            if not in_box(x1, x2, X_goal_bounds):
+                u = get_u(x1, x2, controller)
+                ur = get_u_raw(x1, x2, controller)
+                u2[i, -1] = float(u[1])
+                u_raw[i, -1] = float(ur[0]) if ur.size > 0 else 0.0
+                effort_acc += (u_raw[i, -1] ** 2) * dt
+                effort[i, -1] = effort_acc
 
         u2_hist[name] = u2
         u_raw_hist[name] = u_raw
@@ -933,13 +942,13 @@ def compare_control_effort_profiles(
             ax[0].plot(t_grid, ur[i], color=color, alpha=0.15, linewidth=0.9)
             ax[1].plot(t_grid, u2[i], color=color, alpha=0.15, linewidth=0.9)
             ax[2].plot(t_grid, ef[i], color=color, alpha=0.15, linewidth=0.9)
-        ax[0].plot(t_grid, ur.mean(axis=0), color=color, linewidth=2.0, label=f"{name} mean")
-        ax[1].plot(t_grid, u2.mean(axis=0), color=color, linewidth=2.0, label=f"{name} mean")
-        ax[2].plot(t_grid, ef.mean(axis=0), color=color, linewidth=2.0, label=f"{name} mean")
+        ax[0].plot(t_grid, np.nanmean(ur, axis=0), color=color, linewidth=2.0, label=f"{name} mean")
+        ax[1].plot(t_grid, np.nanmean(u2, axis=0), color=color, linewidth=2.0, label=f"{name} mean")
+        ax[2].plot(t_grid, np.nanmean(ef, axis=0), color=color, linewidth=2.0, label=f"{name} mean")
     ax[0].set_ylabel("u_raw(t)")
     ax[1].set_ylabel("u_applied(t)")
     ax[2].set_ylabel(r"$\int u_{raw}^2 dt$")
-    ax[2].set_xlabel("time (s)")
+    ax[2].set_xlabel("energy (s)")
     ax[0].grid(True)
     ax[1].grid(True)
     ax[2].grid(True)
@@ -1051,29 +1060,29 @@ def report_controller_difference(name_a, ctrl_a, name_b, ctrl_b):
 
 
 def main():
-    # Load latest controllers from nominal / beta-curriculum / time-curriculum checkpoints.
-    # Priority for simulation below: time -> beta -> nominal.
+    # Load latest controllers from nominal / beta-curriculum / energy-curriculum checkpoints.
+    # Priority for simulation below: energy -> beta -> nominal.
     nominal_ckpt = OUTPUT_DIR / "resume_checkpoint.pth"
     beta_ckpt = OUTPUT_DIR / "beta_latest_resume_checkpoint.pth"
-    time_ckpt = OUTPUT_DIR / "time_latest_resume_checkpoint.pth"
+    energy_ckpt = OUTPUT_DIR / "energy_latest_resume_checkpoint.pth"
 
     control_nominal = load_control_net(nominal_ckpt) if nominal_ckpt.exists() else None
     control_beta = load_control_net(beta_ckpt) if beta_ckpt.exists() else None
-    control_time = load_control_net(time_ckpt) if time_ckpt.exists() else None
+    control_energy = load_control_net(energy_ckpt) if energy_ckpt.exists() else None
 
     print(f"[Controller] nominal checkpoint: {nominal_ckpt} | exists={nominal_ckpt.exists()}")
     print(f"[Controller] beta checkpoint:    {beta_ckpt} | exists={beta_ckpt.exists()}")
-    print(f"[Controller] time checkpoint:    {time_ckpt} | exists={time_ckpt.exists()}")
+    print(f"[Controller] energy checkpoint:    {energy_ckpt} | exists={energy_ckpt.exists()}")
     report_controller_difference("nominal", control_nominal, "beta", control_beta)
-    report_controller_difference("nominal", control_nominal, "time", control_time)
-    report_controller_difference("beta", control_beta, "time", control_time)
+    report_controller_difference("nominal", control_nominal, "energy", control_energy)
+    report_controller_difference("beta", control_beta, "energy", control_energy)
 
     d = np.array([1.0, 1.0], dtype=float)
 
     controller_dict = {
         "nominal": control_nominal,
         "beta_curriculum": control_beta,
-        "time_curriculum": control_time,
+        "energy_curriculum": control_energy,
     }
     available = {k: v for k, v in controller_dict.items() if v is not None}
     if not available:
@@ -1101,24 +1110,22 @@ def main():
 
     # 3) MC simulation for each available controller.
     print("\n=== 3) MC simulation per controller (uniform + corners) ===")
+    mc_effort_summary = {}
     for name, ctrl in available.items():
         mc_T = 10.0
-        if name == "time_curriculum":
-            raw = input(
-                "Set MC time horizon T_mc for time_curriculum (press Enter for 10.0): "
-            ).strip()
-            if raw:
-                try:
-                    parsed = float(raw)
-                    if parsed > 0.0:
-                        mc_T = parsed
-                    else:
-                        print("T_mc must be > 0. Using default 10.0.")
-                except ValueError:
-                    print("Invalid T_mc input. Using default 10.0.")
+        stats_uniform = run_mc_case(f"MC uniform ({name})", ctrl, d, mode="uniform", T_mc=mc_T)
+        stats_corners = run_mc_case(f"MC corners ({name})", ctrl, d, mode="corners", T_mc=mc_T)
+        mc_effort_summary[name] = {
+            "uniform": float(stats_uniform.get("u_raw_sq_mean", 0.0)),
+            "corners": float(stats_corners.get("u_raw_sq_mean", 0.0)),
+        }
 
-        run_mc_case(f"MC uniform ({name})", ctrl, d, mode="uniform", T_mc=mc_T)
-        run_mc_case(f"MC corners ({name})", ctrl, d, mode="corners", T_mc=mc_T)
+    print("\n=== Average control effort from MC ===")
+    print("(metric: u_raw_sq_mean = average of u_raw^2 over MC time/sample points)")
+    for name in available.keys():
+        e_u = mc_effort_summary[name]["uniform"]
+        e_c = mc_effort_summary[name]["corners"]
+        print(f"{name:>18s} | uniform: {e_u:.6f} | corners: {e_c:.6f}")
 
 
 if __name__ == "__main__":
