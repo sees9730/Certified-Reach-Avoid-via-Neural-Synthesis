@@ -386,7 +386,7 @@ def plot_phase_trajectories(entries, viz_paths_per_ctrl, save_dir=None):
     viz_paths_per_ctrl : list of path lists, one per controller,
                          produced by rollout_viz_paths (extended to T_hit+1s).
     """
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(8, 6))
     draw_regions(ax)
 
     for style, (label, res, stats), viz_paths in zip(CTRL_STYLES, entries, viz_paths_per_ctrl):
@@ -406,8 +406,6 @@ def plot_phase_trajectories(entries, viz_paths_per_ctrl, save_dir=None):
 
     ax.legend(loc="upper left", framealpha=0.9, fontsize=18)
     ax.grid(True, alpha=0.35)
-    ax.set_xlabel(r"$\theta$, rad")
-    ax.set_ylabel(r"$\dot\theta$, rad/s")
     # ax.set_title("Phase-Plane Trajectories")
     fig.tight_layout()
 
@@ -419,78 +417,28 @@ def plot_phase_trajectories(entries, viz_paths_per_ctrl, save_dir=None):
 
 
 # -----------------------------------------------------------------------
-# Figure 2 — Energy vs Hitting-time scatter with marginal KDEs
+# Figure 2 — Energy vs Hitting-time scatter
 # -----------------------------------------------------------------------
 def plot_energy_vs_thit(entries, budgets, save_dir=None):
     """
-    Joint scatter of (T_hit, energy) for successful trajectories,
-    with marginal KDE of T_hit on the top panel and marginal KDE of
-    energy on the right panel.
+    budgets : list of dicts, one per controller, with optional keys
+              'energy_budget' and 'time_budget'.
     """
-    fig = plt.figure(figsize=(8, 5))
-    gs  = fig.add_gridspec(
-        2, 2,
-        width_ratios=[3.5, 1.2], height_ratios=[1.2, 3.5],
-        # hspace=0.06, wspace=0.06,
-    )
-    ax_main  = fig.add_subplot(gs[1, 0])
-    ax_top   = fig.add_subplot(gs[0, 0], sharex=ax_main)
-    ax_right = fig.add_subplot(gs[1, 1], sharey=ax_main)
+    fig, ax = plt.subplots(figsize=(8, 6))
 
     for style, (label, res, stats) in zip(CTRL_STYLES, entries):
         mask  = stats["success_mask"]
         t_hit = np.array(res["hit_times"])[mask]
         e_hit = stats["energies_success"]
-        color = style["color"]
-        ls    = style["ls"]
+        ax.scatter(t_hit, e_hit,
+                   color=style["color"], alpha=0.55, s=30,
+                   label=label, zorder=3)
 
-        # --- main scatter ---
-        ax_main.scatter(t_hit, e_hit,
-                        color=color, alpha=0.6, s=40,
-                        label=label, zorder=3)
-
-        # --- top marginal: T_hit KDE ---
-        if t_hit.size >= 2:
-            pad = 0.05 * np.ptp(t_hit)
-            xs  = np.linspace(t_hit.min() - pad, t_hit.max() + pad, 400)
-            ys  = gaussian_kde(t_hit, bw_method="scott")(xs)
-            ax_top.plot(xs, ys, color=color, ls=ls, lw=2.2)
-            ax_top.fill_between(xs, ys, color=color, alpha=0.18)
-
-        # --- right marginal: energy KDE ---
-        if e_hit.size >= 2:
-            pad = 0.05 * np.ptp(e_hit)
-            ys  = np.linspace(e_hit.min() - pad, e_hit.max() + pad, 400)
-            xs  = gaussian_kde(e_hit, bw_method="scott")(ys)
-            ax_right.plot(xs, ys, color=color, ls=ls, lw=2.2)
-            ax_right.fill_betweenx(ys, xs, color=color, alpha=0.18)
-
-    # --- main axes ---
-    ax_main.set_xlabel("Reach-avoid time (s)")
-    ax_main.set_ylabel("Control energy")
-    ax_main.legend(framealpha=0.9, fontsize=14)
-    ax_main.grid(True, alpha=0.35)
-
-    # --- top marginal ---
-    ax_top.set_ylabel("Density", labelpad=6)
-    ax_top.yaxis.set_label_position("left")
-    ax_top.tick_params(axis="y", labelsize=12)
-    ax_top.grid(True, alpha=0.35)
-    ax_top.spines["bottom"].set_visible(False)
-    plt.setp(ax_top.get_xticklabels(), visible=False)
-    # remove zero from top y-axis to avoid clutter
-    ax_top.yaxis.get_major_locator().set_params(nbins=4)
-
-    # --- right marginal ---
-    ax_right.set_xlabel("Density", labelpad=6)
-    ax_right.xaxis.set_label_position("bottom")
-    ax_right.tick_params(axis="x", labelsize=12, rotation=45)
-    ax_right.grid(True, alpha=0.35)
-    ax_right.spines["left"].set_visible(False)
-    plt.setp(ax_right.get_yticklabels(), visible=False)
-    ax_right.xaxis.get_major_locator().set_params(nbins=3)
-
-    fig.align_labels()
+    ax.set_xlabel("Reach-avoid time")
+    ax.set_ylabel("Control energy")
+    # ax.set_title("Control Energy vs. First-Hitting Time")
+    ax.legend(framealpha=0.9, fontsize=18)
+    ax.grid(True, alpha=0.35)
     fig.tight_layout()
 
     if save_dir is not None:
@@ -735,8 +683,8 @@ def main():
     SAVE_DIR = str(OUTPUT_DIR)
     plot_phase_trajectories(entries, viz_paths_per_ctrl, save_dir=SAVE_DIR)
     plot_energy_vs_thit(entries, BUDGETS,         save_dir=SAVE_DIR)
-    # plot_energy_distribution(entries,             save_dir=SAVE_DIR)
-    # plot_thit_distribution(entries,               save_dir=SAVE_DIR)
+    plot_energy_distribution(entries,             save_dir=SAVE_DIR)
+    plot_thit_distribution(entries,               save_dir=SAVE_DIR)
     plot_u_raw_trajectories(entries, DT,          save_dir=SAVE_DIR)
 
 
