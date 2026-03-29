@@ -1,5 +1,15 @@
 """
 Two-Room Temperature Control SDE Benchmark
+
+Example usage:
+a) hand-designed policy (default)
+    python test.py --animate-mc
+b) Trained controller from pretrain file:
+    python test.py --controller-checkpoint outputs/controller_pretrained.pth --animate-mc
+c) Trained controller from nominal:
+    python test.py --controller-checkpoint outputs/resume_checkpoint.pth --animate-mc
+d) Trained controller from energy-training:
+    python test.py --controller-checkpoint outputs/energy_runs/eval_bundle.pth --animate-mc
 ============================================
 
 Continuous-time stochastic differential equation model for temperature
@@ -29,9 +39,13 @@ The continuous-time SDE is
 
 where
 
-    f(x, u; lambda) = A @ x + B @ u + E * lambda,
+    f(x, u; lambda) = A @ x + B @ u + E * lambda + r_rad(x),
     g               = sigma * I_2,
     w(t)            = 2-dimensional standard Brownian motion.
+
+with component-wise radiative term
+
+    r_rad,i(x) = -k_rad * (x_i + 273.15)^4,   i in {1,2}.
 
 Matrices:
 
@@ -123,8 +137,18 @@ The control set U = [-u_max, u_max]^2 is compact.
 """
 
 import argparse
+import sys
+from pathlib import Path
 
 import numpy as np
+import torch
+
+ROOT = Path(__file__).resolve().parents[3]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.control_network import RoomTempControlNN, RoomTempControlWrapper
+from src.set_values import AdditiveBoxSetDrift
 
 
 # ---------------------------------------------------------------------------
@@ -135,6 +159,8 @@ ALPHA_E = 5e-3      # room-to-exterior heat loss coefficient [1/s]
 BETA = 0.1          # heater effectiveness                   [°C/(s·u)]
 T_E_NOM = 20.0      # nominal ambient temperature            [°C]
 SIGMA = 0.05         # diffusion intensity                    [°C/sqrt(s)]
+KELVIN_OFFSET = 273.15
+RADIATION_COEFF = 1e-11  # radiative cooling gain [1/(s·K^4)]
 
 # ---------------------------------------------------------------------------
 #  System matrices
@@ -158,8 +184,8 @@ G_DIFF = SIGMA * np.eye(2)               # diffusion matrix
 #  Uncertainty sets
 # ---------------------------------------------------------------------------
 # Config 1: uncertain ambient temperature
-T_E_MIN = 19.0
-T_E_MAX = 21.0
+T_E_MIN = 18.0
+T_E_MAX = 22.0
 
 # Config 2: uncertain thermal parameters
 ALPHA_RANGE = (4e-2, 6e-2)
@@ -172,8 +198,8 @@ ALPHA_E_RANGE = (3e-3, 7e-3)
 X_DOMAIN = (10.0, 30.0)     # [x_min, x_max] per dimension
 X0_INIT = (17.0, 23.0)      # initial set [lo, hi] per dimension
 XG_GOAL = (19.0, 21.0)      # goal (comfort) set per dimension
-XS_SAFE = (11.0, 29.0)      # safe set per dimension
-U_MAX = 3.0                 # max heater input per room
+XS_SAFE = (10.5, 29.5)      # safe set per dimension
+U_MAX = 20.0                 # max heater input per room
 
 
 # ---------------------------------------------------------------------------
@@ -181,7 +207,8 @@ U_MAX = 3.0                 # max heater input per room
 # ---------------------------------------------------------------------------
 def drift(x, u, T_e=T_E_NOM):
     """
-    Evaluate the drift  f(x, u; T_e) = A @ x + B @ u + E * T_e.
+    Evaluate the drift
+    f(x, u; T_e) = A @ x + B @ u + E * T_e - k_rad * (x + 273.15)^4.
 
     Parameters
     ----------
@@ -193,7 +220,9 @@ def drift(x, u, T_e=T_E_NOM):
     -------
     f   : ndarray, shape (2,)   —  drift vector.
     """
-    return A_DRIFT @ x + B_INPUT @ u + E_PARAM * T_e
+    x_kelvin = x + KELVIN_OFFSET
+    radiation = -RADIATION_COEFF * (x_kelvin ** 4)
+    return A_DRIFT @ x + B_INPUT @ u + E_PARAM * T_e + radiation
 
 
 def diffusion():
@@ -333,6 +362,57 @@ def bang_bang_policy(x):
     ])
 
 
+def _extract_control_state_dict(loaded_obj):
+    """
+    Extract a controller state_dict from common checkpoint formats.
+    Supported:
+      - raw state_dict (.pth)
+      - checkpoint dict with key "control_state_dict"
+    """
+    if not isinstance(loaded_obj, dict):
+        raise ValueError("Checkpoint is not a dictionary.")
+
+    if "control_state_dict" in loaded_obj and isinstance(loaded_obj["control_state_dict"], dict):
+        return loaded_obj["control_state_dict"]
+
+    if all(isinstance(v, torch.Tensor) for v in loaded_obj.values()):
+        return loaded_obj
+
+    raise ValueError(
+        "Could not find controller weights. Expected a raw state_dict "
+        "or a dict containing key 'control_state_dict'."
+    )
+
+
+def make_trained_policy_from_checkpoint(checkpoint_path: str):
+    """
+    Load a trained RoomTemp controller from checkpoint and return a numpy policy(x)->u.
+    """
+    ckpt = torch.load(checkpoint_path, map_location="cpu")
+    control_state = _extract_control_state_dict(ckpt)
+
+    policy_net = RoomTempControlNN(input_dim=2, hidden_dim=32, output_dim=2, u_max=U_MAX)
+    wrapper = RoomTempControlWrapper(policy_net, B_INPUT)
+
+    state_keys = list(control_state.keys())
+    if any(k.startswith("policy_net.") for k in state_keys) or ("B" in control_state):
+        # Wrapper-format weights saved from main.py (most common).
+        wrapper.load_state_dict(control_state, strict=False)
+    else:
+        # Raw policy-network weights.
+        policy_net.load_state_dict(control_state, strict=True)
+
+    policy_net.eval()
+
+    @torch.no_grad()
+    def trained_policy(x_np):
+        x_t = torch.tensor(np.asarray(x_np, dtype=np.float32)).reshape(1, 2)
+        u_t = policy_net(x_t).reshape(-1)
+        return u_t.cpu().numpy()
+
+    return trained_policy
+
+
 def classify_trajectory(xs):
     """
     Classify one trajectory for reach-avoid.
@@ -356,10 +436,19 @@ def first_goal_hit_step(xs):
     return None
 
 
-def run_monte_carlo(policy, n_mc, T_horizon, dt, T_e, rng, store_rollouts=False):
+def run_monte_carlo(policy, n_mc, T_horizon, dt, T_e, rng=None, seed=None, store_rollouts=False):
     """
     Run MC rollouts once and return both statistics and (optionally) paths.
+
+    Reproducibility:
+    - If `seed` is provided, each trajectory uses its own deterministic RNG
+      derived from (seed, trajectory_index). This makes the full MC batch
+      reproducible across runs when settings are unchanged.
+    - If `seed` is None, falls back to `rng` (or a fresh default_rng()).
     """
+    if (seed is None) and (rng is None):
+        rng = np.random.default_rng()
+
     statuses = []
     reach_times = []
     energies = []
@@ -370,9 +459,21 @@ def run_monte_carlo(policy, n_mc, T_horizon, dt, T_e, rng, store_rollouts=False)
     hit_steps = []
     ts_ref = None
 
-    for _ in range(n_mc):
-        x0 = rng.uniform(X0_INIT[0], X0_INIT[1], size=2)
-        ts, xs, us = simulate_euler_maruyama(x0, policy, T_horizon=T_horizon, dt=dt, T_e=T_e, rng=rng)
+    for i in range(n_mc):
+        if seed is not None:
+            traj_rng = np.random.default_rng(np.random.SeedSequence([int(seed), int(i)]))
+        else:
+            traj_rng = rng
+
+        x0 = traj_rng.uniform(X0_INIT[0], X0_INIT[1], size=2)
+        ts, xs, us = simulate_euler_maruyama(
+            x0,
+            policy,
+            T_horizon=T_horizon,
+            dt=dt,
+            T_e=T_e,
+            rng=traj_rng,
+        )
         status, step = classify_trajectory(xs)
         statuses.append(status)
         hit_steps.append(int(step))
@@ -617,19 +718,65 @@ def animate_mc_results(paths, controls, energy_hist, statuses, hit_steps, ts, sk
 
 
 # ---------------------------------------------------------------------------
+#  PyTorch dynamics (open-loop, for neural synthesis training)
+# ---------------------------------------------------------------------------
+_A_T = torch.tensor(A_DRIFT, dtype=torch.float32)
+_E_T = torch.tensor(E_PARAM, dtype=torch.float32)
+_g_coeffs = torch.tensor([SIGMA, SIGMA], dtype=torch.float32)
+
+
+def f_ol(x: torch.Tensor, _u: torch.Tensor = None) -> torch.Tensor:
+    """Open-loop drift: drift(x, u=0, T_e=T_E_NOM) lifted to torch tensors."""
+    A_t = _A_T.to(x.device, x.dtype)
+    E_t = _E_T.to(x.device, x.dtype)
+    x_kelvin = x + KELVIN_OFFSET
+    radiation = -RADIATION_COEFF * (x_kelvin ** 4)
+    return x @ A_t.T + E_t.unsqueeze(0) * T_E_NOM + radiation
+
+
+def g_torch(x: torch.Tensor) -> torch.Tensor:
+    """Diagonal diffusion g = sigma * I_2, returned as a coefficient vector."""
+    base = _g_coeffs.to(device=x.device, dtype=x.dtype)
+    if x.dim() == 1:
+        return base
+    elif x.dim() == 2:
+        return base.unsqueeze(0).expand(x.shape[0], -1)
+    else:
+        raise ValueError(f"g_torch(x) expects x of shape (2,) or (N, 2), got {tuple(x.shape)}")
+
+
+# Additive disturbance from uncertain ambient temperature T_e ∈ [T_E_MIN, T_E_MAX].
+_delta_max = float(T_E_MAX - T_E_NOM)
+drift_unc = torch.tensor(
+    [abs(E_PARAM[0]) * _delta_max, abs(E_PARAM[1]) * _delta_max],
+    dtype=torch.float32,
+)
+f_ol_set = AdditiveBoxSetDrift(f_ol, drift_unc)
+
+
+# ---------------------------------------------------------------------------
 #  Example usage
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Two-room temperature SDE demo and animation")
     parser.add_argument("--seed", type=int, default=42, help="RNG seed.")
     parser.add_argument("--n-mc", type=int, default=100, help="Number of Monte Carlo trajectories.")
-    parser.add_argument("--mc-horizon", type=float, default=50.0, help="Monte Carlo horizon [s].")
-    parser.add_argument("--mc-dt", type=float, default=0.01, help="Monte Carlo integration step [s].")
+    parser.add_argument("--mc-horizon", type=float, default=30.0, help="Monte Carlo horizon [s].")
+    parser.add_argument("--mc-dt", type=float, default=0.005, help="Monte Carlo integration step [s].")
     parser.add_argument("--animate-mc", action="store_true", help="Animate subset of MC rollouts (state, control, energy).")
-    parser.add_argument("--anim-trajs", type=int, default=80, help="How many MC trajectories to animate.")
+    parser.add_argument("--anim-trajs", type=int, default=50, help="How many MC trajectories to animate.")
     parser.add_argument("--anim-skip", type=int, default=3, help="Frame stride for animation.")
     parser.add_argument("--save-animation", type=str, default=None, help="Optional path to save animation (.gif recommended).")
     parser.add_argument("--no-show", action="store_true", help="Do not open an interactive animation window.")
+    parser.add_argument(
+        "--controller-checkpoint",
+        type=str,
+        default="",
+        help=(
+            "Optional path to trained controller checkpoint from main.py "
+            "(raw control state_dict or checkpoint containing control_state_dict)."
+        ),
+    )
     args = parser.parse_args()
 
     print("Two-Room Temperature Control SDE Benchmark")
@@ -649,19 +796,31 @@ if __name__ == "__main__":
     print(f"Safe set    Xs: [{XS_SAFE[0]}, {XS_SAFE[1]}]^2")
     print()
 
-    rng = np.random.default_rng(int(args.seed))
+    base_seed = int(args.seed)
+    rng = np.random.default_rng(base_seed)
     n_mc = int(args.n_mc)
     dt = float(args.mc_dt)
     T_horizon = float(args.mc_horizon)
     need_paths = bool(args.animate_mc or args.save_animation)
 
+    policy = bang_bang_policy
+    policy_name = "bang-bang set-point (hand-designed)"
+    if args.controller_checkpoint:
+        ckpt_path = Path(args.controller_checkpoint)
+        if not ckpt_path.exists():
+            raise FileNotFoundError(f"Controller checkpoint not found: {ckpt_path}")
+        policy = make_trained_policy_from_checkpoint(str(ckpt_path))
+        policy_name = f"trained controller from {ckpt_path}"
+    print(f"Policy: {policy_name}")
+
     mc = run_monte_carlo(
-        policy=bang_bang_policy,
+        policy=policy,
         n_mc=n_mc,
         T_horizon=T_horizon,
         dt=dt,
         T_e=T_E_NOM,
         rng=rng,
+        seed=base_seed,
         store_rollouts=need_paths,
     )
 

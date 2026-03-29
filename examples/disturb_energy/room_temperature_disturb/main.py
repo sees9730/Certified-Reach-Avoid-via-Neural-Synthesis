@@ -18,6 +18,9 @@ Pipeline
 - Energy curriculum (`energy_max` decreases in-loop):
   `python main.py --train 1 --curriculum_mode energy --resume_checkpoint outputs/resume_checkpoint.pth --energy_max_step 0.1 --energy_max_min 0.2`
 
+3) Further training,  
+    python main.py --train 1 --curriculum_mode beta --resume_checkpoint outputs/energy_runs/eval_bundle.pth
+  
 Optional stop/resume:
 - Beta: during training, type `stop` in terminal.
   Resume with:
@@ -80,11 +83,10 @@ from src.trainer import train_network_bounds
 from src.training_utils import evaluate_constraints, print_constraint_summary
 from src.utils import cleanup_and_setup_directories
 from src.visualization import create_summary_plots
-from src.set_values import AdditiveBoxSetDrift, ClosedLoopSetValuedDrift
+from src.set_values import ClosedLoopSetValuedDrift
 from test import (
-    A_DRIFT, B_INPUT, E_PARAM, SIGMA,
-    T_E_NOM, T_E_MIN, T_E_MAX,
-    X_DOMAIN, X0_INIT, XG_GOAL, XS_SAFE, U_MAX,
+    B_INPUT, X_DOMAIN, X0_INIT, XG_GOAL, XS_SAFE, U_MAX,
+    g_torch, f_ol_set,
 )
 
 torch.manual_seed(0)
@@ -531,6 +533,8 @@ def main():
                         help="Energy curriculum decrement step used inside trainer loop")
     parser.add_argument("--energy_max_min", type=float, default=None,
                         help="Minimum energy_max target for energy curriculum")
+    parser.add_argument("--beta_ra_max", type=float, default=10.0,
+                        help="Maximum beta_ra used in beta curriculum mode")
     args = parser.parse_args()
 
     print("="*20)
@@ -550,7 +554,7 @@ def main():
     params.include_energy = True
     state_dim = 2
 
-    energy_max = float(args.energy_max) if args.energy_max is not None else 10.0
+    energy_max = float(args.energy_max) if args.energy_max is not None else 20.0
     energy_range = np.array([[0.0, energy_max]], dtype=np.float32)
     params.network.n_inputs = state_dim + (1 if params.include_energy else 0)
     params.network.n_hidden_1 = 32
@@ -577,6 +581,7 @@ def main():
 
     params.constraints.beta_ra = 5.0 # max beta_ra = 20.0 by default
     params.constraints.beta_increment = 0.5
+    params.constraints.beta_ra_max = float(args.beta_ra_max)
 
     params.compute_V = True
     params.compute_GV = True
@@ -605,19 +610,19 @@ def main():
     params.refinement.v_outside.late_epoch_threshold = 2500
     params.refinement.v_outside.refine_interval_late = 100
     params.refinement.v_outside.refine_factor = 2
-    params.refinement.v_outside.max_cells = 50000
+    params.refinement.v_outside.max_cells = 100000
     params.refinement.v_outside.N_to_refine = 100
     params.refinement.v_outside.enable_merging = True
     params.refinement.v_outside.merge_interval = 501
     params.refinement.v_outside.merge_max_passes = 8
-    params.refinement.v_outside.merge_relax_margin = 20.0
+    params.refinement.v_outside.merge_relax_margin = 30.0
 
     params.refinement.v_unsafe.enable_refinement = True
     params.refinement.v_unsafe.refine_interval = 500
     params.refinement.v_unsafe.late_epoch_threshold = 2500
     params.refinement.v_unsafe.refine_interval_late = 500
     params.refinement.v_unsafe.refine_factor = 2
-    params.refinement.v_unsafe.max_cells = 50000
+    params.refinement.v_unsafe.max_cells = 100000
     params.refinement.v_unsafe.N_to_refine = 100
     params.refinement.v_unsafe.enable_merging = False
 
@@ -626,7 +631,7 @@ def main():
     params.refinement.v_init.late_epoch_threshold = 2500
     params.refinement.v_init.refine_interval_late = 500
     params.refinement.v_init.refine_factor = 2
-    params.refinement.v_init.max_cells = 50000
+    params.refinement.v_init.max_cells = 100000
     params.refinement.v_init.N_to_refine = 100
     params.refinement.v_init.enable_merging = False
 
@@ -650,7 +655,7 @@ def main():
     params.refinement.gv_generator.merge_interval = 501
     params.refinement.gv_generator.merge_max_passes = 8
     params.refinement.gv_generator.merge_relax_margin = -500.0
-    params.refinement.refine_interval_after_first_sat = 500 # increase the refinement frequecny for all region after first SAT
+    params.refinement.refine_interval_after_first_sat = 200 # increase the refinement frequecny for all region after first SAT
 
     # === Dynamics ===
     # Controller acts on physical state x only; energy is handled in GV via dE/dt.
@@ -658,37 +663,10 @@ def main():
     rl_policy_net = RoomTempControlNN(input_dim=ctrl_input_dim, u_max=U_MAX)
     u_nn = RoomTempControlWrapper(rl_policy_net, B_INPUT)
 
-    _A = torch.tensor(A_DRIFT, dtype=torch.float32)
-    _E = torch.tensor(E_PARAM, dtype=torch.float32)
-
-    def f_ol(x: torch.Tensor, u: torch.Tensor = None) -> torch.Tensor:
-        """Nominal open-loop drift: A @ x + E * T_e_nom  (no control, no disturbance)."""
-        A_t = _A.to(x.device, x.dtype)
-        E_t = _E.to(x.device, x.dtype)
-        return x @ A_t.T + E_t.unsqueeze(0) * T_E_NOM
-
-    # Diffusion: g = sigma * I_2  (both rooms driven by noise)
-    g_coeffs = torch.tensor([SIGMA, SIGMA], dtype=torch.float32)
-
-    def g(x: torch.Tensor) -> torch.Tensor:
-        base = g_coeffs.to(device=x.device, dtype=x.dtype)
-        if x.dim() == 1:
-            return base
-        elif x.dim() == 2:
-            N = x.shape[0]
-            return base.unsqueeze(0).expand(N, -1)
-        else:
-            raise ValueError(f"g(x) expects x of shape (2,) or (N, 2), got {tuple(x.shape)}")
-
-    # Additive disturbance from uncertain ambient temperature T_e ∈ [T_E_MIN, T_E_MAX].
-    # Deviation from nominal: E * (T_e - T_e_nom), T_e - T_e_nom ∈ [T_E_MIN-T_E_NOM, T_E_MAX-T_E_NOM].
-    # Per-dimension half-width: |E[i]| * (T_E_MAX - T_E_NOM).
-    _delta_max = float(T_E_MAX - T_E_NOM)
-    drift_unc = torch.tensor([abs(E_PARAM[0]) * _delta_max,
-                              abs(E_PARAM[1]) * _delta_max], dtype=torch.float32)
-    f_ol_set = AdditiveBoxSetDrift(f_ol, drift_unc).to(params.training.device)
-    f_cl_module = ClosedLoopSetValuedDrift(f_ol_set, controller=u_nn).to(params.training.device)
-    dynamics = Dynamics.dynamics(f=f_cl_module, g=g, state_dim=state_dim)
+    f_cl_module = ClosedLoopSetValuedDrift(
+        f_ol_set.to(params.training.device), controller=u_nn
+    ).to(params.training.device)
+    dynamics = Dynamics.dynamics(f=f_cl_module, g=g_torch, state_dim=state_dim)
 
     # === Regions ===
     # All temperature sets are symmetric in x1 and x2.
@@ -744,7 +722,7 @@ def main():
 
     # === Networks ===
     if params.include_energy:
-        input_offset = [1.0, x_center, x_center]
+        input_offset = [0.2, x_center, x_center]
     else:
         input_offset = [x_center, x_center]
     output_offset = np.float32(0.1)

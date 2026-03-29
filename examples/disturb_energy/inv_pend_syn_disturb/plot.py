@@ -1,14 +1,16 @@
 """
-MC Validation Comparison — Three Controllers
-=============================================
+MC Validation Comparison — Four Controllers
+============================================
 
 Compares:
-  A) examples/disturbance/inv_pend_syn_disturb/outputs/eval_bundle.pth
-       No-energy-constraint (plain disturbance synthesis)
+  A) examples/disturb_energy/inv_pend_syn_disturb_baseline/outputs/eval_bundle.pth
+       Cert. (plain disturbance synthesis)
   B) examples/disturb_temporal/inv_pend_syn_disturb/outputs/time_runs/eval_bundle.pth
-       Time-optimal (temporal curriculum)
+       Cert. (time) (temporal curriculum)
   C) examples/disturb_energy/inv_pend_syn_disturb/outputs/beta_runs/eval_bundle.pth
-       Energy-constrained (beta / energy curriculum)
+       Cert. (energy) (beta / energy curriculum)
+  D) examples/disturb_energy/inv_pend_syn_disturb_rl/outputs/rl_controller.pth
+       RL (same architecture, additive box disturbance training)
 
 Metrics (successful trajectories only unless stated):
   1. Reach-avoid probability  p_success / p_fail / p_timeout
@@ -18,8 +20,7 @@ Metrics (successful trajectories only unless stated):
 Output (PDF, saved to outputs/):
   fig1_phase_trajectories.pdf
   fig2_energy_vs_thit.pdf
-  fig3_energy_distribution.pdf
-  fig4_thit_distribution.pdf
+  fig5_u_raw_trajectories
 
 Usage (from this directory):
     python plot.py
@@ -34,6 +35,7 @@ import matplotlib.gridspec as gridspec
 from matplotlib.patches import Rectangle
 from pathlib import Path
 from scipy.stats import gaussian_kde
+import seaborn as sns
 
 # -----------------------------------------------------------------------
 # Publication-quality style
@@ -49,15 +51,15 @@ matplotlib.rcParams.update({
     "mathtext.bf":          "Times New Roman:bold",
     # --- sizes ---
     "font.size":            16,
-    "axes.titlesize":       18,
-    "axes.labelsize":       17,
-    "legend.fontsize":      13,
-    "xtick.labelsize":      14,
-    "ytick.labelsize":      14,
+    "axes.titlesize":       16,
+    "axes.labelsize":       16,
+    "legend.fontsize":      16,
+    "xtick.labelsize":      16,
+    "ytick.labelsize":      16,
     # --- layout ---
     "axes.linewidth":       1.2,
     "grid.linewidth":       0.7,
-    "lines.linewidth":      1.5,
+    "lines.linewidth":      2.0,
     # --- PDF embedding (TrueType, not Type 3) ---
     "pdf.fonttype":         42,
     "ps.fonttype":          42,
@@ -85,15 +87,17 @@ M      = 6.0
 sigma  = 0.2
 pi     = np.pi
 
-TORQUE_SCALE = M / (m * L**2)   # ≈ 80
+TORQUE_SCALE = M / (m * L**2) 
 
 # -----------------------------------------------------------------------
 # Per-controller style  (color, linestyle, marker)
 # -----------------------------------------------------------------------
+_pal = sns.color_palette("Set2", 4)
 CTRL_STYLES = [
-    {"color": "#1f77b4", "ls": "-",  "lw": 1.2, "label": "No-constraints"},  # blue  / solid
-    {"color": "#2ca02c", "ls": "--", "lw": 1.2, "label": "Time-constrained"},           # green / dashed
-    {"color": "#d62728", "ls": "-.", "lw": 1.2, "label": "Energy-constrained"},     # red   / dash-dot
+    {"color": _pal[0], "ls": "-",  "lw": 2.0, "label": "Cert."},      # solid
+    {"color": _pal[1], "ls": "--", "lw": 2.0, "label": "Cert. (time)"},    # dashed
+    {"color": _pal[2], "ls": "-.", "lw": 2.0, "label": "Cert. (energy)"},  # dash-dot
+    {"color": _pal[3], "ls": ":",  "lw": 2.0, "label": "RL"},              # dotted
 ]
 
 # -----------------------------------------------------------------------
@@ -129,12 +133,21 @@ def g_diff(x):
 # -----------------------------------------------------------------------
 # Controller helpers
 # -----------------------------------------------------------------------
-def load_control_net(bundle_path, device="cpu"):
-    bundle = load_eval_bundle(Path(bundle_path), map_location="cpu")
+def load_control_net(bundle_path, device="cpu", pretrained_state_dict=False):
+    """
+    Load a WrapperConterlNN from either:
+      - an eval_bundle.pth  (pretrained_state_dict=False, default): dict with key "control_state_dict"
+      - a controller_pretrained.pth  (pretrained_state_dict=True): raw state_dict saved by pretrain step
+    """
     rl_policy_net = InvertControlNN(input_dim=2, hidden_dim=8, output_dim=1)
     control_net   = WrapperConterlNN(rl_policy_net).to(device)
-    if bundle.get("control_state_dict") is not None:
-        control_net.load_state_dict(bundle["control_state_dict"])
+    if pretrained_state_dict:
+        state = torch.load(bundle_path, map_location="cpu")
+        control_net.load_state_dict(state)
+    else:
+        bundle = load_eval_bundle(Path(bundle_path), map_location="cpu")
+        if bundle.get("control_state_dict") is not None:
+            control_net.load_state_dict(bundle["control_state_dict"])
     control_net.eval()
     return control_net
 
@@ -178,8 +191,18 @@ def rollout_mc(
                         the trajectory is classified 'fail' immediately.
         time_budget   : if the trajectory enters X_goal but T_hit > time_budget
                         it is reclassified 'fail' instead of 'success'.
+
+    Initial conditions are pre-generated from a root RNG so that every controller
+    sees the same x0_i for trajectory i.  Per-step noise (w and dW) uses a
+    per-trajectory RNG seeded by (seed, i) so the noise sequence is also identical
+    across controllers for each trajectory, regardless of early termination.
     """
-    rng     = np.random.default_rng(seed)
+    # Pre-generate all initial conditions so every controller gets the same
+    # x0_i regardless of how long other trajectories ran.
+    root_rng = np.random.default_rng(seed)
+    x1_init  = root_rng.uniform(X_init_bounds["x1_min"], X_init_bounds["x1_max"], size=n_mc)
+    x2_init  = root_rng.uniform(X_init_bounds["x2_min"], X_init_bounds["x2_max"], size=n_mc)
+
     N_steps = int(T_max / dt)
 
     outcomes   = []
@@ -188,14 +211,16 @@ def rollout_mc(
     paths_out  = []
     uraw_out   = []   # u_raw(t) history for stored paths
 
-    for _ in range(n_mc):
-        x1 = rng.uniform(X_init_bounds["x1_min"], X_init_bounds["x1_max"])
-        x2 = rng.uniform(X_init_bounds["x2_min"], X_init_bounds["x2_max"])
+    for i in range(n_mc):
+        x1, x2 = float(x1_init[i]), float(x2_init[i])
+
+        # Per-trajectory noise RNG — same seed for every controller on trajectory i
+        traj_rng = np.random.default_rng([seed, i])
 
         energy_acc = 0.0
         outcome    = "timeout"
         T_hit      = T_max
-        store_path = len(paths_out) < n_paths
+        store_path = i < n_paths
         if store_path:
             path  = [[x1, x2]]
             uraw  = []
@@ -221,9 +246,9 @@ def rollout_mc(
                 T_hit   = k * dt
                 break
 
-            w      = rng.uniform(-d, d) if disturbance_mode == "uniform" else np.zeros(2)
+            w      = traj_rng.uniform(-d, d) if disturbance_mode == "uniform" else np.zeros(2)
             drift  = f_drift(np.array([x1, x2]), u_applied) + w
-            dW     = np.sqrt(dt) * rng.standard_normal()
+            dW     = np.sqrt(dt) * traj_rng.standard_normal()
             x_next = np.array([x1, x2]) + drift * dt + g_diff(np.array([x1, x2])) * dW
             x1, x2 = float(x_next[0]), float(x_next[1])
 
@@ -289,11 +314,11 @@ def compute_stats(results: dict):
 # Region drawing helper
 # -----------------------------------------------------------------------
 def draw_regions(ax):
-    kw_border = dict(fill=False, lw=1.8, edgecolor="crimson", zorder=2)
+    kw_border = dict(fill=False, lw=2.0, edgecolor="crimson", zorder=2)
     kw_init   = dict(alpha=0.18, facecolor="#1f77b4", edgecolor="#1f77b4",
-                     linestyle="--", lw=1.5, zorder=1)
-    kw_goal   = dict(alpha=0.20, facecolor="green",   edgecolor="green",   lw=1.5, zorder=1)
-    kw_unsafe = dict(alpha=0.20, facecolor="crimson", edgecolor="crimson", lw=1.5, zorder=1)
+                     linestyle="--", lw=2.0, zorder=1)
+    kw_goal   = dict(alpha=0.20, facecolor="green",   edgecolor="green",   lw=2.0, zorder=1)
+    kw_unsafe = dict(alpha=0.20, facecolor="crimson", edgecolor="crimson", lw=2.0, zorder=1)
 
     def _rect(box, **kw):
         return Rectangle(
@@ -340,14 +365,23 @@ def rollout_viz_paths(
     Each trajectory runs until T_hit (first goal entry) + t_extra seconds,
     or until T_max + t_extra, whichever comes first.  Unsafe termination
     is not enforced so the curve continues through for visual context.
+
+    Uses pre-generated initial conditions and per-trajectory noise RNGs so
+    all controllers start from identical (x0, w, dW) per path.
     """
-    rng       = np.random.default_rng(seed)
+    # Pre-generate initial conditions shared across all controllers
+    root_rng = np.random.default_rng(seed)
+    x1_init  = root_rng.uniform(X_init_bounds["x1_min"], X_init_bounds["x1_max"], size=n_paths)
+    x2_init  = root_rng.uniform(X_init_bounds["x2_min"], X_init_bounds["x2_max"], size=n_paths)
+
     N_steps   = int((T_max + t_extra) / dt)
     paths_out = []
 
-    for _ in range(n_paths):
-        x1 = rng.uniform(X_init_bounds["x1_min"], X_init_bounds["x1_max"])
-        x2 = rng.uniform(X_init_bounds["x2_min"], X_init_bounds["x2_max"])
+    for i in range(n_paths):
+        x1, x2 = float(x1_init[i]), float(x2_init[i])
+
+        # Per-trajectory noise RNG — same for every controller on path i
+        traj_rng = np.random.default_rng([seed, i])
 
         path    = [[x1, x2]]
         T_hit   = None   # time of first goal entry
@@ -362,9 +396,9 @@ def rollout_viz_paths(
                 break
 
             u_applied, _ = get_u_and_raw(x1, x2, controller)
-            w      = rng.uniform(-d, d) if disturbance_mode == "uniform" else np.zeros(2)
+            w      = traj_rng.uniform(-d, d) if disturbance_mode == "uniform" else np.zeros(2)
             drift  = f_drift(np.array([x1, x2]), u_applied) + w
-            dW     = np.sqrt(dt) * rng.standard_normal()
+            dW     = np.sqrt(dt) * traj_rng.standard_normal()
             x_next = np.array([x1, x2]) + drift * dt + g_diff(np.array([x1, x2])) * dW
             x1, x2 = float(x_next[0]), float(x_next[1])
 
@@ -398,7 +432,7 @@ def plot_phase_trajectories(entries, viz_paths_per_ctrl, save_dir=None):
             lbl = label if first else None
             first = False
             ax.plot(path[:, 0], path[:, 1],
-                    color=color, ls=ls, lw=lw, alpha=0.65, label=lbl, zorder=3)
+                    color=color, ls=ls, lw=lw, alpha=1.0, label=lbl, zorder=3)
         # mark start points
         for path in viz_paths:
             ax.plot(path[0, 0], path[0, 1], "o",
@@ -421,12 +455,14 @@ def plot_phase_trajectories(entries, viz_paths_per_ctrl, save_dir=None):
 # -----------------------------------------------------------------------
 # Figure 2 — Energy vs Hitting-time scatter with marginal KDEs
 # -----------------------------------------------------------------------
-def plot_energy_vs_thit(entries, budgets, save_dir=None):
+def plot_energy_vs_thit(entries, budgets, save_dir=None, styles=None):
     """
     Joint scatter of (T_hit, energy) for successful trajectories,
     with marginal KDE of T_hit on the top panel and marginal KDE of
     energy on the right panel.
     """
+    if styles is None:
+        styles = CTRL_STYLES
     fig = plt.figure(figsize=(8, 5))
     gs  = fig.add_gridspec(
         2, 2,
@@ -437,7 +473,7 @@ def plot_energy_vs_thit(entries, budgets, save_dir=None):
     ax_top   = fig.add_subplot(gs[0, 0], sharex=ax_main)
     ax_right = fig.add_subplot(gs[1, 1], sharey=ax_main)
 
-    for style, (label, res, stats) in zip(CTRL_STYLES, entries):
+    for style, (label, res, stats) in zip(styles, entries):
         mask  = stats["success_mask"]
         t_hit = np.array(res["hit_times"])[mask]
         e_hit = stats["energies_success"]
@@ -446,7 +482,7 @@ def plot_energy_vs_thit(entries, budgets, save_dir=None):
 
         # --- main scatter ---
         ax_main.scatter(t_hit, e_hit,
-                        color=color, alpha=0.6, s=40,
+                        color=color, alpha=1.0, s=40,
                         label=label, zorder=3)
 
         # --- top marginal: T_hit KDE ---
@@ -454,16 +490,16 @@ def plot_energy_vs_thit(entries, budgets, save_dir=None):
             pad = 0.05 * np.ptp(t_hit)
             xs  = np.linspace(t_hit.min() - pad, t_hit.max() + pad, 400)
             ys  = gaussian_kde(t_hit, bw_method="scott")(xs)
-            ax_top.plot(xs, ys, color=color, ls=ls, lw=2.2)
-            ax_top.fill_between(xs, ys, color=color, alpha=0.18)
+            ax_top.plot(xs, ys, color=color, ls=ls, lw=2.0)
+            ax_top.fill_between(xs, ys, color=color, alpha=0.3)
 
         # --- right marginal: energy KDE ---
         if e_hit.size >= 2:
             pad = 0.05 * np.ptp(e_hit)
             ys  = np.linspace(e_hit.min() - pad, e_hit.max() + pad, 400)
             xs  = gaussian_kde(e_hit, bw_method="scott")(ys)
-            ax_right.plot(xs, ys, color=color, ls=ls, lw=2.2)
-            ax_right.fill_betweenx(ys, xs, color=color, alpha=0.18)
+            ax_right.plot(xs, ys, color=color, ls=ls, lw=2.0)
+            ax_right.fill_betweenx(ys, xs, color=color, alpha=0.3)
 
     # --- main axes ---
     ax_main.set_xlabel("Reach-avoid time (s)")
@@ -518,12 +554,12 @@ def _kde_plot(ax, data_list, styles, x_label, title, mean_key, stats_list):
         color = style["color"]
         kde   = gaussian_kde(data, bw_method="scott")
         ys    = kde(xs)
-        ax.plot(xs, ys, color=color, ls=style["ls"], lw=2.2,
+        ax.plot(xs, ys, color=color, ls=style["ls"], lw=2.0,
                 label=f"{style['label']}  ($n={data.size}$)")
-        ax.fill_between(xs, ys, alpha=0.12, color=color)
+        ax.fill_between(xs, ys, alpha=0.3, color=color)
         mu = stats[mean_key]
         if not np.isnan(mu):
-            ax.axvline(mu, color=color, lw=1.6, ls=":", alpha=0.85,
+            ax.axvline(mu, color=color, lw=2.0, ls=":", alpha=1.0,
                        label=fr"$\mu={mu:.3f}$")
 
     ax.set_xlabel(x_label)
@@ -582,18 +618,20 @@ def plot_thit_distribution(entries, save_dir=None):
 # -----------------------------------------------------------------------
 # Figure 5 — u_raw(t) vs time (single plot, all controllers)
 # -----------------------------------------------------------------------
-def plot_u_raw_trajectories(entries, dt, save_dir=None):
+def plot_u_raw_trajectories(entries, dt, save_dir=None, styles=None):
     """
     All controllers in one plot.
     Each trajectory is clipped to its first-hitting time T_hit.
     Individual traces are shown in light colour; the per-controller
     mean (over stored paths, aligned on [0, T_hit]) is drawn in bold.
     """
+    if styles is None:
+        styles = CTRL_STYLES
     fig, ax = plt.subplots(figsize=(8, 5))
 
     # Pre-compute statistics for all controllers
     ctrl_data = []
-    for style, (label, res, __) in zip(CTRL_STYLES, entries):
+    for style, (label, res, __) in zip(styles, entries):
         uraw_all = res["uraw_paths"]
         if not uraw_all:
             ctrl_data.append(None)
@@ -611,24 +649,24 @@ def plot_u_raw_trajectories(entries, dt, save_dir=None):
 
     # Pass 1 — bands (drawn first, underneath everything)
     for zorder, (style, (label, _, __), data) in enumerate(
-            zip(CTRL_STYLES, entries, ctrl_data), start=1):
+            zip(styles, entries, ctrl_data), start=1):
         if data is None:
             continue
         ax.fill_between(data["t_grid"], data["min"], data["max"],
-                        color=style["color"], alpha=0.15, zorder=zorder)
+                        color=style["color"], alpha=0.3, zorder=zorder)
 
     # Pass 2 — mean lines (drawn on top of all bands)
-    # energy-constrained is last in CTRL_STYLES → highest zorder automatically
-    n = len(CTRL_STYLES)
+    # Cert. (energy) is last in styles → highest zorder automatically
+    n = len(styles)
     for zorder, (style, (label, _, __), data) in enumerate(
-            zip(CTRL_STYLES, entries, ctrl_data), start=n + 1):
+            zip(styles, entries, ctrl_data), start=n + 1):
         if data is None:
             continue
         ax.plot(data["t_grid"], data["mean"],
-                color=style["color"], ls=style["ls"], lw=1.5,
+                color=style["color"], ls=style["ls"], lw=2.0,
                 label=label, zorder=zorder)
 
-    ax.axhline(0, color="grey", lw=0.8, ls="--", alpha=0.6)
+    ax.axhline(0, color="grey", lw=2.0, ls="--", alpha=1.0)
     ax.set_xlabel("Time (s)")
     ax.set_ylabel(r"$u_{\rm raw}(t)$")
     ax.legend(framealpha=0.9, fontsize=18)
@@ -670,7 +708,7 @@ def print_summary(label, stats):
 def main():
     bundle_specs = [
         (
-            ROOT / "examples" / "disturbance" / "inv_pend_syn_disturb"
+            ROOT / "examples" / "disturb_energy" / "inv_pend_syn_disturb_baseline"
                  / "outputs" / "eval_bundle.pth",
         ),
         (
@@ -679,6 +717,10 @@ def main():
         ),
         (
             OUTPUT_DIR / "beta_runs" / "eval_bundle.pth",
+        ),
+        (
+            ROOT / "examples" / "disturb_energy" / "inv_pend_syn_disturb_rl"
+                 / "outputs" / "rl_controller.pth",
         ),
     ]
 
@@ -692,10 +734,12 @@ def main():
     # energy_budget : fail if ∫u_raw² dt > threshold  (energy controller)
     # time_budget   : fail if T_hit > threshold         (time controller)
     BUDGETS = [
-        {},                                       # No-energy-constraint: no budget
-        {"time_budget": 4.5},                     # Time-optimal: T_hit must be <= 4.5 s
-        {"energy_budget": 0.6},                   # Energy-constrained: energy must be <= 0.6
+        {},                                       # Cert.: no budget
+        {"time_budget": 4.5},                     # Cert. (time): T_hit must be <= 4.5 s
+        {"energy_budget": 0.6},                   # Cert. (energy): energy must be <= 0.6
+        {},                                       # RL: no budget
     ]
+    IS_PRETRAINED = [False, False, False, True]   # only D uses raw state_dict
 
     # --- MC config ---
     N_MC    = 100
@@ -708,10 +752,10 @@ def main():
 
     # entries: list of (label, res, stats)  — same order as CTRL_STYLES / BUDGETS
     entries = []
-    for (path,), style, bgt in zip(bundle_specs, CTRL_STYLES, BUDGETS):
+    for (path,), style, bgt, is_pt in zip(bundle_specs, CTRL_STYLES, BUDGETS, IS_PRETRAINED):
         label = style["label"]
         print(f"\nLoading '{label}'\n  {path}")
-        ctrl  = load_control_net(path)
+        ctrl  = load_control_net(path, pretrained_state_dict=is_pt)
         print(f"  Running MC (n={N_MC}, budgets={bgt}) ...")
         res   = rollout_mc(
             ctrl, n_mc=N_MC, T_max=T_MAX, dt=DT,
@@ -725,8 +769,8 @@ def main():
 
     # --- viz-only extended paths for Fig 1 (T_hit + 1 s), stats unaffected ---
     viz_paths_per_ctrl = []
-    for (path,), style, bgt in zip(bundle_specs, CTRL_STYLES, BUDGETS):
-        ctrl = load_control_net(path)
+    for (path,), style, bgt, is_pt in zip(bundle_specs, CTRL_STYLES, BUDGETS, IS_PRETRAINED):
+        ctrl = load_control_net(path, pretrained_state_dict=is_pt)
         viz_paths_per_ctrl.append(rollout_viz_paths(
             ctrl, n_paths=N_PATHS, T_max=T_MAX, t_extra=1.0,
             dt=DT, d=D, disturbance_mode=MODE, seed=SEED,
@@ -734,10 +778,10 @@ def main():
 
     SAVE_DIR = str(OUTPUT_DIR)
     plot_phase_trajectories(entries, viz_paths_per_ctrl, save_dir=SAVE_DIR)
-    plot_energy_vs_thit(entries, BUDGETS,         save_dir=SAVE_DIR)
+    plot_energy_vs_thit(entries, BUDGETS, save_dir=SAVE_DIR, styles=CTRL_STYLES)
     # plot_energy_distribution(entries,             save_dir=SAVE_DIR)
     # plot_thit_distribution(entries,               save_dir=SAVE_DIR)
-    plot_u_raw_trajectories(entries, DT,          save_dir=SAVE_DIR)
+    plot_u_raw_trajectories(entries, DT,           save_dir=SAVE_DIR, styles=CTRL_STYLES)
 
 
 if __name__ == "__main__":
