@@ -821,16 +821,19 @@ def train_network_bounds(
                     params.training.latest_sat_beta_ra = float(params.constraints.beta_ra)
                     _save_resume_checkpoint(epoch, stop_requested=False)
                     _save_eval_bundle_snapshot()
+                    beta_ra_max = float(getattr(params.constraints, "beta_ra_max", 20.0))
                     if async_stop_requested:
                         params.training.user_stop_requested = True
                         _save_resume_checkpoint(epoch, stop_requested=True)
                         print("User requested early stop for beta curriculum.")
-                    elif params.constraints.beta_ra < 20.0:
+                    elif params.constraints.beta_ra < beta_ra_max:
                         params.constraints.beta_ra += float(getattr(params.constraints, 'beta_increment', 0.2))
+                        if params.constraints.beta_ra > beta_ra_max:
+                            params.constraints.beta_ra = beta_ra_max
                         all_satisfied = False
                         print(f"Incremented beta_ra to {params.constraints.beta_ra:.2f}")
                     else:
-                        print(f"beta_ra reached maximum of {params.constraints.beta_ra:.2f}")
+                        print(f"beta_ra reached maximum of {beta_ra_max:.2f}")
 
                 elif curriculum_mode in {"time", "energy"}:
                     all_satisfied, v_rebuild_now, gv_rebuild_now = _handle_time_curriculum_sat(

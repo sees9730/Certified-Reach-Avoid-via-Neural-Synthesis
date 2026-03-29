@@ -347,9 +347,10 @@ def evaluate_constraints(
 
         # Init: bounds only (universal)
         if len(region_bounds['init'][0]) > 0:
-            init_lower_ok = (region_bounds['init'][0] >= 0.0).all().item()
+            # init_lower_ok = (region_bounds['init'][0] >= 0.0).all().item()
             init_upper_ok = (region_bounds['init'][1] <= 1.0).all().item()
-            init_satisfied = init_lower_ok and init_upper_ok
+            # init_satisfied = init_lower_ok and init_upper_ok
+            init_satisfied = init_upper_ok
             v_init_min = region_bounds['init'][0].min().item()
             v_init_max = region_bounds['init'][1].max().item()
         else:
@@ -629,25 +630,25 @@ def print_constraint_summary(results: dict, prefix: str = "", bounds: dict = Non
     stats = ""
     if bounds and 'goal' in bounds and len(bounds['goal'][0]) > 0:
         stats = cell_stats('goal', bounds['goal'][0] >= 0, len(bounds['goal'][0]))
-    print(f"{prefix}Goal:      {status(results['goal_satisfied']):4s}, V bounds: [{results['V_goal_min']:7.3f}, {results['V_goal_max']:7.3f}]{stats}")
+    print(f"{prefix}Goal:      {status(results['goal_satisfied']):4s}, V_lower_min: {results['V_goal_min']:7.3f}{stats}")
 
     # Unsafe
     stats = ""
     if bounds and 'unsafe' in bounds and len(bounds['unsafe'][0]) > 0:
         stats = cell_stats('unsafe', bounds['unsafe'][0] >= beta_ra, len(bounds['unsafe'][0]))
-    print(f"{prefix}Unsafe:    {status(results['unsafe_satisfied']):4s}, V bounds: [{results['V_unsafe_min']:7.3f}, {results['V_unsafe_max']:7.3f}]{stats}")
+    print(f"{prefix}Unsafe:    {status(results['unsafe_satisfied']):4s}, V_lower_min: {results['V_unsafe_min']:7.3f}{stats}")
 
     # Init
     stats = ""
     if bounds and 'init' in bounds and len(bounds['init'][1]) > 0:
         stats = cell_stats('init', bounds['init'][1] <= 1.0, len(bounds['init'][1]))
-    print(f"{prefix}Init:      {status(results['init_satisfied']):4s}, V bounds: [{results['V_init_min']:7.3f}, {results['V_init_max']:7.3f}]{stats}")
+    print(f"{prefix}Init:      {status(results['init_satisfied']):4s}, V_upper_max: {results['V_init_max']:7.3f}{stats}")
 
     # Outside
     stats = ""
     if bounds and 'outside' in bounds and len(bounds['outside'][0]) > 0:
         stats = cell_stats('outside', bounds['outside'][0] >= 0.0, len(bounds['outside'][0]))
-    print(f"{prefix}Outside:   {status(results['outside_satisfied']):4s}, V bounds: [{results['V_outside_min']:7.3f}, {results['V_outside_max']:7.3f}]{stats}")
+    print(f"{prefix}Outside:   {status(results['outside_satisfied']):4s}, V_lower_min: {results['V_outside_min']:7.3f}{stats}")
 
     # Generator
     stats = ""
@@ -662,7 +663,7 @@ def print_constraint_summary(results: dict, prefix: str = "", bounds: dict = Non
             stats = f" | {passing}/{total_gen} pass ({failing} fail, {pct:.1f}%)"
     elif phi_uppers is not None and len(phi_uppers) > 0:
         stats = cell_stats('generator', phi_uppers < 0.0, len(phi_uppers))
-    print(f"{prefix}Generator: {status(results['generator_satisfied']):4s}, GV bounds: [{results['Phi_min']:7.3f}, {results['Phi_max']:7.3f}]{stats}")
+    print(f"{prefix}Generator: {status(results['generator_satisfied']):4s}, GV_upper_max: {results['Phi_max']:7.3f}{stats}")
 
 from typing import List, Tuple, Optional
 import numpy as np
