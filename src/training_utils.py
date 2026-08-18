@@ -143,7 +143,13 @@ def compute_loss_generator_bounds(
         sat = True
         return loss, sat
 
+    # pure Phi_upper active loss
     loss = F.relu(Phi_upper_active + delta).sum()
+
+    # value-informed Phi_upper active loss
+    # den = torch.max(1e-3, V_generator_lower[active])
+    # loss = F.relu(Phi_upper_active/den + delta).sum()
+
     sat = bool((Phi_upper_active.max() < 0.0).item())
     return loss, sat
 

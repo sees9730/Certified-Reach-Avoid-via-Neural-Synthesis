@@ -1,0 +1,369 @@
+
+====================
+Region Discretization
+====================
+Using weights-based discretization with axis_weights=[1.0, 1.0]
+Shared region budget (init/goal/unsafe/outside): 1000
+Generator budget: 1000
+Init region: weights-based discretization
+ Init target budget: 1000
+ Init actual cells: 992
+ 992 cells
+Goal region: weights-based discretization
+ Goal target budget: 1000
+ Goal actual cells: 992
+ 992 cells
+Unsafe region: weights-based discretization
+ Unsafe target budget: 1000
+ Unsafe actual cells: 958
+ 958 cells
+Outside goal region: weights-based discretization
+ Outside target budget: 1000
+ Outside actual cells: 948
+ 948 cells
+Generator region: weights-based discretization
+ Generator target budget: 1000
+ Generator actual cells: 982
+ 982 cells
+
+====================
+Pre-training using samples
+====================
+GV pre-training enabled
+Epoch 0 | V_loss=3483.9590 | GV_loss= 77.1167
+Epoch 100 | V_loss=3316.8245 | GV_loss=  6.2598
+Epoch 200 | V_loss=  3.8945 | GV_loss=  1.3489
+Epoch 300 | V_loss=  3.3578 | GV_loss=  0.5462
+Epoch 400 | V_loss=  3.2032 | GV_loss=  0.5691
+Epoch 500 | V_loss=  8.3789 | GV_loss=  1.5620
+Epoch 600 | V_loss=  2.7689 | GV_loss=  1.1913
+Epoch 700 | V_loss=  2.7071 | GV_loss=  0.9623
+Epoch 800 | V_loss=  2.8824 | GV_loss=  1.4464
+Epoch 900 | V_loss=  1.5706 | GV_loss=  1.5280
+Epoch 1000 | V_loss=  3.2028 | GV_loss=  1.7559
+Epoch 1100 | V_loss=  2.9090 | GV_loss=  0.7103
+Epoch 1200 | V_loss=  2.2115 | GV_loss=  1.5194
+Epoch 1300 | V_loss=  1.7054 | GV_loss=  0.4409
+Epoch 1400 | V_loss=  2.8952 | GV_loss=  0.2929
+Epoch 1500 | V_loss=  1.3319 | GV_loss=  0.7843
+Epoch 1600 | V_loss=  1.8155 | GV_loss=  0.2856
+Epoch 1700 | V_loss=  1.4223 | GV_loss=  0.6529
+Epoch 1800 | V_loss= 16.0355 | GV_loss=  2.0023
+Epoch 1900 | V_loss=  1.2439 | GV_loss=  0.3269
+Epoch 2000 | V_loss=  2.1193 | GV_loss=  0.6366
+Epoch 2100 | V_loss=  2.2156 | GV_loss=  0.7036
+Epoch 2200 | V_loss=  1.1676 | GV_loss=  0.2087
+Epoch 2300 | V_loss=  1.6908 | GV_loss=  0.6895
+Epoch 2400 | V_loss=  1.0514 | GV_loss=  0.5136
+Epoch 2500 | V_loss=  1.3880 | GV_loss=  0.2124
+Epoch 2600 | V_loss=  0.7577 | GV_loss=  0.4225
+Epoch 2700 | V_loss=  0.7790 | GV_loss=  0.1361
+Epoch 2800 | V_loss=  1.5254 | GV_loss=  0.6159
+Epoch 2900 | V_loss= 15.0050 | GV_loss=  0.6229
+Epoch 3000 | V_loss=  0.9084 | GV_loss=  0.3182
+Epoch 3100 | V_loss=  1.1652 | GV_loss=  0.5972
+Epoch 3200 | V_loss=  0.7864 | GV_loss=  0.3314
+Epoch 3300 | V_loss=  0.6165 | GV_loss=  0.6946
+Epoch 3400 | V_loss=  0.9051 | GV_loss=  0.3734
+Epoch 3500 | V_loss=  0.5971 | GV_loss=  0.1956
+Epoch 3600 | V_loss=  0.5641 | GV_loss=  0.2017
+Epoch 3700 | V_loss=  0.2247 | GV_loss=  0.1812
+Epoch 3800 | V_loss=  0.4240 | GV_loss=  0.0000
+Epoch 3900 | V_loss=  0.5819 | GV_loss=  0.2344
+Epoch 4000 | V_loss=  0.5744 | GV_loss=  0.0383
+Epoch 4100 | V_loss=  0.4028 | GV_loss=  0.1249
+Epoch 4200 | V_loss=  0.4684 | GV_loss=  0.0734
+Epoch 4300 | V_loss=  0.3559 | GV_loss=  0.3858
+Epoch 4400 | V_loss=  0.3964 | GV_loss=  0.1017
+Epoch 4500 | V_loss=  0.1819 | GV_loss=  0.1382
+Epoch 4600 | V_loss=  0.5312 | GV_loss=  0.0663
+Epoch 4700 | V_loss=  0.1938 | GV_loss=  0.1705
+Epoch 4800 | V_loss=  0.3910 | GV_loss=  0.0948
+Epoch 4900 | V_loss=  0.5107 | GV_loss=  0.1907
+
+Best loss: 0.210190
+Saved pretrained V_net to: /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/disturb_energy/inv_pend_syn_disturb_baseline_adv/outputs/V_pretrained.pth
+Saved pretrained Controller_net to: /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/disturb_energy/inv_pend_syn_disturb_baseline_adv/outputs/controller_pretrained.pth
+Pre-training complete. V + GV + Controller initialized.
+Pre-training time: 119.3s
+
+====================
+Bound-based training
+====================
+=== Total cells per region for V ===
+init: 992 cells
+goal: 992 cells
+unsafe: 958 cells
+outside: 948 cells
+Total V cells: 3890
+Created CROWN cache for V with 3890 cells
+/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/src/phi_module.py:603: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  self._cached_scale_D == D
+Created 982 CROWN caches for GV
+Epoch     0 | Total:  834.1068 | Goal:  54.4340 | Unsafe: 182.2379 | Init:   2.2270 | Outside:  61.5993 | Gen: 533.6086 | Time: 2.1s
+=== Detailed Evaluation ===
+Goal:      FAIL, V_lower_min:  -0.194 | 463/992 pass (46.7%)
+Unsafe:    FAIL, V_lower_min:   1.343 | 726/958 pass (75.8%)
+Init:      FAIL, V_upper_max:   1.104 | 935/992 pass (94.3%)
+Outside:   FAIL, V_lower_min:  -0.885 | 793/948 pass (83.6%)
+Generator: FAIL, GV_upper_max:  16.077 | 729/874 pass (145 fail, 16.6%)
+Saved visualization plots for epoch 0 to '/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/disturb_energy/inv_pend_syn_disturb_baseline_adv/training_progress'
+Epoch    10 | Total:  529.1421 | Goal:  38.7916 | Unsafe: 197.1308 | Init:  41.0511 | Outside:  50.9301 | Gen: 201.2384 | Time: 6.0s
+Epoch    20 | Total:  455.6325 | Goal:  33.8225 | Unsafe: 196.8087 | Init:  35.3783 | Outside:  42.7546 | Gen: 146.8683 | Time: 6.9s
+Epoch    30 | Total:  392.2825 | Goal:  29.9398 | Unsafe: 162.5656 | Init:  27.4214 | Outside:  34.9537 | Gen: 137.4021 | Time: 7.8s
+Epoch    40 | Total:  352.8068 | Goal:  21.2661 | Unsafe: 154.7048 | Init:  29.3020 | Outside:  26.0261 | Gen: 121.5078 | Time: 8.8s
+Epoch    50 | Total:  322.9614 | Goal:  17.9640 | Unsafe: 154.3129 | Init:  24.1439 | Outside:  21.6487 | Gen: 104.8919 | Time: 10.0s
+Epoch    60 | Total:  300.2131 | Goal:  16.1371 | Unsafe: 149.4015 | Init:  18.5203 | Outside:  18.9766 | Gen:  97.1777 | Time: 10.9s
+Epoch    70 | Total:  281.6531 | Goal:  15.3054 | Unsafe: 140.5969 | Init:  15.7023 | Outside:  17.1784 | Gen:  92.8702 | Time: 11.8s
+Epoch    80 | Total:  265.2776 | Goal:  14.8499 | Unsafe: 129.7976 | Init:  14.5603 | Outside:  15.9580 | Gen:  90.1118 | Time: 12.8s
+Epoch    90 | Total:  249.1583 | Goal:  14.6240 | Unsafe: 116.3625 | Init:  14.3610 | Outside:  15.0872 | Gen:  88.7236 | Time: 13.7s
+Epoch   100 | Total:  233.2860 | Goal:  15.0857 | Unsafe: 104.4738 | Init:  11.7371 | Outside:  14.7032 | Gen:  87.2862 | Time: 14.6s
+Epoch   110 | Total:  214.8590 | Goal:  15.9018 | Unsafe:  83.7481 | Init:  12.6985 | Outside:  14.6520 | Gen:  87.8585 | Time: 15.5s
+Epoch   120 | Total:  195.7869 | Goal:  16.6758 | Unsafe:  65.7447 | Init:  10.0422 | Outside:  14.6826 | Gen:  88.6417 | Time: 16.4s
+Epoch   130 | Total:  179.1441 | Goal:  16.9425 | Unsafe:  51.1800 | Init:   7.8287 | Outside:  14.1892 | Gen:  89.0037 | Time: 17.3s
+Epoch   140 | Total:  162.6711 | Goal:  16.2610 | Unsafe:  37.1014 | Init:   7.4478 | Outside:  13.1543 | Gen:  88.7066 | Time: 18.3s
+Epoch   150 | Total:  150.7950 | Goal:  13.4800 | Unsafe:  31.6330 | Init:   9.5302 | Outside:  11.1826 | Gen:  84.9694 | Time: 19.2s
+Epoch   160 | Total:  141.2504 | Goal:  13.3548 | Unsafe:  32.5881 | Init:   3.8901 | Outside:  10.4874 | Gen:  80.9299 | Time: 20.1s
+Epoch   170 | Total:  132.6692 | Goal:  11.0510 | Unsafe:  30.2425 | Init:   4.3245 | Outside:   8.9579 | Gen:  78.0933 | Time: 21.1s
+Epoch   180 | Total:  126.2103 | Goal:   8.4125 | Unsafe:  27.2118 | Init:   6.7178 | Outside:   7.3777 | Gen:  76.4904 | Time: 22.0s
+Epoch   190 | Total:  119.5728 | Goal:   7.7633 | Unsafe:  25.0525 | Init:   5.0615 | Outside:   6.7597 | Gen:  74.9359 | Time: 22.9s
+Epoch   200 | Total:  113.2272 | Goal:   6.4011 | Unsafe:  22.1551 | Init:   4.6441 | Outside:   5.8383 | Gen:  74.1886 | Time: 24.0s
+Epoch   210 | Total:  106.4721 | Goal:   6.3822 | Unsafe:  19.9850 | Init:   2.7899 | Outside:   5.6546 | Gen:  71.6604 | Time: 24.9s
+Epoch   220 | Total:  100.2882 | Goal:   4.2439 | Unsafe:  16.1350 | Init:   4.3397 | Outside:   4.4805 | Gen:  71.0891 | Time: 26.1s
+Epoch   230 | Total:   93.7838 | Goal:   3.9250 | Unsafe:  15.1225 | Init:   2.5974 | Outside:   4.2097 | Gen:  67.9293 | Time: 27.0s
+Epoch   240 | Total:   87.7625 | Goal:   3.0095 | Unsafe:  13.8550 | Init:   1.9710 | Outside:   3.6506 | Gen:  65.2766 | Time: 28.0s
+Epoch   250 | Total:   81.7100 | Goal:   1.7314 | Unsafe:  10.3157 | Init:   2.8118 | Outside:   2.9005 | Gen:  63.9506 | Time: 29.0s
+Epoch   260 | Total:   76.2020 | Goal:   0.8236 | Unsafe:   8.0032 | Init:   3.1190 | Outside:   2.3720 | Gen:  61.8842 | Time: 29.8s
+Epoch   270 | Total:   70.1562 | Goal:   0.3029 | Unsafe:   4.6193 | Init:   2.6854 | Outside:   1.9240 | Gen:  60.6246 | Time: 30.8s
+Epoch   280 | Total:   65.7418 | Goal:   0.1536 | Unsafe:   4.5293 | Init:   1.8884 | Outside:   1.7606 | Gen:  57.4098 | Time: 31.6s
+Epoch   290 | Total:   62.7397 | Goal:   0.0009 | Unsafe:   3.6229 | Init:   2.0976 | Outside:   1.4258 | Gen:  55.5925 | Time: 32.6s
+Epoch   300 | Total:   60.4288 | Goal:   0.0183 | Unsafe:   2.9626 | Init:   1.4718 | Outside:   1.4522 | Gen:  54.5239 | Time: 33.4s
+Epoch   310 | Total:   57.9403 | Goal:   0.0000 | Unsafe:   3.1765 | Init:   0.8818 | Outside:   1.1887 | Gen:  52.6933 | Time: 34.4s
+Epoch   320 | Total:   55.7441 | Goal:   0.0000 | Unsafe:   2.2199 | Init:   0.7346 | Outside:   1.1976 | Gen:  51.5920 | Time: 35.2s
+Epoch   330 | Total:   53.8870 | Goal:   0.0000 | Unsafe:   2.3936 | Init:   0.6166 | Outside:   0.9801 | Gen:  49.8966 | Time: 36.1s
+Epoch   340 | Total:   52.3629 | Goal:   0.0000 | Unsafe:   2.2028 | Init:   0.6277 | Outside:   0.8007 | Gen:  48.7317 | Time: 37.0s
+Epoch   350 | Total:   51.0315 | Goal:   0.0000 | Unsafe:   1.8820 | Init:   0.7648 | Outside:   0.6637 | Gen:  47.7209 | Time: 37.9s
+Epoch   360 | Total:   49.6193 | Goal:   0.0000 | Unsafe:   2.1369 | Init:   0.4202 | Outside:   0.5522 | Gen:  46.5100 | Time: 39.1s
+Epoch   370 | Total:   48.3171 | Goal:   0.0000 | Unsafe:   1.8613 | Init:   0.4190 | Outside:   0.4473 | Gen:  45.5895 | Time: 40.2s
+Epoch   380 | Total:   47.2297 | Goal:   0.0000 | Unsafe:   1.5216 | Init:   0.5285 | Outside:   0.3303 | Gen:  44.8493 | Time: 41.1s
+Epoch   390 | Total:   46.0277 | Goal:   0.0000 | Unsafe:   1.7641 | Init:   0.3866 | Outside:   0.2654 | Gen:  43.6116 | Time: 42.0s
+Epoch   400 | Total:   44.9762 | Goal:   0.0000 | Unsafe:   1.5595 | Init:   0.4402 | Outside:   0.2237 | Gen:  42.7528 | Time: 43.0s
+Epoch   410 | Total:   43.8878 | Goal:   0.0000 | Unsafe:   1.6510 | Init:   0.4515 | Outside:   0.1839 | Gen:  41.6014 | Time: 43.9s
+Epoch   420 | Total:   42.6094 | Goal:   0.0000 | Unsafe:   1.6057 | Init:   0.4749 | Outside:   0.1618 | Gen:  40.3671 | Time: 44.8s
+Epoch   430 | Total:   40.6980 | Goal:   0.0000 | Unsafe:   1.6423 | Init:   0.6396 | Outside:   0.1334 | Gen:  38.2826 | Time: 45.7s
+Epoch   440 | Total:   37.1426 | Goal:   0.0000 | Unsafe:   2.2509 | Init:   0.5954 | Outside:   0.1290 | Gen:  34.1672 | Time: 46.6s
+Epoch   450 | Total:   34.2085 | Goal:   0.0000 | Unsafe:   1.8878 | Init:   0.7765 | Outside:   0.1305 | Gen:  31.4137 | Time: 47.5s
+Epoch   460 | Total:   32.8046 | Goal:   0.0000 | Unsafe:   1.1725 | Init:   0.5425 | Outside:   0.1478 | Gen:  30.9418 | Time: 48.4s
+Epoch   470 | Total:   31.7091 | Goal:   0.0000 | Unsafe:   0.9706 | Init:   0.3344 | Outside:   0.1456 | Gen:  30.2586 | Time: 49.3s
+Epoch   480 | Total:   30.7776 | Goal:   0.0000 | Unsafe:   0.7881 | Init:   0.3259 | Outside:   0.1336 | Gen:  29.5299 | Time: 50.2s
+Epoch   490 | Total:   29.9199 | Goal:   0.0000 | Unsafe:   1.0216 | Init:   0.1429 | Outside:   0.1314 | Gen:  28.6239 | Time: 51.1s
+Refining outside cells: 5 failing, refined 5 cells, 963 total
+Refining init cells: 8 failing, refined 8 cells, 1016 total
+Refining unsafe cells: 15 failing, refined 15 cells, 1003 total
+Refining generator cells: 44 failing, refined 44 cells, 1114 total
+Rebuilt V cache with 3974 cells
+/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/src/phi_module.py:603: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  self._cached_scale_D == D
+Rebuilt Phi cache with 1114 cells
+Merging outside cells: merged 2 pairs, 961 total
+Merging generator cells: merged 0 pairs, 1114 total
+Epoch   500 | Total:   19.9635 | Goal:   0.0000 | Unsafe:   0.0082 | Init:   0.4190 | Outside:   0.0000 | Gen:  19.5362 | Time: 53.9s
+Rebuilt V cache with 3972 cells
+Rebuilt Phi cache with 1114 cells
+Epoch   510 | Total:   18.0123 | Goal:   0.0000 | Unsafe:   0.2842 | Init:   0.0000 | Outside:   0.0098 | Gen:  17.7183 | Time: 56.7s
+Epoch   520 | Total:   17.1034 | Goal:   0.0000 | Unsafe:   0.2346 | Init:   0.0000 | Outside:   0.0017 | Gen:  16.8672 | Time: 57.7s
+Epoch   530 | Total:   16.6236 | Goal:   0.0000 | Unsafe:   0.0585 | Init:   0.0000 | Outside:   0.0041 | Gen:  16.5610 | Time: 58.7s
+Epoch   540 | Total:   16.1814 | Goal:   0.0000 | Unsafe:   0.0527 | Init:   0.0000 | Outside:   0.0043 | Gen:  16.1244 | Time: 59.7s
+Epoch   550 | Total:   15.7296 | Goal:   0.0000 | Unsafe:   0.2375 | Init:   0.0000 | Outside:   0.0000 | Gen:  15.4921 | Time: 60.7s
+Epoch   560 | Total:   15.3474 | Goal:   0.0000 | Unsafe:   0.2821 | Init:   0.0000 | Outside:   0.0000 | Gen:  15.0653 | Time: 61.7s
+Epoch   570 | Total:   15.1372 | Goal:   0.0000 | Unsafe:   0.1128 | Init:   0.0000 | Outside:   0.0005 | Gen:  15.0239 | Time: 62.7s
+Epoch   580 | Total:   14.7343 | Goal:   0.0000 | Unsafe:   0.2450 | Init:   0.0000 | Outside:   0.0000 | Gen:  14.4893 | Time: 63.7s
+Epoch   590 | Total:   14.2853 | Goal:   0.0000 | Unsafe:   0.4851 | Init:   0.0000 | Outside:   0.0005 | Gen:  13.7996 | Time: 64.7s
+Epoch   600 | Total:   13.6670 | Goal:   0.0000 | Unsafe:   0.1854 | Init:   0.0000 | Outside:   0.0048 | Gen:  13.4768 | Time: 65.7s
+Epoch   610 | Total:   13.3197 | Goal:   0.0000 | Unsafe:   0.0623 | Init:   0.0000 | Outside:   0.0084 | Gen:  13.2490 | Time: 66.7s
+Epoch   620 | Total:   12.9479 | Goal:   0.0000 | Unsafe:   0.0693 | Init:   0.0000 | Outside:   0.0223 | Gen:  12.8562 | Time: 67.7s
+Epoch   630 | Total:   12.5309 | Goal:   0.0000 | Unsafe:   0.1426 | Init:   0.0000 | Outside:   0.0296 | Gen:  12.3586 | Time: 68.7s
+Epoch   640 | Total:   12.1624 | Goal:   0.0000 | Unsafe:   0.0518 | Init:   0.0000 | Outside:   0.0249 | Gen:  12.0856 | Time: 69.7s
+Epoch   650 | Total:   11.8116 | Goal:   0.0000 | Unsafe:   0.0558 | Init:   0.0000 | Outside:   0.0644 | Gen:  11.6915 | Time: 70.7s
+Epoch   660 | Total:   11.5548 | Goal:   0.0000 | Unsafe:   0.0937 | Init:   0.0000 | Outside:   0.0297 | Gen:  11.4313 | Time: 71.7s
+Epoch   670 | Total:   11.2529 | Goal:   0.0000 | Unsafe:   0.0803 | Init:   0.0000 | Outside:   0.0354 | Gen:  11.1372 | Time: 72.7s
+Epoch   680 | Total:   11.0370 | Goal:   0.0000 | Unsafe:   0.1992 | Init:   0.0000 | Outside:   0.0160 | Gen:  10.8218 | Time: 73.7s
+Epoch   690 | Total:   10.6659 | Goal:   0.0000 | Unsafe:   0.1956 | Init:   0.0000 | Outside:   0.0258 | Gen:  10.4445 | Time: 74.7s
+Epoch   700 | Total:   10.5071 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0388 | Gen:  10.4683 | Time: 75.7s
+Epoch   710 | Total:   10.3471 | Goal:   0.0000 | Unsafe:   0.1309 | Init:   0.0000 | Outside:   0.0142 | Gen:  10.2019 | Time: 76.7s
+Epoch   720 | Total:   10.0920 | Goal:   0.0000 | Unsafe:   0.3988 | Init:   0.0000 | Outside:   0.0169 | Gen:   9.6762 | Time: 77.7s
+Epoch   730 | Total:    9.7078 | Goal:   0.0000 | Unsafe:   0.0432 | Init:   0.0000 | Outside:   0.0223 | Gen:   9.6423 | Time: 78.9s
+Epoch   740 | Total:    9.4762 | Goal:   0.0000 | Unsafe:   0.0478 | Init:   0.0000 | Outside:   0.0164 | Gen:   9.4120 | Time: 80.3s
+Epoch   750 | Total:    9.2892 | Goal:   0.0000 | Unsafe:   0.0312 | Init:   0.0000 | Outside:   0.0195 | Gen:   9.2386 | Time: 81.7s
+Epoch   760 | Total:    9.0271 | Goal:   0.0000 | Unsafe:   0.1075 | Init:   0.0000 | Outside:   0.0550 | Gen:   8.8647 | Time: 82.9s
+Epoch   770 | Total:    8.7825 | Goal:   0.0000 | Unsafe:   0.0371 | Init:   0.0000 | Outside:   0.0321 | Gen:   8.7132 | Time: 83.9s
+Epoch   780 | Total:    8.5161 | Goal:   0.0000 | Unsafe:   0.0424 | Init:   0.0000 | Outside:   0.0227 | Gen:   8.4511 | Time: 85.1s
+Epoch   790 | Total:    8.3283 | Goal:   0.0000 | Unsafe:   0.1059 | Init:   0.0000 | Outside:   0.0176 | Gen:   8.2048 | Time: 86.6s
+Epoch   800 | Total:    8.0665 | Goal:   0.0000 | Unsafe:   0.0923 | Init:   0.0000 | Outside:   0.0148 | Gen:   7.9594 | Time: 88.0s
+Epoch   810 | Total:    7.8335 | Goal:   0.0000 | Unsafe:   0.0317 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.8018 | Time: 89.5s
+Epoch   820 | Total:    7.6499 | Goal:   0.0000 | Unsafe:   0.0481 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.6017 | Time: 90.9s
+Epoch   830 | Total:    7.5081 | Goal:   0.0000 | Unsafe:   0.0439 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.4642 | Time: 92.1s
+Epoch   840 | Total:    7.4089 | Goal:   0.0000 | Unsafe:   0.0212 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.3877 | Time: 93.4s
+Epoch   850 | Total:    7.2932 | Goal:   0.0000 | Unsafe:   0.0447 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.2485 | Time: 94.6s
+Epoch   860 | Total:    7.2368 | Goal:   0.0000 | Unsafe:   0.0294 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.2074 | Time: 95.8s
+Epoch   870 | Total:    7.0484 | Goal:   0.0000 | Unsafe:   0.0312 | Init:   0.0000 | Outside:   0.0000 | Gen:   7.0172 | Time: 97.1s
+Epoch   880 | Total:    6.9664 | Goal:   0.0000 | Unsafe:   0.1010 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.8654 | Time: 98.3s
+Epoch   890 | Total:    6.8453 | Goal:   0.0000 | Unsafe:   0.0180 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.8272 | Time: 99.4s
+Epoch   900 | Total:    6.7271 | Goal:   0.0000 | Unsafe:   0.0168 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.7104 | Time: 100.4s
+Epoch   910 | Total:    6.5878 | Goal:   0.0000 | Unsafe:   0.0222 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.5655 | Time: 101.4s
+Epoch   920 | Total:    6.4449 | Goal:   0.0000 | Unsafe:   0.0175 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.4274 | Time: 102.3s
+Epoch   930 | Total:    6.3368 | Goal:   0.0000 | Unsafe:   0.0933 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.2434 | Time: 103.4s
+Epoch   940 | Total:    6.2265 | Goal:   0.0000 | Unsafe:   0.0201 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.2063 | Time: 104.3s
+Epoch   950 | Total:    6.0770 | Goal:   0.0000 | Unsafe:   0.0282 | Init:   0.0000 | Outside:   0.0000 | Gen:   6.0489 | Time: 105.4s
+Epoch   960 | Total:    5.9429 | Goal:   0.0000 | Unsafe:   0.0437 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.8991 | Time: 106.3s
+Epoch   970 | Total:    5.8215 | Goal:   0.0000 | Unsafe:   0.0787 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.7428 | Time: 107.3s
+Epoch   980 | Total:    5.6949 | Goal:   0.0000 | Unsafe:   0.0350 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.6598 | Time: 108.4s
+Epoch   990 | Total:    5.6212 | Goal:   0.0000 | Unsafe:   0.0065 | Init:   0.0000 | Outside:   0.0000 | Gen:   5.6147 | Time: 109.4s
+Refining unsafe cells: 1 failing, refined 1 cells, 1006 total
+Refining generator cells: 36 failing, refined 36 cells, 1222 total
+Rebuilt V cache with 3975 cells
+Rebuilt Phi cache with 1222 cells
+Epoch  1000 | Total:    2.9833 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.9833 | Time: 112.3s
+=== Detailed Evaluation ===
+Goal:      PASS, V_lower_min:   0.056 | 992/992 pass (100.0%)
+Unsafe:    PASS, V_lower_min:   3.009 | 1006/1006 pass (100.0%)
+Init:      PASS, V_upper_max:   0.943 | 1016/1016 pass (100.0%)
+Outside:   PASS, V_lower_min:   0.037 | 961/961 pass (100.0%)
+Generator: FAIL, GV_upper_max:   0.123 | 1018/1065 pass (47 fail, 4.4%)
+Saved visualization plots for epoch 1000 to '/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/disturb_energy/inv_pend_syn_disturb_baseline_adv/training_progress'
+Merging outside cells: merged 0 pairs, 961 total
+Merging generator cells: merged 0 pairs, 1222 total
+Rebuilt V cache with 3975 cells
+/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/src/phi_module.py:603: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  self._cached_scale_D == D
+Rebuilt Phi cache with 1222 cells
+Epoch  1010 | Total:    2.7278 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.7278 | Time: 118.3s
+Epoch  1020 | Total:    2.5429 | Goal:   0.0000 | Unsafe:   0.0217 | Init:   0.0079 | Outside:   0.0000 | Gen:   2.5133 | Time: 119.7s
+Epoch  1030 | Total:    2.4405 | Goal:   0.0000 | Unsafe:   0.0143 | Init:   0.0741 | Outside:   0.0000 | Gen:   2.3521 | Time: 121.8s
+Epoch  1040 | Total:    3.6244 | Goal:   0.0000 | Unsafe:   0.9010 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.7234 | Time: 123.4s
+Epoch  1050 | Total:    3.3921 | Goal:   0.0000 | Unsafe:   0.3630 | Init:   0.0000 | Outside:   0.0000 | Gen:   3.0291 | Time: 124.8s
+Epoch  1060 | Total:    2.5361 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.5361 | Time: 125.9s
+Epoch  1070 | Total:    2.5373 | Goal:   0.0000 | Unsafe:   0.0040 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.5333 | Time: 127.3s
+Epoch  1080 | Total:    2.3261 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.3261 | Time: 128.8s
+Epoch  1090 | Total:    2.1469 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.1469 | Time: 130.2s
+Epoch  1100 | Total:    2.0699 | Goal:   0.0000 | Unsafe:   0.0167 | Init:   0.0000 | Outside:   0.0000 | Gen:   2.0532 | Time: 131.5s
+Epoch  1110 | Total:    1.9367 | Goal:   0.0000 | Unsafe:   0.0087 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.9281 | Time: 132.8s
+Epoch  1120 | Total:    1.8310 | Goal:   0.0000 | Unsafe:   0.0101 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.8209 | Time: 134.0s
+Epoch  1130 | Total:    1.7627 | Goal:   0.0000 | Unsafe:   0.0107 | Init:   0.0399 | Outside:   0.0000 | Gen:   1.7121 | Time: 135.1s
+Epoch  1140 | Total:    1.6691 | Goal:   0.0000 | Unsafe:   0.0074 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.6617 | Time: 136.3s
+Epoch  1150 | Total:    1.6025 | Goal:   0.0000 | Unsafe:   0.0181 | Init:   0.0006 | Outside:   0.0000 | Gen:   1.5838 | Time: 137.5s
+Epoch  1160 | Total:    1.5491 | Goal:   0.0000 | Unsafe:   0.0119 | Init:   0.0036 | Outside:   0.0000 | Gen:   1.5336 | Time: 138.7s
+Epoch  1170 | Total:    1.5052 | Goal:   0.0000 | Unsafe:   0.0027 | Init:   0.0186 | Outside:   0.0000 | Gen:   1.4839 | Time: 139.9s
+Epoch  1180 | Total:    1.5004 | Goal:   0.0000 | Unsafe:   0.0272 | Init:   0.0049 | Outside:   0.0000 | Gen:   1.4683 | Time: 141.1s
+Epoch  1190 | Total:    1.5009 | Goal:   0.0000 | Unsafe:   0.0425 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.4584 | Time: 142.2s
+Epoch  1200 | Total:    1.4154 | Goal:   0.0000 | Unsafe:   0.0300 | Init:   0.0007 | Outside:   0.0000 | Gen:   1.3847 | Time: 143.4s
+Epoch  1210 | Total:    1.4057 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0387 | Outside:   0.0000 | Gen:   1.3670 | Time: 144.5s
+Epoch  1220 | Total:    1.3928 | Goal:   0.0000 | Unsafe:   0.0023 | Init:   0.0329 | Outside:   0.0000 | Gen:   1.3576 | Time: 145.6s
+Epoch  1230 | Total:    1.3319 | Goal:   0.0000 | Unsafe:   0.0137 | Init:   0.0039 | Outside:   0.0000 | Gen:   1.3143 | Time: 146.7s
+Epoch  1240 | Total:    1.3203 | Goal:   0.0000 | Unsafe:   0.0176 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.3026 | Time: 147.9s
+Epoch  1250 | Total:    1.3016 | Goal:   0.0000 | Unsafe:   0.0564 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.2452 | Time: 149.0s
+Epoch  1260 | Total:    1.2825 | Goal:   0.0000 | Unsafe:   0.0298 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.2528 | Time: 150.2s
+Epoch  1270 | Total:    1.3025 | Goal:   0.0000 | Unsafe:   0.0726 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.2299 | Time: 151.3s
+Epoch  1280 | Total:    1.2076 | Goal:   0.0000 | Unsafe:   0.0197 | Init:   0.0093 | Outside:   0.0000 | Gen:   1.1786 | Time: 152.4s
+Epoch  1290 | Total:    1.2040 | Goal:   0.0000 | Unsafe:   0.0362 | Init:   0.0154 | Outside:   0.0000 | Gen:   1.1524 | Time: 153.6s
+Epoch  1300 | Total:    1.2088 | Goal:   0.0000 | Unsafe:   0.0080 | Init:   0.0427 | Outside:   0.0000 | Gen:   1.1581 | Time: 154.7s
+Epoch  1310 | Total:    1.1390 | Goal:   0.0000 | Unsafe:   0.0185 | Init:   0.0084 | Outside:   0.0000 | Gen:   1.1121 | Time: 155.9s
+Epoch  1320 | Total:    1.1450 | Goal:   0.0000 | Unsafe:   0.0258 | Init:   0.0027 | Outside:   0.0000 | Gen:   1.1165 | Time: 157.0s
+Epoch  1330 | Total:    1.1066 | Goal:   0.0000 | Unsafe:   0.0005 | Init:   0.0176 | Outside:   0.0000 | Gen:   1.0885 | Time: 158.3s
+Epoch  1340 | Total:    1.1210 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0390 | Outside:   0.0000 | Gen:   1.0820 | Time: 159.4s
+Epoch  1350 | Total:    1.0798 | Goal:   0.0000 | Unsafe:   0.0169 | Init:   0.0039 | Outside:   0.0000 | Gen:   1.0589 | Time: 160.7s
+Epoch  1360 | Total:    1.0670 | Goal:   0.0000 | Unsafe:   0.0126 | Init:   0.0013 | Outside:   0.0000 | Gen:   1.0531 | Time: 162.0s
+Epoch  1370 | Total:    1.0666 | Goal:   0.0000 | Unsafe:   0.0069 | Init:   0.0196 | Outside:   0.0000 | Gen:   1.0401 | Time: 163.1s
+Epoch  1380 | Total:    1.0334 | Goal:   0.0000 | Unsafe:   0.0171 | Init:   0.0000 | Outside:   0.0000 | Gen:   1.0162 | Time: 164.3s
+Epoch  1390 | Total:    0.9938 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0009 | Outside:   0.0000 | Gen:   0.9929 | Time: 165.5s
+Epoch  1400 | Total:    1.0107 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0315 | Outside:   0.0000 | Gen:   0.9791 | Time: 166.8s
+Epoch  1410 | Total:    1.0018 | Goal:   0.0000 | Unsafe:   0.0001 | Init:   0.0127 | Outside:   0.0000 | Gen:   0.9890 | Time: 168.0s
+Epoch  1420 | Total:    1.0072 | Goal:   0.0000 | Unsafe:   0.0336 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.9737 | Time: 169.2s
+Epoch  1430 | Total:    0.9685 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0282 | Outside:   0.0000 | Gen:   0.9403 | Time: 170.4s
+Epoch  1440 | Total:    0.9656 | Goal:   0.0000 | Unsafe:   0.0208 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.9448 | Time: 171.5s
+Epoch  1450 | Total:    0.9663 | Goal:   0.0000 | Unsafe:   0.0227 | Init:   0.0001 | Outside:   0.0000 | Gen:   0.9436 | Time: 172.6s
+Epoch  1460 | Total:    0.9002 | Goal:   0.0000 | Unsafe:   0.0057 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.8945 | Time: 173.8s
+Epoch  1470 | Total:    0.8939 | Goal:   0.0000 | Unsafe:   0.0009 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.8930 | Time: 174.9s
+Epoch  1480 | Total:    0.8889 | Goal:   0.0000 | Unsafe:   0.0090 | Init:   0.0005 | Outside:   0.0000 | Gen:   0.8794 | Time: 176.1s
+Epoch  1490 | Total:    0.9697 | Goal:   0.0000 | Unsafe:   0.0501 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.9196 | Time: 177.3s
+Refining unsafe cells: 23 failing, refined 23 cells, 1075 total
+Refining generator cells: 33 failing, refined 33 cells, 1321 total
+Rebuilt V cache with 4044 cells
+Rebuilt Phi cache with 1321 cells
+Epoch  1500 | Total:    0.3969 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.3969 | Time: 180.5s
+Merging outside cells: merged 0 pairs, 961 total
+Merging generator cells: merged 0 pairs, 1321 total
+Rebuilt V cache with 4044 cells
+Rebuilt Phi cache with 1321 cells
+Epoch  1510 | Total:    0.4535 | Goal:   0.0000 | Unsafe:   0.0603 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.3932 | Time: 183.8s
+Epoch  1520 | Total:    0.3091 | Goal:   0.0000 | Unsafe:   0.0067 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.3025 | Time: 184.9s
+Epoch  1530 | Total:    0.2609 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.2609 | Time: 186.0s
+Epoch  1540 | Total:    0.2210 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.2210 | Time: 187.2s
+Epoch  1550 | Total:    0.1662 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.1662 | Time: 188.3s
+Epoch  1560 | Total:    0.1459 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.1459 | Time: 189.4s
+Epoch  1570 | Total:    0.1236 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.1236 | Time: 190.5s
+Epoch  1580 | Total:    0.1019 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.1019 | Time: 191.9s
+Epoch  1590 | Total:    0.1056 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.1056 | Time: 193.4s
+Epoch  1600 | Total:    0.0948 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0948 | Time: 194.6s
+Epoch  1610 | Total:    0.0791 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0791 | Time: 196.1s
+Epoch  1620 | Total:    0.0665 | Goal:   0.0000 | Unsafe:   0.0056 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0609 | Time: 197.3s
+Epoch  1630 | Total:    0.0625 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0625 | Time: 198.7s
+Epoch  1640 | Total:    0.0587 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0587 | Time: 200.2s
+Epoch  1650 | Total:    0.0635 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0077 | Outside:   0.0000 | Gen:   0.0558 | Time: 201.8s
+Epoch  1660 | Total:    0.0488 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0016 | Outside:   0.0000 | Gen:   0.0473 | Time: 202.9s
+Epoch  1670 | Total:    0.0474 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0003 | Outside:   0.0000 | Gen:   0.0471 | Time: 204.1s
+Epoch  1680 | Total:    0.0468 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0468 | Time: 205.2s
+Epoch  1690 | Total:    0.0782 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0782 | Time: 206.4s
+Epoch  1700 | Total:    0.0694 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0694 | Time: 207.5s
+Epoch  1710 | Total:    0.0667 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0667 | Time: 209.0s
+Epoch  1720 | Total:    0.0596 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0020 | Outside:   0.0000 | Gen:   0.0577 | Time: 210.3s
+Epoch  1730 | Total:    0.0488 | Goal:   0.0000 | Unsafe:   0.0002 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0486 | Time: 211.8s
+Epoch  1740 | Total:    0.0427 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0031 | Outside:   0.0000 | Gen:   0.0395 | Time: 213.4s
+Epoch  1750 | Total:    0.0396 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0396 | Time: 214.9s
+Epoch  1760 | Total:    0.0488 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0488 | Time: 216.4s
+Epoch  1770 | Total:    0.0496 | Goal:   0.0000 | Unsafe:   0.0014 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0482 | Time: 217.9s
+Epoch  1780 | Total:    0.0490 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0490 | Time: 219.3s
+Epoch  1790 | Total:    0.0392 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0392 | Time: 220.4s
+Epoch  1800 | Total:    0.0393 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0393 | Time: 221.5s
+Epoch  1810 | Total:    0.0434 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0434 | Time: 222.7s
+Epoch  1820 | Total:    0.0558 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0070 | Outside:   0.0000 | Gen:   0.0488 | Time: 223.8s
+Epoch  1830 | Total:    0.0413 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0413 | Time: 224.9s
+Epoch  1840 | Total:    0.0363 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0363 | Time: 226.0s
+Epoch  1850 | Total:    0.0461 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0018 | Outside:   0.0000 | Gen:   0.0443 | Time: 227.2s
+Epoch  1860 | Total:    0.0393 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0393 | Time: 228.3s
+Epoch  1870 | Total:    0.0379 | Goal:   0.0000 | Unsafe:   0.0025 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0354 | Time: 229.4s
+Epoch  1880 | Total:    0.0366 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0366 | Time: 230.5s
+Epoch  1890 | Total:    0.1076 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0735 | Outside:   0.0000 | Gen:   0.0340 | Time: 231.7s
+Epoch  1900 | Total:    0.0533 | Goal:   0.0000 | Unsafe:   0.0038 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0495 | Time: 232.8s
+Epoch  1910 | Total:    0.0504 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0504 | Time: 234.0s
+Epoch  1920 | Total:    0.0377 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0377 | Time: 235.3s
+Epoch  1930 | Total:    0.0346 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0346 | Time: 236.4s
+Epoch  1940 | Total:    0.0321 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0321 | Time: 237.5s
+Epoch  1950 | Total:    0.0404 | Goal:   0.0000 | Unsafe:   0.0022 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0382 | Time: 238.6s
+Epoch  1960 | Total:    0.0331 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0040 | Outside:   0.0000 | Gen:   0.0291 | Time: 239.8s
+Epoch  1970 | Total:    0.0343 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0343 | Time: 241.2s
+Epoch  1980 | Total:    0.0282 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0282 | Time: 242.4s
+Epoch  1990 | Total:    0.0271 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0006 | Outside:   0.0000 | Gen:   0.0265 | Time: 243.7s
+Refining generator cells: 6 failing, refined 6 cells, 1339 total
+Rebuilt Phi cache with 1339 cells
+Epoch  2000 | Total:    0.0000 | Goal:   0.0000 | Unsafe:   0.0000 | Init:   0.0000 | Outside:   0.0000 | Gen:   0.0000 | Time: 246.0s
+Applied refine_interval_after_first_sat=500 to enabled refinement regions
+Saved resume checkpoint -> /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/disturb_energy/inv_pend_syn_disturb_baseline_adv/outputs/resume_checkpoint.pth
+Saved eval bundle -> /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/disturb_energy/inv_pend_syn_disturb_baseline_adv/outputs/eval_bundle.pth
+No curriculum mode provided; saved checkpoint and stopped at first SAT.
+
+Training completed in 246.42 seconds (4.11 minutes)
+
+====================
+Final Evaluation
+====================
+Goal:      PASS, V_lower_min:   0.085
+Unsafe:    PASS, V_lower_min:   3.005
+Init:      PASS, V_upper_max:   0.991
+Outside:   PASS, V_lower_min:   0.072
+Generator: PASS, GV_upper_max:  -0.001
+
+====================
+Visualizations
+====================
+All plots saved to '/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/disturb_energy/inv_pend_syn_disturb_baseline_adv/results/'

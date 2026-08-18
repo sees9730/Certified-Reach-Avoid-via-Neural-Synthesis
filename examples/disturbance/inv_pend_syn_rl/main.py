@@ -205,7 +205,8 @@ class ActorCritic(nn.Module):
 # =========================================================================
 # Episode rollout
 # =========================================================================
-def rollout_episode(policy: ActorCritic, rng: np.random.Generator, device):
+def rollout_episode(policy: ActorCritic, rng: np.random.Generator, device,
+                    use_shaping: bool = True):
     """
     Collect one episode using the current policy.
 
@@ -239,10 +240,6 @@ def rollout_episode(policy: ActorCritic, rng: np.random.Generator, device):
         # Domain-exit check (excessive rotation / angular speed) → fail
         out_of_domain = not (X1_MIN <= x1n <= X1_MAX) or not (X2_MIN <= x2n <= X2_MAX)
 
-        # Potential-based shaping: GAMMA * cos(x1_next) − cos(x1_curr)
-        # Rewards progress toward upright (x1=0) on every step
-        shaping = C_SHAPE * (GAMMA * np.cos(x1n) - np.cos(x1))
-
         # Reward based on next state
         if out_of_domain:
             r, done, outcome = R_FAIL, True, "fail"
@@ -251,7 +248,11 @@ def rollout_episode(policy: ActorCritic, rng: np.random.Generator, device):
         elif _in_box(x1n, x2n, UNSAFE_1) or _in_box(x1n, x2n, UNSAFE_2):
             r, done, outcome = R_FAIL, True, "fail"
         else:
-            r    = shaping
+            if use_shaping:
+                # Potential-based shaping: GAMMA * cos(x1_next) − cos(x1_curr)
+                r = C_SHAPE * (GAMMA * np.cos(x1n) - np.cos(x1))
+            else:
+                r = 0.0   # naive: purely sparse reward
             done = False
 
         states.append([x1, x2])
@@ -343,14 +344,31 @@ def ppo_update(policy: ActorCritic, optimizer: torch.optim.Optimizer,
 # Main training loop
 # =========================================================================
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(
+        description="PPO training for inverted pendulum."
+    )
+    parser.add_argument(
+        "--naive_rl", type=int, default=0,
+        help=(
+            "0 (default): use potential-based shaping reward (C_SHAPE*(γ·cos(x1')-cos(x1))). "
+            "1: use purely sparse reward (+R_SUCCESS / -R_FAIL / 0). "
+            "Saves as naive_rl_controller.pth when 1."
+        ),
+    )
+    args = parser.parse_args()
+    USE_SHAPING = not bool(args.naive_rl)
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    reward_str = "sparse (naive)" if not USE_SHAPING else "potential-shaping"
     print("=" * 60)
     print("PPO Training — Inverted Pendulum (stochastic set-valued drift)")
     print(f"  L ~ Uniform{PARAM_RANGES['L']},  sigma = {sigma}")
     print(f"  Device : {device}")
     print(f"  Updates: {N_UPDATES},  episodes/update: {N_COLLECT}")
+    print(f"  Reward : {reward_str}")
     print("=" * 60)
 
     rng    = np.random.default_rng(seed=42)
@@ -367,7 +385,8 @@ def main():
         outcomes = {"success": 0, "fail": 0, "timeout": 0}
 
         for _ in range(N_COLLECT):
-            S, A, R, LP, V, lv, outcome = rollout_episode(policy, rng, device)
+            S, A, R, LP, V, lv, outcome = rollout_episode(policy, rng, device,
+                                                           use_shaping=USE_SHAPING)
             adv, ret = compute_gae(R, V, lv)
             Ss.append(S);   As.append(A)
             Rets.append(ret); Advs.append(adv); LPs.append(LP)
@@ -407,7 +426,8 @@ def main():
 
     # ---- save as WrapperConterlNN state_dict (IS_PRETRAINED=True) ----
     u_nn      = WrapperConterlNN(policy.actor)
-    save_path = OUTPUT_DIR / "rl_controller.pth"
+    fname     = "naive_rl_controller.pth" if not USE_SHAPING else "rl_controller.pth"
+    save_path = OUTPUT_DIR / fname
     torch.save(u_nn.state_dict(), save_path)
     print(f"Saved: {save_path}")
     print("  → load in plot.py with IS_PRETRAINED=True")

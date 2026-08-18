@@ -99,11 +99,12 @@ PARAM_RANGES = {
 # -----------------------------------------------------------------------
 # Per-controller style
 # -----------------------------------------------------------------------
-_pal = sns.color_palette("Set2", 3)
+_pal = sns.color_palette("Set2", 4)
 CTRL_STYLES = [
-    {"color": _pal[0], "ls": "-",  "lw": 2.0, "label": "Cert. (closed-form)"},   # solid
-    {"color": _pal[1], "ls": "--", "lw": 2.0, "label": "Cert. (partition-based)"},  # dashed
-    {"color": _pal[2], "ls": ":",  "lw": 2.0, "label": "RL"},            # dotted
+    {"color": _pal[0], "ls": "-",  "lw": 2.0, "label": "Cert. (closed-form)"},    # solid
+    {"color": _pal[1], "ls": "--", "lw": 2.0, "label": "Cert. (partition-based)"},# dashed
+    {"color": _pal[2], "ls": ":",  "lw": 2.0, "label": "RL"},                     # dotted
+    {"color": _pal[3], "ls": "-.", "lw": 2.0, "label": "REINFORCE"},              # dash-dot
 ]
 
 # -----------------------------------------------------------------------
@@ -145,6 +146,31 @@ def sample_param_set(rng, param_ranges):
         rng.uniform(*param_ranges["b"]),
         rng.uniform(*param_ranges["m"]),
     ], dtype=float)
+
+
+# -----------------------------------------------------------------------
+# Parameter vertices  (corners of the hyper-rectangular set Λ)
+# -----------------------------------------------------------------------
+def get_param_vertices(param_ranges: dict = None) -> list:
+    """
+    Return all vertices of the parameter hyper-rectangle Λ.
+
+    Each vertex is a dict {param: value} where every parameter is fixed at
+    either its minimum or maximum.  Degenerate dimensions (min == max) produce
+    only one value, so the total number of vertices is 2^d where d is the
+    number of non-degenerate parameters.
+
+    For the current PARAM_RANGES (only L varies), this yields 2 vertices:
+        [{"g": 9.81, "L": 0.40, "b": 0.10, "m": 0.15},
+         {"g": 9.81, "L": 0.60, "b": 0.10, "m": 0.15}]
+    """
+    import itertools
+    if param_ranges is None:
+        param_ranges = PARAM_RANGES
+    keys   = list(param_ranges.keys())
+    levels = [sorted(set(param_ranges[k])) for k in keys]   # {min} or {min, max}
+    return [{k: v for k, v in zip(keys, combo)}
+            for combo in itertools.product(*levels)]
 
 
 # -----------------------------------------------------------------------
@@ -192,16 +218,22 @@ def rollout_mc(
     param_ranges:  dict  = None,
     seed:          int   = 42,
     n_paths:       int   = 20,
+    fixed_params:  dict  = None,
+    fixed_x0:      tuple = None,
 ):
     """
     Euler-Maruyama rollout with parametric set-valued drift.
-    Physical parameters (g, L, b, m) are sampled once per trajectory
-    from param_ranges (uniform), matching test_invpend_dynamics.py.
 
-    Initial conditions and parameters are pre-generated from a root RNG so
-    that every controller sees the same (x0, params) for each trajectory i.
-    Per-step noise uses a per-trajectory RNG seeded by (seed, i) so the
-    noise sequence is also identical across controllers for each trajectory.
+    Nominal mode (fixed_params=None):
+        Parameters sampled uniformly once per trajectory from param_ranges.
+        Initial conditions and parameters are pre-generated so every
+        controller sees the same (x0_i, params_i) for trajectory i.
+        Per-step noise uses a per-trajectory RNG seeded by (seed, i).
+
+    Vertex mode (fixed_params=dict):
+        All trajectories use the same fixed parameter values.
+        Used for adversarial vertex evaluation: run at each corner of Λ,
+        then take the worst-case success rate across vertices.
 
     Returns dict:
         outcomes  : list[str]            'success' | 'fail' | 'timeout'
@@ -213,12 +245,20 @@ def rollout_mc(
     if param_ranges is None:
         param_ranges = PARAM_RANGES
 
-    # Pre-generate all initial conditions so every controller gets the same
-    # (x0_i, params_i) regardless of how long other trajectories ran.
     root_rng = np.random.default_rng(seed)
-    x1_init  = root_rng.uniform(X_init_bounds["x1_min"], X_init_bounds["x1_max"], size=n_mc)
-    x2_init  = root_rng.uniform(X_init_bounds["x2_min"], X_init_bounds["x2_max"], size=n_mc)
-    params_list = [sample_param_set(root_rng, param_ranges) for _ in range(n_mc)]
+    if fixed_x0 is not None:
+        x1_init = np.full(n_mc, fixed_x0[0])
+        x2_init = np.full(n_mc, fixed_x0[1])
+    else:
+        x1_init = root_rng.uniform(X_init_bounds["x1_min"], X_init_bounds["x1_max"], size=n_mc)
+        x2_init = root_rng.uniform(X_init_bounds["x2_min"], X_init_bounds["x2_max"], size=n_mc)
+
+    if fixed_params is not None:
+        gf, Lf, bf, mf = (fixed_params["g"], fixed_params["L"],
+                          fixed_params["b"], fixed_params["m"])
+        params_list = [(gf, Lf, bf, mf)] * n_mc
+    else:
+        params_list = [sample_param_set(root_rng, param_ranges) for _ in range(n_mc)]
 
     N_steps = int(T_max / dt)
 
@@ -230,7 +270,7 @@ def rollout_mc(
 
     for i in range(n_mc):
         x1, x2 = float(x1_init[i]), float(x2_init[i])
-        gk, Lk, bk, mk = params_list[i]
+        gk, Lk, bk, mk = params_list[i]   # Lk used only in nominal mode
 
         # Per-trajectory noise RNG — same seed for every controller on trajectory i
         traj_rng = np.random.default_rng([seed, i])
@@ -369,19 +409,32 @@ def rollout_viz_paths(
     dt:            float = 0.005,
     param_ranges:  dict  = None,
     seed:          int   = 42,
+    fixed_params:  dict  = None,
+    fixed_x0:      tuple = None,
 ):
-    """Returns a list of (K, 2) phase-state arrays.
+    """Returns a list of (K, 2) phase-state arrays extended to T_hit + t_extra.
     Uses pre-generated initial conditions and per-trajectory noise RNGs so
-    all controllers start from identical (x0, params, noise) per path.
+    all controllers start from identical (x0, noise) per path.
+    If fixed_params is provided, all paths use those fixed parameter values.
+    If fixed_x0 is provided, all paths start from that point.
     """
     if param_ranges is None:
         param_ranges = PARAM_RANGES
 
-    # Pre-generate initial conditions shared across all controllers
     root_rng = np.random.default_rng(seed)
-    x1_init  = root_rng.uniform(X_init_bounds["x1_min"], X_init_bounds["x1_max"], size=n_paths)
-    x2_init  = root_rng.uniform(X_init_bounds["x2_min"], X_init_bounds["x2_max"], size=n_paths)
-    params_list = [sample_param_set(root_rng, param_ranges) for _ in range(n_paths)]
+    if fixed_x0 is not None:
+        x1_init = np.full(n_paths, fixed_x0[0])
+        x2_init = np.full(n_paths, fixed_x0[1])
+    else:
+        x1_init = root_rng.uniform(X_init_bounds["x1_min"], X_init_bounds["x1_max"], size=n_paths)
+        x2_init = root_rng.uniform(X_init_bounds["x2_min"], X_init_bounds["x2_max"], size=n_paths)
+
+    if fixed_params is not None:
+        gf, Lf, bf, mf = (fixed_params["g"], fixed_params["L"],
+                          fixed_params["b"], fixed_params["m"])
+        params_list = [(gf, Lf, bf, mf)] * n_paths
+    else:
+        params_list = [sample_param_set(root_rng, param_ranges) for _ in range(n_paths)]
 
     N_steps   = int((T_max + t_extra) / dt)
     paths_out = []
@@ -658,15 +711,70 @@ def print_summary(label, stats):
 # -----------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------
+def _print_vertex_table(vertex_results: dict):
+    """
+    Print worst-case reach-avoid probability table across all vertices.
+
+    vertex_results : {label: [(vertex_dict, stats), ...]}
+    """
+    w = 70
+    print(f"\n{'='*w}")
+    print("  Adversarial Vertex Evaluation  (worst-case over corners of Λ)")
+    print(f"{'='*w}")
+    print(f"  {'Controller':<28}  {'Worst vertex (L)':<18}  {'p_success':>10}")
+    print(f"  {'-'*28}  {'-'*18}  {'-'*10}")
+    for label, vlist in vertex_results.items():
+        worst = min(vlist, key=lambda x: x[1]["p_success"])
+        v, st = worst
+        v_str = "  ".join(f"{k}={v:.2f}" for k, v in v.items() if PARAM_RANGES[k][0] != PARAM_RANGES[k][1])
+        print(f"  {label:<28}  {v_str:<18}  {st['p_success']:>10.4f}  "
+              f"({st['n_success']}/{st['n_mc']})")
+    print(f"{'='*w}")
+
+
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(
+        description="MC comparison of inv-pend controllers under parametric uncertainty."
+    )
+    parser.add_argument(
+        "--use-adversarial", type=int, default=0,
+        help=(
+            "0 (default): parameters sampled uniformly from Λ per trajectory. "
+            "1: evaluate at every vertex of Λ (corners of the hyper-rectangle) "
+            "and report the worst-case reach-avoid probability across all vertices."
+        ),
+    )
+    parser.add_argument(
+        "--naive_rl", type=int, default=0,
+        help=(
+            "0 (default): compare the three standard controllers. "
+            "1: also load naive_rl_controller.pth (REINFORCE) "
+            "from inv_pend_syn_rl/outputs/ and add it to the comparison."
+        ),
+    )
+    args = parser.parse_args()
+    USE_ADVERSARIAL = bool(args.use_adversarial)
+    NAIVE_RL        = bool(args.naive_rl)
+
     bundle_specs = [
         (OUTPUT_DIR / "eval_bundle.pth",),
         (ROOT / "examples" / "disturbance" / "inv_pend_syn_global"
               / "outputs" / "eval_bundle.pth",),
-        (ROOT / "examples" / "disturbance" / "inv_pend_syn_rl"
-              / "outputs" / "rl_controller.pth",),
+
+        (OUTPUT_DIR / "controller_pretrained.pth",),
+        # (ROOT / "examples" / "disturbance" / "inv_pend_syn_rl"
+        #       / "outputs" / "rl_controller.pth",),
+        
     ]
     IS_PRETRAINED = [False, False, True]
+
+    if NAIVE_RL:
+        bundle_specs.append((
+            ROOT / "examples" / "disturbance" / "inv_pend_syn_rl"
+                 / "outputs" / "naive_rl_controller.pth",
+        ))
+        IS_PRETRAINED.append(True)
 
     for (path,), style, is_pt in zip(bundle_specs, CTRL_STYLES, IS_PRETRAINED):
         if not path.exists():
@@ -681,12 +789,15 @@ def main():
     SEED    = 42
     N_PATHS = 10
 
+    # -----------------------------------------------------------------------
+    # Nominal evaluation  (uniform parameter sampling)
+    # -----------------------------------------------------------------------
+    print(f"\nNominal MC: parameters sampled uniformly from Λ  (n={N_MC})")
     entries = []
     for (path,), style, is_pt in zip(bundle_specs, CTRL_STYLES, IS_PRETRAINED):
         label = style["label"]
-        print(f"\nLoading '{label}'\n  {path}")
+        print(f"  [{label}]")
         ctrl  = load_control_net(path, pretrained_state_dict=is_pt)
-        print(f"  Running MC (n={N_MC}, parametric-uniform, L∈[0.40,0.60]) ...")
         res   = rollout_mc(ctrl, n_mc=N_MC, T_max=T_MAX, dt=DT, seed=SEED, n_paths=N_PATHS)
         stats = compute_stats(res)
         print_summary(label, stats)
@@ -695,15 +806,46 @@ def main():
     viz_paths_per_ctrl = []
     for (path,), style, is_pt in zip(bundle_specs, CTRL_STYLES, IS_PRETRAINED):
         ctrl = load_control_net(path, pretrained_state_dict=is_pt)
-        viz_paths_per_ctrl.append(rollout_viz_paths(
-            ctrl, n_paths=N_PATHS, T_max=T_MAX, t_extra=1.0, dt=DT, seed=SEED,
-        ))
+        viz_paths_per_ctrl.append(
+            rollout_viz_paths(ctrl, n_paths=N_PATHS, T_max=T_MAX, t_extra=1.0, dt=DT, seed=SEED)
+        )
 
     SAVE_DIR = str(OUTPUT_DIR)
     plot_state_trajectories(entries, viz_paths_per_ctrl, DT, save_dir=SAVE_DIR)
     plot_phase_trajectories(entries, viz_paths_per_ctrl, save_dir=SAVE_DIR)
     plot_energy_vs_thit(entries,         save_dir=SAVE_DIR)
     plot_u_raw_trajectories(entries, DT, save_dir=SAVE_DIR)
+
+    # -----------------------------------------------------------------------
+    # Adversarial vertex evaluation
+    # -----------------------------------------------------------------------
+    if USE_ADVERSARIAL:
+        vertices = get_param_vertices(PARAM_RANGES)
+        print(f"\nAdversarial vertex evaluation: {len(vertices)} vertices  (n={N_MC} each)")
+        for v in vertices:
+            v_str = "  ".join(f"{k}={val:.2f}"
+                              for k, val in v.items()
+                              if PARAM_RANGES[k][0] != PARAM_RANGES[k][1])
+            print(f"  vertex: {v_str}")
+
+        vertex_results = {}   # label → [(vertex_dict, stats), ...]
+        for (path,), style, is_pt in zip(bundle_specs, CTRL_STYLES, IS_PRETRAINED):
+            label = style["label"]
+            print(f"\n  [{label}]")
+            ctrl  = load_control_net(path, pretrained_state_dict=is_pt)
+            vlist = []
+            for v in vertices:
+                v_str = "  ".join(f"{k}={val:.2f}"
+                                  for k, val in v.items()
+                                  if PARAM_RANGES[k][0] != PARAM_RANGES[k][1])
+                res   = rollout_mc(ctrl, n_mc=N_MC, T_max=T_MAX, dt=DT,
+                                   seed=SEED, n_paths=0, fixed_params=v)
+                stats = compute_stats(res)
+                print(f"    vertex ({v_str}):  p_success = {stats['p_success']:.4f}")
+                vlist.append((v, stats))
+            vertex_results[label] = vlist
+
+        _print_vertex_table(vertex_results)
 
 
 if __name__ == "__main__":

@@ -526,6 +526,8 @@ def main(benchmark_mode=False):
                         help="Time curriculum decrement step used inside trainer loop")
     parser.add_argument("--time_horizon_min", type=float, default=None,
                         help="Minimum time horizon target (used by time curriculum visualization gating)")
+    parser.add_argument("--beta_ra_max", type=float, default=10.0,
+                        help="Maximum beta_ra used in beta curriculum mode")
     args = parser.parse_args()
 
     if benchmark_mode:
@@ -604,6 +606,7 @@ def main(benchmark_mode=False):
 
     params.constraints.beta_ra = 5.0 # max beta_ra = 20.0 by default
     params.constraints.beta_increment = 0.5
+    params.constraints.beta_ra_max = float(args.beta_ra_max)
 
     params.compute_V = True
     params.compute_GV = True
@@ -632,7 +635,7 @@ def main(benchmark_mode=False):
     params.refinement.v_outside.late_epoch_threshold = 2500
     params.refinement.v_outside.refine_interval_late = 100
     params.refinement.v_outside.refine_factor = 2
-    params.refinement.v_outside.max_cells = 50000
+    params.refinement.v_outside.max_cells = 100000
     params.refinement.v_outside.N_to_refine = 100
     params.refinement.v_outside.enable_merging = True
     params.refinement.v_outside.merge_interval = 501
@@ -671,7 +674,7 @@ def main(benchmark_mode=False):
     params.refinement.gv_generator.late_epoch_threshold = 3500
     params.refinement.gv_generator.refine_interval_late = 500
     params.refinement.gv_generator.refine_factor = 2
-    params.refinement.gv_generator.max_cells = 50000
+    params.refinement.gv_generator.max_cells = 100000
     params.refinement.gv_generator.N_to_refine = 100
     params.refinement.gv_generator.enable_merging = True
     params.refinement.gv_generator.merge_interval = 501
