@@ -1,0 +1,60 @@
+{
+  "algorithm": "stable_baselines3.DDPG",
+  "best_eval_success_rate": 1.0,
+  "best_timesteps": 20000,
+  "total_training_time_sec": 313.77797412872314,
+  "seed": 0,
+  "n_envs": 4,
+  "total_timesteps": 1000000,
+  "dt": 0.01,
+  "t_max": 30.0,
+  "sigma": 0.2,
+  "drift_mag": 24.0,
+  "controller_hidden_dim": 8,
+  "lr": 0.001,
+  "gamma": 0.99,
+  "buffer_size": 300000,
+  "learning_starts": 5000,
+  "batch_size": 256,
+  "tau": 0.02,
+  "train_freq": [
+    4,
+    "step"
+  ],
+  "gradient_steps": 4,
+  "action_noise_sigma": 0.2,
+  "eval_every_steps": 20000,
+  "eval_episodes": 64,
+  "success_ma_window": 10,
+  "early_stopping_patience": 15,
+  "early_stopping_min_delta": 0.005,
+  "early_stopping_warmup_evals": 10,
+  "stopped_early": true,
+  "stop_timesteps": 480000,
+  "distillation": {
+    "n_random_states": 20000,
+    "n_traj_episodes": 200,
+    "n_state_action_pairs": 37010,
+    "epochs": 300,
+    "lr": 0.001,
+    "final_mse": 0.004828574436509635
+  },
+  "final_eval_episodes": 300,
+  "sb3_eval_metrics": {
+    "success_rate": 1.0,
+    "fail_rate": 0.0,
+    "timeout_rate": 0.0,
+    "mean_return": 1.1513577694816703,
+    "mean_episode_length": 86.02
+  },
+  "distilled_eval_metrics": {
+    "success_rate": 1.0,
+    "fail_rate": 0.0,
+    "timeout_rate": 0.0,
+    "mean_return": 1.152216202795071,
+    "mean_episode_length": 85.55
+  },
+  "history_csv": "rl_training_history.csv",
+  "controller_path": "rl_controller.pth",
+  "sb3_model_path": "ddpg_offtheshelf.zip"
+}

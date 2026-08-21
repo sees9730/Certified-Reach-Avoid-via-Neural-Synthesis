@@ -11,6 +11,8 @@ No energy dimension, no finite-time dimension, no curriculum, no resume/warm-sta
 import sys
 import time
 import json
+import os
+import random
 from math import pi
 from pathlib import Path
 
@@ -18,16 +20,20 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+TRAIN_SEED = 4
+
 ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 EXAMPLE_ROOT = HERE.parent
-OUTPUT_DIR = HERE / "outputs"
 sys.path.insert(0, str(ROOT))
 
 from src.control_network import InvertControlNN, WrapperConterlNN
 from src.discretization import discretize_regions
 from src.dynamics import Dynamics
 from src.hyperparameters import Hyperparameters
+from src.inv_pend_adversarial_config import (
+    load_controller_hidden_dim, load_dynamics_params, load_region_arrays,
+)
 from src.network import create_V
 from src.phi_module import create_GV
 from src.regions import Region, Regions
@@ -38,13 +44,38 @@ from src.training_utils import evaluate_constraints, print_constraint_summary
 from src.utils import cleanup_and_setup_directories
 from src.visualization import create_summary_plots
 
-torch.manual_seed(0)
+
+def configure_reproducibility(seed: int) -> None:
+    """
+    Configure deterministic behavior for repeated neural-certified runs.
+
+    Exact bitwise reproducibility is expected for repeated runs on the same
+    hardware/software stack and device type.
+    """
+    os.environ.setdefault("PYTHONHASHSEED", str(seed))
+    os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+
+    if hasattr(torch.backends, "cudnn"):
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
+    torch.use_deterministic_algorithms(True)
 
 with (EXAMPLE_ROOT / "config.json").open("r", encoding="utf-8") as f:
     EXAMPLE_CONFIG = json.load(f)
 
 # Additive box disturbance magnitude shared across inv_pend_adversarial examples.
 DRIFT_MAG = float(EXAMPLE_CONFIG["drift_mag"])
+REGIONS_CFG = load_region_arrays(EXAMPLE_CONFIG)
+CONTROLLER_HIDDEN_DIM = load_controller_hidden_dim(EXAMPLE_CONFIG)
+DYNAMICS = load_dynamics_params(EXAMPLE_CONFIG)
 
 
 def pretrain_network_samples(
@@ -249,14 +280,17 @@ def evaluate_and_visualize(
 
 
 def main():
+    configure_reproducibility(TRAIN_SEED)
     print("=" * 20)
     print("2D Inverted Pendulum Baseline")
     print("=" * 20)
     print("Baseline mode: no energy dimension, no time dimension, no curriculum.")
+    print(f"Random seed: {TRAIN_SEED}")
 
-    active_output_dir = OUTPUT_DIR
-    active_results_dir = HERE / "results"
-    active_progress_dir = HERE / "training_progress"
+    seed_dir = HERE / f"seed{TRAIN_SEED}"
+    active_output_dir = seed_dir / "outputs"
+    active_results_dir = seed_dir / "results"
+    active_progress_dir = seed_dir / "training_progress"
 
     # === Hyperparameters ===
     params = Hyperparameters.default()
@@ -268,18 +302,19 @@ def main():
     params.network.n_hidden_1 = 64
     params.network.n_hidden_2 = 64
     params.network.input_scale = [2 * pi, 20.0]
-    params.network.scale_factor = 20.0
+    params.network.scale_factor = 5.0
 
     params.training.learning_rate = 0.005
     params.training.num_epochs = 200000
     params.training.generator_weight = 1.0
     params.training.generator_start_epoch = 0
+    params.training.random_seed = TRAIN_SEED
 
     params.discretization.axis_weights = [1.0, 1.0]
     params.discretization.max_region_budget = 1000
     params.discretization.max_generator_budget = 1000
 
-    params.constraints.beta_ra = 8.0
+    params.constraints.beta_ra = 5.0
 
     params.compute_V = True
     params.compute_GV = True
@@ -289,7 +324,7 @@ def main():
     params.training.pretrain_lr = 0.01
     params.training.pretrain_n_samples = 1200
     params.training.curriculum_mode = "none"
-    params.training.resume_checkpoint_path = str(OUTPUT_DIR / "resume_checkpoint.pth")
+    params.training.resume_checkpoint_path = str(active_output_dir / "resume_checkpoint.pth")
     params.training.eval_bundle_output_dir = str(active_output_dir)
     params.training.progress_output_dir = str(active_progress_dir)
 
@@ -347,17 +382,18 @@ def main():
     params.refinement.refine_interval_after_first_sat = 500
 
     # === Dynamics ===
-    rl_policy_net = InvertControlNN()
+    rl_policy_net = InvertControlNN(hidden_dim=CONTROLLER_HIDDEN_DIM)
     u_nn = WrapperConterlNN(rl_policy_net)
 
     def f_ol(x: torch.Tensor, _u: torch.Tensor = None) -> torch.Tensor:
         x1 = x[:, 0]
         x2 = x[:, 1]
         f1 = x2
-        f2 = (9.81 / 0.5) * torch.sin(x1) - (0.1 / (0.15 * 0.5 ** 2)) * x2
+        f2 = (DYNAMICS["g"] / DYNAMICS["L"]) * torch.sin(x1) - \
+            (DYNAMICS["b"] / (DYNAMICS["m"] * DYNAMICS["L"] ** 2)) * x2
         return torch.stack([f1, f2], dim=1)
 
-    _g_coeffs = torch.tensor([0.0, 0.2], dtype=torch.float32)
+    _g_coeffs = torch.tensor([0.0, DYNAMICS["sigma"]], dtype=torch.float32)
 
     def g(x: torch.Tensor) -> torch.Tensor:
         base = _g_coeffs.to(device=x.device, dtype=x.dtype)
@@ -368,7 +404,11 @@ def main():
         else:
             raise ValueError(f"g(x) expects x of shape (2,) or (N, 2), got {tuple(x.shape)}")
 
-    drift_unc = torch.tensor([DRIFT_MAG, DRIFT_MAG], dtype=torch.float32)
+    # Physical disturbance: an unknown external torque/force acting on the
+    # angular-acceleration channel only (x2). x1 = theta has no direct force
+    # input (dtheta/dt = omega is a kinematic identity), so its disturbance
+    # half-width is 0 -- the box degenerates to a segment on the x2 axis.
+    drift_unc = torch.tensor([0.0, DRIFT_MAG], dtype=torch.float32)
     f_ol_set = AdditiveBoxSetDrift(f_ol, drift_unc)
     f_cl_module = ClosedLoopSetValuedDrift(
         f_ol_set.to(params.training.device), controller=u_nn
@@ -376,16 +416,16 @@ def main():
     dynamics = Dynamics.dynamics(f=f_cl_module, g=g, state_dim=state_dim)
 
     # === Regions ===
-    init_range  = np.array([[(3/4)*pi, (5/4)*pi], [-1.0,  1.0]],  dtype=np.float32)
-    goal_range  = np.array([[-0.4*pi,  0.4*pi],   [-4.0,  4.0]],  dtype=np.float32)
-    full_range  = np.array([[-2*pi,    2*pi],      [-20.0, 20.0]], dtype=np.float32)
+    init_range = REGIONS_CFG["init_range"].copy()
+    goal_range = REGIONS_CFG["goal_range"].copy()
+    full_range = REGIONS_CFG["full_range"].copy()
 
-    unsafe_down1 = np.array([[-2*pi,       -2*pi+0.5*pi], [-20.0, -10.0]], dtype=np.float32)
-    unsafe_down2 = np.array([[ 2*pi-0.5*pi, 2*pi],        [ 10.0,  20.0]], dtype=np.float32)
-    unsafe_lb    = np.array([[-2*pi,        -2*pi+0.5],   [-20.0,  20.0]], dtype=np.float32)
-    unsafe_rb    = np.array([[ 2*pi-0.5,    2*pi],        [-20.0,  20.0]], dtype=np.float32)
-    unsafe_tb    = np.array([[-2*pi,        2*pi],        [ 19.5,  20.0]], dtype=np.float32)
-    unsafe_bb    = np.array([[-2*pi,        2*pi],        [-20.0, -19.5]], dtype=np.float32)
+    unsafe_down1 = REGIONS_CFG["unsafe_down1"].copy()
+    unsafe_down2 = REGIONS_CFG["unsafe_down2"].copy()
+    unsafe_lb    = REGIONS_CFG["unsafe_lb"].copy()
+    unsafe_rb    = REGIONS_CFG["unsafe_rb"].copy()
+    unsafe_tb    = REGIONS_CFG["unsafe_tb"].copy()
+    unsafe_bb    = REGIONS_CFG["unsafe_bb"].copy()
 
     init   = Region(init_range)
     goal   = Region(goal_range)
@@ -412,7 +452,7 @@ def main():
         include_energy=False,
     )
 
-    cleanup_and_setup_directories([active_results_dir, active_progress_dir])
+    cleanup_and_setup_directories([active_output_dir, active_results_dir, active_progress_dir])
     enable_terminal_logging(active_output_dir / "terminal_log.txt", append=False)
 
     region_cells = discretize_regions(regions, params.discretization, use_radial_generator=False)

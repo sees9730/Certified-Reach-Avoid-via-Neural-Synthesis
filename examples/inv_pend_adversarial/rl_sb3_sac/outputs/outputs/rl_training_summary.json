@@ -1,0 +1,61 @@
+{
+  "algorithm": "stable_baselines3.SAC",
+  "best_eval_success_rate": 0.78125,
+  "best_timesteps": 10000,
+  "total_training_time_sec": 330.88658118247986,
+  "seed": 0,
+  "n_envs": 4,
+  "total_timesteps": 1000000,
+  "dt": 0.01,
+  "t_max": 10.0,
+  "sigma": 0.2,
+  "drift_mag": 24.0,
+  "controller_hidden_dim": 8,
+  "lr": 0.0003,
+  "gamma": 0.99,
+  "buffer_size": 300000,
+  "learning_starts": 5000,
+  "batch_size": 256,
+  "tau": 0.005,
+  "train_freq": [
+    4,
+    "step"
+  ],
+  "gradient_steps": 4,
+  "ent_coef": "auto",
+  "target_entropy": "auto",
+  "eval_every_steps": 10000,
+  "eval_episodes": 64,
+  "success_ma_window": 10,
+  "early_stopping_patience": 15,
+  "early_stopping_min_delta": 0.005,
+  "early_stopping_warmup_evals": 10,
+  "stopped_early": true,
+  "stop_timesteps": 240000,
+  "distillation": {
+    "n_random_states": 20000,
+    "n_traj_episodes": 200,
+    "n_state_action_pairs": 130226,
+    "epochs": 300,
+    "lr": 0.001,
+    "final_mse": 2.8256146277288058e-05
+  },
+  "final_eval_episodes": 300,
+  "sb3_eval_metrics": {
+    "success_rate": 0.6666666666666666,
+    "fail_rate": 0.0,
+    "timeout_rate": 0.3333333333333333,
+    "mean_return": 0.12822266722822995,
+    "mean_episode_length": 575.7466666666667
+  },
+  "distilled_eval_metrics": {
+    "success_rate": 0.7166666666666667,
+    "fail_rate": 0.0,
+    "timeout_rate": 0.2833333333333333,
+    "mean_return": 0.22703601355895284,
+    "mean_episode_length": 546.41
+  },
+  "history_csv": "rl_training_history.csv",
+  "controller_path": "rl_controller.pth",
+  "sb3_model_path": "sac_offtheshelf.zip"
+}

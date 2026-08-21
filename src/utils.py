@@ -19,5 +19,4 @@ def cleanup_and_setup_directories(dirs: list) -> None:
         if dir_path.exists():
             shutil.rmtree(dir_path)
             print(f"Cleaned up old {dir_path.name} directory")
-        dir_path.mkdir(exist_ok=True)
-
+        dir_path.mkdir(parents=True, exist_ok=True)

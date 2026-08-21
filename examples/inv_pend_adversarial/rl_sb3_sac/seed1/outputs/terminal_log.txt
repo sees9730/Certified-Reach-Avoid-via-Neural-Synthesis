@@ -1,0 +1,89 @@
+========================================================================
+Off-the-shelf SAC Training (Stable-Baselines3) - Inverted Pendulum SDE
+  Disturbance : d=[0, d2], d2 ~ Uniform([-24.0, 24.0])
+  Diffusion   : sigma = 0.2
+  Device      : cpu
+  Seed        : 1
+  Envs        : 4
+  Total steps : 1000000
+  Eval        : every 20000 steps on 64 episodes
+========================================================================
+t=    20000 | EvalSR=0.00 EvalMA=0.00 BestMA=0.00 Fail=0.00 Timeout=1.00 Elapsed=26s
+t=    40000 | EvalSR=0.00 EvalMA=0.00 BestMA=0.00 Fail=0.00 Timeout=1.00 Elapsed=59s
+t=    60000 | EvalSR=1.00 EvalMA=0.33 BestMA=0.33 Fail=0.00 Timeout=0.00 Elapsed=75s
+t=    80000 | EvalSR=1.00 EvalMA=0.50 BestMA=0.50 Fail=0.00 Timeout=0.00 Elapsed=91s
+t=   100000 | EvalSR=0.00 EvalMA=0.40 BestMA=0.50 Fail=0.00 Timeout=1.00 Elapsed=124s
+t=   120000 | EvalSR=0.00 EvalMA=0.33 BestMA=0.50 Fail=0.00 Timeout=1.00 Elapsed=156s
+t=   140000 | EvalSR=0.00 EvalMA=0.29 BestMA=0.50 Fail=0.00 Timeout=1.00 Elapsed=188s
+t=   160000 | EvalSR=1.00 EvalMA=0.38 BestMA=0.50 Fail=0.00 Timeout=0.00 Elapsed=203s
+t=   180000 | EvalSR=1.00 EvalMA=0.44 BestMA=0.50 Fail=0.00 Timeout=0.00 Elapsed=219s
+t=   200000 | EvalSR=1.00 EvalMA=0.50 BestMA=0.50 Fail=0.00 Timeout=0.00 Elapsed=234s
+t=   220000 | EvalSR=1.00 EvalMA=0.60 BestMA=0.60 Fail=0.00 Timeout=0.00 Elapsed=249s
+t=   240000 | EvalSR=1.00 EvalMA=0.70 BestMA=0.70 Fail=0.00 Timeout=0.00 Elapsed=264s
+t=   260000 | EvalSR=1.00 EvalMA=0.70 BestMA=0.70 Fail=0.00 Timeout=0.00 Elapsed=279s
+t=   280000 | EvalSR=1.00 EvalMA=0.70 BestMA=0.70 Fail=0.00 Timeout=0.00 Elapsed=294s
+t=   300000 | EvalSR=1.00 EvalMA=0.80 BestMA=0.80 Fail=0.00 Timeout=0.00 Elapsed=310s
+t=   320000 | EvalSR=1.00 EvalMA=0.90 BestMA=0.90 Fail=0.00 Timeout=0.00 Elapsed=325s
+t=   340000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=341s
+t=   360000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=356s
+t=   380000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=372s
+t=   400000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=387s
+t=   420000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=402s
+t=   440000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=418s
+t=   460000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=433s
+t=   480000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=448s
+t=   500000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=464s
+t=   520000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=479s
+t=   540000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=494s
+t=   560000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=509s
+t=   580000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=524s
+t=   600000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=541s
+t=   620000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=556s
+t=   640000 | EvalSR=1.00 EvalMA=1.00 BestMA=1.00 Fail=0.00 Timeout=0.00 Elapsed=571s
+
+Early stopping: validation success plateaued (window=10, patience=15, min_delta=0.005).
+
+Training complete. Best validation SR (10-eval MA) = 1.000 at t=340000.
+Training completed in 570.93 seconds (9.52 minutes)
+Saved SB3 checkpoint: /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/inv_pend_adversarial/rl_sb3_sac/seed1/outputs/sac_offtheshelf.zip
+
+Building distillation dataset from trained SB3 policy ...
+  dataset size: 25501 state-action pairs
+Distilling into InvertControlNN(hidden_dim=8) ...
+  [distill] epoch    1/300  mse=0.506680
+  [distill] epoch   30/300  mse=0.018640
+  [distill] epoch   60/300  mse=0.011507
+  [distill] epoch   90/300  mse=0.008802
+  [distill] epoch  120/300  mse=0.006936
+  [distill] epoch  150/300  mse=0.005170
+  [distill] epoch  180/300  mse=0.003930
+  [distill] epoch  210/300  mse=0.002978
+  [distill] epoch  240/300  mse=0.002283
+  [distill] epoch  270/300  mse=0.001972
+  [distill] epoch  300/300  mse=0.001790
+
+Evaluating SB3 policy vs. distilled controller (deterministic, 300 episodes) ...
+
+==============================================================
+  SB3 SAC policy (pre-distillation)
+==============================================================
+  success_rate   = 1.0000
+  fail_rate      = 0.0000
+  timeout_rate   = 0.0000
+  mean_return    = 1.3210
+  mean_ep_length = 27.8
+
+==============================================================
+  Distilled InvertControlNN (exported)
+==============================================================
+  success_rate   = 1.0000
+  fail_rate      = 0.0000
+  timeout_rate   = 0.0000
+  mean_return    = 1.3210
+  mean_ep_length = 27.6
+
+Saved controller: /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/inv_pend_adversarial/rl_sb3_sac/seed1/outputs/rl_controller.pth
+  -> load in run_mc.py / plot.py with IS_PRETRAINED=True
+Saved training history CSV: /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/inv_pend_adversarial/rl_sb3_sac/seed1/outputs/rl_training_history.csv
+Saved training summary JSON: /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/inv_pend_adversarial/rl_sb3_sac/seed1/outputs/rl_training_summary.json
+Saved training history plot: /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/inv_pend_adversarial/rl_sb3_sac/seed1/outputs/rl_training_history.pdf
