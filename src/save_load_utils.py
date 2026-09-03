@@ -98,6 +98,17 @@ def enable_terminal_logging(log_path: Path, append: bool = False):
     log_f = open(log_path, mode, buffering=1)  # line-buffered
     sys.stdout = Tee(sys.__stdout__, log_f)
     sys.stderr = Tee(sys.__stderr__, log_f)
+
+    def _restore_and_close():
+        # Restore the real streams first so nothing (including Python's own
+        # shutdown machinery) can write through a Tee into this file after
+        # it's closed -- that raises ValueError from inside atexit, which is
+        # too late to propagate normally and shows up as a bare "Exception
+        # ignored in: Exception ignored in sys.unraisablehook" at exit.
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        log_f.close()
+
     import atexit
-    atexit.register(log_f.close)
+    atexit.register(_restore_and_close)
     return log_f  # keep a reference so it doesn't get GC'd

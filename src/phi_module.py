@@ -43,7 +43,10 @@ class GV(nn.Module):
         if input_scale_init is None:
             input_scale_init = V_net.input_scale
 
-        s = torch.tensor(input_scale_init, dtype=torch.float32)
+        if isinstance(input_scale_init, torch.Tensor):
+            s = input_scale_init.detach().clone().to(dtype=torch.float32)
+        else:
+            s = torch.tensor(input_scale_init, dtype=torch.float32)
         self.register_buffer("input_scale", s)
         self.register_buffer("input_scale_sq", s ** 2)
 
@@ -78,7 +81,7 @@ class GV(nn.Module):
             (1,) if input was (D,), else (N,1)
         """
         x, was_1d = self._as_batch(x)
-        N, D = x.shape
+        _, D = x.shape
 
         W0, b0, W1, b1, W2 = self._get_V_params()  # W2: (1,m1)
         W2v = W2.view(-1)  # (m1,)
@@ -94,7 +97,7 @@ class GV(nn.Module):
 
         # layer 2
         z1 = F.linear(h0, W1, b1)         # (N,m1)
-        h1, d1, q1 = self._sigmoid_derivs(z1)
+        _, d1, q1 = self._sigmoid_derivs(z1)
 
         # S = W1[j,k] * d0[n,k] -> (N,m1,m0)
         S = W1.unsqueeze(0) * d0.unsqueeze(1)
@@ -222,20 +225,6 @@ class GV(nn.Module):
     def _expand_scale(scale: torch.Tensor, D: int) -> torch.Tensor:
         return scale.expand(D) if scale.numel() == 1 else scale.view(-1)
 
-    def _activation_derivs(self, z: torch.Tensor):
-        """Compute activation, first derivative, and second derivative using autograd."""
-        with torch.enable_grad():
-            z_leaf = z.detach().requires_grad_(True)
-            h = self.V_net.activation_fn(z_leaf)
-
-            # First derivative
-            d = torch.autograd.grad(h.sum(), z_leaf, create_graph=True)[0]
-
-            # Second derivative
-            q = torch.autograd.grad(d.sum(), z_leaf)[0]
-
-        return h.detach(), d.detach(), q.detach()
-    
     @staticmethod
     def _sigmoid_derivs(z: torch.Tensor):
         h = torch.sigmoid(z)
@@ -325,7 +314,7 @@ class GV(nn.Module):
         if self._g_is_none:
             return torch.zeros_like(x)
 
-        N, D = x.shape
+        _, D = x.shape
 
         if self._g_callable:
             if self._g_has_diag_sq:
@@ -419,16 +408,20 @@ class GV_offset(nn.Module):
         # -------------------------
         if input_scale_init is None:
             input_scale_init = V_net.input_scale
+        if isinstance(input_scale_init, torch.Tensor):
+            input_scale_init = input_scale_init.detach().clone().to(dtype=torch.float32)
+        else:
+            input_scale_init = torch.tensor(input_scale_init, dtype=torch.float32)
 
         self.learnable_input_scale = learnable_input_scale
         if learnable_input_scale:
-            self.input_scale = nn.Parameter(torch.tensor(input_scale_init, dtype=torch.float32))
+            self.input_scale = nn.Parameter(input_scale_init)
             # no caching when learnable
             self._cached_scale_D = None
             self._cached_inv_scale = None
             self._cached_inv_scale_sq = None
         else:
-            s = torch.tensor(input_scale_init, dtype=torch.float32)
+            s = input_scale_init
             self.register_buffer("input_scale", s)
             self.register_buffer("input_scale_sq", s ** 2)
 
@@ -444,6 +437,10 @@ class GV_offset(nn.Module):
             offset_init = getattr(V_net, "input_offset", torch.zeros_like(self.input_scale))
         self.register_buffer("input_offset",
                             torch.as_tensor(offset_init, dtype=torch.float32).detach().clone())
+
+        # cache expanded (D,) offset for speed (input_offset is always a plain buffer, never learnable)
+        self._cached_offset_D = None
+        self._cached_offset = None
 
 
         # -------------------------
@@ -474,7 +471,7 @@ class GV_offset(nn.Module):
             (1,) if input was (D,), else (N,1)
         """
         x, was_1d = self._as_batch(x)
-        N, D = x.shape
+        _, D = x.shape
 
         W0, b0, W1, b1, W2 = self._get_V_params()  # W2: (1,m1)
         W2v = W2.view(-1)  # (m1,)
@@ -484,7 +481,7 @@ class GV_offset(nn.Module):
         # normalize (multiplication is a bit cheaper than division)
         # x_norm = x * inv_scale
         # NEW: match V normalization: (x - offset)/scale
-        offset = self._expand_scale(self.input_offset.to(device=x.device, dtype=x.dtype), D)  # (D,)
+        offset = self._get_offset(D, x.device, x.dtype)  # (D,)
         x_norm = (x - offset) * inv_scale
 
 
@@ -494,7 +491,7 @@ class GV_offset(nn.Module):
 
         # layer 2
         z1 = F.linear(h0, W1, b1)         # (N,m1)
-        h1, d1, q1 = self._sigmoid_derivs(z1)
+        _, d1, q1 = self._sigmoid_derivs(z1)
 
         # S = W1[j,k] * d0[n,k] -> (N,m1,m0)
         S = W1.unsqueeze(0) * d0.unsqueeze(1)
@@ -599,12 +596,14 @@ class GV_offset(nn.Module):
             return inv, inv_sq
 
         # non-learnable => cache expanded vectors on the right device/dtype
-        cache_ok = (
-            self._cached_scale_D == D
-            and self._cached_inv_scale is not None
-            and self._cached_inv_scale.device == device
-            and self._cached_inv_scale.dtype == dtype
-        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", torch.jit.TracerWarning)
+            cache_ok = (
+                self._cached_scale_D == D
+                and self._cached_inv_scale is not None
+                and self._cached_inv_scale.device == device
+                and self._cached_inv_scale.dtype == dtype
+            )
         if cache_ok:
             return self._cached_inv_scale, self._cached_inv_scale_sq
 
@@ -618,6 +617,28 @@ class GV_offset(nn.Module):
         self._cached_inv_scale = inv
         self._cached_inv_scale_sq = inv_sq
         return inv, inv_sq
+
+    def _get_offset(self, D: int, device, dtype):
+        """
+        Returns:
+            offset: (D,)
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", torch.jit.TracerWarning)
+            cache_ok = (
+                self._cached_offset_D == D
+                and self._cached_offset is not None
+                and self._cached_offset.device == device
+                and self._cached_offset.dtype == dtype
+            )
+        if cache_ok:
+            return self._cached_offset
+
+        offset = self._expand_scale(self.input_offset, D).to(device=device, dtype=dtype)
+
+        self._cached_offset_D = D
+        self._cached_offset = offset
+        return offset
 
     # -------------------------
     # small internal helpers
@@ -720,7 +741,7 @@ class GV_offset(nn.Module):
         if self._g_is_none:
             return torch.zeros_like(x)
 
-        N, D = x.shape
+        _, D = x.shape
 
         if self._g_callable:
             if self._g_has_diag_sq:

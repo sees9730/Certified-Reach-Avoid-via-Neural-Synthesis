@@ -6,6 +6,7 @@ Generator loss uses a global theta-cell adversary:
 """
 import itertools
 import time
+import gc
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -210,13 +211,13 @@ def train_network_bounds_const_theta(
             # Global constant-theta adversary over theta cells.
             best_idx = None
             best_obj = float("-inf")
-            for j, entry in enumerate(theta_phi_caches):
-                with torch.no_grad():
+            with torch.no_grad():
+                for j, entry in enumerate(theta_phi_caches):
                     phi_u_j = entry["cache"].compute_bounds(input_lowers_gen, input_uppers_gen)
                     obj_j = float(F.relu(phi_u_j + adv_delta).sum().item())
-                if obj_j > best_obj:
-                    best_obj = obj_j
-                    best_idx = j
+                    if obj_j > best_obj:
+                        best_obj = obj_j
+                        best_idx = j
 
             chosen = theta_phi_caches[best_idx]
             phi_uppers = chosen["cache"].compute_bounds(input_lowers_gen, input_uppers_gen)
@@ -369,6 +370,7 @@ def train_network_bounds_const_theta(
                     all_cells_V[idx] = cell
                     idx += 1
 
+            del crown_cache_all
             if total_cells_V > 0:
                 input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, device=device, input_dim=input_dim)
                 crown_cache_all = SymbolicCROWNCache(V_net, total_cells_V, input_dim=input_dim, device=device)
@@ -391,6 +393,11 @@ def train_network_bounds_const_theta(
                 f"Rebuilt generator caches: cells={len(region_cells['generator'])}, "
                 f"theta_cells={len(theta_phi_caches)}"
             )
+
+        if needs_v_cache_rebuild or needs_gv_cache_rebuild:
+            gc.collect()
+            if str(device).startswith('cuda'):
+                torch.cuda.empty_cache()
 
         if epoch % params.logging.loss_log_interval == 0 or epoch == 0 or epoch == params.training.num_epochs - 1:
             elapsed = time.time() - start_time

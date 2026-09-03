@@ -1,7 +1,6 @@
 """Utility functions for training and setup."""
 
 import shutil
-import torch.nn as nn
 from pathlib import Path
 
 # Set up directories
@@ -9,7 +8,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]   # repo_root
 import sys
 sys.path.insert(0, str(ROOT))
-from src.hyperparameters import Hyperparameters
 
 
 def cleanup_and_setup_directories(dirs: list) -> None:

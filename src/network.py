@@ -10,7 +10,6 @@ This module provides flexible network architectures with:
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 # Set up directories
 from pathlib import Path

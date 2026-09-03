@@ -6,7 +6,6 @@ for training (with gradients) and verification.
 """
 
 import torch
-import torch.nn as nn
 import numpy as np
 from auto_LiRPA import BoundedModule, BoundedTensor
 from auto_LiRPA.perturbations import PerturbationLpNorm
@@ -37,10 +36,6 @@ class SymbolicCROWNCache:
         self.num_cells = num_cells
         self.input_dim = input_dim
         self.device = device
-
-        # Save original training mode
-        self.was_training = model.training
-        # model.eval()
 
         # Create dummy batch input
         dummy_batch = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)
@@ -107,12 +102,6 @@ class SymbolicCROWNCache:
 
         return v_lowers, v_uppers
 
-    def __del__(self):
-        """Restore model training mode on cleanup"""
-        if hasattr(self, 'was_training') and self.was_training:
-            self.model.train()
-
-
 class SymbolicCROWNCache_Phi:
     """
     Cache for symbolic CROWN computation on Phi (GV) network.
@@ -135,11 +124,6 @@ class SymbolicCROWNCache_Phi:
         self.num_cells = num_cells
         self.input_dim = input_dim
         self.device = device
-
-        # Save original training mode
-        self.was_training_V = phi_module.V_net.training
-        # phi_module.V_net.eval()
-        # phi_module.eval()
 
         # Create dummy batch input
         dummy_batch = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)
@@ -206,11 +190,6 @@ class SymbolicCROWNCache_Phi:
         phi_uppers = ub.squeeze(-1)  # (N,)
 
         return phi_uppers
-
-    def __del__(self):
-        """Restore training mode"""
-        if hasattr(self, 'was_training_V') and self.was_training_V:
-            self.phi_module.V_net.train()
 
 
 def prepare_cell_bounds(cells, device='cpu', input_dim=2):

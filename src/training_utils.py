@@ -11,7 +11,7 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 import itertools
-from typing import List, Tuple, Union, Optional
+from typing import List, Tuple, Optional
 from types import SimpleNamespace
 
 # Set up directories
@@ -21,43 +21,12 @@ OUTPUT_DIR = ROOT / "gbm_veri"/ "outputs"
 import sys
 sys.path.insert(0, str(ROOT))
 from src.crown_bounds import SymbolicCROWNCache, SymbolicCROWNCache_Phi, prepare_cell_bounds
-from src.discretization import discretize_region, discretize_region_with_splits
+from src.discretization import discretize_region_with_splits
 from src.regions import Region
 from src.dynamics import Dynamics
 from src.phi_module import create_GV
 from src.set_values import InvertedPendulumSetDrift, ClosedLoopSetValuedDrift
 
-
-def sample_from_cells(
-    cells: List[Tuple[torch.Tensor, torch.Tensor]],
-    n_samples: int,
-    device: str = 'cpu'
-) -> torch.Tensor:
-    """
-    Sample uniformly from a list of cells.
-
-    Args:
-        cells: List of (lower, upper) cell bounds
-        n_samples: Number of samples to draw
-        device: Device to place samples on
-
-    Returns:
-        Samples of shape (n_samples, state_dim)
-    """
-    if len(cells) == 0:
-        return torch.empty(0, 2, device=device)
-
-    # Sample cell indices uniformly
-    cell_indices = torch.randint(0, len(cells), (n_samples,))
-
-    samples = []
-    for idx in cell_indices:
-        lower, upper = cells[idx]
-        # Sample uniformly within cell
-        sample = lower + torch.rand(lower.shape) * (upper - lower)
-        samples.append(sample)
-
-    return torch.stack(samples).to(device)
 
 # ============================================================================
 # BOUND-BASED LOSS FUNCTIONS
@@ -248,12 +217,16 @@ def evaluate_constraints(
     device: str = 'cpu',
     crown_cache_all=None,
     crown_cache_phi=None,
+    crown_cache_v_gen=None,
     input_bounds_all=None,
     cell_counts_V: dict = None,
     input_bounds_gen=None,
     theta_ranges: dict = None,
     theta_grid_splits=None,
     adv_delta: float = 1e-4,
+    precomputed_region_bounds: dict = None,
+    precomputed_phi_uppers=None,
+    precomputed_v_gen_lowers=None,
 ) -> dict:
     """
     Evaluate constraint satisfaction using CROWN bounds.
@@ -298,7 +271,9 @@ def evaluate_constraints(
     with torch.no_grad():
         region_bounds = {}
 
-        if crown_cache_all is not None and input_bounds_all is not None and cell_counts_V is not None:
+        if precomputed_region_bounds is not None:
+            region_bounds = precomputed_region_bounds
+        elif crown_cache_all is not None and input_bounds_all is not None and cell_counts_V is not None:
             # Use pre-computed single cache and split results
             input_lowers_all, input_uppers_all = input_bounds_all
             v_lowers_all, v_uppers_all = crown_cache_all.compute_bounds(input_lowers_all, input_uppers_all)
@@ -365,21 +340,28 @@ def evaluate_constraints(
 
         # Generator: bounds GV(x) < 0 or V(x) >= beta_ra
         if len(region_cells['generator']) > 0:
-            if input_bounds_gen is not None:
-                input_lowers, input_uppers = input_bounds_gen
+            if precomputed_phi_uppers is not None and precomputed_v_gen_lowers is not None:
+                phi_uppers = precomputed_phi_uppers
+                v_gen_lowers = precomputed_v_gen_lowers
             else:
-                input_lowers, input_uppers = prepare_cell_bounds(
-                    region_cells['generator'], device=device, input_dim=input_dim
-                )
+                if input_bounds_gen is not None:
+                    input_lowers, input_uppers = input_bounds_gen
+                else:
+                    input_lowers, input_uppers = prepare_cell_bounds(
+                        region_cells['generator'], device=device, input_dim=input_dim
+                    )
 
-            if crown_cache_phi is not None:
-                phi_uppers = crown_cache_phi.compute_bounds(input_lowers, input_uppers)
-            else:
-                cache_phi = SymbolicCROWNCache_Phi(GV_net, len(region_cells['generator']), input_dim=input_dim, device=device)
-                phi_uppers = cache_phi.compute_bounds(input_lowers, input_uppers)
+                if crown_cache_phi is not None:
+                    phi_uppers = crown_cache_phi.compute_bounds(input_lowers, input_uppers)
+                else:
+                    cache_phi = SymbolicCROWNCache_Phi(GV_net, len(region_cells['generator']), input_dim=input_dim, device=device)
+                    phi_uppers = cache_phi.compute_bounds(input_lowers, input_uppers)
 
-            cache_v_gen = SymbolicCROWNCache(V_net, len(region_cells['generator']), input_dim=input_dim, device=device)
-            v_gen_lowers, _ = cache_v_gen.compute_bounds(input_lowers, input_uppers)
+                if crown_cache_v_gen is not None:
+                    cache_v_gen = crown_cache_v_gen
+                else:
+                    cache_v_gen = SymbolicCROWNCache(V_net, len(region_cells['generator']), input_dim=input_dim, device=device)
+                v_gen_lowers, _ = cache_v_gen.compute_bounds(input_lowers, input_uppers)
             active_mask = v_gen_lowers < beta_ra
             failing_mask = (phi_uppers > 0.0) & active_mask
 

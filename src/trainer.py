@@ -8,6 +8,7 @@ import torch
 import torch.nn as nn
 import time
 import select
+import gc
 from pathlib import Path
 
 from pathlib import Path
@@ -613,7 +614,8 @@ def train_network_bounds(
                 )
                 region_cells['outside'] = merged_cells
                 print(f"Merging outside cells: merged {num_merges} pairs, {len(merged_cells)} total")
-                needs_v_cache_rebuild = True
+                if num_merges > 0:
+                    needs_v_cache_rebuild = True
 
         # Adaptive refinement for V goal region cells
         if params.compute_V and len(bounds_updated['goal'][0]) > 0:
@@ -652,7 +654,8 @@ def train_network_bounds(
                 )
                 region_cells['goal'] = merged_cells
                 print(f"Merging goal cells: merged {num_merges} pairs, {len(merged_cells)} total")
-                needs_v_cache_rebuild = True
+                if num_merges > 0:
+                    needs_v_cache_rebuild = True
 
         # Adaptive refinement for V init region cells
         if params.compute_V and len(bounds_updated['init'][1]) > 0:
@@ -691,7 +694,8 @@ def train_network_bounds(
                 )
                 region_cells['init'] = merged_cells
                 print(f"Merging init cells: merged {num_merges} pairs, {len(merged_cells)} total")
-                needs_v_cache_rebuild = True
+                if num_merges > 0:
+                    needs_v_cache_rebuild = True
 
         # Adaptive refinement for V unsafe region cells
         if params.compute_V and len(bounds_updated['unsafe'][0]) > 0:
@@ -767,7 +771,8 @@ def train_network_bounds(
                 )
                 region_cells['generator'] = merged_cells
                 print(f"Merging generator cells: merged {num_merges} pairs, {len(merged_cells)} total")
-                needs_gv_cache_rebuild = True
+                if num_merges > 0:
+                    needs_gv_cache_rebuild = True
 
         # Logging
         if epoch % params.logging.loss_log_interval == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
@@ -871,15 +876,28 @@ def train_network_bounds(
                 print("Skipping detailed evaluation this epoch (cache rebuild pending after cell updates).")
             else:
                 print(f"=== Detailed Evaluation ===")
+                # bounds_updated/phi_uppers/v_gen_lowers were already computed this epoch
+                # (above, before optimizer.step()) on the exact same cells/weights - reuse
+                # them instead of recomputing via a second compute_bounds() pass.
+                generator_bounds_valid = (
+                    params.compute_GV
+                    and epoch >= params.training.generator_start_epoch
+                    and params.training.generator_weight > 0
+                    and crown_cache_phi is not None
+                )
                 results = evaluate_constraints(
                     V_net, GV_net, region_cells,
                     crown_cache_all=crown_cache_all,
                     crown_cache_phi=crown_cache_phi,
+                    crown_cache_v_gen=crown_cache_v_gen,
                     input_bounds_all=(input_lowers_all, input_uppers_all),
                     cell_counts_V=cell_counts_V,
                     input_bounds_gen=(input_lowers_gen, input_uppers_gen) if input_lowers_gen is not None else None,
                     beta_ra=params.constraints.beta_ra,
-                    device=params.training.device
+                    device=params.training.device,
+                    precomputed_region_bounds=bounds_updated,
+                    precomputed_phi_uppers=phi_uppers if generator_bounds_valid else None,
+                    precomputed_v_gen_lowers=v_gen_lowers if generator_bounds_valid else None,
                 )
 
                 # Pass bounds and phi_uppers to show cell statistics
@@ -928,6 +946,7 @@ def train_network_bounds(
 
                 # Rebuild V CROWN cache and input bounds
                 input_lowers_all, input_uppers_all = prepare_cell_bounds(all_cells_V, params.training.device, input_dim=params.network.n_inputs)
+                del crown_cache_all
                 crown_cache_all = SymbolicCROWNCache(
                     model=V_net,
                     num_cells=total_cells_V,
@@ -949,6 +968,7 @@ def train_network_bounds(
             if params.compute_GV:
                 total_cells_GV = len(region_cells['generator'])
                 input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], params.training.device, input_dim=params.network.n_inputs)
+                del crown_cache_phi, crown_cache_v_gen
                 crown_cache_phi = SymbolicCROWNCache_Phi(
                     phi_module=GV_net,
                     num_cells=total_cells_GV,
@@ -962,6 +982,11 @@ def train_network_bounds(
                     device=params.training.device
                 )
                 print(f"Rebuilt Phi cache with {total_cells_GV} cells")
+
+        if needs_v_cache_rebuild or needs_gv_cache_rebuild:
+            gc.collect()
+            if str(params.training.device).startswith('cuda'):
+                torch.cuda.empty_cache()
 
     elapsed_time = time.time() - start_time
     print(f"\nTraining completed in {elapsed_time:.2f} seconds ({elapsed_time/60:.2f} minutes)")
