@@ -3,13 +3,6 @@
 import shutil
 from pathlib import Path
 
-# Set up directories
-from pathlib import Path
-ROOT = Path(__file__).resolve().parents[1]   # repo_root
-import sys
-sys.path.insert(0, str(ROOT))
-
-
 def cleanup_and_setup_directories(dirs: list) -> None:
     """Remove and recreate directories for fresh training run."""
     for dir_path in dirs:

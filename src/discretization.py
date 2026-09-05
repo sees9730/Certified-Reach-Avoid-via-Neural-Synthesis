@@ -21,54 +21,9 @@ sys.path.insert(0, str(ROOT))
 from src.regions import Region
 
 
-def debug_print_region_bounds(region_cells, label: str = "Region") -> None:
-    """
-    Print per-dimension [min, max] bounds for region cells.
-
-    Accepted inputs:
-      - list of cells: [(lower_tensor, upper_tensor), ...]
-      - dict of cells: {"init": [...], "goal": [...], ...}
-      - Region (kept for backward compatibility)
-    """
-    if isinstance(region_cells, Region):
-        region = region_cells
-        if region.is_union and len(region.components) > 0:
-            lowers = np.stack([comp.bounds[:, 0] for comp in region.components], axis=0)
-            uppers = np.stack([comp.bounds[:, 1] for comp in region.components], axis=0)
-            mins = lowers.min(axis=0)
-            maxs = uppers.max(axis=0)
-        else:
-            mins = region.bounds[:, 0]
-            maxs = region.bounds[:, 1]
-    elif isinstance(region_cells, dict):
-        all_cells = []
-        for cells in region_cells.values():
-            all_cells.extend(cells)
-        if len(all_cells) == 0:
-            print(f"{label} bounds: no cells")
-            return
-        lowers = np.stack([lo.detach().cpu().numpy() for lo, _ in all_cells], axis=0)
-        uppers = np.stack([hi.detach().cpu().numpy() for _, hi in all_cells], axis=0)
-        mins = lowers.min(axis=0)
-        maxs = uppers.max(axis=0)
-    else:
-        cells = list(region_cells)
-        if len(cells) == 0:
-            print(f"{label} bounds: no cells")
-            return
-        lowers = np.stack([lo.detach().cpu().numpy() for lo, _ in cells], axis=0)
-        uppers = np.stack([hi.detach().cpu().numpy() for _, hi in cells], axis=0)
-        mins = lowers.min(axis=0)
-        maxs = uppers.max(axis=0)
-
-    print(f"{label} bounds:")
-    for d, (lo, hi) in enumerate(zip(mins, maxs)):
-        print(f"  dim {d}: [{float(lo):.6g}, {float(hi):.6g}]")
-
-
 def discretize_region_with_splits(
     region: Region,
-    n_splits_per_dim: List[int]
+    n_splits_per_dim: List[int],
 ) -> List[Tuple[torch.Tensor, torch.Tensor]]:
     """
     Discretize a (non-union) region with potentially different split counts per dimension.
@@ -147,83 +102,6 @@ def _allocate_budgets(weights: np.ndarray, total_budget: int) -> np.ndarray:
 
 def _flatten_region_components(region: Region) -> List[Region]:
     return region.components if region.is_union else [region]
-
-
-def _splits_from_budget_and_lengths(lengths: np.ndarray, budget: int) -> List[int]:
-    """
-    Choose per-dimension integer splits with product <= budget, roughly proportional to lengths.
-    """
-    D = int(lengths.shape[0])
-    B = max(1, int(budget))
-    L = np.asarray(lengths, dtype=np.float64)
-    L = np.maximum(L, 1e-8)
-
-    c = (B / float(np.prod(L))) ** (1.0 / D)
-    n = np.maximum(1, np.floor(c * L).astype(np.int64))
-
-    def _prod(arr):
-        return int(np.prod(arr.astype(np.int64)))
-
-    # Grow until we would exceed budget.
-    while True:
-        cur = _prod(n)
-        if cur >= B:
-            break
-        best_d = None
-        best_gain = None
-        for d in range(D):
-            cand = n.copy()
-            cand[d] += 1
-            p = _prod(cand)
-            if p <= B:
-                # Favor dimensions with larger lengths while accounting current split count.
-                gain = L[d] / float(n[d] + 1)
-                if (best_gain is None) or (gain > best_gain):
-                    best_gain = gain
-                    best_d = d
-        if best_d is None:
-            break
-        n[best_d] += 1
-
-    return [int(v) for v in n.tolist()]
-
-
-def discretize_region_list_with_budget(
-    regions_list: List[Region],
-    total_budget: int,
-    label: str = "Region",
-) -> List[Tuple[torch.Tensor, torch.Tensor]]:
-    """
-    Discretize a list of (possibly union) regions using a total cell budget.
-
-    Budget allocation is volume-proportional across boxes, then per-dimension
-    split counts are length-proportional within each box.
-    """
-    boxes: List[Region] = []
-    for r in regions_list:
-        boxes.extend(_flatten_region_components(r))
-
-    if len(boxes) == 0:
-        return []
-
-    sizes = np.stack([np.maximum(b.bounds[:, 1] - b.bounds[:, 0], 0.0) for b in boxes], axis=0)  # (K,D)
-    vols = np.prod(np.maximum(sizes, 1e-8), axis=1)
-    box_budgets = _allocate_budgets(vols, int(total_budget))
-
-    all_cells: List[Tuple[torch.Tensor, torch.Tensor]] = []
-    used = 0
-    for box, b in zip(boxes, box_budgets):
-        if int(b) <= 0:
-            continue
-        lengths = np.maximum(box.bounds[:, 1] - box.bounds[:, 0], 1e-8)
-        splits = _splits_from_budget_and_lengths(lengths, int(b))
-        cells = discretize_region_with_splits(box, splits)
-        all_cells.extend(cells)
-        used += len(cells)
-
-    print(f" {label} budget target: {int(total_budget)}")
-    print(f" {label} budget actual: {used}")
-    return all_cells
 
 
 def _splits_from_budget_and_weights(weights: np.ndarray, budget: int) -> List[int]:
@@ -311,105 +189,6 @@ def discretize_region_list_with_weights_budget(
     print(f" {label} target budget: {int(total_budget)}")
     print(f" {label} actual cells: {used}")
     return all_cells
-
-
-def _splits_from_unit_lengths(lengths: np.ndarray, unit_lengths: np.ndarray, scale: float = 1.0) -> List[int]:
-    unit = np.maximum(unit_lengths * float(scale), 1e-8)
-    splits = np.maximum(1, np.ceil(np.maximum(lengths, 0.0) / unit).astype(np.int64))
-    return [int(v) for v in splits.tolist()]
-
-
-def _count_cells_for_boxes_with_unit_lengths(boxes: List[Region], unit_lengths: np.ndarray, scale: float) -> int:
-    total = 0
-    for box in boxes:
-        lengths = np.maximum(box.bounds[:, 1] - box.bounds[:, 0], 0.0)
-        splits = _splits_from_unit_lengths(lengths, unit_lengths, scale=scale)
-        total += int(np.prod(np.array(splits, dtype=np.int64)))
-    return int(total)
-
-
-def discretize_region_list_with_unit_lengths(
-    regions_list: List[Region],
-    unit_lengths: np.ndarray,
-    max_budget: int = 0,
-    label: str = "Region",
-) -> List[Tuple[torch.Tensor, torch.Tensor]]:
-    """
-    Discretize a list of regions using per-dimension unit lengths.
-
-    If max_budget > 0 and the resulting cell count exceeds max_budget, enlarge unit lengths
-    by a global scale factor until the count is <= max_budget.
-    """
-    boxes: List[Region] = []
-    for r in regions_list:
-        boxes.extend(_flatten_region_components(r))
-
-    if len(boxes) == 0:
-        return []
-
-    D = int(boxes[0].bounds.shape[0])
-    u = np.asarray(unit_lengths, dtype=np.float64).reshape(-1)
-    if u.shape[0] != D:
-        raise ValueError(f"{label}: expected {D} unit lengths, got {u.shape[0]}")
-    if np.any(u <= 0.0):
-        raise ValueError(f"{label}: unit lengths must be positive, got {u}")
-
-    base_count = _count_cells_for_boxes_with_unit_lengths(boxes, u, scale=1.0)
-    scale = 1.0
-    budget = int(max_budget)
-    if budget > 0 and base_count > budget:
-        min_count = len(boxes)  # one cell per box (can't go lower without dropping boxes)
-        if min_count > budget:
-            # Budget is too small to satisfy exactly; use one cell per box.
-            scale = 1e12
-            print(
-                f" {label}: budget {budget} is below minimum feasible {min_count}; "
-                f"using one cell per box."
-            )
-        else:
-            lo, hi = 1.0, 1.0
-            while _count_cells_for_boxes_with_unit_lengths(boxes, u, scale=hi) > budget:
-                hi *= 2.0
-
-            # Binary search minimal scale meeting budget.
-            for _ in range(40):
-                mid = 0.5 * (lo + hi)
-                cnt = _count_cells_for_boxes_with_unit_lengths(boxes, u, scale=mid)
-                if cnt > budget:
-                    lo = mid
-                else:
-                    hi = mid
-            scale = hi
-
-    all_cells: List[Tuple[torch.Tensor, torch.Tensor]] = []
-    used = 0
-    for box in boxes:
-        lengths = np.maximum(box.bounds[:, 1] - box.bounds[:, 0], 0.0)
-        splits = _splits_from_unit_lengths(lengths, u, scale=scale)
-        cells = discretize_region_with_splits(box, splits)
-        all_cells.extend(cells)
-        used += len(cells)
-
-    if budget > 0:
-        print(f" {label}: unit-length mode with budget={budget}, cells={used}, scale={scale:.4f}")
-    else:
-        print(f" {label}: unit-length mode, cells={used}, scale={scale:.4f}")
-    return all_cells
-
-
-def discretize_unsafe_with_budget(
-    unsafe_region: Region,
-    total_budget: int
-) -> List[Tuple[torch.Tensor, torch.Tensor]]:
-    """
-    Discretize unsafe region using a total cell budget.
-
-    Strategy:
-      1) Split total budget across unsafe boxes by box volume.
-      2) For each box, choose per-dimension splits proportional to side lengths,
-         with product <= that box's budget.
-    """
-    return discretize_region_list_with_budget([unsafe_region], int(total_budget), label="Unsafe")
 
 
 def discretize_region(region: Region, n_squares: int) -> List[Tuple[torch.Tensor, torch.Tensor]]:
@@ -591,38 +370,6 @@ def discretize_region_radial(
     return all_cells
 
 
-def refine_cells_by_mask(
-    cells: List[Tuple[torch.Tensor, torch.Tensor]],
-    failing_mask: torch.Tensor,
-    refinement_factor: int = 2
-) -> List[Tuple[torch.Tensor, torch.Tensor]]:
-    """
-    Refine cells marked as failing.
-
-    For D dims, each refined cell becomes refinement_factor^D subcells.
-    """
-    new_cells = []
-    num_refined = 0
-
-    D = int(cells[0][0].numel()) if len(cells) > 0 else 0
-
-    for i, (cell_lower, cell_upper) in enumerate(cells):
-        if failing_mask[i]:
-            lower_np = cell_lower.detach().cpu().numpy().astype(np.float32)
-            upper_np = cell_upper.detach().cpu().numpy().astype(np.float32)
-
-            cell_region = Region(np.stack([lower_np, upper_np], axis=1))  # (D, 2)
-
-            refined = discretize_region(cell_region, refinement_factor)
-            new_cells.extend(refined)
-            num_refined += 1
-        else:
-            new_cells.append((cell_lower, cell_upper))
-
-    print(f"    Refined {num_refined} failing cells into {num_refined * (refinement_factor ** D)} subcells")
-    return new_cells
-
-
 def compute_rectangular_partition_outside_goal(
     full_region: Region,
     goal_region: Region
@@ -763,92 +510,38 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
         print(f" {len(region_cells['generator'])} cells")
         return region_cells
 
-    unit_lengths_cfg = getattr(discretization_config, "unit_lengths", None)
-    use_unit_lengths = unit_lengths_cfg is not None and len(unit_lengths_cfg) > 0
-    if use_unit_lengths:
-        unit_lengths = np.asarray(unit_lengths_cfg, dtype=np.float64).reshape(-1)
-        if unit_lengths.shape[0] != D:
-            raise ValueError(
-                f"discretization_config.unit_lengths must have length {D}, got {unit_lengths.shape[0]}"
-            )
-        print(f"Using unit-length discretization with unit_lengths={unit_lengths.tolist()}")
-    else:
-        unit_lengths = None
-
     # Init region
-    n_init_budget = int(getattr(discretization_config, "n_init_budget", 0))
-    if use_unit_lengths:
-        print(f"Init region: unit-length discretization")
-        region_cells['init'] = discretize_region_list_with_unit_lengths(
-            [regions.init], unit_lengths, max_budget=n_init_budget, label="Init"
-        )
-    elif n_init_budget > 0:
-        print(f"Init region: budget-based discretization (budget={n_init_budget})")
-        region_cells['init'] = discretize_region_list_with_budget([regions.init], n_init_budget, label="Init")
-    else:
-        print(f"Init region: {discretization_config.n_init} per-dim grid")
-        region_cells['init'] = discretize_region(regions.init, discretization_config.n_init)
+    print(f"Init region: {discretization_config.n_init} per-dim grid")
+    region_cells['init'] = discretize_region(regions.init, discretization_config.n_init)
     print(f" {len(region_cells['init'])} cells")
 
     # Goal region
-    n_goal_budget = int(getattr(discretization_config, "n_goal_budget", 0))
-    if use_unit_lengths:
-        print(f"Goal region: unit-length discretization")
-        region_cells['goal'] = discretize_region_list_with_unit_lengths(
-            [regions.goal], unit_lengths, max_budget=n_goal_budget, label="Goal"
-        )
-    elif n_goal_budget > 0:
-        print(f"Goal region: budget-based discretization (budget={n_goal_budget})")
-        region_cells['goal'] = discretize_region_list_with_budget([regions.goal], n_goal_budget, label="Goal")
-    else:
-        print(f"Goal region: {discretization_config.n_goal} per-dim grid")
-        region_cells['goal'] = discretize_region(regions.goal, discretization_config.n_goal)
+    print(f"Goal region: {discretization_config.n_goal} per-dim grid")
+    region_cells['goal'] = discretize_region(regions.goal, discretization_config.n_goal)
     print(f" {len(region_cells['goal'])} cells")
 
     # Unsafe region
-    n_unsafe_budget = getattr(discretization_config, "n_unsafe_budget", 0)
-    if use_unit_lengths:
-        print(f"Unsafe region: unit-length discretization")
-        region_cells['unsafe'] = discretize_region_list_with_unit_lengths(
-            [regions.unsafe], unit_lengths, max_budget=int(n_unsafe_budget), label="Unsafe"
-        )
-    elif int(n_unsafe_budget) > 0:
-        print(f"Unsafe region: budget-based discretization (budget={int(n_unsafe_budget)})")
-        region_cells['unsafe'] = discretize_unsafe_with_budget(regions.unsafe, int(n_unsafe_budget))
-    else:
-        print(f"Unsafe region: {discretization_config.n_unsafe} per-dim grid")
-        region_cells['unsafe'] = discretize_region(regions.unsafe, discretization_config.n_unsafe)
+    print(f"Unsafe region: {discretization_config.n_unsafe} per-dim grid")
+    region_cells['unsafe'] = discretize_region(regions.unsafe, discretization_config.n_unsafe)
     print(f" {len(region_cells['unsafe'])} cells")
 
     # Outside goal (for V constraint)
-    n_outside_budget = int(getattr(discretization_config, "n_outside_goal_budget", 0))
     outside_goal_rects = compute_rectangular_partition_outside_goal(regions.full, regions.goal)
-    if use_unit_lengths:
-        print(f"Outside goal region: unit-length discretization")
-        region_cells['outside'] = discretize_region_list_with_unit_lengths(
-            outside_goal_rects, unit_lengths, max_budget=n_outside_budget, label="Outside"
-        )
-    elif n_outside_budget > 0:
-        print(f"Outside goal region: budget-based discretization (budget={n_outside_budget})")
-        region_cells['outside'] = discretize_region_list_with_budget(
-            outside_goal_rects, n_outside_budget, label="Outside"
-        )
-    else:
-        print(f"Outside goal region: {discretization_config.n_outside_goal} per-dim per rectangle")
-        # Pre-allocate: each rectangle -> n_outside_goal^D cells
-        n_per_rect = discretization_config.n_outside_goal ** regions.full.bounds.shape[0]
-        total_outside = n_per_rect * len(outside_goal_rects)
-        region_cells['outside'] = [None] * total_outside
-        idx = 0
-        for rect in outside_goal_rects:
-            for cell in discretize_region(rect, discretization_config.n_outside_goal):
-                region_cells['outside'][idx] = cell
-                idx += 1
-        region_cells['outside'] = region_cells['outside'][:idx]
+    print(f"Outside goal region: {discretization_config.n_outside_goal} per-dim per rectangle")
+    # Pre-allocate: each rectangle -> n_outside_goal^D cells
+    n_per_rect = discretization_config.n_outside_goal ** regions.full.bounds.shape[0]
+    total_outside = n_per_rect * len(outside_goal_rects)
+    region_cells['outside'] = [None] * total_outside
+    idx = 0
+    for rect in outside_goal_rects:
+        for cell in discretize_region(rect, discretization_config.n_outside_goal):
+            region_cells['outside'][idx] = cell
+            idx += 1
+    region_cells['outside'] = region_cells['outside'][:idx]
     print(f" {len(region_cells['outside'])} cells")
 
     # Generator region (outside goal and unsafe)
-    if use_radial_generator and (not use_unit_lengths):
+    if use_radial_generator:
         print(f"Generator region: Radial adaptive discretization with clipping")
         print(f" Using adaptive refinement based on distance from origin")
 
@@ -897,32 +590,20 @@ def discretize_regions(regions, discretization_config, use_radial_generator=True
             first_cell = region_cells['generator'][0]
             print(f' First cell bounds: {first_cell[0].numpy()} to {first_cell[1].numpy()}')
     else:
-        n_gen_budget = int(getattr(discretization_config, "n_generator_budget", 0))
         generator_rects = compute_rectangular_partition_outside_goal_and_unsafe(
             regions.full, regions.goal, regions.unsafe
         )
-        if use_unit_lengths:
-            print(f"Generator region: unit-length discretization")
-            region_cells['generator'] = discretize_region_list_with_unit_lengths(
-                generator_rects, unit_lengths, max_budget=n_gen_budget, label="Generator"
-            )
-        elif n_gen_budget > 0:
-            print(f"Generator region: budget-based discretization (budget={n_gen_budget})")
-            region_cells['generator'] = discretize_region_list_with_budget(
-                generator_rects, n_gen_budget, label="Generator"
-            )
-        else:
-            print(f"Generator region: {discretization_config.n_generator} per-dim per rectangle")
-            # Pre-allocate: each rectangle -> n_generator^D cells
-            n_per_rect = discretization_config.n_generator ** regions.full.bounds.shape[0]
-            total_gen = n_per_rect * len(generator_rects)
-            region_cells['generator'] = [None] * total_gen
-            idx = 0
-            for rect in generator_rects:
-                for cell in discretize_region(rect, discretization_config.n_generator):
-                    region_cells['generator'][idx] = cell
-                    idx += 1
-            region_cells['generator'] = region_cells['generator'][:idx]
+        print(f"Generator region: {discretization_config.n_generator} per-dim per rectangle")
+        # Pre-allocate: each rectangle -> n_generator^D cells
+        n_per_rect = discretization_config.n_generator ** regions.full.bounds.shape[0]
+        total_gen = n_per_rect * len(generator_rects)
+        region_cells['generator'] = [None] * total_gen
+        idx = 0
+        for rect in generator_rects:
+            for cell in discretize_region(rect, discretization_config.n_generator):
+                region_cells['generator'][idx] = cell
+                idx += 1
+        region_cells['generator'] = region_cells['generator'][:idx]
         print(f" {len(region_cells['generator'])} cells")
         
     return region_cells

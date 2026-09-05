@@ -1,7 +1,6 @@
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
-import numpy as np
 
 class LinearControlNN(nn.Module):
       def __init__(self, prior_knowledge=True, input_dim=2):
@@ -16,22 +15,6 @@ class LinearControlNN(nn.Module):
 
       def forward(self, x: torch.Tensor) -> torch.Tensor:
           return self.fc(x)
-
-class TanhPolicy(nn.Sequential):
-    def __init__(
-        self,
-        n_in: int = 2,
-        n_out: int = 1,
-        n_hidden: int = 64,
-        device: torch.device | str = "cpu"
-    ):
-        super().__init__(
-            nn.Linear(n_in, n_hidden, dtype=torch.float32, device=device),
-            nn.Tanh(),
-            nn.Linear(n_hidden, n_hidden, dtype=torch.float32, device=device),
-            nn.Tanh(),
-            nn.Linear(n_hidden, n_out, dtype=torch.float32, device=device),
-        )
 
 class GBMControlNN(nn.Module):
     def __init__(self, input_dim=2, hidden_dim=8, output_dim=2):
@@ -59,61 +42,6 @@ class InvertControlNN(nn.Module):
         out = F.tanh(self.fc2(h1))
         return out
 
-
-class RoomTempControlNN(nn.Module):
-    """
-    Dedicated room-temperature controller.
-    Maps state [x1, x2] to physical HVAC inputs u in [-U_MAX, U_MAX]^2
-    via tanh-only activations.
-    """
-    def __init__(self, input_dim: int = 2, hidden_dim: int = 32, output_dim: int = 2, u_max: float = 1.0):
-        super().__init__()
-        self.fc1 = nn.Linear(input_dim, hidden_dim, bias=True)
-        self.fc2 = nn.Linear(hidden_dim, output_dim, bias=True)
-        self.u_max = float(u_max)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        h = torch.tanh(self.fc1(x))
-        return self.u_max * torch.tanh(self.fc2(h))
-
-
-class RoomTempControlWrapper(nn.Module):
-    """
-    Wrap a policy that outputs physical u in [-U_MAX, U_MAX]^2.
-    forward(x) returns drift contribution B @ u(x).
-    """
-    def __init__(self, policy_net: nn.Module, B_input: np.ndarray):
-        super().__init__()
-        self.policy_net = policy_net
-        self.register_buffer("B", torch.tensor(B_input, dtype=torch.float32))
-
-    @staticmethod
-    def _as_state_batch(x: torch.Tensor) -> tuple[torch.Tensor, bool]:
-        """
-        Accept only physical temperature states [x1, x2].
-        Allowed input shapes: (2,) or (N, 2).
-        """
-        if x.ndim == 1:
-            if x.numel() != 2:
-                raise ValueError(f"Controller expects state [x1, x2]; got shape {tuple(x.shape)}")
-            return x.unsqueeze(0), True
-        if x.ndim == 2:
-            if x.shape[1] != 2:
-                raise ValueError(f"Controller expects input shape (N, 2); got {tuple(x.shape)}")
-            return x, False
-        raise ValueError(f"Controller expects x.ndim in {{1,2}}; got {x.ndim}")
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x_batch, was_1d = self._as_state_batch(x)
-        u = self.policy_net(x_batch)
-        B = self.B.to(x_batch.device, x_batch.dtype)
-        out = u @ B.T
-        return out.squeeze(0) if was_1d else out
-
-    # def raw_control(self, x: torch.Tensor) -> torch.Tensor:
-    #     x_batch, was_1d = self._as_state_batch(x)
-    #     u = self.policy_net(x_batch)
-    #     return u.squeeze(0) if was_1d else u
 
 class TanhPolicy(nn.Sequential):
     """
@@ -184,18 +112,6 @@ class SwapStateWrapper(nn.Module):
 
         return self.base_policy(x_swapped)
 
-class NonlinearControlNN(nn.Module):
-    def __init__(self, input_dim=3, hidden_dim=64, output_dim=3):
-        super().__init__()
-        # Fully connected layers
-        self.fc1 = nn.Linear(input_dim, hidden_dim, bias=True)   # input -> hidden
-        self.fc2 = nn.Linear(hidden_dim, output_dim, bias=False)  # hidden -> output
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        h1 = F.tanh(self.fc1(x))
-        out = (self.fc2(h1))
-        return out
-
 class LorentzLinearControlNN(nn.Module):
     """
     3D linear feedback u = K(x) x with a *base-offset* only on two weights:
@@ -231,8 +147,3 @@ class LorentzLinearControlNN(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         W_eff = self.fc.weight + self.W_base  # grad flows to fc.weight
         return F.linear(x, W_eff, bias=None)
-
-    @torch.no_grad()
-    def get_effective_weight(self) -> torch.Tensor:
-        """Return the effective 3x3 matrix (CPU) used in forward."""
-        return (self.fc.weight + self.W_base).detach().cpu().clone()

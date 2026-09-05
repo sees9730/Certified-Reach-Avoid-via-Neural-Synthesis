@@ -34,7 +34,6 @@ class SymbolicCROWNCache:
         """
         self.model = model
         self.num_cells = num_cells
-        self.input_dim = input_dim
         self.device = device
 
         # Create dummy batch input
@@ -120,9 +119,7 @@ class SymbolicCROWNCache_Phi:
             input_dim: Input dimension
             device: Device
         """
-        self.phi_module = phi_module
         self.num_cells = num_cells
-        self.input_dim = input_dim
         self.device = device
 
         # Create dummy batch input

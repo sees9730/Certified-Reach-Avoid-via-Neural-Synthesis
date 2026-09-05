@@ -65,16 +65,6 @@ class Region:
         """Get upper bounds (state_dim,)."""
         return self.bounds[:, 1]
 
-    @property
-    def center(self) -> np.ndarray:
-        """Get center point (state_dim,)."""
-        return (self.lower + self.upper) / 2
-
-    @property
-    def size(self) -> np.ndarray:
-        """Get size along each dimension (state_dim,)."""
-        return self.upper - self.lower
-
     def contains(self, x: Union[np.ndarray, torch.Tensor]) -> Union[bool, np.ndarray, torch.Tensor]:
         """
         Check if point(s) are inside region.
@@ -243,26 +233,6 @@ class Regions:
 
         self.state_dim = self.init.state_dim
 
-    def get_region(self, name: str) -> Region:
-        """
-        Get region by name.
-
-        Args:
-            name: One of 'init', 'goal', 'unsafe', 'full'
-
-        Returns:
-            Region instance
-        """
-        region_map = {
-            'init': self.init,
-            'goal': self.goal,
-            'unsafe': self.unsafe,
-            'full': self.full
-        }
-        if name not in region_map:
-            raise ValueError(f"Unknown region '{name}'. Must be one of {list(region_map.keys())}")
-        return region_map[name]
-
     def __repr__(self):
         """String representation."""
         return (
@@ -274,33 +244,6 @@ class Regions:
             f")"
         )
 
-    @classmethod
-    def from_numpy_ranges(
-        cls,
-        init_range: np.ndarray,
-        goal_range: np.ndarray,
-        unsafe_range: np.ndarray,
-        full_range: Optional[np.ndarray] = None
-    ):
-        """
-        Create regions from numpy arrays.
-
-        Args:
-            init_range: Initial region bounds (state_dim, 2)
-            goal_range: Goal region bounds (state_dim, 2)
-            unsafe_range: Unsafe region bounds (state_dim, 2)
-            full_range: Full region bounds (state_dim, 2), optional
-
-        Returns:
-            Regions instance
-        """
-        init = Region(init_range)
-        goal = Region(goal_range)
-        unsafe = Region(unsafe_range)
-        full = Region(full_range) if full_range is not None else None
-
-        return cls(init=init, goal=goal, unsafe=unsafe, full=full)
-
     def to_dict(self):
         """Convert to dictionary (for saving/loading)."""
         return {
@@ -309,17 +252,3 @@ class Regions:
             'unsafe': self.unsafe.bounds,
             'full': self.full.bounds
         }
-
-    @classmethod
-    def from_dict(cls, data: dict):
-        """Create from dictionary."""
-        return cls(
-            init=Region(data['init']),
-            goal=Region(data['goal']),
-            unsafe=Region(data['unsafe']),
-            full=Region(data['full'])
-        )
-
-
-# Type alias for Union
-Union = Union

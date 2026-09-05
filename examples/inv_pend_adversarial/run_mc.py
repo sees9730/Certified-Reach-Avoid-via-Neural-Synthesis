@@ -58,10 +58,23 @@ Output:
   run_mc_results/<mode>/fig5_u_raw_trajectories.pdf
   run_mc_results/fig6_success_rate_summary.pdf
   run_mc_results/fig7_failure_trajectories.pdf
+  run_mc_results/fig8_energy_distribution.pdf  (energy comparisons)
+
+With --baseline-controller-dir, only figures 6, 7, and 8 are generated.
+Use --figures to select a different set. Figure 8 compares energy boxplots in four panels:
+overall, zero disturbance, uniform disturbance, and all adversarial modes.
+Each panel includes successes, failures, and timeouts.
 
 Usage (from this directory):
     python run_mc.py                # run the MC, save mc_cache.pth + plots, print summary table
     python run_mc.py --verbose      # also print per-controller/per-seed/per-mode detail
+    python run_mc.py --energy-controller-dir /path/to/energy/run  # include Cert. (energy)
+    python run_mc.py \
+        --baseline-controller-dir neural_certified/seed4 \
+        --energy-controller-dir neural_certified/seed4/energy/20260905_091107_645787 \
+        --n-mc 100 \
+        --output-dir run_mc_energy_seed4 \
+        --verbose # compare the cert with/without energy constraints.
     python postprocess_mc.py        # re-render plots/table from mc_cache.pth only
 """
 
@@ -950,6 +963,54 @@ def plot_energy_vs_thit(entries, styles, save_dir=None, verbose=True):
 
 
 # -----------------------------------------------------------------------
+# Figure 8 — Pooled energy distributions across all MC runs
+# -----------------------------------------------------------------------
+def plot_energy_distribution(results, styles, save_dir=None, verbose=True):
+    """Compare energy across all outcomes, pooled within four disturbance groups.
+
+    Energy is accumulated until success, failure, or timeout. Boxes show
+    quartiles and medians, with 1.5-IQR whiskers and individual outliers.
+    White diamonds and numeric labels indicate the arithmetic means.
+    Adversarial energies pool all four attack modes without taking a minimum.
+    """
+    groups = (
+        ("Overall", EVAL_MODES),
+        ("Zero disturbance", ("zero",)),
+        ("Uniform disturbance", ("uniform",)),
+        ("Adversarial", ADVERSARIAL_MODES),
+    )
+    fig, axes = plt.subplots(1, 4, figsize=(16, 4.5))
+    for ax, (title, modes) in zip(axes, groups):
+        pooled = {style["label"]: [] for style in styles}
+        for mode in modes:
+            for label, res, _stats in results.get(mode, []):
+                pooled[label].extend(res["energies"])
+        boxes = ax.boxplot(list(pooled.values()), patch_artist=True, widths=0.5,
+                           medianprops={"color": "black", "linewidth": 2}, showmeans=True,
+                           meanprops={"marker": "D", "markerfacecolor": "white",
+                                      "markeredgecolor": "black", "markersize": 5})
+        for box, style in zip(boxes["boxes"], styles):
+            box.set_facecolor(style["color"])
+        for position, values in enumerate(pooled.values(), start=1):
+            if values:
+                mean = float(np.mean(values))
+                ax.annotate(f"Mean: {mean:.4f}", xy=(position, mean), xytext=(0, 10),
+                            textcoords="offset points", ha="center", va="bottom", fontsize=10,
+                            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.85, "pad": 1})
+        ax.set_xticks(range(1, len(pooled) + 1), list(pooled))
+        ax.set_title(title)
+        ax.grid(True, axis="y", alpha=0.35)
+    fig.supylabel(r"Control energy $E = \int u_{\rm raw}(t)^2\,dt$")
+    fig.tight_layout()
+    save_path = _ensure_save_dir(save_dir)
+    if save_path is not None:
+        path = save_path / "fig8_energy_distribution.pdf"
+        fig.savefig(path, format="pdf", bbox_inches="tight")
+        vprint(f"[saved] {path}", verbose=verbose)
+    plt.close(fig)
+
+
+# -----------------------------------------------------------------------
 # Figure 5 — u_raw(t) vs time (single plot, all controllers)
 # -----------------------------------------------------------------------
 def plot_u_raw_trajectories(entries, dt, styles, save_dir=None, verbose=True):
@@ -1196,7 +1257,7 @@ def evaluate_controller_seed(ckpt_path, *, pretrained, n_mc, t_max, dt, mc_seed,
     return per_mode
 
 
-def parse_args():
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument(
         "--verbose", action="store_true",
@@ -1207,16 +1268,55 @@ def parse_args():
         help="Cap the number of failure trajectories drawn per controller in "
              "fig7_failure_trajectories.pdf (default: draw every pooled failure).",
     )
-    return parser.parse_args()
+    parser.add_argument(
+        "--energy-controller-dir", type=Path, default=None,
+        help="Include Cert. (energy): a run containing outputs/eval_bundle.pth, "
+             "or a directory containing seed<N>/outputs/eval_bundle.pth. "
+             "Uses the same raw-control energy metric and MC regimes as Cert.",
+    )
+    parser.add_argument(
+        "--baseline-controller-dir", type=Path, default=None,
+        help="Compare only this certified baseline with --energy-controller-dir. "
+             "Select a seed<N> directory to evaluate a single training seed.",
+    )
+    parser.add_argument(
+        "--n-mc", type=int, default=int(EXAMPLE_CONFIG["n_mc"]), metavar="N",
+        help="Trajectories per controller, training seed, and disturbance mode (default: config.json).",
+    )
+    parser.add_argument(
+        "--output-dir", type=Path, default=OUTPUT_DIR,
+        help="Directory for the MC cache and figures (default: run_mc_results).",
+    )
+    parser.add_argument(
+        "--figures", type=int, nargs="+", choices=(1, 2, 5, 6, 7, 8), default=None,
+        help="Figures to generate (default: 6 7 8 for a baseline/energy comparison; "
+             "1 2 5 6 7 otherwise).",
+    )
+    args = parser.parse_args(argv)
+    if args.figures is None:
+        args.figures = [6, 7, 8] if args.baseline_controller_dir is not None else [1, 2, 5, 6, 7]
+    if args.n_mc < 1:
+        parser.error("--n-mc must be positive")
+    if args.baseline_controller_dir is not None:
+        if args.energy_controller_dir is None:
+            parser.error("--baseline-controller-dir requires --energy-controller-dir")
+        if not discover_seed_checkpoints(args.baseline_controller_dir, "outputs/eval_bundle.pth"):
+            parser.error("No baseline controller checkpoint found under --baseline-controller-dir")
+    if args.energy_controller_dir is not None and not discover_seed_checkpoints(
+        args.energy_controller_dir, "outputs/eval_bundle.pth"
+    ):
+        parser.error("No energy controller checkpoint found under --energy-controller-dir")
+    return args
 
 
 # -----------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------
-def main():
-    args = parse_args()
+def main(argv=None):
+    args = parse_args(argv)
     verbose = args.verbose
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    output_dir = args.output_dir
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Controllers to compare — add/remove entries here.
     # `base_dir`: controller directory. If it holds `seed<N>/<rel_path>`
@@ -1235,6 +1335,12 @@ def main():
         dict(label="RL (SB3 DDPG)",         base_dir=HERE / "rl_sb3_ddpg", rel_path="outputs/rl_controller.pth", pretrained=True),
         dict(label="RL (SB3 RPO)",          base_dir=HERE / "rl_sb3_rpo", rel_path="outputs/rl_controller.pth", pretrained=True),
     ]
+    if args.baseline_controller_dir is not None:
+        bundle_specs = [dict(label="Cert.", base_dir=args.baseline_controller_dir,
+                             rel_path="outputs/eval_bundle.pth", pretrained=False)]
+    if args.energy_controller_dir is not None:
+        bundle_specs.insert(1, dict(label="Cert. (energy)", base_dir=args.energy_controller_dir,
+                                    rel_path="outputs/eval_bundle.pth", pretrained=False))
 
     controllers = []
     for spec in bundle_specs:
@@ -1252,7 +1358,7 @@ def main():
     styles = build_controller_styles([c["label"] for c in controllers])
 
     # --- MC config ---
-    N_MC    = int(EXAMPLE_CONFIG["n_mc"])
+    N_MC    = args.n_mc
     T_MAX   = 30.0
     DT      = 0.005
     MC_SEED = 42
@@ -1309,7 +1415,7 @@ def main():
             viz_success[mode].append(pooled_viz_success)
 
     save_mc_cache(
-        MC_CACHE_PATH,
+        output_dir / "mc_cache.pth",
         controller_labels=[c["label"] for c in controllers],
         results=results,
         viz_paths=viz_paths,
@@ -1323,6 +1429,7 @@ def main():
             mc_seed=MC_SEED,
             n_paths=N_PATHS,
             eval_modes=list(EVAL_MODES),
+            figures=args.figures,
             seed_counts=seed_counts,
             bundle_specs=[
                 {
@@ -1340,25 +1447,27 @@ def main():
     )
 
     for mode in EVAL_MODES:
-        mode_dir = OUTPUT_DIR / mode
-        vprint(f"\nSaving '{mode}' comparison figures -> {mode_dir}", verbose=verbose)
-        plot_phase_trajectories(results[mode], viz_paths[mode], styles, save_dir=mode_dir, verbose=verbose)
-        plot_energy_vs_thit(results[mode], styles, save_dir=mode_dir, verbose=verbose)
-        plot_u_raw_trajectories(results[mode], DT, styles, save_dir=mode_dir, verbose=verbose)
+        mode_dir = output_dir / mode
+        if 1 in args.figures:
+            plot_phase_trajectories(results[mode], viz_paths[mode], styles, save_dir=mode_dir, verbose=verbose)
+        if 2 in args.figures:
+            plot_energy_vs_thit(results[mode], styles, save_dir=mode_dir, verbose=verbose)
+        if 5 in args.figures:
+            plot_u_raw_trajectories(results[mode], DT, styles, save_dir=mode_dir, verbose=verbose)
 
     labels = [c["label"] for c in controllers]
-
-    vprint(f"\nSaving failure trajectories figure -> {OUTPUT_DIR}", verbose=verbose)
-    pooled_viz_paths, pooled_viz_success = pool_viz_across_modes(viz_paths, viz_success, list(EVAL_MODES))
-    adv_viz_paths, adv_viz_success = pool_viz_across_modes(viz_paths, viz_success, list(ADVERSARIAL_MODES))
-    plot_failure_trajectories(labels, pooled_viz_paths, pooled_viz_success,
-                               adv_viz_paths, adv_viz_success, styles,
-                               save_dir=OUTPUT_DIR, verbose=verbose,
-                               max_per_controller=args.max_fail_trajectories)
-
-    vprint(f"\nSaving success-rate summary figure -> {OUTPUT_DIR}", verbose=verbose)
-    plot_success_rate_summary(labels, success_table, per_seed_success, styles,
-                               save_dir=OUTPUT_DIR, verbose=verbose)
+    if 6 in args.figures:
+        plot_success_rate_summary(labels, success_table, per_seed_success, styles,
+                                  save_dir=output_dir, verbose=verbose)
+    if 7 in args.figures:
+        pooled_viz_paths, pooled_viz_success = pool_viz_across_modes(viz_paths, viz_success, list(EVAL_MODES))
+        adv_viz_paths, adv_viz_success = pool_viz_across_modes(viz_paths, viz_success, list(ADVERSARIAL_MODES))
+        plot_failure_trajectories(labels, pooled_viz_paths, pooled_viz_success,
+                                 adv_viz_paths, adv_viz_success, styles,
+                                 save_dir=output_dir, verbose=verbose,
+                                 max_per_controller=args.max_fail_trajectories)
+    if 8 in args.figures:
+        plot_energy_distribution(results, styles, save_dir=output_dir, verbose=verbose)
 
     print_success_rate_table(labels, success_table)
 

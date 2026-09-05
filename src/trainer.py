@@ -10,8 +10,6 @@ import time
 import select
 import gc
 from pathlib import Path
-
-from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 import sys
 sys.path.insert(0, str(ROOT))
@@ -28,7 +26,6 @@ from src.training_utils import (
 from src.visualization import visualize_training_progress
 from src.regions import Regions
 from src.hyperparameters import Hyperparameters
-from src.discretization import debug_print_region_bounds
 from src.save_load_utils import save_eval_bundle
 
 
@@ -37,169 +34,6 @@ def _cells_to_cpu(region_cells: dict):
     for name, cells in region_cells.items():
         out[name] = [(lo.detach().cpu(), hi.detach().cpu()) for (lo, hi) in cells]
     return out
-
-
-def _get_current_time_horizon(params) -> float:
-    # Keep legacy name for backward compatibility.
-    if not (bool(getattr(params, "include_time", False)) or bool(getattr(params, "include_energy", False))):
-        return None
-    scales = getattr(params.network, "input_scale", None)
-    if isinstance(scales, (list, tuple)) and len(scales) >= 1:
-        try:
-            return float(scales[0])
-        except Exception:
-            return None
-    return None
-
-
-def _clip_cells_to_time_horizon(cells, new_horizon: float, keep_terminal_cells: bool = False):
-    """
-    Clip a list of (lower, upper) cells along leading dimension (dim=0) to [0, new_horizon].
-
-    Rules:
-      - keep/update only if interval [t_a, t_b] overlaps [0, new_horizon]
-      - otherwise remove
-    """
-    eps = 1e-9
-    kept = []
-    removed = 0
-    clipped = 0
-    moved_terminal = 0
-    for lo, hi in cells:
-        lo2 = lo.clone()
-        hi2 = hi.clone()
-        ta = float(lo2[0].item())
-        tb = float(hi2[0].item())
-
-        # Special case: terminal-time cell above horizon (e.g., terminal unsafe).
-        if keep_terminal_cells and abs(tb - ta) <= eps and ta > new_horizon + eps:
-            lo2[0] = float(new_horizon)
-            hi2[0] = float(new_horizon)
-            kept.append((lo2, hi2))
-            moved_terminal += 1
-            continue
-
-        # No overlap with [0, new_horizon] -> remove.
-        if (tb < 0.0 - eps) or (ta > new_horizon + eps):
-            removed += 1
-            continue
-
-        # Clip to intersection with [0, new_horizon].
-        if ta < 0.0 - eps:
-            lo2[0] = 0.0
-            clipped += 1
-        if tb > new_horizon + eps:
-            hi2[0] = float(new_horizon)
-            clipped += 1
-
-        if float(lo2[0].item()) > float(hi2[0].item()) + eps:
-            removed += 1
-            continue
-
-        kept.append((lo2, hi2))
-
-    stats = {
-        "in": int(len(cells)),
-        "out": int(len(kept)),
-        "removed": int(removed),
-        "clipped": int(clipped),
-        "moved_terminal": int(moved_terminal),
-    }
-    return kept, stats
-
-
-def _apply_time_horizon_to_region_cells(region_cells: dict, new_horizon: float):
-    """
-    Apply leading-dimension horizon clipping to all region-cell groups in-place-compatible form.
-    """
-    out = {}
-    all_stats = {}
-    for name, cells in region_cells.items():
-        keep_terminal = (name == "unsafe")
-        clipped_cells, stats = _clip_cells_to_time_horizon(
-            cells,
-            new_horizon=float(new_horizon),
-            keep_terminal_cells=keep_terminal,
-        )
-        if name == "init":
-            # Init set is always t=0.
-            for lo, hi in clipped_cells:
-                lo[0] = 0.0
-                hi[0] = 0.0
-        out[name] = clipped_cells
-        all_stats[name] = stats
-    return out, all_stats
-
-
-def _update_time_input_scale_for_models(V_net, GV_net, params, new_horizon: float):
-    """
-    Keep config + model buffers consistent when first-dimension horizon changes.
-    """
-    h = float(new_horizon)
-
-    # 1) Hyperparameter config
-    if hasattr(params.network, "input_scale") and len(params.network.input_scale) > 0:
-        params.network.input_scale[0] = h
-
-    # 2) V network buffer / config
-    with torch.no_grad():
-        if hasattr(V_net, "input_scale") and V_net.input_scale.numel() > 0:
-            V_net.input_scale[0].fill_(h)
-        if hasattr(V_net, "config") and hasattr(V_net.config, "input_scale") and len(V_net.config.input_scale) > 0:
-            V_net.config.input_scale[0] = h
-
-        # 3) GV network buffer (+ squared scale cache buffer)
-        if hasattr(GV_net, "input_scale") and GV_net.input_scale.numel() > 0:
-            GV_net.input_scale[0].fill_(h)
-        if hasattr(GV_net, "input_scale_sq") and GV_net.input_scale_sq.numel() > 0:
-            GV_net.input_scale_sq[0].fill_(h * h)
-
-        # Reset cached inverse scales so new input_scale takes effect immediately.
-        if hasattr(GV_net, "_cached_scale_D"):
-            GV_net._cached_scale_D = None
-        if hasattr(GV_net, "_cached_inv_scale"):
-            GV_net._cached_inv_scale = None
-        if hasattr(GV_net, "_cached_inv_scale_sq"):
-            GV_net._cached_inv_scale_sq = None
-
-
-def _clip_region_time_bounds_inplace(region, new_horizon: float, keep_terminal_cells: bool = False):
-    """Clip region bounds (and union components, if any) on time dim (dim=0) to [0, new_horizon]."""
-    if region is None:
-        return
-    eps = 1e-9
-    h = float(new_horizon)
-
-    def _clip_one(r):
-        if r is None or r.bounds.shape[0] == 0:
-            return
-        ta = float(r.bounds[0, 0])
-        tb = float(r.bounds[0, 1])
-        if keep_terminal_cells and abs(tb - ta) <= eps and ta > h + eps:
-            r.bounds[0, 0] = h
-            r.bounds[0, 1] = h
-            return
-        r.bounds[0, 0] = max(0.0, min(ta, h))
-        r.bounds[0, 1] = max(0.0, min(tb, h))
-        if float(r.bounds[0, 0]) > float(r.bounds[0, 1]):
-            r.bounds[0, 0] = r.bounds[0, 1]
-
-    _clip_one(region)
-    if getattr(region, "is_union", False) and getattr(region, "components", None):
-        for comp in region.components:
-            _clip_one(comp)
-
-
-def _update_regions_time_horizon(regions: Regions, new_horizon: float):
-    """Keep Regions metadata aligned with first-dimension horizon updates."""
-    if regions is None:
-        return
-    if getattr(regions, "init", None) is not None and regions.init.bounds.shape[0] > 0:
-        regions.init.bounds[0, 0] = 0.0
-        regions.init.bounds[0, 1] = 0.0
-    _clip_region_time_bounds_inplace(getattr(regions, "goal", None), new_horizon, keep_terminal_cells=False)
-    _clip_region_time_bounds_inplace(getattr(regions, "unsafe", None), new_horizon, keep_terminal_cells=True)
-    _clip_region_time_bounds_inplace(getattr(regions, "full", None), new_horizon, keep_terminal_cells=False)
 
 
 def train_network_bounds(
@@ -303,17 +137,9 @@ def train_network_bounds(
         opt_params += list(control_net.parameters())
 
     optimizer = torch.optim.Adam(opt_params, lr=params.training.learning_rate)
-    resume_optimizer_state = getattr(params.training, 'resume_optimizer_state_dict', None)
-    if resume_optimizer_state is not None:
-        optimizer.load_state_dict(resume_optimizer_state)
-        print("Loaded optimizer state from resume checkpoint")
 
     # Scheduler is optional and created via factory function from main.py
     scheduler = create_scheduler(optimizer) if create_scheduler is not None else None
-    resume_scheduler_state = getattr(params.training, 'resume_scheduler_state_dict', None)
-    if scheduler is not None and resume_scheduler_state is not None:
-        scheduler.load_state_dict(resume_scheduler_state)
-        print("Loaded scheduler state from resume checkpoint")
 
     # Pre-compute region slice indices for fast bound splitting
     region_slice_indices = {}
@@ -345,7 +171,8 @@ def train_network_bounds(
     first_sat_refine_interval_applied = False
     refine_interval_after_first_sat = getattr(params.refinement, 'refine_interval_after_first_sat', None)
     curriculum_mode = str(getattr(params.training, 'curriculum_mode', 'beta')).lower()
-    params.training.user_stop_requested = False
+    if curriculum_mode not in {"none", "beta"}:
+        raise ValueError("curriculum_mode must be 'none' or 'beta'")
     async_stop_requested = False
 
     def _poll_async_stop_command() -> bool:
@@ -364,9 +191,9 @@ def train_network_bounds(
         except Exception:
             return False
 
-    # For curriculum runs (fresh or resume), directly use the post-first-SAT
+    # For beta curriculum runs, directly use the post-first-SAT
     # refinement interval from the start.
-    if curriculum_mode in {"beta", "time", "energy"} and refine_interval_after_first_sat is not None:
+    if curriculum_mode == "beta" and refine_interval_after_first_sat is not None:
         new_interval = int(refine_interval_after_first_sat)
         if new_interval > 0:
             for cfg in (
@@ -385,14 +212,6 @@ def train_network_bounds(
     def _save_resume_checkpoint(epoch_idx: int, stop_requested: bool = False):
         checkpoint_path = Path(getattr(params.training, 'resume_checkpoint_path', "resume_checkpoint.pth"))
         checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
-        time_horizon = None
-        if bool(getattr(params, "include_time", False)):
-            scales = getattr(params.network, "input_scale", None)
-            if isinstance(scales, (list, tuple)) and len(scales) >= 1:
-                try:
-                    time_horizon = float(scales[0])
-                except Exception:
-                    time_horizon = None
         latest_sat_beta_ra = getattr(params.training, "latest_sat_beta_ra", None)
         torch.save({
             "V_state_dict": {k: v.detach().cpu() for k, v in V_net.state_dict().items()},
@@ -406,7 +225,6 @@ def train_network_bounds(
             "loss_history": loss_history,
             "refinement_epochs": refinement_epochs,
             "stop_requested": bool(stop_requested),
-            "time_horizon": time_horizon,
             "latest_sat_beta_ra": latest_sat_beta_ra,
         }, checkpoint_path)
         print(f"Saved resume checkpoint -> {checkpoint_path}")
@@ -439,65 +257,6 @@ def train_network_bounds(
         if ok and params.compute_GV and sat_dict_local['generator'] is False:
             ok = False
         return ok
-
-    def _handle_time_curriculum_sat(epoch_idx: int, stop_requested: bool = False):
-        """
-        Handle one SAT event in time/energy curriculum mode.
-        Returns:
-            (all_satisfied_after, needs_v_rebuild, needs_gv_rebuild)
-        """
-        cur_h = _get_current_time_horizon(params)
-        is_energy_mode = (curriculum_mode == "energy")
-        min_h = getattr(
-            params.training,
-            "energy_max_min" if is_energy_mode else "time_horizon_min",
-            None,
-        )
-        step_h = float(
-            getattr(
-                params.training,
-                "energy_max_step" if is_energy_mode else "time_horizon_step",
-                1.0,
-            )
-        )
-        if step_h <= 0.0:
-            step_h = 1.0
-
-        # Always persist the SAT state first (checkpoint + eval bundle).
-        params.training.time_user_stop = False
-        _save_resume_checkpoint(epoch_idx, stop_requested=False)
-        _save_eval_bundle_snapshot()
-
-        if stop_requested:
-            params.training.user_stop_requested = True
-            _save_resume_checkpoint(epoch_idx, stop_requested=True)
-            print(f"User requested early stop for {'energy' if is_energy_mode else 'time'} curriculum.")
-            return True, False, False
-
-        if (cur_h is not None) and (min_h is not None) and (cur_h > float(min_h) + 1e-9):
-            next_h = max(float(min_h), cur_h - step_h)
-            print(
-                f"SAT reached at beta_ra={params.constraints.beta_ra:.2f}. "
-                f"{'Energy max' if is_energy_mode else 'Time horizon'} curriculum update: {cur_h:.4f} -> {next_h:.4f}"
-            )
-            nonlocal region_cells
-            region_cells, clip_stats = _apply_time_horizon_to_region_cells(region_cells, new_horizon=next_h)
-            _update_time_input_scale_for_models(V_net, GV_net, params, new_horizon=next_h)
-            _update_regions_time_horizon(regions, new_horizon=next_h)
-            debug_print_region_bounds(region_cells["unsafe"], label="Unsafe cells")
-            for rname, st in clip_stats.items():
-                print(
-                    f"[{'EnergyClip' if is_energy_mode else 'TimeClip'}:{rname}] in={st['in']} out={st['out']} "
-                    f"removed={st['removed']} clipped={st['clipped']} moved_terminal={st['moved_terminal']}"
-                )
-            # Continue training with tightened horizon.
-            return False, True, True
-
-        print(
-            f"SAT reached at beta_ra={params.constraints.beta_ra:.2f} "
-            f"({'energy' if is_energy_mode else 'time'} curriculum complete)"
-        )
-        return True, False, False
 
     for epoch in range(params.training.num_epochs):
         V_net.train()
@@ -596,7 +355,7 @@ def train_network_bounds(
                         outside_failing_mask,
                         v_cfg.refine_factor,
                         N_to_refine=v_cfg.N_to_refine,
-                        scores=-bounds_updated['outside'][0]
+                        scores=-bounds_updated['outside'][0],
                     )
                     region_cells['outside'] = new_cells
                     print(f"Refining outside cells: {num_outside_failing} failing, refined {num_refined} cells, {len(new_cells)} total")
@@ -636,7 +395,7 @@ def train_network_bounds(
                         goal_failing_mask,
                         v_cfg.refine_factor,
                         N_to_refine=v_cfg.N_to_refine,
-                        scores=-bounds_updated['goal'][0]
+                        scores=-bounds_updated['goal'][0],
                     )
                     region_cells['goal'] = new_cells
                     print(f"Refining goal cells: {num_goal_failing} failing, refined {num_refined} cells, {len(new_cells)} total")
@@ -676,7 +435,7 @@ def train_network_bounds(
                         init_failing_mask,
                         v_cfg.refine_factor,
                         N_to_refine=v_cfg.N_to_refine,
-                        scores=bounds_updated['init'][1]
+                        scores=bounds_updated['init'][1],
                     )
                     region_cells['init'] = new_cells
                     print(f"Refining init cells: {num_init_failing} failing, refined {num_refined} cells, {len(new_cells)} total")
@@ -718,7 +477,7 @@ def train_network_bounds(
                         unsafe_failing_mask,
                         v_cfg.refine_factor,
                         N_to_refine=v_cfg.N_to_refine,
-                        scores=-bounds_updated['unsafe'][0]
+                        scores=-bounds_updated['unsafe'][0],
                     )
                     region_cells['unsafe'] = new_cells
                     print(f"Refining unsafe cells: {num_unsafe_failing} failing, refined {num_refined} cells, {len(new_cells)} total")
@@ -748,7 +507,7 @@ def train_network_bounds(
                         phi_upper_failing_mask,
                         gv_cfg.refine_factor,
                         N_to_refine=gv_cfg.N_to_refine,
-                        scores=phi_uppers
+                        scores=phi_uppers,
                     )
                     region_cells['generator'] = new_cells
                     print(f"Refining generator cells: {num_total_failing} failing, refined {num_refined} cells, {len(new_cells)} total")
@@ -767,7 +526,7 @@ def train_network_bounds(
                     region_cells['generator'],
                     phi_upper_failing_mask_relax,
                     max_passes=gv_cfg.merge_max_passes,
-                    max_merges=None
+                    max_merges=None,
                 )
                 region_cells['generator'] = merged_cells
                 print(f"Merging generator cells: merged {num_merges} pairs, {len(merged_cells)} total")
@@ -783,12 +542,11 @@ def train_network_bounds(
 
         # Early stopping check
         with torch.no_grad():
-            if curriculum_mode in {"beta", "time", "energy"}:
+            if curriculum_mode == "beta":
                 async_stop_requested = async_stop_requested or _poll_async_stop_command()
 
             # Immediate stop for curriculum modes: main.py will reload latest SAT eval_bundle.
-            if async_stop_requested and curriculum_mode in {"beta", "time", "energy"}:
-                params.training.user_stop_requested = True
+            if async_stop_requested and curriculum_mode == "beta":
                 print("User requested stop. Exiting training and loading latest SAT bundle in main.")
                 break
 
@@ -828,7 +586,6 @@ def train_network_bounds(
                     _save_eval_bundle_snapshot()
                     beta_ra_max = float(getattr(params.constraints, "beta_ra_max", 20.0))
                     if async_stop_requested:
-                        params.training.user_stop_requested = True
                         _save_resume_checkpoint(epoch, stop_requested=True)
                         print("User requested early stop for beta curriculum.")
                     elif params.constraints.beta_ra < beta_ra_max:
@@ -839,14 +596,6 @@ def train_network_bounds(
                         print(f"Incremented beta_ra to {params.constraints.beta_ra:.2f}")
                     else:
                         print(f"beta_ra reached maximum of {beta_ra_max:.2f}")
-
-                elif curriculum_mode in {"time", "energy"}:
-                    all_satisfied, v_rebuild_now, gv_rebuild_now = _handle_time_curriculum_sat(
-                        epoch,
-                        stop_requested=async_stop_requested
-                    )
-                    needs_v_cache_rebuild = needs_v_cache_rebuild or v_rebuild_now
-                    needs_gv_cache_rebuild = needs_gv_cache_rebuild or gv_rebuild_now
 
             # Early stop if all active constraints are satisfied
             if all_satisfied:
@@ -911,7 +660,7 @@ def train_network_bounds(
                 )
 
         # Visualize progress
-        if curriculum_mode not in {"time", "beta", "energy"} and params.logging.visualize_interval > 0 and epoch % params.logging.visualize_interval == 0:
+        if curriculum_mode == "none" and params.logging.visualize_interval > 0 and epoch % params.logging.visualize_interval == 0:
             progress_dir = getattr(params.training, "progress_output_dir", "training_progress")
             visualize_training_progress(
                 V_net, GV_net, regions, region_cells,

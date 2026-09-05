@@ -16,7 +16,8 @@ from src.dynamics import Dynamics
 
 class GV(nn.Module):
     """
-    Infinitesimal generator G applied to value function V
+    Infinitesimal generator G applied to value function V.
+    With include_energy=True, inputs are [physical state..., E].
     """
 
     def __init__(
@@ -135,10 +136,10 @@ class GV(nn.Module):
             Hdiag_dyn = Hdiag[:, 1:]
             extra_term = dVdt
         elif self.include_energy:
-            dVdE = dVdx[:, :1]
-            x_dyn = x[:, 1:]
-            dVdx_dyn = dVdx[:, 1:]
-            Hdiag_dyn = Hdiag[:, 1:]
+            dVdE = dVdx[:, -1:]
+            x_dyn = x[:, :-1]
+            dVdx_dyn = dVdx[:, :-1]
+            Hdiag_dyn = Hdiag[:, :-1]
             energy_rate = self._compute_energy_rate(x_dyn)
             extra_term = dVdE * energy_rate
         else:
@@ -260,9 +261,6 @@ class GV(nn.Module):
             sig = inspect.signature(self.f)
             self._f_expects_u = (len(sig.parameters) >= 2)
 
-        self._f_is_tensor = isinstance(self.f, torch.Tensor)
-        self._f_is_numpy = isinstance(self.f, np.ndarray)
-
     def _init_g_dispatch(self):
         self._g_is_none = (self.g is None)
         self._g_callable = callable(self.g)
@@ -276,13 +274,24 @@ class GV(nn.Module):
             self._g_callable = False
             self._g_has_diag_sq = False
 
-        self._g_is_tensor = isinstance(self.g, torch.Tensor)
         self._g_is_float = isinstance(self.g, (int, float))
         self._g_expects_u = False
         if self._g_callable and (not self._g_has_diag_sq):
             import inspect
             sig = inspect.signature(self.g)
             self._g_expects_u = (len(sig.parameters) >= 2)
+
+        # Validate constant-tensor g against the dynamics' state dim once here
+        # (not per forward call): a runtime check inside forward() would branch
+        # on a shape derived from the traced input, which is what triggers
+        # "Converting a tensor to a Python boolean" TracerWarnings under
+        # auto_LiRPA's BoundedModule tracing.
+        if isinstance(self.g, torch.Tensor):
+            D = self.dynamics.state_dim
+            if self.g.dim() == 1 and self.g.numel() != D:
+                raise ValueError(f"g vector dim {self.g.numel()} != state dim {D}")
+            if self.g.dim() == 2 and tuple(self.g.shape) != (D, D):
+                raise ValueError(f"g matrix shape {tuple(self.g.shape)} not (D,D) with D={D}")
 
     # -------------------------
     # drift / diffusion (fast paths)
@@ -350,13 +359,9 @@ class GV(nn.Module):
                 return g_t.square() * torch.ones_like(x)
 
             if g_t.dim() == 1:
-                if g_t.numel() != D:
-                    raise ValueError(f"g vector dim {g_t.numel()} != state dim {D}")
                 return g_t.view(1, D).square().expand_as(x)
 
             if g_t.dim() == 2:
-                if g_t.shape != (D, D):
-                    raise ValueError(f"g matrix shape {tuple(g_t.shape)} not (D,D) with D={D}")
                 # diag(GG^T) = row-wise sum of squares
                 diag = g_t.square().sum(dim=1)  # (D,)
                 return diag.view(1, D).expand_as(x)
@@ -368,6 +373,8 @@ class GV(nn.Module):
 
 class GV_offset(nn.Module):
     """
+    With include_energy=True, inputs are [physical state..., E].
+
     Optimized GV:
       - caches callable signatures once
       - computes diag(GG^T) via sum of squares (no bmm, no eye mask)
@@ -478,12 +485,9 @@ class GV_offset(nn.Module):
 
         inv_scale, inv_scale_sq = self._get_inv_scales(D, x.device, x.dtype)  # (D,), (D,)
 
-        # normalize (multiplication is a bit cheaper than division)
-        # x_norm = x * inv_scale
-        # NEW: match V normalization: (x - offset)/scale
+        # Match V normalization: (x - offset) / scale.
         offset = self._get_offset(D, x.device, x.dtype)  # (D,)
         x_norm = (x - offset) * inv_scale
-
 
         # layer 1
         z0 = F.linear(x_norm, W0, b0)     # (N,m0)
@@ -524,13 +528,6 @@ class GV_offset(nn.Module):
         # Fuse final operations: scale * sum * inv_scale_sq
         Hdiag = (self.scale_factor * inv_scale_sq) * (cross + direct).sum(dim=1)  # (N,D)
 
-        # drift and diffusion terms - compute and fuse in one pass
-        # fx = self._evaluate_f_fast(x)  # (N,D)
-        # g_diag_sq = self._compute_gg_diag_fast(x)  # (N,D)
-
-        # # Fuse: out = (fx * dVdx).sum() + 0.5 * (g_diag_sq * Hdiag).sum()
-        # out = ((fx * dVdx) + (0.5 * g_diag_sq * Hdiag)).sum(dim=1, keepdim=True)  # (N,1)
-
         if self.include_time:
             dVdt = dVdx[:, :1]
             x_dyn = x[:, 1:]
@@ -538,10 +535,10 @@ class GV_offset(nn.Module):
             Hdiag_dyn = Hdiag[:, 1:]
             extra_term = dVdt
         elif self.include_energy:
-            dVdE = dVdx[:, :1]
-            x_dyn = x[:, 1:]
-            dVdx_dyn = dVdx[:, 1:]
-            Hdiag_dyn = Hdiag[:, 1:]
+            dVdE = dVdx[:, -1:]
+            x_dyn = x[:, :-1]
+            dVdx_dyn = dVdx[:, :-1]
+            Hdiag_dyn = Hdiag[:, :-1]
             extra_term = dVdE * self._compute_energy_rate(x_dyn)
         else:
             x_dyn = x
@@ -687,9 +684,6 @@ class GV_offset(nn.Module):
             sig = inspect.signature(self.f)
             self._f_expects_u = (len(sig.parameters) >= 2)
 
-        self._f_is_tensor = isinstance(self.f, torch.Tensor)
-        self._f_is_numpy = isinstance(self.f, np.ndarray)
-
     def _init_g_dispatch(self):
         self._g_is_none = (self.g is None)
         self._g_callable = callable(self.g)
@@ -703,13 +697,24 @@ class GV_offset(nn.Module):
             self._g_callable = False
             self._g_has_diag_sq = False
 
-        self._g_is_tensor = isinstance(self.g, torch.Tensor)
         self._g_is_float = isinstance(self.g, (int, float))
         self._g_expects_u = False
         if self._g_callable and (not self._g_has_diag_sq):
             import inspect
             sig = inspect.signature(self.g)
             self._g_expects_u = (len(sig.parameters) >= 2)
+
+        # Validate constant-tensor g against the dynamics' state dim once here
+        # (not per forward call): a runtime check inside forward() would branch
+        # on a shape derived from the traced input, which is what triggers
+        # "Converting a tensor to a Python boolean" TracerWarnings under
+        # auto_LiRPA's BoundedModule tracing.
+        if isinstance(self.g, torch.Tensor):
+            D = self.dynamics.state_dim
+            if self.g.dim() == 1 and self.g.numel() != D:
+                raise ValueError(f"g vector dim {self.g.numel()} != state dim {D}")
+            if self.g.dim() == 2 and tuple(self.g.shape) != (D, D):
+                raise ValueError(f"g matrix shape {tuple(self.g.shape)} not (D,D) with D={D}")
 
     # -------------------------
     # drift / diffusion (fast paths)
@@ -777,13 +782,9 @@ class GV_offset(nn.Module):
                 return g_t.square() * torch.ones_like(x)
 
             if g_t.dim() == 1:
-                if g_t.numel() != D:
-                    raise ValueError(f"g vector dim {g_t.numel()} != state dim {D}")
                 return g_t.view(1, D).square().expand_as(x)
 
             if g_t.dim() == 2:
-                if g_t.shape != (D, D):
-                    raise ValueError(f"g matrix shape {tuple(g_t.shape)} not (D,D) with D={D}")
                 # diag(GG^T) = row-wise sum of squares
                 diag = g_t.square().sum(dim=1)  # (D,)
                 return diag.view(1, D).expand_as(x)
@@ -854,11 +855,11 @@ def compute_GV_autograd(
         extra_term = dVdt
     elif getattr(phi_module, "include_energy", False):
         if x.shape[1] < 2:
-            raise ValueError("include_energy=True requires input shape (N, 1 + state_dim)")
-        dVdE = dVdx[:, :1]
-        x_dyn = x[:, 1:]
-        dVdx_dyn = dVdx[:, 1:]
-        H_diag_dyn = H_diag[:, 1:] if g_fn is not None else None
+            raise ValueError("include_energy=True requires input shape (N, state_dim + 1), with E last")
+        dVdE = dVdx[:, -1:]
+        x_dyn = x[:, :-1]
+        dVdx_dyn = dVdx[:, :-1]
+        H_diag_dyn = H_diag[:, :-1] if g_fn is not None else None
         f_fn_for_energy = dynamics.get_f()
         if hasattr(f_fn_for_energy, "controller") and callable(getattr(f_fn_for_energy.controller, "forward", None)):
             ctrl = f_fn_for_energy.controller
@@ -962,8 +963,8 @@ def verify_GV(
         rng = torch.Generator(device=x.device)
         rng.manual_seed(0)
         # Sample within bounded in-domain ranges inferred from input_scale.
-        # include_time/include_energy=True: first dim in [0, input_scale[0]],
-        # remaining dims in [-scale, scale].
+        # Time is first; energy is last. The augmented coordinate is in
+        # [0, scale], and physical coordinates are in [-scale, scale].
         # otherwise: all dims in [-scale, scale].
         scale = torch.as_tensor(getattr(phi_module, "input_scale", torch.ones(D)), dtype=torch.float32).view(-1)
         if scale.numel() == 1:
@@ -974,7 +975,7 @@ def verify_GV(
         include_time = bool(getattr(phi_module, "include_time", False))
         include_energy = bool(getattr(phi_module, "include_energy", False))
         for d in range(D):
-            if (include_time or include_energy) and d == 0:
+            if (include_time and d == 0) or (include_energy and d == D - 1):
                 x[:, d].uniform_(0.0, float(scale[d].item()), generator=rng)
             else:
                 s = float(scale[d].item())

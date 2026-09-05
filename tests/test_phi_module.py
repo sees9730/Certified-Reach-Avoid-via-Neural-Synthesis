@@ -73,6 +73,24 @@ def test_GV_offset_2d_diagonal_diffusion():
         f"GV_offset verification failed for 2D GBM with input/output offsets"
 
 
+def test_GV_energy_last_without_offset():
+    """The non-offset generator also separates the final energy coordinate."""
+    from src.control_network import InvertControlNN, WrapperConterlNN
+    from src.dynamics import ClosedLoopDrift
+
+    torch.manual_seed(8)
+    config = NetworkConfig(n_inputs=3, n_hidden_1=8, n_hidden_2=8,
+                           input_scale=[2.0, 3.0, 0.6])
+    value = create_V(config)
+    controller = WrapperConterlNN(InvertControlNN())
+    dynamics = Dynamics(f=ClosedLoopDrift(lambda x: -x, controller),
+                        g=torch.tensor([0.0, 0.2]), state_dim=2)
+    generator = create_GV(value, dynamics, config, include_energy=True, verify=False)
+    x = torch.tensor([[0.4, -0.2, 0.1], [1.2, 0.8, 0.4]])
+    assert verify_GV(generator, dynamics, x=x, tol=1e-5)
+    torch.testing.assert_close(generator(x[0]), generator(x[:1])[0])
+
+
 if __name__ == "__main__":
     test_GV_2d_diagonal_diffusion()
     test_GV_4d_chain_diffusion()

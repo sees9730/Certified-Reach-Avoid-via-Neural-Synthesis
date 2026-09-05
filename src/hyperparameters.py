@@ -36,24 +36,17 @@ class DiscretizationConfig:
     axis_weights: list = field(default_factory=list)
     max_region_budget: int = 0
     max_generator_budget: int = 0
-    unit_lengths: list = field(default_factory=list)
     n_goal: int = 3
-    n_goal_budget: int = 0
     n_outside_goal: int = 3
-    n_outside_goal_budget: int = 0
     n_generator: int = 1 
-    n_generator_budget: int = 0
     n_unsafe: int = 3
-    n_unsafe_budget: int = 0
     n_init: int = 3
-    n_init_budget: int = 0
 
 @dataclass
 class ConstraintConfig:
     """Constraint parameters for training."""
     beta_ra: float = 20.0
     beta_increment: float = 0.2
-    all_v_lower_target: float = 0.0
 
 @dataclass
 class RefinementConfigRegion:
@@ -102,7 +95,6 @@ class LoggingConfig:
     loss_log_interval: int = 10  # Epochs between loss prints
     detailed_eval_interval: int = 1000  # Epochs between detailed evaluations
     visualize_interval: int = 1000  # Epochs between visualizations (0 to disable)
-    print_controller_interval: int = 100  # Epochs between controller param prints
 
 @dataclass
 class TrainingConfig:
@@ -203,22 +195,15 @@ class Hyperparameters:
                 'axis_weights': self.discretization.axis_weights,
                 'max_region_budget': self.discretization.max_region_budget,
                 'max_generator_budget': self.discretization.max_generator_budget,
-                'unit_lengths': self.discretization.unit_lengths,
                 'n_goal': self.discretization.n_goal,
-                'n_goal_budget': self.discretization.n_goal_budget,
                 'n_outside_goal': self.discretization.n_outside_goal,
-                'n_outside_goal_budget': self.discretization.n_outside_goal_budget,
                 'n_generator': self.discretization.n_generator,
-                'n_generator_budget': self.discretization.n_generator_budget,
                 'n_unsafe': self.discretization.n_unsafe,
-                'n_unsafe_budget': self.discretization.n_unsafe_budget,
                 'n_init': self.discretization.n_init,
-                'n_init_budget': self.discretization.n_init_budget,
             },
             'constraints': {
                 'beta_ra': self.constraints.beta_ra,
                 'beta_increment': self.constraints.beta_increment,
-                'all_v_lower_target': self.constraints.all_v_lower_target,
             },
             'training': {
                 'learning_rate': self.training.learning_rate,
@@ -303,27 +288,8 @@ class Hyperparameters:
                 'loss_log_interval': self.logging.loss_log_interval,
                 'detailed_eval_interval': self.logging.detailed_eval_interval,
                 'visualize_interval': self.logging.visualize_interval,
-                'print_controller_interval': self.logging.print_controller_interval
             },
             'compute_V': self.compute_V,
             'compute_GV': self.compute_GV,
             'include_time': self.include_time
         }
-
-
-def load_hparams(hp_dict: dict) -> Hyperparameters:
-    # start from defaults (so newly-added fields get sensible values)
-    base = Hyperparameters.default().to_dict()
-
-    # shallow merge at top-level + sub-dicts
-    # (for your structure, a simple recursive merge is safer)
-    def deep_update(dst, src):
-        for k, v in src.items():
-            if isinstance(v, dict) and isinstance(dst.get(k), dict):
-                deep_update(dst[k], v)
-            else:
-                dst[k] = v
-        return dst
-
-    merged = deep_update(base, hp_dict or {})
-    return Hyperparameters.from_dict(merged)

@@ -14,44 +14,28 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from typing import Optional, List, Tuple
 
-# Set up directories
-from pathlib import Path
-ROOT = Path(__file__).resolve().parents[1]   # repo_root
-import sys
-sys.path.insert(0, str(ROOT))
 from src.regions import Regions
 
 
-def _get_plot_pairs(D: int):
-    """
-    Return list of (x_dim, y_dim) index pairs (0-based) following your rule:
-      D=2: (1 vs 2)
-      D=3: (1 vs 2), (3 vs 2)
-      D=4: (1 vs 2), (3 vs 4)
-      D=5: (1 vs 2), (3 vs 4), (5 vs 4)
-    General rule:
-      - Consecutive pairs: (1 vs 2), (3 vs 4), (5 vs 6), ...
-      - If D is odd and > 2: add last dim vs previous dim: (D vs D-1)
+def _get_plot_pairs(D: int, include_energy: bool = False):
+    """Pair consecutive coordinates, sharing an axis for an odd final dimension.
+
+    For [x, E], keep E on the vertical axis, after the physical coordinates.
+    In 3D this gives (x₁, x₂), (x₂, E).
     """
     if D <= 1:
         raise ValueError(f"D must be > 1, got D={D}")
-
-    pairs = []
-    # consecutive pairs: (0,1), (2,3), (4,5), ...
-    for i in range(0, D - 1, 2):
-        pairs.append((i, i + 1))
-
-    # odd leftover: add (D-1) vs (D-2) => x_D vs x_{D-1}
-    if (D % 2 == 1) and (D > 2):
-        pairs.append((D - 1, D - 2))  # x-axis: last dim, y-axis: previous dim
-
+    pairs = [(i, i + 1) for i in range(0, D - 1, 2)]
+    if D % 2:
+        pairs.append((D - 2, D - 1) if include_energy else (D - 1, D - 2))
     return pairs
 
 
-def _format_dim_label(k_0based: int) -> str:
-    """Pretty label like x₁, x₂, ... for small indices; falls back to x{n}."""
-    n = k_0based + 1
-    subs = str(n).translate(str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉"))
+def _format_dim_label(k_0based: int, energy_dim: Optional[int] = None) -> str:
+    """Label physical coordinates x₁, x₂, … and the final energy coordinate E."""
+    if k_0based == energy_dim:
+        return "E"
+    subs = str(k_0based + 1).translate(str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉"))
     return f"x{subs}"
 
 
@@ -81,88 +65,16 @@ def _make_slice_grid(full_bounds: np.ndarray, x_dim: int, y_dim: int, resolution
     return X, Y, grid
 
 
-def make_slice_point_for_region(
-    region,
-    full_bounds: np.ndarray,
-    x_dim: int,
-    y_dim: int,
-    *,
-    fallback: str = "center_full",   # or "center_region"
-) -> np.ndarray:
-    """
-    Create a (D,) slice_point that passes through the middle of `region`
-    for all dimensions except x_dim and y_dim.
-
-    - For dims not in {x_dim, y_dim}: use center of the region bounds.
-    - For x_dim and y_dim: keep fallback center (doesn't matter; those dims vary).
-    - Clips result to full_bounds.
-
-    Handles union regions by using the center of the union bounding box.
-    """
-    D = full_bounds.shape[0]
-
-    # Base point (fallback for plotted dims)
-    if fallback == "center_region":
-        # If you want even plotted dims to start from region center (not necessary)
-        base = 0.5 * (_region_bbox(region, D)[:, 0] + _region_bbox(region, D)[:, 1])
-    else:
-        base = 0.5 * (full_bounds[:, 0] + full_bounds[:, 1])
-
-    region_bounds = _region_bbox(region, D)  # (D,2)
-    region_center = 0.5 * (region_bounds[:, 0] + region_bounds[:, 1])
-
-    slice_point = base.copy()
-    for d in range(D):
-        if d != x_dim and d != y_dim:
-            slice_point[d] = region_center[d]
-
-    # Safety: clip to full bounds
-    slice_point = np.clip(slice_point, full_bounds[:, 0], full_bounds[:, 1]).astype(np.float32)
-    return slice_point
-
-
-def _region_bbox(region, D: int) -> np.ndarray:
-    """
-    Return a (D,2) bounding box for Region or union Region.
-    Assumes `region.bounds` exists for non-union, and `region.components` for union.
-    """
-    if getattr(region, "is_union", False):
-        lows = []
-        highs = []
-        for comp in region.components:
-            b = np.asarray(comp.bounds, dtype=np.float32)
-            lows.append(b[:, 0])
-            highs.append(b[:, 1])
-        low = np.min(np.stack(lows, axis=0), axis=0)
-        high = np.max(np.stack(highs, axis=0), axis=0)
-        return np.stack([low, high], axis=1)
-    else:
-        b = np.asarray(region.bounds, dtype=np.float32)
-        if b.shape != (D, 2):
-            raise ValueError(f"Region bounds shape {b.shape} != ({D},2)")
-        return b
-
-
 def _draw_region_proj(ax, region, color: str, label: str, x_dim: int, y_dim: int):
     """Draw region projected to (x_dim, y_dim) on the given axis."""
-    if region.is_union:
-        for i, comp in enumerate(region.components):
-            bounds = comp.bounds
-            comp_label = label if i == 0 else None
-            rect = Rectangle(
-                (bounds[x_dim, 0], bounds[y_dim, 0]),
-                bounds[x_dim, 1] - bounds[x_dim, 0],
-                bounds[y_dim, 1] - bounds[y_dim, 0],
-                linewidth=3, edgecolor=color, facecolor='none', label=comp_label
-            )
-            ax.add_patch(rect)
-    else:
-        bounds = region.bounds
+    components = region.components if region.is_union else [region]
+    for i, component in enumerate(components):
+        bounds = component.bounds
         rect = Rectangle(
             (bounds[x_dim, 0], bounds[y_dim, 0]),
             bounds[x_dim, 1] - bounds[x_dim, 0],
             bounds[y_dim, 1] - bounds[y_dim, 0],
-            linewidth=3, edgecolor=color, facecolor='none', label=label
+            linewidth=3, edgecolor=color, facecolor='none', label=label if i == 0 else None
         )
         ax.add_patch(rect)
 
@@ -176,13 +88,16 @@ def visualize_value_function(
     training_cells: Optional[List] = None,
     filename: Optional[str] = None,
     resolution: int = 100,
-    figsize: Tuple[int, int] = (10, 8)
+    figsize: Tuple[int, int] = (10, 8),
+    *,
+    include_energy: bool = False
 ):
     V_net.eval()
 
     full_bounds = regions.full.bounds
     D = full_bounds.shape[0]
-    pairs = _get_plot_pairs(D)
+    pairs = _get_plot_pairs(D, include_energy)
+    labels = [_format_dim_label(d, D - 1 if include_energy else None) for d in range(D)]
 
     # device for eval
     try:
@@ -210,16 +125,16 @@ def visualize_value_function(
         vmin, vmax = float(np.min(V_output)), float(np.max(V_output))
 
         contour = ax.contourf(X, Y, V_output, levels=20, cmap='viridis')
-        fig.colorbar(contour, ax=ax, label=f"V({_format_dim_label(x_dim)}, {_format_dim_label(y_dim)})")
+        fig.colorbar(contour, ax=ax, label=f"V({labels[x_dim]}, {labels[y_dim]})")
 
-        ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
-        ax.set_ylabel(_format_dim_label(y_dim), fontsize=12)
+        ax.set_xlabel(labels[x_dim], fontsize=12)
+        ax.set_ylabel(labels[y_dim], fontsize=12)
         if epoch is not None:
-            ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
+            ax.set_title(f"{labels[x_dim]} vs {labels[y_dim]}\n"
                         f"Epoch: {epoch} - V(x) Output Range: [{vmin:.4f}, {vmax:.4f}]",
                         fontsize=12, fontweight='bold')
         else:
-            ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
+            ax.set_title(f"{labels[x_dim]} vs {labels[y_dim]}\n"
                         f"Final Evaluation - V(x) Output Range: [{vmin:.4f}, {vmax:.4f}]",
                         fontsize=12, fontweight='bold')
 
@@ -276,7 +191,9 @@ def visualize_generator(
 
     full_bounds = regions.full.bounds
     D = full_bounds.shape[0]
-    pairs = _get_plot_pairs(D)
+    include_energy = getattr(GV_net, "include_energy", False)
+    pairs = _get_plot_pairs(D, include_energy)
+    labels = [_format_dim_label(d, D - 1 if include_energy else None) for d in range(D)]
 
     try:
         net_device = next(GV_net.parameters()).device
@@ -294,13 +211,7 @@ def visualize_generator(
     for p, (x_dim, y_dim) in enumerate(pairs):
         ax = axes[p]
 
-        slice_point = make_slice_point_for_region(
-            regions.goal,
-            full_bounds,
-            x_dim=x_dim,
-            y_dim=y_dim,
-        )
-
+        slice_point = np.clip(regions.goal.bounds.mean(axis=1), full_bounds[:, 0], full_bounds[:, 1])
         X, Y, grid_np = _make_slice_grid(full_bounds, x_dim, y_dim, resolution, slice_point=slice_point)
         x_grid = torch.tensor(grid_np, dtype=torch.float32, device=net_device)
 
@@ -317,19 +228,19 @@ def visualize_generator(
         abs_max = max(abs(phi_min), abs(phi_max))
         contour = ax.contourf(X, Y, Phi_output, levels=20, cmap='RdBu_r',
                               vmin=-abs_max, vmax=abs_max)
-        fig.colorbar(contour, ax=ax, label=f"GV({_format_dim_label(x_dim)}, {_format_dim_label(y_dim)})")
+        fig.colorbar(contour, ax=ax, label=f"GV({labels[x_dim]}, {labels[y_dim]})")
 
         # GV=0 contour
         ax.contour(X, Y, Phi_output, levels=[0], colors='black', linewidths=2)
 
-        ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
-        ax.set_ylabel(_format_dim_label(y_dim), fontsize=12)
+        ax.set_xlabel(labels[x_dim], fontsize=12)
+        ax.set_ylabel(labels[y_dim], fontsize=12)
         if epoch is not None:
-            ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
+            ax.set_title(f"{labels[x_dim]} vs {labels[y_dim]}\n"
                      f"Epoch {epoch} - GV(x) Output Range: [{phi_min:.4f}, {phi_max:.4f}]",
                      fontsize=12, fontweight='bold')
         else:
-            ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}\n"
+            ax.set_title(f"{labels[x_dim]} vs {labels[y_dim]}\n"
                      f"Final Evaluation - GV(x) Output Range: [{phi_min:.4f}, {phi_max:.4f}]",
                      fontsize=12, fontweight='bold')
 
@@ -405,7 +316,8 @@ def visualize_training_progress(
         show_regions=True,
         show_discretization=True,
         training_cells=v_cells,
-        filename=f"{output_dir}/value_function_epoch_{epoch}.pdf"
+        filename=f"{output_dir}/value_function_epoch_{epoch}.pdf",
+        include_energy=getattr(GV_net, "include_energy", False)
     )
 
     # Plot generator with GV discretization
@@ -429,7 +341,9 @@ def plot_constraint_regions(
     beta_ra: float,
     filename: Optional[str] = None,
     resolution: int = 100,
-    figsize: Tuple[int, int] = (10, 8)
+    figsize: Tuple[int, int] = (10, 8),
+    *,
+    include_energy: bool = False
 ):
     V_net.eval()
     if beta_s is not None:
@@ -440,18 +354,9 @@ def plot_constraint_regions(
     beta_ra = float(beta_ra)
 
     full_bounds = np.array(regions.full.bounds, dtype=np.float32, copy=True)
-    # Safety for time-dependent models: ensure plotting horizon is consistent
-    # with the loaded V network scale on the first input dimension.
-    try:
-        v_scale = getattr(V_net, "input_scale", None)
-        if v_scale is not None and len(v_scale) >= 1 and full_bounds.shape[0] >= 1:
-            horizon = float(v_scale[0].detach().cpu().item() if hasattr(v_scale[0], "detach") else v_scale[0])
-            if horizon > 0.0:
-                full_bounds[0, 1] = min(float(full_bounds[0, 1]), horizon)
-    except Exception:
-        pass
     D = full_bounds.shape[0]
-    pairs = _get_plot_pairs(D)
+    pairs = _get_plot_pairs(D, include_energy)
+    labels = [_format_dim_label(d, D - 1 if include_energy else None) for d in range(D)]
 
     try:
         net_device = next(V_net.parameters()).device
@@ -469,21 +374,14 @@ def plot_constraint_regions(
     for p, (x_dim, y_dim) in enumerate(pairs):
         ax = axes[p]
 
-        slice_point = make_slice_point_for_region(
-            regions.full,   # or regions.goal / regions.init / regions.full
-            full_bounds,
-            x_dim=x_dim,
-            y_dim=y_dim,
-        )
-
-        X, Y, grid_np = _make_slice_grid(full_bounds, x_dim, y_dim, resolution, slice_point=slice_point)
+        X, Y, grid_np = _make_slice_grid(full_bounds, x_dim, y_dim, resolution)
         x_grid = torch.tensor(grid_np, dtype=torch.float32, device=net_device)
 
         with torch.no_grad():
             V_grid = V_net(x_grid).detach().cpu().numpy().reshape(X.shape)
 
         contour = ax.contourf(X, Y, V_grid, levels=20, cmap='viridis')
-        fig.colorbar(contour, ax=ax, label=f"V({_format_dim_label(x_dim)}, {_format_dim_label(y_dim)})")
+        fig.colorbar(contour, ax=ax, label=f"V({labels[x_dim]}, {labels[y_dim]})")
 
         # constraint contours
         if beta_s is not None:
@@ -492,9 +390,9 @@ def plot_constraint_regions(
         ax.contour(X, Y, V_grid, levels=[1.0], colors='green', linewidths=2, linestyles='--')
         ax.contour(X, Y, V_grid, levels=[beta_ra], colors='orange', linewidths=2, linestyles='--')
 
-        ax.set_xlabel(_format_dim_label(x_dim), fontsize=12)
-        ax.set_ylabel(_format_dim_label(y_dim), fontsize=12)
-        ax.set_title(f"{_format_dim_label(x_dim)} vs {_format_dim_label(y_dim)}",
+        ax.set_xlabel(labels[x_dim], fontsize=12)
+        ax.set_ylabel(labels[y_dim], fontsize=12)
+        ax.set_title(f"{labels[x_dim]} vs {labels[y_dim]}",
                      fontsize=12, fontweight='bold')
 
         # regions projected
@@ -654,7 +552,8 @@ def create_summary_plots(
         show_regions=True,
         show_discretization=True,
         training_cells=v_cells,
-        filename=f"{output_dir}/value_function.pdf"
+        filename=f"{output_dir}/value_function.pdf",
+        include_energy=getattr(GV_net, "include_energy", False)
     )
 
     # Generator with GV discretization
@@ -670,7 +569,8 @@ def create_summary_plots(
     # Constraint regions
     plot_constraint_regions(
         V_net, regions, beta_s, beta_ra,
-        filename=f"{output_dir}/constraint_regions.pdf"
+        filename=f"{output_dir}/constraint_regions.pdf",
+        include_energy=getattr(GV_net, "include_energy", False)
     )
 
     # Loss history

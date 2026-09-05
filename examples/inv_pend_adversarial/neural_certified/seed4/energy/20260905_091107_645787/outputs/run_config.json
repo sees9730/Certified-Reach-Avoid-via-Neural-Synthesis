@@ -1,0 +1,47 @@
+{
+  "baseline_checkpoint": "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/inv_pend_adversarial/neural_certified/seed4/outputs/eval_bundle.pth",
+  "energy_max": 2.0,
+  "energy_margin": 0.03,
+  "freeze_controller": false,
+  "seed": 4,
+  "epochs": 200000,
+  "pretrain_epochs": 2000,
+  "samples": 400,
+  "energy_cells": 4,
+  "device": "cpu",
+  "output_dir": null,
+  "no_plots": false,
+  "energy_ceiling": 1.9700000286102295,
+  "goal_energy_max": 1.9696999788284302,
+  "initial_discretization": "baseline_final_cells_extruded_in_energy",
+  "energy_cell_edges": [
+    0.0,
+    0.5,
+    1.0,
+    1.5,
+    1.9696999788284302,
+    1.9700000286102295,
+    2.0
+  ],
+  "baseline_cell_counts": {
+    "init": 1112,
+    "goal": 992,
+    "unsafe": 1015,
+    "outside": 994,
+    "generator": 1414
+  },
+  "initial_cell_counts": {
+    "init": 1112,
+    "goal": 3968,
+    "unsafe": 8076,
+    "outside": 7948,
+    "generator": 8062
+  },
+  "energy_definition": "integral(raw_control(x)**2 dt)",
+  "coordinate_order": [
+    "theta",
+    "omega",
+    "E"
+  ],
+  "drift_mag": 24.0
+}

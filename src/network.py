@@ -87,28 +87,6 @@ class V(nn.Module):
 
         return x
 
-    def get_weights(self):
-        """
-        Get network weights for manual bound computation.
-
-        Returns:
-            Dictionary with layer weights and biases
-        """
-        return {
-            'layer1': {
-                'weight': self.layer1.weight,
-                'bias': self.layer1.bias
-            },
-            'layer2': {
-                'weight': self.layer2.weight,
-                'bias': self.layer2.bias
-            },
-            'output': {
-                'weight': self.output.weight,
-                'bias': self.output.bias
-            }
-        }
-
     def __repr__(self):
         """String representation."""
         activation_name = self.activation_fn.__class__.__name__ if hasattr(self.activation_fn, '__class__') else str(self.activation_fn)
@@ -199,28 +177,6 @@ class V_offset(nn.Module):
 
         return out.squeeze(0) if was_1d else out
 
-
-    def get_weights(self):
-        """
-        Get network weights for manual bound computation.
-
-        Returns:
-            Dictionary with layer weights and biases
-        """
-        return {
-            'layer1': {
-                'weight': self.layer1.weight,
-                'bias': self.layer1.bias
-            },
-            'layer2': {
-                'weight': self.layer2.weight,
-                'bias': self.layer2.bias
-            },
-            'output': {
-                'weight': self.output.weight,
-                'bias': self.output.bias
-            }
-        }
 
     def __repr__(self):
         """String representation."""
