@@ -1,3 +1,4 @@
+# Shared requirements for the main framework and all nova_* examples.
 appdirs==1.4.4
 astroid==4.0.1
 auto_LiRPA @ git+https://github.com/Verified-Intelligence/alpha-beta-CROWN.git@474f75de70160b19302795a6efe1717ec33d83ac#subdirectory=auto_LiRPA

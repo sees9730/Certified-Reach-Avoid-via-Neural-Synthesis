@@ -12,9 +12,16 @@ We use interval bound propagation and adaptive partitioning to train neural netw
 
 ### Installation
 
+From the repository root, install the shared requirements for the framework
+and all `nova_*` examples:
+
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
+
+The root `requirements.txt` is the shared dependency manifest for the main
+project and `nova_*` examples. The vendored `third_party/` folder retains its
+own dependency files.
 
 ### Running Examples
 

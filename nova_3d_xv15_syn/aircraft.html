@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XV-15 smooth-controller rollout</title>
+<style>
+body{font:15px system-ui,sans-serif;margin:24px auto;max-width:1200px;padding:0 16px;background:#f3f6fa;color:#14263a}
+h1{font-size:24px}canvas{width:100%;background:white;border-radius:10px}button,select{font:inherit;padding:8px 14px;border:1px solid #abbaca;border-radius:6px;background:white}input{flex:1;min-width:120px}.controls{display:flex;gap:12px;align-items:center;margin:12px 0}.stats{font-variant-numeric:tabular-nums;padding:12px;background:#e1eaf3;border-radius:8px}p{line-height:1.5}.note{font-size:13px;color:#53657a}#state{margin-top:16px}
+</style>
+<h1>XV-15 · smooth synthesized controller</h1>
+<p id="summary"></p>
+<div class="controls"><button id="play">Pause</button><button id="restart">Restart</button><input id="seek" aria-label="Simulation time" type="range" min="0" step="1"><select id="speed" aria-label="Playback speed"><option value="1">1×</option><option value="2" selected>2×</option><option value="4">4×</option><option value=".5">0.5×</option></select></div>
+<div class="stats" id="stats"></div>
+<canvas id="flight" width="1200" height="370"></canvas>
+<p class="note">Aircraft schematic enlarged for visibility. Position is reconstructed from airspeed and flight-path angle; altitude is relative to the start. Body pitch = flight-path angle + angle of attack. Rotor tilt is relative to the body.</p>
+<canvas id="state" width="1200" height="270"></canvas>
+<p class="note">Green bands: goal ranges. Orange bands: initial ranges. Red bands: unsafe boundary strips. All three state coordinates must enter their goal ranges together. The trajectory stops at the first detected goal, unsafe region, domain exit, or time limit.</p>
+<p class="note" id="method"></p>
+<script>
+const data=__ROLLOUT_DATA__;
+const rows=data.rollout.samples, p=data.problem, last=rows.length-1;
+const flight=document.getElementById('flight'), state=document.getElementById('state'), ctx=flight.getContext('2d'), sc=state.getContext('2d');
+const seek=document.getElementById('seek'), play=document.getElementById('play');seek.max=last;
+document.getElementById('summary').textContent=`Interval verification: ${data.verification}. Rollout: ${data.rollout.outcome.replaceAll('_',' ')} at ${rows[last][0].toFixed(2)} s. ${data.rollout.stochastic?'SDE noise enabled':'Deterministic drift only'}; seed ${data.rollout.seed}.`;
+document.getElementById('method').textContent=`${data.rollout.method}. Integration step ${data.rollout.dt} s; displayed samples approximately every 0.05 s. Rapid control changes between displayed frames are not resolved by the animation. Rollout outcomes do not change the interval verification result.`;
+let current=0, elapsed=0, running=true, previous=null;
+const xs=rows.map(r=>r[4]), ys=rows.map(r=>r[5]), xmin=Math.min(...xs), xmax=Math.max(...xs), ymin=Math.min(...ys), ymax=Math.max(...ys);
+const scale=Math.min(1050/Math.max(100,xmax-xmin),230/Math.max(20,ymax-ymin));
+const X=x=>75+(x-xmin)*scale, Y=y=>185-((y-(ymin+ymax)/2)*scale);
+function line(c,points,color,width=2){c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.strokeStyle=color;c.lineWidth=width;c.stroke()}
+function text(c,s,x,y,color='#30465e'){c.fillStyle=color;c.font='14px system-ui';c.fillText(s,x,y)}
+function draw(index){
+ const r=rows[index];seek.value=index;ctx.clearRect(0,0,1200,370);
+ text(ctx,'Reconstructed flight path · horizontal distance and relative altitude [m]',25,30);
+ line(ctx,rows.map(t=>[X(t[4]),Y(t[5])]),'#d9e2ec',3);line(ctx,rows.slice(0,index+1).map(t=>[X(t[4]),Y(t[5])]),'#1875b9',3);
+ for(let i=0;i<5;i++){const x=xmin+(xmax-xmin)*i/4;text(ctx,x.toFixed(0)+' m',X(x)-12,345)}
+ const px=X(r[4]),py=Y(r[5]);ctx.save();ctx.translate(px,py);ctx.rotate(-(r[2]+r[7])*Math.PI/180);
+ ctx.beginPath();[[-35,3],[-27,-5],[22,-6],[39,0],[22,6],[-35,6]].forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fillStyle='#d7e6f2';ctx.fill();ctx.strokeStyle='#234562';ctx.stroke();
+ line(ctx,[[-27,2],[-33,-15],[-23,-12],[-16,2]],'#234562',3);line(ctx,[[-4,-17],[9,17]],'#234562',5);
+ for(const [hx,hy] of [[-4,-17],[9,17]]){ctx.save();ctx.translate(hx,hy);ctx.rotate(-r[3]*Math.PI/180);line(ctx,[[0,-12],[0,12]],'#60788b',3);const length=12+18*r[6]/(p.mass*p.gravity*1.8);line(ctx,[[0,0],[length,0],[length-5,-3],[length,0],[length-5,3]],'#dd8819',2);ctx.restore()}
+ ctx.restore();text(ctx,`distance ${r[4].toFixed(1)} m · relative altitude ${r[5].toFixed(1)} m`,25,58);
+ document.getElementById('stats').textContent=`t ${r[0].toFixed(2)} s  |  v ${r[1].toFixed(2)} m/s  |  γ ${r[2].toFixed(2)}°  |  tilt ${r[3].toFixed(2)}°  |  thrust ${(r[6]/1000).toFixed(2)} kN  |  α ${r[7].toFixed(2)}°  |  tilt rate ${r[8].toFixed(2)}°/s  |  V ${r[9].toFixed(4)}  |  GV ${r[10].toFixed(4)}`;
+ sc.clearRect(0,0,1200,270);
+ ['Airspeed [m/s]','Flight-path angle [deg]','Rotor tilt [deg]'].forEach((label,j)=>{
+  const left=50+j*400,w=325,top=38,h=178,[lo,hi]=p.domain[j];const sx=t=>left+w*t/Math.max(.001,rows[last][0]),sy=y=>top+h*(hi-y)/(hi-lo);
+  for(const [box,color] of [[p.initial,'#ffe4bd'],[p.goal,'#d1efd9']]){sc.fillStyle=color;sc.fillRect(left,sy(box[j][1]),w,sy(box[j][0])-sy(box[j][1]))}
+  for(const box of p.unsafe){if(box[j][1]-box[j][0]<hi-lo){sc.fillStyle='#ffd8d8';sc.fillRect(left,sy(box[j][1]),w,sy(box[j][0])-sy(box[j][1]))}}
+  text(sc,label,left,24);line(sc,[[left,top],[left,top+h],[left+w,top+h]],'#77899b',1);
+  for(let k=0;k<3;k++){const y=lo+(hi-lo)*k/2;text(sc,y.toFixed(0),left-32,sy(y)+5)}
+  line(sc,rows.map(t=>[sx(t[0]),sy(t[j+1])]),'#b9c7d6',1);line(sc,rows.slice(0,index+1).map(t=>[sx(t[0]),sy(t[j+1])]),'#1875b9',2);
+  line(sc,[[sx(r[0]),top],[sx(r[0]),top+h]],'#dd8819',1);text(sc,'0 s',left,243);text(sc,rows[last][0].toFixed(1)+' s',left+w-38,243);
+ });
+}
+play.onclick=()=>{running=!running;play.textContent=running?'Pause':'Play'};
+document.getElementById('restart').onclick=()=>{elapsed=0;current=0;running=true;play.textContent='Pause';draw(0)};
+seek.oninput=()=>{current=Number(seek.value);elapsed=rows[current][0];draw(current)};
+function frame(now){if(previous!==null&&running){elapsed=Math.min(rows[last][0],elapsed+(now-previous)/1000*Number(document.getElementById('speed').value));while(current<last&&rows[current+1][0]<=elapsed)current++;if(elapsed<rows[current][0]){current=0;while(current<last&&rows[current+1][0]<=elapsed)current++}draw(current);if(current===last){running=false;play.textContent='Play'}}previous=now;requestAnimationFrame(frame)}
+draw(0);requestAnimationFrame(frame);
+</script></html>
