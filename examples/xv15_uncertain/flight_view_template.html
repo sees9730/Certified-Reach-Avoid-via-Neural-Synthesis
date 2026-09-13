@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XV-15 nominal-drift rollout</title>
+<style>
+:root{
+  color-scheme:light;
+  --ink:#16233a; --muted:#64748b; --card:#ffffff;
+  --accent:#2f6fed; --accent-soft:#e8f0ff;
+  --goal:#0f9d58; --goal-soft:#d9f5e4;
+  --init:#d97706; --init-soft:#fdedd3;
+  --unsafe:#dc3545; --unsafe-soft:#fbe0e2;
+  --cert:#7c3aed; --cert-soft:#efe5fd;
+  --line:#e3e8f0;
+}
+*{box-sizing:border-box}
+body{
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  margin:0 auto;max-width:1200px;padding:28px 18px 48px;color:var(--ink);
+  background:
+    radial-gradient(1100px 500px at 12% -10%, #eaf1ff 0%, rgba(234,241,255,0) 60%),
+    radial-gradient(900px 460px at 100% 0%, #f2e9fd 0%, rgba(242,233,253,0) 55%),
+    #f6f8fb;
+}
+header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:2px}
+h1{
+  font-size:25px;margin:0;font-weight:800;letter-spacing:-.01em;
+  background:linear-gradient(90deg,#1c3a8a,var(--accent) 55%,#7c3aed);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;
+  font-size:12.5px;font-weight:700;letter-spacing:.02em;box-shadow:0 1px 2px rgba(16,24,40,.06)}
+.badge .dot{width:7px;height:7px;border-radius:50%}
+.badge.ok{background:var(--goal-soft);color:#0b6b3b}
+.badge.ok .dot{background:var(--goal);box-shadow:0 0 0 3px rgba(15,157,88,.18)}
+.badge.no{background:var(--unsafe-soft);color:#9c1620}
+.badge.no .dot{background:var(--unsafe);box-shadow:0 0 0 3px rgba(220,53,69,.18)}
+p.lead{margin:8px 0 18px;color:var(--muted);max-width:82ch}
+
+.panel{background:var(--card);border-radius:18px;padding:16px 18px 14px;margin-bottom:16px;
+  box-shadow:0 1px 2px rgba(16,24,40,.04), 0 10px 30px -18px rgba(16,24,40,.25);
+  border:1px solid rgba(16,24,40,.05)}
+.panel h2{font-size:14px;margin:0 0 10px;color:var(--ink);font-weight:700}
+.panel .caption{font-size:12.5px;color:var(--muted);margin:10px 2px 0}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{
+  font:inherit;font-weight:600;padding:8px 16px;border:none;border-radius:999px;cursor:pointer;
+  background:var(--ink);color:#fff;box-shadow:0 1px 2px rgba(16,24,40,.15);transition:transform .08s ease, box-shadow .15s ease;
+}
+button:hover{box-shadow:0 4px 14px rgba(16,24,40,.22);transform:translateY(-1px)}
+button:active{transform:translateY(0)}
+button#resetBtn{background:#fff;color:var(--ink);border:1px solid var(--line)}
+select{
+  font:inherit;font-weight:600;padding:8px 12px;border:1px solid var(--line);border-radius:999px;
+  background:#fff;color:var(--ink);cursor:pointer;
+}
+input[type=range]{flex:1;min-width:160px;accent-color:var(--accent);height:4px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px 10px}
+.chip{background:var(--accent-soft);border-radius:10px;padding:6px 11px;font-size:13px}
+.chip b{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:700}
+.chip span{color:var(--muted);margin-right:5px}
+.chip.v{background:var(--cert-soft)}
+
+canvas{width:100%;display:block;border-radius:14px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin:10px 2px 0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+</style>
+
+<header>
+  <h1 id="heading">XV-15 nominal-drift closed loop</h1>
+  <span class="badge" id="certBadge"><span class="dot"></span><span id="certText"></span></span>
+</header>
+<p class="lead" id="lead"></p>
+
+<div class="panel">
+  <div class="bar">
+    <button id="toggleBtn">&#10073;&#10073;&nbsp; Pause</button>
+    <button id="resetBtn">&#8635;&nbsp; Restart</button>
+    <input id="scrubber" type="range" min="0" step="1" aria-label="Scrub through the rollout">
+    <select id="rateSelect" aria-label="Playback speed">
+      <option value="0.5">0.5&times;</option>
+      <option value="1" selected>1&times;</option>
+      <option value="2">2&times;</option>
+      <option value="4">4&times;</option>
+    </select>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="chips" id="readout"></div>
+</div>
+
+<div class="panel">
+  <h2>Flight path</h2>
+  <canvas id="trackCanvas" width="1180" height="320"></canvas>
+  <p class="caption">Distance vs. relative altitude (m). Pitch = gamma + alpha. The rotor disk shows
+  tilt beta relative to the body: beta=0&deg; keeps it aligned with the nose (forward flight),
+  beta=90&deg; swings it to point straight up relative to the body (hover); the flame trails opposite
+  the thrust direction and scales with thrust magnitude.</p>
+</div>
+
+<div class="panel">
+  <h2>State, control &amp; certificate time series</h2>
+  <canvas id="seriesCanvas" width="1180" height="750"></canvas>
+  <div class="legend">
+    <span><i style="background:var(--init-soft);box-shadow:inset 0 0 0 1px var(--init)"></i>Initial range</span>
+    <span><i style="background:var(--goal-soft);box-shadow:inset 0 0 0 1px var(--goal)"></i>Goal range</span>
+    <span><i style="background:var(--unsafe-soft);box-shadow:inset 0 0 0 1px var(--unsafe)"></i>Unsafe strip</span>
+    <span><i style="background:#fff;box-shadow:inset 0 0 0 1px #0d9488"></i>Control trajectory</span>
+    <span><i style="background:var(--cert-soft);box-shadow:inset 0 0 0 1px var(--cert)"></i>Certificate V(x(t))</span>
+  </div>
+  <p class="caption">The three control strips (thrust, angle of attack, tilt rate) plot the trained
+  controller's output against dashed lines at its physical actuation limits from config.json. The
+  certificate strip plots V(x(t)) against V=0 (goal floor), V=1 (init ceiling), and V=beta_ra (unsafe
+  threshold) — the same conditions the bound-based training checked exhaustively.</p>
+  <p class="caption" id="methodNote"></p>
+</div>
+
+<script>
+const ROLLOUT = __XV15_ROLLOUT__;
+const cols = ROLLOUT.rollout.columns, frames = ROLLOUT.rollout.samples, lastIdx = frames.length - 1;
+const col = name => cols.indexOf(name);
+const problem = ROLLOUT.problem;
+const totalTime = frames[lastIdx][col('time_s')] || 1;
+
+const trackCanvas = document.getElementById('trackCanvas'), seriesCanvas = document.getElementById('seriesCanvas');
+const tctx = trackCanvas.getContext('2d'), sctx = seriesCanvas.getContext('2d');
+const scrubber = document.getElementById('scrubber'), toggleBtn = document.getElementById('toggleBtn');
+scrubber.max = lastIdx;
+
+const badge = document.getElementById('certBadge');
+document.getElementById('certText').textContent = ROLLOUT.certified ? 'bound-verified SAT' : 'not certified';
+badge.className = 'badge ' + (ROLLOUT.certified ? 'ok' : 'no');
+
+document.getElementById('lead').textContent =
+  `Closed-loop rollout under the trained controller: ${ROLLOUT.rollout.outcome.replaceAll('_', ' ')} ` +
+  `at ${totalTime.toFixed(2)} s (${ROLLOUT.rollout.stochastic ? 'SDE noise on' : 'drift only'}, ` +
+  `seed ${ROLLOUT.rollout.seed}). The badge reflects the exhaustive bound-checked training result for this ` +
+  `weight set, not this one sampled rollout.`;
+document.getElementById('methodNote').textContent =
+  `${ROLLOUT.rollout.method} Integration step ${ROLLOUT.rollout.dt} s; frames are recorded roughly every ` +
+  `0.05 s of simulated time, so brief control transients between frames are not shown. This rollout's outcome ` +
+  `does not change the bound-checked training result above.`;
+
+let playhead = 0, elapsedSim = 0, playing = true, lastTick = null;
+
+const fmt = (n, digits) => Number(n).toFixed(digits);
+
+function roundedRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawReadout(i) {
+  const r = frames[i];
+  const chips = [
+    ['t', fmt(r[col('time_s')], 2) + ' s'],
+    ['v', fmt(r[col('airspeed_m_s')], 1) + ' m/s'],
+    ['gamma', fmt(r[col('gamma_deg')], 1) + '°'],
+    ['beta', fmt(r[col('tilt_deg')], 1) + '°'],
+    ['thrust', fmt(r[col('thrust_N')] / 1000, 2) + ' kN'],
+    ['alpha', fmt(r[col('alpha_deg')], 1) + '°'],
+    ['delta', fmt(r[col('tilt_rate_deg_s')], 2) + '°/s'],
+  ];
+  const html = chips.map(([k, v]) => `<span class="chip"><span>${k}</span><b>${v}</b></span>`).join('')
+    + `<span class="chip v"><span>V</span><b>${fmt(r[col('V')], 4)}</b></span>`
+    + `<span class="chip v"><span>GV</span><b>${fmt(r[col('GV')], 4)}</b></span>`;
+  document.getElementById('readout').innerHTML = html;
+}
+
+function drawTrack(i) {
+  const w = trackCanvas.width, h = trackCanvas.height;
+  const sky = tctx.createLinearGradient(0, 0, 0, h);
+  sky.addColorStop(0, '#eaf4ff'); sky.addColorStop(1, '#fbfdff');
+  tctx.fillStyle = sky; tctx.fillRect(0, 0, w, h);
+
+  const xs = frames.map(r => r[col('distance_m')]), zs = frames.map(r => r[col('relative_altitude_m')]);
+  const xMin = Math.min(...xs), xMax = Math.max(...xs), zMin = Math.min(...zs), zMax = Math.max(...zs);
+  const scale = Math.min((w - 140) / Math.max(60, xMax - xMin), (h - 120) / Math.max(30, zMax - zMin));
+  const zMid = (zMin + zMax) / 2;
+  const toX = x => 70 + (x - xMin) * scale, toY = z => h / 2 - (z - zMid) * scale;
+
+  tctx.strokeStyle = 'rgba(100,116,139,.14)'; tctx.lineWidth = 1;
+  for (let k = 0; k <= 4; k++) {
+    const y = 40 + (h - 90) * k / 4;
+    tctx.beginPath(); tctx.moveTo(60, y); tctx.lineTo(w - 30, y); tctx.stroke();
+  }
+
+  tctx.font = '600 13px system-ui'; tctx.fillStyle = '#3c4d63';
+  tctx.fillText('Reconstructed flight path', 20, 22);
+
+  tctx.beginPath();
+  frames.forEach((r, k) => { const p = [toX(r[col('distance_m')]), toY(r[col('relative_altitude_m')])];
+    k ? tctx.lineTo(...p) : tctx.moveTo(...p); });
+  tctx.strokeStyle = '#d3e0f0'; tctx.lineWidth = 3; tctx.lineCap = 'round'; tctx.stroke();
+
+  tctx.save();
+  tctx.shadowColor = 'rgba(47,111,237,.45)'; tctx.shadowBlur = 10;
+  tctx.beginPath();
+  frames.slice(0, i + 1).forEach((r, k) => { const p = [toX(r[col('distance_m')]), toY(r[col('relative_altitude_m')])];
+    k ? tctx.lineTo(...p) : tctx.moveTo(...p); });
+  tctx.strokeStyle = '#2f6fed'; tctx.lineWidth = 3; tctx.lineCap = 'round'; tctx.stroke();
+  tctx.restore();
+
+  const r = frames[i];
+  const px = toX(r[col('distance_m')]), py = toY(r[col('relative_altitude_m')]);
+  const pitchRad = (r[col('gamma_deg')] + r[col('alpha_deg')]) * Math.PI / 180;
+  tctx.save(); tctx.translate(px, py); tctx.rotate(-pitchRad);
+
+  const body = tctx.createLinearGradient(-30, 0, 34, 0);
+  body.addColorStop(0, '#9fb7d6'); body.addColorStop(1, '#eaf2fb');
+  tctx.beginPath();
+  tctx.moveTo(-30, 4); tctx.quadraticCurveTo(-34, 0, -30, -4);
+  tctx.lineTo(-14, -7); tctx.quadraticCurveTo(6, -8, 22, -5);
+  tctx.quadraticCurveTo(34, -2, 36, 0); tctx.quadraticCurveTo(34, 2, 22, 5);
+  tctx.quadraticCurveTo(6, 8, -14, 7); tctx.closePath();
+  tctx.fillStyle = body; tctx.fill(); tctx.strokeStyle = '#204866'; tctx.lineWidth = 1.4; tctx.stroke();
+
+  tctx.beginPath(); tctx.ellipse(8, -3, 7, 3.4, 0, Math.PI, 0); tctx.fillStyle = 'rgba(255,255,255,.85)'; tctx.fill();
+  tctx.beginPath(); tctx.moveTo(-26, -5); tctx.lineTo(-32, -15); tctx.lineTo(-20, -6); tctx.closePath();
+  tctx.fillStyle = '#204866'; tctx.fill();
+
+  // Nacelle/rotor: beta=0 keeps the thrust axis along the nose (forward flight);
+  // beta=90 swings it a quarter turn to point straight up relative to the body (hover).
+  // Drawn along local +x after this rotation, so the rotor disk (perpendicular to
+  // thrust) sits along local y, and the exhaust trails opposite thrust, along local -x.
+  const betaRad = r[col('tilt_deg')] * Math.PI / 180;
+  tctx.save(); tctx.translate(18, 0); tctx.rotate(-betaRad);
+  const flameLen = 8 + 22 * Math.max(0, r[col('thrust_N')]) / Math.max(1, problem.thrust_max);
+  const flame = tctx.createLinearGradient(-flameLen - 6, 0, -2, 0);
+  flame.addColorStop(0, 'rgba(255,196,0,0)'); flame.addColorStop(1, '#ff8a1f');
+  tctx.beginPath(); tctx.moveTo(-2, 0); tctx.lineTo(-flameLen, -5); tctx.lineTo(-flameLen - 6, 0); tctx.lineTo(-flameLen, 5); tctx.closePath();
+  tctx.fillStyle = flame; tctx.fill();
+  tctx.beginPath(); tctx.ellipse(0, 0, 2.6, 13, 0, 0, 2 * Math.PI);
+  tctx.fillStyle = 'rgba(90,114,136,.35)'; tctx.fill(); tctx.strokeStyle = '#5a7288'; tctx.lineWidth = 1.4; tctx.stroke();
+  tctx.beginPath(); tctx.arc(0, 0, 2.4, 0, 2 * Math.PI); tctx.fillStyle = '#3c4d63'; tctx.fill();
+  tctx.restore();
+  tctx.restore();
+
+  tctx.fillStyle = '#3c4d63'; tctx.font = '12.5px system-ui';
+  tctx.fillText(`distance ${fmt(r[col('distance_m')], 1)} m · relative altitude ${fmt(r[col('relative_altitude_m')], 1)} m`, 20, 44);
+}
+
+function fillBand(ctx, left, width, yTop, yBottom, color) {
+  ctx.fillStyle = color; ctx.fillRect(left, Math.min(yTop, yBottom), width, Math.abs(yBottom - yTop));
+}
+
+function drawStrip(ctx, box, i, label, lo, hi, valueOf, bands, accent) {
+  const { left, top, width: w, height: h } = box;
+  const toX = t => left + w * t / totalTime, toY = v => top + h * (hi - v) / (hi - lo);
+
+  roundedRect(ctx, left, top, w, h, 10);
+  ctx.fillStyle = '#f7f9fc'; ctx.fill();
+
+  for (const [range, color] of bands) fillBand(ctx, left, w, toY(range[1]), toY(range[0]), color);
+
+  ctx.strokeStyle = 'rgba(100,116,139,.18)'; ctx.lineWidth = 1;
+  for (let k = 0; k <= 2; k++) {
+    const y = top + h * k / 2;
+    ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(left + w, y); ctx.stroke();
+  }
+
+  ctx.fillStyle = '#3c4d63'; ctx.font = '600 12.5px system-ui'; ctx.fillText(label, left + 2, top - 7);
+  ctx.font = '11.5px system-ui'; ctx.fillStyle = '#8492a6';
+  for (let k = 0; k <= 2; k++) { const v = lo + (hi - lo) * (2 - k) / 2; ctx.fillText(v.toFixed(1), left - 44, top + h * k / 2 + 4); }
+
+  const areaTop = toY(valueOf(frames[0]));
+  ctx.beginPath();
+  ctx.moveTo(toX(frames[0][col('time_s')]), top + h);
+  frames.slice(0, i + 1).forEach(r => ctx.lineTo(toX(r[col('time_s')]), toY(valueOf(r))));
+  ctx.lineTo(toX(frames[i][col('time_s')]), top + h); ctx.closePath();
+  ctx.fillStyle = accent.fillFaint; ctx.fill();
+
+  ctx.beginPath();
+  frames.forEach((r, k) => { const p = [toX(r[col('time_s')]), toY(valueOf(r))]; k ? ctx.lineTo(...p) : ctx.moveTo(...p); });
+  ctx.strokeStyle = 'rgba(100,116,139,.3)'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.stroke(); ctx.setLineDash([]);
+
+  ctx.save();
+  ctx.shadowColor = accent.glow; ctx.shadowBlur = 6;
+  ctx.beginPath();
+  frames.slice(0, i + 1).forEach((r, k) => { const p = [toX(r[col('time_s')]), toY(valueOf(r))]; k ? ctx.lineTo(...p) : ctx.moveTo(...p); });
+  ctx.strokeStyle = accent.line; ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.stroke();
+  ctx.restore();
+
+  const cx = toX(frames[i][col('time_s')]), cy = toY(valueOf(frames[i]));
+  ctx.beginPath(); ctx.arc(cx, cy, 4, 0, 2 * Math.PI); ctx.fillStyle = accent.line; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx, cy, 6.5, 0, 2 * Math.PI); ctx.strokeStyle = accent.line; ctx.lineWidth = 1; ctx.globalAlpha = .35; ctx.stroke(); ctx.globalAlpha = 1;
+
+  ctx.beginPath(); ctx.moveTo(cx, top); ctx.lineTo(cx, top + h);
+  ctx.strokeStyle = 'rgba(217,119,6,.55)'; ctx.lineWidth = 1; ctx.stroke();
+}
+
+function drawLevelLines(ctx, box, lo, hi, levels) {
+  const { left, top, width: w, height: h } = box;
+  const toY = v => top + h * (hi - v) / (hi - lo);
+  for (const [value, color] of levels) {
+    ctx.beginPath(); ctx.setLineDash([5, 4]);
+    ctx.moveTo(left, toY(value)); ctx.lineTo(left + w, toY(value));
+    ctx.strokeStyle = color; ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
+  }
+}
+
+const STATE_ACCENT = { line: '#2f6fed', glow: 'rgba(47,111,237,.55)', fillFaint: 'rgba(47,111,237,.08)' };
+const CONTROL_ACCENT = { line: '#0d9488', glow: 'rgba(13,148,136,.55)', fillFaint: 'rgba(13,148,136,.08)' };
+const CERT_ACCENT = { line: '#7c3aed', glow: 'rgba(124,58,237,.55)', fillFaint: 'rgba(124,58,237,.10)' };
+
+function buildStripSpecs() {
+  const specs = [];
+
+  const stateDefs = [
+    { label: 'Airspeed v [m/s]', dim: 0, key: 'airspeed_m_s' },
+    { label: 'Flight-path angle gamma [deg]', dim: 1, key: 'gamma_deg', scale: 180 / Math.PI },
+    { label: 'Rotor tilt beta [deg]', dim: 2, key: 'tilt_deg', scale: 180 / Math.PI },
+  ];
+  for (const spec of stateDefs) {
+    const s = spec.scale || 1;
+    const domainLo = problem.domain[spec.dim][0] * s, domainHi = problem.domain[spec.dim][1] * s;
+    const vals = frames.map(r => r[col(spec.key)]);
+    const lo = Math.min(domainLo, ...vals), hi = Math.max(domainHi, ...vals);
+    const bands = [
+      [[problem.initial[spec.dim][0] * s, problem.initial[spec.dim][1] * s], '#fdedd3'],
+      [[problem.goal[spec.dim][0] * s, problem.goal[spec.dim][1] * s], '#d9f5e4'],
+    ];
+    for (const box of problem.unsafe) {
+      const [uLo, uHi] = [box[spec.dim][0] * s, box[spec.dim][1] * s];
+      if (uHi - uLo < hi - lo) bands.push([[uLo, uHi], '#fbe0e2']);
+    }
+    specs.push({ label: spec.label, valueOf: r => r[col(spec.key)], lo, hi, bands, levels: [], accent: STATE_ACCENT });
+  }
+
+  const controlDefs = [
+    { label: 'Thrust [N]', key: 'thrust_N', lo: problem.thrust_min, hi: problem.thrust_max },
+    { label: 'Angle of attack alpha [deg]', key: 'alpha_deg', lo: -problem.alpha_max_deg, hi: problem.alpha_max_deg },
+    { label: 'Tilt rate delta [deg/s]', key: 'tilt_rate_deg_s', lo: -problem.delta_max_deg_s, hi: problem.delta_max_deg_s },
+  ];
+  for (const spec of controlDefs) {
+    const vals = frames.map(r => r[col(spec.key)]);
+    const lo = Math.min(spec.lo, ...vals), hi = Math.max(spec.hi, ...vals);
+    specs.push({
+      label: spec.label, valueOf: r => r[col(spec.key)], lo, hi, bands: [],
+      levels: [[spec.lo, '#94a3b8'], [spec.hi, '#94a3b8']], accent: CONTROL_ACCENT,
+    });
+  }
+
+  const vVals = frames.map(r => r[col('V')]);
+  const vLo = Math.min(0, ...vVals), vHi = Math.max(problem.beta_ra, ...vVals);
+  specs.push({
+    label: 'Certificate V(x(t))', valueOf: r => r[col('V')], lo: vLo, hi: vHi, bands: [],
+    levels: [[0, '#c98a12'], [1, '#0b6b3b'], [problem.beta_ra, '#9c1620']], accent: CERT_ACCENT,
+  });
+
+  return specs;
+}
+
+function drawSeries(i) {
+  const specs = buildStripSpecs();
+  const w = seriesCanvas.width;
+  sctx.clearRect(0, 0, w, seriesCanvas.height);
+  const left = 60, width = w - 84, top0 = 34, stripH = 76, gap = 24;
+
+  specs.forEach((spec, idx) => {
+    const top = top0 + idx * (stripH + gap);
+    const box = { left, top, width, height: stripH };
+    drawStrip(sctx, box, i, spec.label, spec.lo, spec.hi, spec.valueOf, spec.bands, spec.accent);
+    drawLevelLines(sctx, box, spec.lo, spec.hi, spec.levels);
+  });
+
+  sctx.fillStyle = '#8492a6'; sctx.font = '11.5px system-ui';
+  const axisY = top0 + (specs.length - 1) * (stripH + gap) + stripH + 20;
+  sctx.fillText('0 s', left, axisY);
+  sctx.fillText(`${totalTime.toFixed(1)} s`, left + width - 32, axisY);
+}
+
+function renderFrame(i) {
+  scrubber.value = i;
+  drawReadout(i);
+  drawTrack(i);
+  drawSeries(i);
+}
+
+toggleBtn.onclick = () => { playing = !playing; toggleBtn.innerHTML = playing ? '&#10073;&#10073;&nbsp; Pause' : '&#9654;&nbsp; Play'; };
+document.getElementById('resetBtn').onclick = () => { elapsedSim = 0; playhead = 0; playing = true; toggleBtn.innerHTML = '&#10073;&#10073;&nbsp; Pause'; renderFrame(0); };
+scrubber.oninput = () => { playhead = Number(scrubber.value); elapsedSim = frames[playhead][col('time_s')]; renderFrame(playhead); };
+
+function tick(now) {
+  if (lastTick !== null && playing) {
+    const rate = Number(document.getElementById('rateSelect').value);
+    elapsedSim = Math.min(totalTime, elapsedSim + (now - lastTick) / 1000 * rate);
+    if (elapsedSim < frames[playhead][col('time_s')]) playhead = 0;
+    while (playhead < lastIdx && frames[playhead + 1][col('time_s')] <= elapsedSim) playhead++;
+    renderFrame(playhead);
+    if (playhead === lastIdx) { playing = false; toggleBtn.innerHTML = '&#9654;&nbsp; Play'; }
+  }
+  lastTick = now;
+  requestAnimationFrame(tick);
+}
+
+renderFrame(0);
+requestAnimationFrame(tick);
+</script>
+</html>

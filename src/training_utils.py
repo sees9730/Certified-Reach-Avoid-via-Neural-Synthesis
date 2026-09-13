@@ -26,6 +26,25 @@ from src.regions import Region
 # BOUND-BASED LOSS FUNCTIONS
 # ============================================================================
 
+GENERATOR_MARGIN = 1e-4
+UNSAFE_TRAINING_MARGIN_RATIO = 0.01
+
+
+def generator_bound_masks(Phi_upper, beta_ra, V_generator_lower=None):
+    """Closed-sublevel activity and failure of the fixed negative margin.
+
+    Within the supplied generator cover, only a strict V lower bound above
+    beta can exclude a cell. The discretizer excludes goal and unsafe regions.
+    """
+    if V_generator_lower is None or V_generator_lower.numel() == 0:
+        active = torch.ones_like(Phi_upper, dtype=torch.bool)
+    else:
+        active = (V_generator_lower <= beta_ra) | ~torch.isfinite(V_generator_lower)
+    failing = active & ((Phi_upper > -GENERATOR_MARGIN) | ~torch.isfinite(Phi_upper))
+    if V_generator_lower is not None and V_generator_lower.numel() > 0:
+        failing = failing | ~torch.isfinite(V_generator_lower)
+    return active, failing
+
 def compute_loss_goal_bounds(
     V_lower: torch.Tensor
 ) -> torch.Tensor:
@@ -47,14 +66,11 @@ def compute_loss_unsafe_bounds(
 ) -> torch.Tensor:
     # FIXME: Add function signature
 
-    # Want V >= beta_ra, so penalize V_lower < beta_ra
-    loss = F.relu(beta_ra - V_lower).sum()
-
-    # Check if unsafe is satisfied
-    if (loss <= 0.0):
-        sat = True
-    else:
-        sat = False
+    # Encourage a 1% buffer during training, without strengthening the
+    # certificate condition used for SAT and termination.
+    training_target = beta_ra * (1.0 + UNSAFE_TRAINING_MARGIN_RATIO)
+    loss = F.relu(training_target - V_lower).sum()
+    sat = bool((V_lower >= beta_ra).all().item())
     return loss, sat
 
 def compute_loss_init_bounds(
@@ -92,24 +108,10 @@ def compute_loss_generator_bounds(
     beta_ra,
     V_generator_lower: torch.Tensor = None,
 ) -> torch.Tensor:
-    # Apply generator loss only on cells that are potentially below beta_ra.
-    # If V_lower >= beta_ra, treat that cell as inactive for generator training.
-    delta = 1e-4
-    if V_generator_lower is None or V_generator_lower.numel() == 0:
-        Phi_upper_active = Phi_upper
-    else:
-        active = V_generator_lower < beta_ra
-        Phi_upper_active = Phi_upper[active]
-
-    if Phi_upper_active.numel() == 0:
-        loss = torch.tensor(0.0, device=Phi_upper.device, dtype=Phi_upper.dtype)
-        sat = True
-        return loss, sat
-
-    # pure Phi_upper active loss
-    loss = F.relu(Phi_upper_active + delta).sum()
-
-    sat = bool((Phi_upper_active.max() < 0.0).item())
+    active, failing = generator_bound_masks(Phi_upper, beta_ra, V_generator_lower)
+    # An empty selection still retains its autograd connection.
+    loss = F.relu(Phi_upper[active] + GENERATOR_MARGIN).sum()
+    sat = not bool(failing.any().item())
     return loss, sat
 
 def compute_total_loss_bounds(
@@ -309,7 +311,7 @@ def evaluate_constraints(
             init_satisfied = True
             v_init_min = v_init_max = 0.0
 
-        # Generator: bounds GV(x) < 0 or V(x) >= beta_ra
+        # Same closed-sublevel and negative-margin checks as training.
         if len(region_cells['generator']) > 0:
             if precomputed_phi_uppers is not None and precomputed_v_gen_lowers is not None:
                 phi_uppers = precomputed_phi_uppers
@@ -333,8 +335,7 @@ def evaluate_constraints(
                 else:
                     cache_v_gen = SymbolicCROWNCache(V_net, len(region_cells['generator']), input_dim=input_dim, device=device)
                 v_gen_lowers, _ = cache_v_gen.compute_bounds(input_lowers, input_uppers)
-            active_mask = v_gen_lowers < beta_ra
-            failing_mask = (phi_uppers > 0.0) & active_mask
+            active_mask, failing_mask = generator_bound_masks(phi_uppers, beta_ra, v_gen_lowers)
 
             num_failing = failing_mask.sum().item()
             num_active = active_mask.sum().item()
@@ -372,6 +373,7 @@ def evaluate_constraints(
         'Phi_mean': phi_mean,
         'num_failing_cells': num_failing,
         'num_active_generator_cells': num_active,
+        'generator_margin': GENERATOR_MARGIN,
     }
 
     V_net.train()
@@ -470,8 +472,8 @@ def print_constraint_summary(results: dict, prefix: str = "", bounds: dict = Non
             pct = 100 * failing / total_gen
             stats = f" | {passing}/{total_gen} pass ({failing} fail, {pct:.1f}%)"
     elif phi_uppers is not None and len(phi_uppers) > 0:
-        stats = cell_stats('generator', phi_uppers < 0.0, len(phi_uppers))
-    print(f"{prefix}Generator: {status(results['generator_satisfied']):4s}, GV_upper_max: {results['Phi_max']:7.3f}{stats}")
+        stats = cell_stats('generator', phi_uppers <= -GENERATOR_MARGIN, len(phi_uppers))
+    print(f"{prefix}Generator: {status(results['generator_satisfied']):4s}, GV_upper_max: {results['Phi_max']:.6e}, required <= {-GENERATOR_MARGIN:.6e}{stats}")
 
 def refine_failing_cells(
     region_cells: List[Tuple[torch.Tensor, torch.Tensor]],

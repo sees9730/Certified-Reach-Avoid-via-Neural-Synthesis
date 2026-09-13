@@ -1,0 +1,297 @@
+{
+  "mode": "nominal_drift",
+  "example": {
+    "controller_hidden_dim": 64,
+    "beta_ra": 5.0,
+    "uncertainty": {
+      "air_density_kg_m3": [
+        1.16375,
+        1.28625
+      ]
+    },
+    "dynamics": {
+      "mass": 5900.0,
+      "gravity": 9.81,
+      "density": 1.225,
+      "wing_area": 15.7,
+      "lift_cruise": [
+        0.0849,
+        0.3482
+      ],
+      "lift_hover": [
+        0.0646,
+        0.2709
+      ],
+      "drag_cruise": [
+        0.00042143,
+        0.003,
+        0.0218
+      ],
+      "drag_hover": [
+        0.000473216,
+        0.00343,
+        0.2165
+      ],
+      "diffusion_mps_deg_deg": [
+        0.5,
+        0.1,
+        0.1
+      ]
+    },
+    "control": {
+      "thrust_over_weight": [
+        0.1,
+        1.8
+      ],
+      "alpha_max_deg": 16.0,
+      "delta_max_deg_per_second": 5.0
+    },
+    "regions_mps_deg_deg": {
+      "full_range": [
+        [
+          0.5,
+          100.0
+        ],
+        [
+          -20.0,
+          20.0
+        ],
+        [
+          0.0,
+          90.0
+        ]
+      ],
+      "init_range": [
+        [
+          28.0,
+          32.0
+        ],
+        [
+          8.5,
+          10.5
+        ],
+        [
+          58.0,
+          62.0
+        ]
+      ],
+      "goal_range": [
+        [
+          65.0,
+          85.0
+        ],
+        [
+          -2.0,
+          10.0
+        ],
+        [
+          25.0,
+          35.0
+        ]
+      ],
+      "unsafe_up": [
+        [
+          0.5,
+          100.0
+        ],
+        [
+          19.0,
+          20.0
+        ],
+        [
+          0.0,
+          90.0
+        ]
+      ],
+      "unsafe_dn": [
+        [
+          0.5,
+          100.0
+        ],
+        [
+          -20.0,
+          -19.0
+        ],
+        [
+          0.0,
+          90.0
+        ]
+      ],
+      "unsafe_min_beta": [
+        [
+          0.5,
+          100.0
+        ],
+        [
+          -20.0,
+          20.0
+        ],
+        [
+          0.0,
+          1.0
+        ]
+      ],
+      "unsafe_max_beta": [
+        [
+          0.5,
+          100.0
+        ],
+        [
+          -20.0,
+          20.0
+        ],
+        [
+          89.0,
+          90.0
+        ]
+      ],
+      "unsafe_min_vel": [
+        [
+          0.5,
+          1.0
+        ],
+        [
+          -20.0,
+          20.0
+        ],
+        [
+          0.0,
+          90.0
+        ]
+      ],
+      "unsafe_max_vel": [
+        [
+          99.5,
+          100.0
+        ],
+        [
+          -20.0,
+          20.0
+        ],
+        [
+          0.0,
+          90.0
+        ]
+      ]
+    }
+  },
+  "hyperparameters": {
+    "network": {
+      "n_inputs": 3,
+      "n_hidden_1": 64,
+      "n_hidden_2": 64,
+      "n_outputs": 1,
+      "input_scale": [
+        100.0,
+        0.3490658503988659,
+        1.5707963267948966
+      ],
+      "scale_factor": 20.0
+    },
+    "discretization": {
+      "axis_weights": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "max_region_budget": 1000,
+      "max_generator_budget": 1000,
+      "n_goal": 3,
+      "n_outside_goal": 3,
+      "n_generator": 1,
+      "n_unsafe": 3,
+      "n_init": 3
+    },
+    "constraints": {
+      "beta_ra": 5.0,
+      "beta_increment": 0.2
+    },
+    "training": {
+      "learning_rate": 0.005,
+      "num_epochs": 30000,
+      "device": "cpu",
+      "random_seed": 0,
+      "enable_pretraining": true,
+      "pretrain_epochs": 15000,
+      "pretrain_lr": 0.01,
+      "pretrain_n_samples": 1200,
+      "generator_weight": 1.0,
+      "generator_start_epoch": 0
+    },
+    "refinement": {
+      "v_goal": {
+        "enable_refinement": true,
+        "refine_interval": 500,
+        "refine_interval_late": 500,
+        "late_epoch_threshold": 2500,
+        "refine_factor": 2,
+        "max_cells": 100000,
+        "N_to_refine": 100,
+        "enable_merging": false,
+        "merge_interval": 501,
+        "merge_max_passes": 8,
+        "merge_relax_margin": 0.3
+      },
+      "v_init": {
+        "enable_refinement": true,
+        "refine_interval": 500,
+        "refine_interval_late": 500,
+        "late_epoch_threshold": 2500,
+        "refine_factor": 2,
+        "max_cells": 50000,
+        "N_to_refine": 100,
+        "enable_merging": false,
+        "merge_interval": 501,
+        "merge_max_passes": 8,
+        "merge_relax_margin": 0.3
+      },
+      "v_outside": {
+        "enable_refinement": true,
+        "refine_interval": 500,
+        "refine_interval_late": 100,
+        "late_epoch_threshold": 2500,
+        "refine_factor": 2,
+        "max_cells": 50000,
+        "N_to_refine": 100,
+        "enable_merging": true,
+        "merge_interval": 501,
+        "merge_max_passes": 8,
+        "merge_relax_margin": 20.0
+      },
+      "v_unsafe": {
+        "enable_refinement": true,
+        "refine_interval": 500,
+        "refine_interval_late": 500,
+        "late_epoch_threshold": 2500,
+        "refine_factor": 2,
+        "max_cells": 50000,
+        "N_to_refine": 100,
+        "enable_merging": false,
+        "merge_interval": 501,
+        "merge_max_passes": 8,
+        "merge_relax_margin": 0.3
+      },
+      "gv_generator": {
+        "enable_refinement": true,
+        "refine_interval": 500,
+        "refine_interval_late": 500,
+        "late_epoch_threshold": 3500,
+        "refine_factor": 2,
+        "max_cells": 100000,
+        "N_to_refine": 100,
+        "enable_merging": true,
+        "merge_interval": 501,
+        "merge_max_passes": 8,
+        "merge_relax_margin": -1000.0
+      }
+    },
+    "logging": {
+      "loss_log_interval": 10,
+      "detailed_eval_interval": 1000,
+      "visualize_interval": 1000
+    },
+    "compute_V": true,
+    "compute_GV": true,
+    "include_time": false
+  }
+}
