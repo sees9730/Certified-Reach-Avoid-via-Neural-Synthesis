@@ -1,0 +1,27 @@
+{
+  "algorithm": "stable_baselines3.PPO",
+  "export": "exact deterministic actor; no distillation",
+  "best_timesteps": 520000,
+  "actual_timesteps": 1007616,
+  "best_validation_success": 1.0,
+  "final_evaluation": {
+    "n_mc": 300,
+    "n_success": 300,
+    "p_success": 1.0,
+    "p_fail": 0.0,
+    "p_timeout": 0.0,
+    "n_timeout": 0,
+    "n_goal": 300,
+    "n_unsafe": 0,
+    "n_domain_exit": 0,
+    "n_nonfinite": 0,
+    "hit_time_s_mean": 5.019033432006836,
+    "hit_time_s_median": 5.010000228881836,
+    "hit_time_s_std": 0.2328677624464035,
+    "normalized_effort_mean": 9.06119441986084,
+    "normalized_effort_median": 9.033785820007324,
+    "normalized_effort_std": 0.4534170627593994
+  },
+  "export_max_normalized_error": 0.0,
+  "elapsed_s": 302.2703453330032
+}

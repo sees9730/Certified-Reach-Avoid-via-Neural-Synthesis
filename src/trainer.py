@@ -16,6 +16,8 @@ sys.path.insert(0, str(ROOT))
 
 from src.crown_bounds import SymbolicCROWNCache, SymbolicCROWNCache_Phi, prepare_cell_bounds
 from src.training_utils import (
+    GENERATOR_MARGIN,
+    generator_bound_masks,
     compute_total_loss_bounds,
     evaluate_constraints,
     print_loss_summary,
@@ -289,9 +291,10 @@ def train_network_bounds(
                 phi_uppers = crown_cache_phi.compute_bounds(input_lowers_gen, input_uppers_gen)
                 v_gen_lowers, _ = crown_cache_v_gen.compute_bounds(input_lowers_gen, input_uppers_gen)
                 current_gen_weight = params.training.generator_weight
-                # Track failing cells for adaptive refinement:
-                # only cells with V lower bound below beta_ra need GV < 0.
-                phi_upper_failing_mask = (phi_uppers >= 0.0) & (v_gen_lowers < params.constraints.beta_ra)
+                # Refine every active cell that misses the same margin used
+                # in the loss and SAT checks, including V_lower == beta.
+                _, phi_upper_failing_mask = generator_bound_masks(
+                    phi_uppers, params.constraints.beta_ra, v_gen_lowers)
                 num_total_failing = phi_upper_failing_mask.sum().item()
             else:
                 phi_uppers = empty_tensor
@@ -521,7 +524,7 @@ def train_network_bounds(
 
             if (gv_cfg.enable_merging and
                 (epoch + 1) % gv_cfg.merge_interval == 0):
-                phi_upper_failing_mask_relax = phi_uppers > gv_cfg.merge_relax_margin
+                phi_upper_failing_mask_relax = phi_uppers > min(gv_cfg.merge_relax_margin, -GENERATOR_MARGIN)
                 merged_cells, num_merges = merge_passing_neighbor_cells(
                     region_cells['generator'],
                     phi_upper_failing_mask_relax,
@@ -550,7 +553,11 @@ def train_network_bounds(
                 print("User requested stop. Exiting training and loading latest SAT bundle in main.")
                 break
 
-            all_satisfied = _compute_all_satisfied(sat_dict)
+            # A partition changed after these bounds were computed. Recheck
+            # its new cells before accepting or saving a SAT pair.
+            all_satisfied = (_compute_all_satisfied(sat_dict)
+                             and not needs_v_cache_rebuild and not needs_gv_cache_rebuild
+                             and (not params.compute_GV or current_gen_weight > 0))
 
             # Optional one-time refinement interval update at first SAT.
             if (all_satisfied and
