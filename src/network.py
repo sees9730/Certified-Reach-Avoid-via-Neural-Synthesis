@@ -226,6 +226,50 @@ class V_offset(nn.Module):
         return bool(ok)
     
 
+class _FeedForwardBody(nn.Module):
+    """Single-branch view of V_offset, sharing its layers.
+
+    V_offset.forward evaluates the network twice (at x and at input_offset) and
+    subtracts. auto_LiRPA's backward passes ('CROWN', 'CROWN-IBP') cannot
+    propagate through that two-branch graph, so bounds are taken on this body
+    and the constant baseline is applied to the resulting bounds instead.
+    """
+
+    def __init__(self, source: "V_offset"):
+        super().__init__()
+        # The same Linear objects, so this body shares parameters (and therefore
+        # gradients) with the network it was built from.
+        self.layer1, self.layer2, self.output = source.layer1, source.layer2, source.output
+        self.activation_fn = source.activation_fn
+        for name in ("input_scale", "input_offset", "scale_factor"):
+            self.register_buffer(name, getattr(source, name))
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x_norm = (x - self.input_offset) / self.input_scale
+        h = self.activation_fn(self.layer1(x_norm))
+        h = self.activation_fn(self.layer2(h))
+        return self.output(h * self.scale_factor)
+
+
+def bound_body(model: nn.Module):
+    """Split a value network into a body whose bounds shift by a constant.
+
+    Returns (body, shift_fn) with ``model(x) == body(x) + shift_fn()`` for every
+    x, so bounds on the body plus the shift are exact bounds on the model. For a
+    plain feed-forward network the body is the model itself and shift_fn is None.
+    """
+    if not isinstance(model, V_offset):
+        return model, None
+
+    body = _FeedForwardBody(model)
+
+    def shift_fn():
+        # Recomputed per call: it moves as the shared parameters are trained.
+        return model.output_offset - body(model.input_offset.unsqueeze(0)).reshape(())
+
+    return body, shift_fn
+
+
 def create_V(config: NetworkConfig, input_offset=None, output_offset=None) -> nn.Module:
     """
     Factory function to create value network from config.

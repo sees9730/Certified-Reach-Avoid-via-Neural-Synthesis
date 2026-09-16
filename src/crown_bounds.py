@@ -10,6 +10,21 @@ import numpy as np
 from auto_LiRPA import BoundedModule, BoundedTensor
 from auto_LiRPA.perturbations import PerturbationLpNorm
 
+from src.network import bound_body
+
+# auto_LiRPA bound methods usable for training: every one of these is
+# differentiable and returns both bounds. 'IBP' is cheapest and loosest;
+# 'CROWN-IBP' adds one backward pass over the final layer; 'CROWN' is a full
+# backward pass, tightest and slowest.
+BOUND_METHODS = ('IBP', 'CROWN-IBP', 'CROWN')
+
+
+def validate_bound_method(method):
+    """Normalize and check a bound method name."""
+    if method not in BOUND_METHODS:
+        raise ValueError(f"Unknown bound method {method!r}; expected one of {list(BOUND_METHODS)}")
+    return method
+
 
 class SymbolicCROWNCache:
     """
@@ -22,7 +37,7 @@ class SymbolicCROWNCache:
     The bounds are DIFFERENTIABLE and can be used in training loss.
     """
 
-    def __init__(self, model, num_cells, input_dim=2, device='cpu'):
+    def __init__(self, model, num_cells, input_dim=2, device='cpu', method='IBP'):
         """
         Initialize CROWN cache.
 
@@ -31,17 +46,24 @@ class SymbolicCROWNCache:
             num_cells: Number of cells to compute bounds for
             input_dim: Input dimension
             device: Device
+            method: auto_LiRPA bound method, one of BOUND_METHODS
         """
         self.model = model
         self.num_cells = num_cells
         self.device = device
+        self.method = validate_bound_method(method)
+
+        # Backward methods cannot propagate through V_offset's two-branch graph,
+        # so bound the single-branch body and shift the result by the constant
+        # baseline it leaves out.
+        self.body, self.shift_fn = bound_body(model)
 
         # Create dummy batch input
         dummy_batch = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)
 
         # Create BoundedModule ONCE - this builds the symbolic computation graph
         # print(f"[SymbolicCROWNCache] Creating BoundedModule for {num_cells} cells...")
-        self.lirpa_model = BoundedModule(model, dummy_batch, device=device)
+        self.lirpa_model = BoundedModule(self.body, dummy_batch, device=device)
 
         # Initialize with dummy bounds
         dummy_lower = torch.zeros(num_cells, input_dim, device=device)
@@ -93,11 +115,17 @@ class SymbolicCROWNCache:
         # Compute bounds
         lb, ub = self.lirpa_model.compute_bounds(
             x=(bounded_input,),
-            method='IBP'
+            method=self.method
         )
 
         v_lowers = lb.squeeze(-1)  # (N,)
         v_uppers = ub.squeeze(-1)  # (N,)
+
+        if self.shift_fn is not None:
+            # A constant in x, so it shifts both bounds without loosening them.
+            shift = self.shift_fn()
+            v_lowers = v_lowers + shift
+            v_uppers = v_uppers + shift
 
         return v_lowers, v_uppers
 
@@ -109,7 +137,7 @@ class SymbolicCROWNCache_Phi:
     that can be used in training loss!
     """
 
-    def __init__(self, phi_module, num_cells, input_dim=2, device='cpu'):
+    def __init__(self, phi_module, num_cells, input_dim=2, device='cpu', method='IBP'):
         """
         Initialize CROWN cache for Phi.
 
@@ -118,9 +146,11 @@ class SymbolicCROWNCache_Phi:
             num_cells: Number of cells
             input_dim: Input dimension
             device: Device
+            method: auto_LiRPA bound method, one of BOUND_METHODS
         """
         self.num_cells = num_cells
         self.device = device
+        self.method = validate_bound_method(method)
 
         # Create dummy batch input
         dummy_batch = torch.zeros(num_cells, input_dim, dtype=torch.float32, device=device)
@@ -176,11 +206,11 @@ class SymbolicCROWNCache_Phi:
         )
         bounded_input = BoundedTensor(self.dummy_batch_cache, ptb)
 
-        # Compute bounds (only upper bound needed for generator loss, but IBP computes both)
-        # Note: For IBP, bound_lower=False doesn't save computation, so we compute both
+        # Compute bounds (only the upper bound is needed for the generator loss,
+        # but bound_lower=False saves little here, so we compute both)
         _, ub = self.lirpa_model.compute_bounds(
             x=(bounded_input,),
-            method='IBP'
+            method=self.method
         )
 
         # phi_lowers = lb.squeeze(-1)  # (N,) - computed but unused in loss

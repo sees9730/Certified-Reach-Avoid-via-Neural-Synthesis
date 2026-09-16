@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4D double-integrator rollout</title>
+<style>
+body{font:16px system-ui;margin:24px auto;max-width:760px;padding:0 16px;color:#18324a;background:#f6f8fa}
+canvas{width:100%;background:white;border:1px solid #ccd6df}button{padding:8px 16px}input{width:70%}
+pre{white-space:pre-wrap}small{display:block;margin:12px 0}
+</style>
+<h1>4D double-integrator rollout</h1>
+<p id="result"></p><canvas id="plot" width="720" height="520" aria-label="Position projection of the simulated trajectory"></canvas>
+<p><button id="play">Play</button> <input id="frame" type="range" min="0" value="0" aria-label="Simulation frame"></p>
+<pre id="state"></pre>
+<small>Position projection: blue initial box, green goal box, red position boundary strips.
+Goal and unsafe events also test velocity bounds in all four dimensions. A simulated rollout is not a verification proof; events are checked at integration steps.</small>
+<script>
+const data={"rollout": {"samples": [{"t": 0.0, "x": [0.5136961719975666, 0.17697867572879739, -0.022951324145191642, -0.024173618583788525], "u": [-0.9585384130477905, -0.2814365029335022], "V": null, "GV": null}, {"t": 0.10000000000000002, "x": [0.5072454330578189, 0.17335142683460697, -0.10576515649279147, -0.04826573311902051], "u": [-0.6971954107284546, -0.20190563797950745], "V": null, "GV": null}, {"t": 0.2000000000000001, "x": [0.49366272229903596, 0.16766603495508287, -0.16550020967487036, -0.06536410918569185], "u": [-0.490824818611145, -0.13923974335193634], "V": null, "GV": null}, {"t": 0.30000000000000016, "x": [0.47501853196385535, 0.16054532735889632, -0.20682070862327132, -0.07683057301646509], "u": [-0.32957494258880615, -0.0905989408493042], "V": null, "GV": null}, {"t": 0.40000000000000024, "x": [0.45295455231766435, 0.1524981545882937, -0.2337534021397021, -0.08398773003812203], "u": [-0.2046489119529724, -0.05303311347961426], "V": null, "GV": null}, {"t": 0.5000000000000003, "x": [0.42876046297109904, 0.14388724609326425, -0.24940799608053588, -0.08784039738671172], "u": [-0.10929697751998901, -0.02425330877304077], "V": null, "GV": null}, {"t": 0.6000000000000004, "x": [0.40341035818650606, 0.13502814257682155, -0.2569032605538949, -0.08904999775842504], "u": [-0.03611093759536743, -0.002906292676925659], "V": null, "GV": null}, {"t": 0.7000000000000005, "x": [0.3776273672186512, 0.1261282148263589, -0.2578088512102682, -0.08859058730225321], "u": [0.018171846866607666, 0.013515323400497437], "V": null, "GV": null}, {"t": 0.8000000000000006, "x": [0.3519930730757046, 0.11735800404149893, -0.25401254860944283, -0.08655531850007923], "u": [0.058051466941833496, 0.024949952960014343], "V": null, "GV": null}, {"t": 0.9000000000000007, "x": [0.32691534556883606, 0.10882882515598874, -0.24673589345003927, -0.0837712667626019], "u": [0.08637696504592896, 0.033656150102615356], "V": null, "GV": null}, {"t": 1.0000000000000007, "x": [0.3026777745174918, 0.10061739318935986, -0.23716921835562332, -0.0801086132250539], "u": [0.10615211725234985, 0.03909105062484741], "V": null, "GV": null}, {"t": 1.1049999999999984, "x": [0.27836078633058103, 0.0924211560997818, -0.22522840714946174, -0.07573903970781468], "u": [0.11896365880966187, 0.042374804615974426], "V": null, "GV": null}, {"t": 1.2099999999999962, "x": [0.2553425931322131, 0.08468706711592938, -0.21243735898361224, -0.07128242186764254], "u": [0.1266268491744995, 0.04447314143180847], "V": null, "GV": null}, {"t": 1.314999999999994, "x": [0.23369850806861403, 0.0774400608281311, -0.19908257168921287, -0.06642879018434981], "u": [0.12985071539878845, 0.04440625011920929], "V": null, "GV": null}, {"t": 1.4199999999999917, "x": [0.21348177071863073, 0.070694650065171, -0.18538044480087582, -0.06170374034105123], "u": [0.1291777789592743, 0.04372192919254303], "V": null, "GV": null}, {"t": 1.5249999999999895, "x": [0.19468997058660942, 0.064446345415682, -0.1719205988443579, -0.057193094676908564], "u": [0.12638184428215027, 0.0426865816116333], "V": null, "GV": null}, {"t": 1.6299999999999872, "x": [0.17729194591024178, 0.05867647546275373, -0.15879191543975116, -0.05257631974650099], "u": [0.12179186940193176, 0.04037600755691528], "V": null, "GV": null}, {"t": 1.734999999999985, "x": [0.16125458206019583, 0.053365171428786995, -0.1462469494070669, -0.04829212733662649], "u": [0.11623167991638184, 0.03814603388309479], "V": null, "GV": null}, {"t": 1.8149999999999833, "x": [0.14990330406666952, 0.049617836885055, -0.13698582351085464, -0.04529370482774232], "u": [0.11115086078643799, 0.03664543479681015], "V": null, "GV": null}], "outcome": "goal", "stochastic": true, "seed": 0, "dt": 0.005}, "certified": false, "mode": "baseline", "regions": {"full_range": [[-1.0, 1.0], [-1.0, 1.0], [-1.0, 1.0], [-1.0, 1.0]], "init_range": [[0.44999998807907104, 0.550000011920929], [0.15000000596046448, 0.25], [-0.02500000037252903, 0.02500000037252903], [-0.02500000037252903, 0.02500000037252903]], "goal_range": [[-0.15000000596046448, 0.15000000596046448], [-0.15000000596046448, 0.15000000596046448], [-0.15000000596046448, 0.15000000596046448], [-0.15000000596046448, 0.15000000596046448]], "unsafe_ranges": [[[-1.0, -0.9200000166893005], [-1.0, 1.0], [-1.0, 1.0], [-1.0, 1.0]], [[0.9200000166893005, 1.0], [-1.0, 1.0], [-1.0, 1.0], [-1.0, 1.0]], [[-1.0, 1.0], [-1.0, -0.9200000166893005], [-1.0, 1.0], [-1.0, 1.0]], [[-1.0, 1.0], [0.9200000166893005, 1.0], [-1.0, 1.0], [-1.0, 1.0]], [[-1.0, 1.0], [-1.0, 1.0], [-1.0, -0.9200000166893005], [-1.0, 1.0]], [[-1.0, 1.0], [-1.0, 1.0], [0.9200000166893005, 1.0], [-1.0, 1.0]], [[-1.0, 1.0], [-1.0, 1.0], [-1.0, 1.0], [-1.0, -0.9200000166893005]], [[-1.0, 1.0], [-1.0, 1.0], [-1.0, 1.0], [0.9200000166893005, 1.0]]]}}, rows=data.rollout.samples, regions=data.regions;
+const canvas=document.getElementById('plot'),ctx=canvas.getContext('2d'),slider=document.getElementById('frame');
+slider.max=rows.length-1;
+document.getElementById('result').textContent=`${data.mode==='baseline'?'Linear feedback baseline (no certificate)':`Trained controller. Full-cell certificate SAT: ${data.certified?'yes':'no'}`}. Rollout: ${data.rollout.outcome}. Noise: ${data.rollout.stochastic?'on':'off'}.`;
+const domain=regions.full_range, pad=45, width=canvas.width-2*pad,height=canvas.height-2*pad;
+function px(x){return pad+(x-domain[0][0])/(domain[0][1]-domain[0][0])*width}
+function py(y){return canvas.height-pad-(y-domain[1][0])/(domain[1][1]-domain[1][0])*height}
+function box(b,color){ctx.fillStyle=color;ctx.fillRect(px(b[0][0]),py(b[1][1]),px(b[0][1])-px(b[0][0]),py(b[1][0])-py(b[1][1]))}
+function draw(){
+ const i=Number(slider.value),r=rows[i];ctx.clearRect(0,0,canvas.width,canvas.height);
+ regions.unsafe_ranges.slice(0,4).forEach(b=>box(b,'#fbdada'));
+ box(regions.init_range,'#bedcff');box(regions.goal_range,'#b8edcc');
+ ctx.strokeStyle='#506477';ctx.strokeRect(pad,pad,width,height);
+ ctx.beginPath();rows.slice(0,i+1).forEach((s,j)=>j?ctx.lineTo(px(s.x[0]),py(s.x[1])):ctx.moveTo(px(s.x[0]),py(s.x[1])));
+ ctx.strokeStyle='#2463b3';ctx.lineWidth=2;ctx.stroke();
+ ctx.beginPath();ctx.arc(px(r.x[0]),py(r.x[1]),5,0,2*Math.PI);ctx.fillStyle='#18324a';ctx.fill();
+ ctx.font='14px system-ui';ctx.fillText('px',canvas.width/2,canvas.height-10);ctx.fillText('py',8,canvas.height/2);
+ ctx.fillText(String(domain[0][0]),pad,canvas.height-23);ctx.fillText(String(domain[0][1]),canvas.width-pad-18,canvas.height-23);
+ ctx.fillText(String(domain[1][1]),8,pad);ctx.fillText(String(domain[1][0]),8,canvas.height-pad);
+ const certificate=r.V===null?'No neural certificate for this baseline':`V=${r.V.toFixed(5)}, GV=${r.GV.toExponential(3)}`;
+ document.getElementById('state').textContent=`t=${r.t.toFixed(3)}\n[px, py, vx, vy]=[${r.x.map(v=>v.toFixed(4)).join(', ')}]\n[ux, uy]=[${r.u.map(v=>v.toFixed(4)).join(', ')}]\n${certificate}\nGoal velocity bounds: vx=${regions.goal_range[2]}, vy=${regions.goal_range[3]}`;
+}
+let timer=null;const button=document.getElementById('play');
+button.onclick=()=>{if(timer){clearInterval(timer);timer=null;button.textContent='Play';return}
+ if(Number(slider.value)===rows.length-1)slider.value=0;
+ button.textContent='Pause';timer=setInterval(()=>{slider.value=Math.min(Number(slider.value)+1,rows.length-1);draw();
+ if(Number(slider.value)===rows.length-1){clearInterval(timer);timer=null;button.textContent='Play'}},100)};
+slider.oninput=draw;draw();
+</script></html>

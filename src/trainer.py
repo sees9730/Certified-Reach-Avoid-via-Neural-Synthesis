@@ -105,9 +105,10 @@ def train_network_bounds(
         model=V_net,
         num_cells=total_cells_V,
         input_dim=params.network.n_inputs,
-        device=params.training.device
+        device=params.training.device,
+        method=params.training.bound_method
     )
-    print(f"Created CROWN cache for V with {total_cells_V} cells")
+    print(f"Created {params.training.bound_method} cache for V with {total_cells_V} cells")
 
     # Create CROWN cache for generator (Phi) - separate cache
     crown_cache_phi = None
@@ -119,16 +120,19 @@ def train_network_bounds(
             phi_module=GV_net,
             num_cells=len(region_cells['generator']),
             input_dim=params.network.n_inputs,
-            device=params.training.device
+            device=params.training.device,
+            method=params.training.generator_bound_method
         )
-        print(f"Created {len(region_cells['generator'])} CROWN caches for GV")
+        print(f"Created {params.training.generator_bound_method} cache for GV "
+              f"with {len(region_cells['generator'])} cells")
         # Prepare generator input bounds
         input_lowers_gen, input_uppers_gen = prepare_cell_bounds(region_cells['generator'], params.training.device, input_dim=params.network.n_inputs)
         crown_cache_v_gen = SymbolicCROWNCache(
             model=V_net,
             num_cells=len(region_cells['generator']),
             input_dim=params.network.n_inputs,
-            device=params.training.device
+            device=params.training.device,
+            method=params.training.bound_method
         )
 
     # Prepare optimizer with all trainable parameters
@@ -707,7 +711,8 @@ def train_network_bounds(
                     model=V_net,
                     num_cells=total_cells_V,
                     input_dim=params.network.n_inputs,
-                    device=params.training.device
+                    device=params.training.device,
+                    method=params.training.bound_method
                 )
                 print(f"Rebuilt V cache with {total_cells_V} cells")
 
@@ -729,13 +734,15 @@ def train_network_bounds(
                     phi_module=GV_net,
                     num_cells=total_cells_GV,
                     input_dim=params.network.n_inputs,
-                    device=params.training.device
+                    device=params.training.device,
+                    method=params.training.generator_bound_method
                 )
                 crown_cache_v_gen = SymbolicCROWNCache(
                     model=V_net,
                     num_cells=total_cells_GV,
                     input_dim=params.network.n_inputs,
-                    device=params.training.device
+                    device=params.training.device,
+                    method=params.training.bound_method
                 )
                 print(f"Rebuilt Phi cache with {total_cells_GV} cells")
 

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4D double-integrator rollout</title>
+<style>
+body{font:16px system-ui;margin:24px auto;max-width:760px;padding:0 16px;color:#18324a;background:#f6f8fa}
+canvas{width:100%;background:white;border:1px solid #ccd6df}button{padding:8px 16px}input{width:70%}
+pre{white-space:pre-wrap}small{display:block;margin:12px 0}
+</style>
+<h1>4D double-integrator rollout</h1>
+<p id="result"></p><canvas id="plot" width="720" height="520" aria-label="Position projection of the simulated trajectory"></canvas>
+<p><button id="play">Play</button> <input id="frame" type="range" min="0" value="0" aria-label="Simulation frame"></p>
+<pre id="state"></pre>
+<small>Position projection: blue initial box, green goal box, red position boundary strips.
+Goal and unsafe events also test velocity bounds in all four dimensions. A simulated rollout is not a verification proof; events are checked at integration steps.</small>
+<script>
+const data=__ROLLOUT__, rows=data.rollout.samples, regions=data.regions;
+const canvas=document.getElementById('plot'),ctx=canvas.getContext('2d'),slider=document.getElementById('frame');
+slider.max=rows.length-1;
+document.getElementById('result').textContent=`${data.mode==='baseline'?'Linear feedback baseline (no certificate)':`Trained controller. Full-cell certificate SAT: ${data.certified?'yes':'no'}`}. Rollout: ${data.rollout.outcome}. Noise: ${data.rollout.stochastic?'on':'off'}.`;
+const domain=regions.full_range, pad=45, width=canvas.width-2*pad,height=canvas.height-2*pad;
+function px(x){return pad+(x-domain[0][0])/(domain[0][1]-domain[0][0])*width}
+function py(y){return canvas.height-pad-(y-domain[1][0])/(domain[1][1]-domain[1][0])*height}
+function box(b,color){ctx.fillStyle=color;ctx.fillRect(px(b[0][0]),py(b[1][1]),px(b[0][1])-px(b[0][0]),py(b[1][0])-py(b[1][1]))}
+function draw(){
+ const i=Number(slider.value),r=rows[i];ctx.clearRect(0,0,canvas.width,canvas.height);
+ regions.unsafe_ranges.slice(0,4).forEach(b=>box(b,'#fbdada'));
+ box(regions.init_range,'#bedcff');box(regions.goal_range,'#b8edcc');
+ ctx.strokeStyle='#506477';ctx.strokeRect(pad,pad,width,height);
+ ctx.beginPath();rows.slice(0,i+1).forEach((s,j)=>j?ctx.lineTo(px(s.x[0]),py(s.x[1])):ctx.moveTo(px(s.x[0]),py(s.x[1])));
+ ctx.strokeStyle='#2463b3';ctx.lineWidth=2;ctx.stroke();
+ ctx.beginPath();ctx.arc(px(r.x[0]),py(r.x[1]),5,0,2*Math.PI);ctx.fillStyle='#18324a';ctx.fill();
+ ctx.font='14px system-ui';ctx.fillText('px',canvas.width/2,canvas.height-10);ctx.fillText('py',8,canvas.height/2);
+ ctx.fillText(String(domain[0][0]),pad,canvas.height-23);ctx.fillText(String(domain[0][1]),canvas.width-pad-18,canvas.height-23);
+ ctx.fillText(String(domain[1][1]),8,pad);ctx.fillText(String(domain[1][0]),8,canvas.height-pad);
+ const certificate=r.V===null?'No neural certificate for this baseline':`V=${r.V.toFixed(5)}, GV=${r.GV.toExponential(3)}`;
+ document.getElementById('state').textContent=`t=${r.t.toFixed(3)}\n[px, py, vx, vy]=[${r.x.map(v=>v.toFixed(4)).join(', ')}]\n[ux, uy]=[${r.u.map(v=>v.toFixed(4)).join(', ')}]\n${certificate}\nGoal velocity bounds: vx=${regions.goal_range[2]}, vy=${regions.goal_range[3]}`;
+}
+let timer=null;const button=document.getElementById('play');
+button.onclick=()=>{if(timer){clearInterval(timer);timer=null;button.textContent='Play';return}
+ if(Number(slider.value)===rows.length-1)slider.value=0;
+ button.textContent='Pause';timer=setInterval(()=>{slider.value=Math.min(Number(slider.value)+1,rows.length-1);draw();
+ if(Number(slider.value)===rows.length-1){clearInterval(timer);timer=null;button.textContent='Play'}},100)};
+slider.oninput=draw;draw();
+</script></html>

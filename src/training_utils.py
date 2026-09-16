@@ -214,11 +214,16 @@ def evaluate_constraints(
     precomputed_region_bounds: dict = None,
     precomputed_phi_uppers=None,
     precomputed_v_gen_lowers=None,
+    bound_method: str = 'IBP',
+    generator_bound_method: str = 'IBP',
 ) -> dict:
     """
     Evaluate constraint satisfaction using CROWN bounds.
 
     Dimension-generic: infers input_dim from provided bounds or region_cells.
+    The bound_method arguments apply only when this function has to build its own
+    caches; they must match the ones training used, or SAT is judged on bounds
+    the loss never saw.
     """
 
     V_net.eval()
@@ -267,7 +272,8 @@ def evaluate_constraints(
             # Fallback: create separate cache for each region (dimension-generic)
             for name in ['goal', 'unsafe', 'init', 'outside']:
                 if len(region_cells[name]) > 0:
-                    cache = SymbolicCROWNCache(V_net, len(region_cells[name]), input_dim=input_dim, device=device)
+                    cache = SymbolicCROWNCache(V_net, len(region_cells[name]), input_dim=input_dim,
+                                               device=device, method=bound_method)
                     input_lowers, input_uppers = prepare_cell_bounds(region_cells[name], device=device, input_dim=input_dim)
                     v_lowers, v_uppers = cache.compute_bounds(input_lowers, input_uppers)
                     region_bounds[name] = (v_lowers, v_uppers)
@@ -327,13 +333,15 @@ def evaluate_constraints(
                 if crown_cache_phi is not None:
                     phi_uppers = crown_cache_phi.compute_bounds(input_lowers, input_uppers)
                 else:
-                    cache_phi = SymbolicCROWNCache_Phi(GV_net, len(region_cells['generator']), input_dim=input_dim, device=device)
+                    cache_phi = SymbolicCROWNCache_Phi(GV_net, len(region_cells['generator']), input_dim=input_dim,
+                                                       device=device, method=generator_bound_method)
                     phi_uppers = cache_phi.compute_bounds(input_lowers, input_uppers)
 
                 if crown_cache_v_gen is not None:
                     cache_v_gen = crown_cache_v_gen
                 else:
-                    cache_v_gen = SymbolicCROWNCache(V_net, len(region_cells['generator']), input_dim=input_dim, device=device)
+                    cache_v_gen = SymbolicCROWNCache(V_net, len(region_cells['generator']), input_dim=input_dim,
+                                                     device=device, method=bound_method)
                 v_gen_lowers, _ = cache_v_gen.compute_bounds(input_lowers, input_uppers)
             active_mask, failing_mask = generator_bound_masks(phi_uppers, beta_ra, v_gen_lowers)
 

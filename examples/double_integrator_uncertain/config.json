@@ -1,0 +1,33 @@
+{
+  "problem": "double_integrator_4d",
+  "beta_ra": 4.0,
+  "dynamics": {"velocity_diffusion_rate": [1.234e-7, 1.234e-7]},
+  "control": {"type": "neural", "u_max": [8.0, 8.0], "kp_init": 1.0, "kd_init": 1.0},
+  "domain": {"px": [-1.0, 1.0], "py": [-1.0, 1.0], "vx": [-1.0, 1.0], "vy": [-1.0, 1.0]},
+  "boundary_margin_fraction": 0.04,
+  "initial": {"px": [0.45, 0.55], "py": [0.15, 0.25], "vx": [-0.025, 0.025], "vy": [-0.025, 0.025]},
+  "goal": {"px": [-0.15, 0.15], "py": [-0.15, 0.15], "vx": [-0.15, 0.15], "vy": [-0.15, 0.15]},
+  "learning": {
+    "certificate_hidden_dims": [32, 32],
+    "certificate_scale_factor": 20.0,
+    "pretrain_epochs": 5000,
+    "pretrain_lr": 0.001,
+    "pretrain_n_samples": 512,
+    "pretrain_l2": 0.001,
+    "epochs": 100000,
+    "lr": 0.001,
+    "lr_decay_gamma": 0.97,
+    "lr_decay_step": 2000,
+    "lr_floor": 0.0004,
+    "lr_floor_epoch": 30000,
+    "bound_method": "CROWN-IBP",
+    "generator_bound_method": "CROWN",
+    "generator_weight": 1.0,
+    "region_budget": 4000,
+    "generator_budget": 4000,
+    "refine_interval": 500,
+    "refine_n_cells": 64,
+    "max_value_cells": 100000,
+    "max_generator_cells": 100000
+  }
+}

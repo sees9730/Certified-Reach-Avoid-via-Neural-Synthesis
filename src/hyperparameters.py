@@ -114,6 +114,23 @@ class TrainingConfig:
     generator_weight: float = 1.0
     generator_start_epoch: int = 0
 
+    # Step decay, for scheduler factories that honour it: the rate is
+    # multiplied by lr_decay_gamma every lr_decay_step epochs.
+    lr_decay_gamma: float = 0.95
+    lr_decay_step: int = 2000
+
+    # Learning-rate floor, for scheduler factories that honour it: hold
+    # lr_floor from lr_floor_epoch onwards instead of decaying forever.
+    # lr_floor_epoch = 0 disables the floor.
+    lr_floor: float = 0.0
+    lr_floor_epoch: int = 0
+
+    # auto_LiRPA bound method for the V and GV bounds used in the loss, the SAT
+    # checks and the diagnostics. See src.crown_bounds.BOUND_METHODS. Kept at
+    # 'IBP' by default so existing examples are unaffected.
+    bound_method: str = 'IBP'
+    generator_bound_method: str = 'IBP'
+
 @dataclass
 class Hyperparameters:
     """
@@ -215,7 +232,13 @@ class Hyperparameters:
                 'pretrain_lr': self.training.pretrain_lr,
                 'pretrain_n_samples': self.training.pretrain_n_samples,
                 'generator_weight': self.training.generator_weight,
-                'generator_start_epoch': self.training.generator_start_epoch
+                'generator_start_epoch': self.training.generator_start_epoch,
+                'lr_decay_gamma': self.training.lr_decay_gamma,
+                'lr_decay_step': self.training.lr_decay_step,
+                'lr_floor': self.training.lr_floor,
+                'lr_floor_epoch': self.training.lr_floor_epoch,
+                'bound_method': self.training.bound_method,
+                'generator_bound_method': self.training.generator_bound_method
             },
             'refinement': {
                 'v_goal': {
