@@ -129,6 +129,12 @@ class XV15EqMLPControl(nn.Module):
             ("du_scale", [t_max, a_max, d_max]),
         ):
             self.register_buffer(name, torch.as_tensor(value, dtype=torch.float32).clone())
+        # Normalizer for run_mc.py's normalized_effort: thrust by nominal
+        # weight, angles by their limits. Non-persistent so checkpoints saved
+        # before it still load with strict=True.
+        self.register_buffer("effort_scale",
+                             torch.tensor([weight, a_max, d_max], dtype=torch.float32),
+                             persistent=False)
         p = (self.u_eq[0] - self.T_min) / (self.T_max - self.T_min)
         a, d = self.u_eq[1] / self.alpha_max, self.u_eq[2] / self.delta_max
         self.register_buffer("z_eq", torch.stack([torch.logit(p), torch.atanh(a), torch.atanh(d)]))
@@ -144,6 +150,15 @@ class XV15EqMLPControl(nn.Module):
         alpha = self.alpha_max * torch.tanh(z[:, 1])
         delta = self.delta_max * torch.tanh(z[:, 2])
         return torch.stack([thrust, alpha, delta], dim=1)
+
+    def raw_control(self, x):
+        """Normalized control; its squared norm is run_mc.py's effort rate.
+
+        The augmented-energy generator reads this through
+        phi_module._compute_energy_rate, so dE/dt matches the Monte-Carlo
+        effort integrand exactly.
+        """
+        return self.forward(x) / self.effort_scale.unsqueeze(0)
 
 
 class NominalClosedLoopDrift(nn.Module):

@@ -26,7 +26,7 @@ are inserted as additional slab edges. Initial-set cells remain at E=0.
 Outputs go into a fresh directory; the baseline checkpoint is never replaced.
 
 Example (from the repository root):
-    .venv/bin/python examples/inv_pend_adversarial/neural_certified/main_constraint_energy.py --energy-max 0.6 --energy-margin 0.03
+    .venv/bin/python examples/inv_pend_adversarial/neural_certified/main_constraint_energy.py --energy-max 2.0 --energy-margin 0.03
 
 Compare a saved energy run using the same MC metrics and disturbance regimes:
     .venv/bin/python examples/inv_pend_adversarial/run_mc.py --energy-controller-dir /path/to/energy/run
@@ -245,7 +245,7 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--baseline-checkpoint", type=Path,
                         help="Default: neural_certified/seed<seed>/outputs/eval_bundle.pth")
-    parser.add_argument("--energy-max", type=float, default=0.6)
+    parser.add_argument("--energy-max", type=float, default=2.0)
     parser.add_argument("--energy-margin", type=float, default=None,
                         help="Unsafe band width; default 5%% of energy-max")
     parser.add_argument("--freeze-controller", action="store_true")

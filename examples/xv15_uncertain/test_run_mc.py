@@ -11,7 +11,8 @@ from torch import nn
 from examples.xv15_uncertain.model import XV15Aero, XV15EqMLPControl, find_goal_equilibrium, load_config, load_region_arrays
 from examples.xv15_uncertain.run_mc import (
     ATTACKS, MODES, ExportedPPOControl, adversarial_score, aggregate_results,
-    discover_checkpoints, load_controller, main, rollout_mc, select_parameters,
+    compute_stats, discover_checkpoints, load_controller, main, rollout_mc,
+    select_parameters,
 )
 from examples.xv15_uncertain.postprocess_mc import main as postprocess_main
 
@@ -175,6 +176,38 @@ def test_aggregation_takes_worst_attack_per_seed_before_averaging():
     row=aggregate_results(runs)[0]
     assert row['p_success'] == pytest.approx(.25)
     assert row['selected_attacks'] == {'seed0':'lookahead','seed1':'nearest_unsafe'}
+
+
+def test_effort_stats_split_all_outcomes_from_successful_ones():
+    effort = torch.tensor([1., 5., 3., 9., float('inf')], dtype=torch.float64)
+    result = dict(outcomes=['success', 'timeout', 'success', 'fail', 'success'],
+                  stop_reasons=['goal', 'time_limit', 'goal', 'unsafe', 'goal'],
+                  stop_times=torch.tensor([1., 2., 3., 4., 5.], dtype=torch.float64),
+                  normalized_effort=effort)
+    stats = compute_stats(result)
+    # Nonfinite effort is excluded from both populations and counted instead.
+    assert stats['n_nonfinite_effort'] == 1
+    assert stats['normalized_effort_mean'] == pytest.approx((1 + 5 + 3 + 9) / 4)
+    assert stats['normalized_effort_max'] == pytest.approx(9.)
+    # Successful only: drops the timeout and the failure, keeps finite successes.
+    assert stats['normalized_effort_success_mean'] == pytest.approx(2.)
+    assert stats['normalized_effort_success_max'] == pytest.approx(3.)
+
+
+def test_effort_maximum_takes_the_worst_seed_while_means_average():
+    runs = []
+    for seed, (mean, maximum) in [('seed0', (3., 8.)), ('seed1', (5., 6.))]:
+        runs.append(dict(label='test', training_seed=seed, density_mode='zero', mass_mode='zero',
+                         attack='lookahead', stats=dict(
+                             p_success=1., p_fail=0., p_timeout=0., hit_time_s_mean=2.,
+                             normalized_effort_mean=mean, normalized_effort_max=maximum,
+                             normalized_effort_success_mean=mean - 1, normalized_effort_success_max=maximum - 1)))
+    row = aggregate_results(runs)[0]
+    assert row['normalized_effort_mean'] == pytest.approx(4.)
+    assert row['normalized_effort_success_mean'] == pytest.approx(3.)
+    # Worst case across seeds, not the average of the per-seed worst cases.
+    assert row['normalized_effort_max'] == pytest.approx(8.)
+    assert row['normalized_effort_success_max'] == pytest.approx(7.)
 
 
 def test_ppo_export_normalization_clipping_and_loading(tmp_path):

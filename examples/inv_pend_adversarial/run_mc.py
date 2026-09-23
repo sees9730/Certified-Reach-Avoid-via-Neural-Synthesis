@@ -76,6 +76,14 @@ Usage (from this directory):
         --output-dir run_mc_energy_seed4 \
         --verbose # compare the cert with/without energy constraints.
     python postprocess_mc.py        # re-render plots/table from mc_cache.pth only
+
+Usafe (from repo root):
+    python examples/inv_pend_adversarial/run_mc.py \
+  --baseline-controller-dir examples/inv_pend_adversarial/neural_certified/seed4 \
+  --energy-controller-dir examples/inv_pend_adversarial/neural_certified/seed4/energy/20260922_170827_086787 \
+  --output-dir examples/inv_pend_adversarial/run_mc_energy_seed4 \
+  --figures 6 7 8 \
+  --verbose
 """
 
 import argparse

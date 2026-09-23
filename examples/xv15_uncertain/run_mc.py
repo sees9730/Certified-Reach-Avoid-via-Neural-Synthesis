@@ -243,14 +243,22 @@ def compute_stats(result):
     success = torch.tensor([v == "success" for v in outcomes])
     times = result["stop_times"][success]
     effort = result["normalized_effort"]
-    finite_effort = effort[torch.isfinite(effort)]
+    finite = torch.isfinite(effort)
+    finite_effort = effort[finite]
+    # Effort accumulated up to the hitting time is what an energy certificate
+    # budgets; the all-outcome figures also count failures and timeouts, whose
+    # effort is truncated at whatever stopped them.
+    success_effort = effort[success & finite]
     stats = dict(n_mc=len(outcomes), n_success=int(success.sum()),
                  p_success=float(success.double().mean()),
                  p_fail=outcomes.count("fail") / len(outcomes), p_timeout=outcomes.count("timeout") / len(outcomes),
                  hit_time_s_mean=float(times.mean()) if len(times) else None,
                  hit_time_s_median=float(times.median()) if len(times) else None,
                  normalized_effort_mean=float(finite_effort.mean()) if len(finite_effort) else None,
-                 n_nonfinite_effort=int((~torch.isfinite(effort)).sum()))
+                 normalized_effort_max=float(finite_effort.max()) if len(finite_effort) else None,
+                 normalized_effort_success_mean=float(success_effort.mean()) if len(success_effort) else None,
+                 normalized_effort_success_max=float(success_effort.max()) if len(success_effort) else None,
+                 n_nonfinite_effort=int((~finite).sum()))
     stats.update({f"n_{name}": result["stop_reasons"].count(name) for name in REASONS})
     return stats
 
@@ -273,9 +281,15 @@ def aggregate_results(runs):
         row = dict(controller=label, density_mode=density, mass_mode=mass, n_seeds=len(selected),
                    p_success=float(np.mean(rates)), p_success_seed_std=float(np.std(rates)),
                    selected_attacks={r["training_seed"]: r["attack"] for r in selected})
-        for field in ("p_fail", "p_timeout", "hit_time_s_mean", "normalized_effort_mean"):
-            values = [r["stats"][field] for r in selected if r["stats"][field] is not None]
+        for field in ("p_fail", "p_timeout", "hit_time_s_mean",
+                      "normalized_effort_mean", "normalized_effort_success_mean"):
+            values = [v for v in (r["stats"].get(field) for r in selected) if v is not None]
             row[field] = float(np.mean(values)) if values else None
+        # Worst case observed for this controller, not an average of the
+        # per-seed worst cases: a budget has to hold for every seed.
+        for field in ("normalized_effort_max", "normalized_effort_success_max"):
+            values = [v for v in (r["stats"].get(field) for r in selected) if v is not None]
+            row[field] = float(np.max(values)) if values else None
         rows.append(row)
     return rows
 
@@ -296,10 +310,16 @@ def write_reports(cache, output_dir):
         writer = csv.DictWriter(stream, fieldnames=list(details[0]))
         writer.writeheader()
         writer.writerows(details)
-    print("\nController | density / mass | success | fail | timeout")
+    def effort(row, suffix):
+        mean, maximum = row[f"normalized_effort{suffix}_mean"], row[f"normalized_effort{suffix}_max"]
+        return ("n/a" if mean is None else f"{mean:.2f}") + "/" + ("n/a" if maximum is None else f"{maximum:.2f}")
+
+    print("\nController | density / mass | success | fail | timeout | "
+          "effort mean/max: all outcomes | successful only")
     for row in rows:
         print(f"{row['controller']} | {row['density_mode']} / {row['mass_mode']} | "
-              f"{row['p_success']:.3f} | {row['p_fail']:.3f} | {row['p_timeout']:.3f}")
+              f"{row['p_success']:.3f} | {row['p_fail']:.3f} | {row['p_timeout']:.3f} | "
+              f"{effort(row, '')} | {effort(row, '_success')}")
     return rows
 
 

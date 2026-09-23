@@ -118,10 +118,34 @@ attacks **for each training seed**, then averages across seeds, as in the
 pendulum runner. Failure/timeout and other summary metrics use those same
 selected runs. Per-seed details retain both attacks. Hitting-time means include
 successful trajectories only, and the reported mean averages the available
-per-seed means. Control effort includes all outcomes, using
+per-seed means. Control effort uses
 `integral [(T/(m0*g))^2 + (alpha/alpha_max)^2 + (delta/delta_max)^2] dt` up to
-stopping. This normalized effort is not physical energy. Nonfinite effort
-values are excluded from its mean and counted explicitly in `per_seed.csv`.
+stopping. This normalized effort is not physical energy. It is reported as a
+mean and a maximum over two populations: `normalized_effort_{mean,max}` covers
+all outcomes, while `normalized_effort_success_{mean,max}` covers successful
+trajectories only, i.e. effort accumulated up to reaching the goal. The
+success-only pair is the quantity an energy certificate budgets, so it is what
+to compare against the unsafe-band start `E_bar = energy_max - energy_margin` when choosing `--energy-max` for
+`neural_certified_uncertain_param/main_constraint_energy.py`. Means average the
+available per-seed means; maxima take the worst case across seeds, since a
+budget has to hold for every seed. Nonfinite effort values are excluded from
+both and counted explicitly in `per_seed.csv`.
+
+The energy-training script follows the pendulum's upper unsafe-band pattern:
+the full effort domain is `[0, energy_max]`, the unsafe band is
+`[E_bar, energy_max]` at every physical state, and the goal ceiling is
+`E_bar - 0.01 * min(energy_margin, E_bar)`. Its initial cells have zero effort.
+The saved spatial SAT certificate is lifted with zero energy weights and
+energy input scale `energy_max`. Goal and unsafe energy boundaries are
+inserted into the slab grid; physical goal cells in the gap receive generator
+checks. Density/mass uncertainty and the controller's three physical inputs
+are retained from the saved baseline.
+
+The existing XV-15 CLI defaults remain `--energy-max 200`,
+`--energy-cells 2`, and `--pretrain-epochs 0`; `--energy-margin` defaults to
+5% of `energy_max`. Set `--pretrain-epochs 2000` to enable V-only pretraining
+before joint bound training, or use `--freeze-controller` to keep the policy
+fixed throughout. `--no-plots` disables both progress and final training plots.
 
 Outputs go to `run_mc_results/`, or `--output-dir PATH`:
 
