@@ -113,6 +113,10 @@ class TrainingConfig:
     # Generator constraint
     generator_weight: float = 1.0
     generator_start_epoch: int = 0
+    # Opt-in optimization controls; default behavior remains the summed loss.
+    loss_reduction: str = 'sum'
+    loss_weights: dict = None
+    max_grad_norm: float = None
 
 @dataclass
 class Hyperparameters:
@@ -215,7 +219,10 @@ class Hyperparameters:
                 'pretrain_lr': self.training.pretrain_lr,
                 'pretrain_n_samples': self.training.pretrain_n_samples,
                 'generator_weight': self.training.generator_weight,
-                'generator_start_epoch': self.training.generator_start_epoch
+                'generator_start_epoch': self.training.generator_start_epoch,
+                'loss_reduction': self.training.loss_reduction,
+                'loss_weights': self.training.loss_weights,
+                'max_grad_norm': self.training.max_grad_norm,
             },
             'refinement': {
                 'v_goal': {

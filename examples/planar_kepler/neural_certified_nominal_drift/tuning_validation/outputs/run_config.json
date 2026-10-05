@@ -1,0 +1,227 @@
+{
+  "mode": "nominal_drift",
+  "example": {
+    "state_order": [
+      "r",
+      "theta",
+      "r_dot",
+      "theta_dot"
+    ],
+    "units": "Normalized length and time; angles in radians",
+    "controller_hidden_dim": 64,
+    "beta_ra": 5.0,
+    "dynamics": {
+      "mu": 1.0,
+      "radial_acceleration_noise": 0.02,
+      "tangential_acceleration_noise": 0.02
+    },
+    "control": {
+      "radial_acceleration": [
+        -3.0,
+        3.0
+      ],
+      "tangential_acceleration": [
+        -2.0,
+        2.0
+      ]
+    },
+    "regions": {
+      "full_range": [
+        [
+          0.6,
+          1.6
+        ],
+        [
+          -0.6,
+          0.6
+        ],
+        [
+          -0.6,
+          0.6
+        ],
+        [
+          -0.6,
+          0.6
+        ]
+      ],
+      "init_range": [
+        [
+          1.2,
+          1.3
+        ],
+        [
+          0.2,
+          0.3
+        ],
+        [
+          -0.15,
+          -0.05
+        ],
+        [
+          -0.15,
+          -0.05
+        ]
+      ],
+      "goal_range": [
+        [
+          0.95,
+          1.05
+        ],
+        [
+          -0.05,
+          0.05
+        ],
+        [
+          -0.05,
+          0.05
+        ],
+        [
+          -0.05,
+          0.05
+        ]
+      ],
+      "unsafe_boundary_width": [
+        0.05,
+        0.05,
+        0.05,
+        0.05
+      ]
+    }
+  },
+  "hyperparameters": {
+    "network": {
+      "n_inputs": 4,
+      "n_hidden_1": 64,
+      "n_hidden_2": 16,
+      "n_outputs": 1,
+      "input_scale": [
+        0.5,
+        0.6000000238418579,
+        0.6000000238418579,
+        0.6000000238418579
+      ],
+      "scale_factor": 20.0
+    },
+    "discretization": {
+      "axis_weights": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "max_region_budget": 256,
+      "max_generator_budget": 512,
+      "n_goal": 3,
+      "n_outside_goal": 3,
+      "n_generator": 1,
+      "n_unsafe": 3,
+      "n_init": 3
+    },
+    "constraints": {
+      "beta_ra": 5.0,
+      "beta_increment": 0.2
+    },
+    "training": {
+      "learning_rate": 0.001,
+      "num_epochs": 2500,
+      "device": "cpu",
+      "random_seed": 0,
+      "enable_pretraining": true,
+      "pretrain_epochs": 5000,
+      "pretrain_lr": 0.001,
+      "pretrain_n_samples": 1000,
+      "generator_weight": 1.0,
+      "generator_start_epoch": 0,
+      "loss_reduction": "mean",
+      "loss_weights": {
+        "goal": 1.0,
+        "unsafe": 5.0,
+        "init": 1.0,
+        "outside": 1.0
+      },
+      "max_grad_norm": 1.0
+    },
+    "refinement": {
+      "v_goal": {
+        "enable_refinement": true,
+        "refine_interval": 500,
+        "refine_interval_late": 250,
+        "late_epoch_threshold": 2500,
+        "refine_factor": 2,
+        "max_cells": 50000,
+        "N_to_refine": 25,
+        "enable_merging": false,
+        "merge_interval": 501,
+        "merge_max_passes": 8,
+        "merge_relax_margin": 0.3
+      },
+      "v_init": {
+        "enable_refinement": true,
+        "refine_interval": 500,
+        "refine_interval_late": 250,
+        "late_epoch_threshold": 2500,
+        "refine_factor": 2,
+        "max_cells": 50000,
+        "N_to_refine": 25,
+        "enable_merging": false,
+        "merge_interval": 501,
+        "merge_max_passes": 8,
+        "merge_relax_margin": 0.3
+      },
+      "v_outside": {
+        "enable_refinement": true,
+        "refine_interval": 500,
+        "refine_interval_late": 250,
+        "late_epoch_threshold": 2500,
+        "refine_factor": 2,
+        "max_cells": 50000,
+        "N_to_refine": 25,
+        "enable_merging": true,
+        "merge_interval": 501,
+        "merge_max_passes": 8,
+        "merge_relax_margin": 0.3
+      },
+      "v_unsafe": {
+        "enable_refinement": true,
+        "refine_interval": 500,
+        "refine_interval_late": 250,
+        "late_epoch_threshold": 2500,
+        "refine_factor": 2,
+        "max_cells": 50000,
+        "N_to_refine": 25,
+        "enable_merging": false,
+        "merge_interval": 501,
+        "merge_max_passes": 8,
+        "merge_relax_margin": 0.3
+      },
+      "gv_generator": {
+        "enable_refinement": true,
+        "refine_interval": 500,
+        "refine_interval_late": 100,
+        "late_epoch_threshold": 2500,
+        "refine_factor": 2,
+        "max_cells": 50000,
+        "N_to_refine": 25,
+        "enable_merging": true,
+        "merge_interval": 501,
+        "merge_max_passes": 8,
+        "merge_relax_margin": -200.0
+      }
+    },
+    "logging": {
+      "loss_log_interval": 10,
+      "detailed_eval_interval": 1000,
+      "visualize_interval": 0
+    },
+    "compute_V": true,
+    "compute_GV": true,
+    "include_time": false
+  },
+  "generator_curriculum": {
+    "beta_ra": 5.0,
+    "warmup_epochs": 1000,
+    "ramp_epochs": 3000,
+    "target_weight": 1.0,
+    "safety_tolerance": 0.1
+  }
+}

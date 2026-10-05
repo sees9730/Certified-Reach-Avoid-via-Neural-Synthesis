@@ -1,0 +1,19 @@
+Planar Kepler nominal-drift controller synthesis; state = [r, theta, r_dot, theta_dot]
+Seed: 0; device: cpu; run directory: /Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/planar_kepler/neural_certified_nominal_drift/tuning_validation
+Controls: radial/tangential acceleration. Goal: fixed position at zero velocity.
+[PhiModule] Initialized with:
+  scale_factor: 20.0
+  input_scale: [0.5, 0.6000000238418579, 0.6000000238418579, 0.6000000238418579]
+  include_time: False
+  include_energy: False
+  f type: <class 'examples.planar_kepler.model.NominalClosedLoopDrift'>
+  g type: <class 'examples.planar_kepler.model.AccelerationDiffusion'>
+Goal equilibrium: [1.0, 0.0, 0.0, 0.0]
+Equilibrium control: [1.0, 0.0]
+Phi Verification PASSED: max diff = 3.051758e-04
+Goal:      PASS, V_lower_min:   0.036
+Unsafe:    PASS, V_lower_min:   5.005
+Init:      FAIL, V_upper_max:   1.075
+Outside:   FAIL, V_lower_min:  -0.017
+Generator: FAIL, GV_upper_max: 2.527036e+01, required <= -1.000000e-04
+Saved eval bundle -> examples/planar_kepler/neural_certified_nominal_drift/tuning_validation/outputs/eval_bundle.pth

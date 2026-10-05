@@ -1,0 +1,18 @@
+{
+  "all_constraints_satisfied": false,
+  "beta_ra": 5.0,
+  "state_order": [
+    "r",
+    "theta",
+    "r_dot",
+    "theta_dot"
+  ],
+  "interpretation": "Final bound checks for the configured reach-avoid problem. A saved checkpoint alone does not establish certification.",
+  "constraints": {
+    "goal_satisfied": true,
+    "unsafe_satisfied": true,
+    "init_satisfied": false,
+    "outside_satisfied": false,
+    "generator_satisfied": false
+  }
+}

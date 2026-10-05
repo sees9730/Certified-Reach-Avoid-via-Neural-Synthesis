@@ -9,6 +9,7 @@ import torch.nn as nn
 import time
 import select
 import gc
+import math
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 import sys
@@ -46,7 +47,8 @@ def train_network_bounds(
     params: Hyperparameters,
     control_net: nn.Module = None,
     create_scheduler = None,
-    start_time: float = None
+    start_time: float = None,
+    generator_weight_schedule = None,
 ):
     """
     Train the value network using CROWN bounds.
@@ -60,6 +62,8 @@ def train_network_bounds(
         control_net: Optional control network for control synthesis
         create_scheduler: Optional scheduler factory function
         start_time: Optional start time for timing purposes
+        generator_weight_schedule: Optional callable(epoch, V_bounds) returning
+            the generator weight; defaults to the configured constant weight.
 
     Returns:
         loss_history: List of loss dictionaries per epoch
@@ -162,6 +166,8 @@ def train_network_bounds(
         'device': params.training.device,
         'compute_V': params.compute_V,
         'compute_GV': params.compute_GV,
+        'loss_weights': getattr(params.training, 'loss_weights', None),
+        'loss_reduction': getattr(params.training, 'loss_reduction', 'sum'),
     }
 
     # Training loop
@@ -283,14 +289,18 @@ def train_network_bounds(
                 else:
                     bounds[name] = (empty_tensor, empty_tensor)
 
+        current_gen_weight = 0.0
         if params.compute_GV:
+            if epoch >= params.training.generator_start_epoch:
+                current_gen_weight = (params.training.generator_weight if generator_weight_schedule is None
+                                      else float(generator_weight_schedule(epoch, bounds)))
+                if not math.isfinite(current_gen_weight) or current_gen_weight < 0:
+                    raise ValueError("Generator schedule must return a finite nonnegative weight")
             # Compute generator bounds if enabled
-            if (epoch >= params.training.generator_start_epoch and
-                params.training.generator_weight > 0 and
+            if (current_gen_weight > 0 and
                 crown_cache_phi is not None):
                 phi_uppers = crown_cache_phi.compute_bounds(input_lowers_gen, input_uppers_gen)
                 v_gen_lowers, _ = crown_cache_v_gen.compute_bounds(input_lowers_gen, input_uppers_gen)
-                current_gen_weight = params.training.generator_weight
                 # Refine every active cell that misses the same margin used
                 # in the loss and SAT checks, including V_lower == beta.
                 _, phi_upper_failing_mask = generator_bound_masks(
@@ -316,9 +326,14 @@ def train_network_bounds(
             loss_kwargs['generator_weight'] = current_gen_weight
 
         total_loss, loss_dict, sat_dict = compute_total_loss_bounds(**loss_kwargs)
+        if generator_weight_schedule is not None:
+            loss_dict['generator_weight'] = current_gen_weight
 
         # Backward pass
         total_loss.backward()
+        max_grad_norm = getattr(params.training, 'max_grad_norm', None)
+        if max_grad_norm is not None:
+            torch.nn.utils.clip_grad_norm_(opt_params, max_grad_norm, error_if_nonfinite=True)
 
         # Recompute bounds after optimizer step for verification
         V_net.eval()
@@ -490,8 +505,7 @@ def train_network_bounds(
         # Adaptive refinement for generator cells
         if params.compute_GV:
             gv_cfg = params.refinement.gv_generator
-            if (epoch >= params.training.generator_start_epoch and
-                params.training.generator_weight > 0 and
+            if (current_gen_weight > 0 and
                 crown_cache_phi is not None and
                 num_total_failing > 0):
 
@@ -522,7 +536,7 @@ def train_network_bounds(
                     len(region_cells['generator']) > gv_cfg.max_cells):
                     print(f"Generator cells exceed max cells threshold: {len(region_cells['generator'])} > {gv_cfg.max_cells}")    
 
-            if (gv_cfg.enable_merging and
+            if (current_gen_weight > 0 and gv_cfg.enable_merging and
                 (epoch + 1) % gv_cfg.merge_interval == 0):
                 phi_upper_failing_mask_relax = phi_uppers > min(gv_cfg.merge_relax_margin, -GENERATOR_MARGIN)
                 merged_cells, num_merges = merge_passing_neighbor_cells(
@@ -540,6 +554,9 @@ def train_network_bounds(
         if epoch % params.logging.loss_log_interval == 0 or epoch == params.training.num_epochs - 1 or epoch == 0:
             elapsed = time.time() - start_time
             print_loss_summary(epoch, loss_dict, compute_V=params.compute_V, compute_GV=params.compute_GV, elapsed_time=elapsed)
+            if generator_weight_schedule is not None:
+                status = "active" if current_gen_weight > 0 else "inactive: value warmup/recovery"
+                print(f"  Generator weight: {current_gen_weight:.6g} ({status})")
             loss_dict['epoch'] = epoch
             loss_history.append(loss_dict.copy())
 
@@ -637,8 +654,7 @@ def train_network_bounds(
                 # them instead of recomputing via a second compute_bounds() pass.
                 generator_bounds_valid = (
                     params.compute_GV
-                    and epoch >= params.training.generator_start_epoch
-                    and params.training.generator_weight > 0
+                    and current_gen_weight > 0
                     and crown_cache_phi is not None
                 )
                 results = evaluate_constraints(
