@@ -1,0 +1,543 @@
+{
+  "checkpoints": {
+    "Certified": "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/xv15_uncertain/neural_certified_uncertain_param/seed0/outputs/eval_bundle.pth",
+    "PPO": "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/xv15_uncertain/rl_sb3_ppo/seed0/outputs/rl_controller.pth",
+    "PPO certified & fine-tuned": "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/xv15_uncertain/rl_sb3_ppo_finetuned_certified_uncertain_param/seed0/outputs/eval_bundle.pth"
+  },
+  "metrics": [
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "fc1.weight",
+      "count": 192,
+      "changed": 192,
+      "mean_abs": 0.7352699103082235,
+      "max_abs": 9.9110303678317,
+      "rms": 1.3302766873129352,
+      "l2": 18.43285448440336,
+      "relative_l2": 3.0806506135691007,
+      "cosine": 0.10048659137860864
+    },
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "fc2.weight",
+      "count": 192,
+      "changed": 192,
+      "mean_abs": 0.35101387146420976,
+      "max_abs": 3.8519320487976074,
+      "rms": 0.6340701690336519,
+      "l2": 8.785933986640568,
+      "relative_l2": 1.25694517289471,
+      "cosine": -0.11771456997446954
+    },
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "all_weights",
+      "count": 384,
+      "changed": 384,
+      "mean_abs": 0.5431418908862167,
+      "max_abs": 9.9110303678317,
+      "rms": 1.0420367181790287,
+      "l2": 20.419666022263808,
+      "relative_l2": 2.2192631997626897,
+      "cosine": 0.04142892676743284
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "fc1.weight",
+      "count": 192,
+      "changed": 192,
+      "mean_abs": 0.7352699103082235,
+      "max_abs": 9.9110303678317,
+      "rms": 1.3302766873129352,
+      "l2": 18.43285448440336,
+      "relative_l2": 3.0806506135691007,
+      "cosine": 0.10048659137860864
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "fc2.weight",
+      "count": 192,
+      "changed": 192,
+      "mean_abs": 0.23137293845134602,
+      "max_abs": 4.550171659138869,
+      "rms": 0.6381810154092824,
+      "l2": 8.842895544918191,
+      "relative_l2": 1.265094284397993,
+      "cosine": 0.013152695303489967
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "all_weights",
+      "count": 384,
+      "changed": 384,
+      "mean_abs": 0.48332142437978476,
+      "max_abs": 9.9110303678317,
+      "rms": 1.0432907248790004,
+      "l2": 20.444239434655497,
+      "relative_l2": 2.2219339030814416,
+      "cosine": 0.06541588359744449
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "fc1.weight",
+      "count": 192,
+      "changed": 0,
+      "mean_abs": 0.0,
+      "max_abs": 0.0,
+      "rms": 0.0,
+      "l2": 0.0,
+      "relative_l2": 0.0,
+      "cosine": 1.0
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "fc2.weight",
+      "count": 192,
+      "changed": 192,
+      "mean_abs": 0.2727734115518758,
+      "max_abs": 4.550390597998103,
+      "rms": 0.5096935637084583,
+      "l2": 7.062521189071154,
+      "relative_l2": 1.547660008776084,
+      "cosine": 0.02577412265649588
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "all_weights",
+      "count": 384,
+      "changed": 192,
+      "mean_abs": 0.1363867057759379,
+      "max_abs": 4.550390597998103,
+      "rms": 0.3604077752253884,
+      "l2": 7.062521189071154,
+      "relative_l2": 0.37941286725593487,
+      "cosine": 0.9290844453547196
+    }
+  ],
+  "fixed_buffers": [
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "x_eq",
+      "equal": true,
+      "first_value": [
+        75.0,
+        0.06981316953897476,
+        0.5235987901687622
+      ],
+      "second_value": [
+        75.0,
+        0.06981316953897476,
+        0.5235987901687622
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "u_eq",
+      "equal": true,
+      "first_value": [
+        14272.9443359375,
+        0.13054761290550232,
+        0.0
+      ],
+      "second_value": [
+        14272.9443359375,
+        0.13054761290550232,
+        0.0
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "input_scale",
+      "equal": true,
+      "first_value": [
+        100.0,
+        0.3490658402442932,
+        1.5707963705062866
+      ],
+      "second_value": [
+        100.0,
+        0.3490658402442932,
+        1.5707963705062866
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "T_min",
+      "equal": true,
+      "first_value": 5787.89990234375,
+      "second_value": 5787.89990234375,
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "T_max",
+      "equal": true,
+      "first_value": 104182.203125,
+      "second_value": 104182.203125,
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "alpha_max",
+      "equal": true,
+      "first_value": 0.27925267815589905,
+      "second_value": 0.27925267815589905,
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "delta_max",
+      "equal": true,
+      "first_value": 0.0872664600610733,
+      "second_value": 0.0872664600610733,
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "du_scale",
+      "equal": true,
+      "first_value": [
+        104182.203125,
+        0.27925267815589905,
+        0.0872664600610733
+      ],
+      "second_value": [
+        104182.203125,
+        0.27925267815589905,
+        0.0872664600610733
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "z_eq",
+      "equal": true,
+      "first_value": [
+        -2.3604958057403564,
+        0.5068525075912476,
+        0.0
+      ],
+      "second_value": [
+        -2.3604958057403564,
+        0.5068525075912476,
+        0.0
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO",
+      "tensor": "inv_slope_eq",
+      "equal": true,
+      "first_value": [
+        0.00012897673877887428,
+        4.5824666023254395,
+        11.459156036376953
+      ],
+      "second_value": [
+        0.00012897673877887428,
+        4.5824666023254395,
+        11.459156036376953
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "x_eq",
+      "equal": true,
+      "first_value": [
+        75.0,
+        0.06981316953897476,
+        0.5235987901687622
+      ],
+      "second_value": [
+        75.0,
+        0.06981316953897476,
+        0.5235987901687622
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "u_eq",
+      "equal": true,
+      "first_value": [
+        14272.9443359375,
+        0.13054761290550232,
+        0.0
+      ],
+      "second_value": [
+        14272.9443359375,
+        0.13054761290550232,
+        0.0
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "input_scale",
+      "equal": true,
+      "first_value": [
+        100.0,
+        0.3490658402442932,
+        1.5707963705062866
+      ],
+      "second_value": [
+        100.0,
+        0.3490658402442932,
+        1.5707963705062866
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "T_min",
+      "equal": true,
+      "first_value": 5787.89990234375,
+      "second_value": 5787.89990234375,
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "T_max",
+      "equal": true,
+      "first_value": 104182.203125,
+      "second_value": 104182.203125,
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "alpha_max",
+      "equal": true,
+      "first_value": 0.27925267815589905,
+      "second_value": 0.27925267815589905,
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "delta_max",
+      "equal": true,
+      "first_value": 0.0872664600610733,
+      "second_value": 0.0872664600610733,
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "du_scale",
+      "equal": true,
+      "first_value": [
+        104182.203125,
+        0.27925267815589905,
+        0.0872664600610733
+      ],
+      "second_value": [
+        104182.203125,
+        0.27925267815589905,
+        0.0872664600610733
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "z_eq",
+      "equal": true,
+      "first_value": [
+        -2.3604958057403564,
+        0.5068525075912476,
+        0.0
+      ],
+      "second_value": [
+        -2.3604958057403564,
+        0.5068525075912476,
+        0.0
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "Certified",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "inv_slope_eq",
+      "equal": true,
+      "first_value": [
+        0.00012897673877887428,
+        4.5824666023254395,
+        11.459156036376953
+      ],
+      "second_value": [
+        0.00012897673877887428,
+        4.5824666023254395,
+        11.459156036376953
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "x_eq",
+      "equal": true,
+      "first_value": [
+        75.0,
+        0.06981316953897476,
+        0.5235987901687622
+      ],
+      "second_value": [
+        75.0,
+        0.06981316953897476,
+        0.5235987901687622
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "u_eq",
+      "equal": true,
+      "first_value": [
+        14272.9443359375,
+        0.13054761290550232,
+        0.0
+      ],
+      "second_value": [
+        14272.9443359375,
+        0.13054761290550232,
+        0.0
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "input_scale",
+      "equal": true,
+      "first_value": [
+        100.0,
+        0.3490658402442932,
+        1.5707963705062866
+      ],
+      "second_value": [
+        100.0,
+        0.3490658402442932,
+        1.5707963705062866
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "T_min",
+      "equal": true,
+      "first_value": 5787.89990234375,
+      "second_value": 5787.89990234375,
+      "max_abs": 0.0
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "T_max",
+      "equal": true,
+      "first_value": 104182.203125,
+      "second_value": 104182.203125,
+      "max_abs": 0.0
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "alpha_max",
+      "equal": true,
+      "first_value": 0.27925267815589905,
+      "second_value": 0.27925267815589905,
+      "max_abs": 0.0
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "delta_max",
+      "equal": true,
+      "first_value": 0.0872664600610733,
+      "second_value": 0.0872664600610733,
+      "max_abs": 0.0
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "du_scale",
+      "equal": true,
+      "first_value": [
+        104182.203125,
+        0.27925267815589905,
+        0.0872664600610733
+      ],
+      "second_value": [
+        104182.203125,
+        0.27925267815589905,
+        0.0872664600610733
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "z_eq",
+      "equal": true,
+      "first_value": [
+        -2.3604958057403564,
+        0.5068525075912476,
+        0.0
+      ],
+      "second_value": [
+        -2.3604958057403564,
+        0.5068525075912476,
+        0.0
+      ],
+      "max_abs": 0.0
+    },
+    {
+      "first": "PPO",
+      "second": "PPO certified & fine-tuned",
+      "tensor": "inv_slope_eq",
+      "equal": true,
+      "first_value": [
+        0.00012897673877887428,
+        4.5824666023254395,
+        11.459156036376953
+      ],
+      "second_value": [
+        0.00012897673877887428,
+        4.5824666023254395,
+        11.459156036376953
+      ],
+      "max_abs": 0.0
+    }
+  ],
+  "interpretation": "Differences use saved neuron order, without permutation alignment. Relative L2 uses the first controller as reference. Fixed normalization, trim, and limit buffers are reported separately from learned weights. Weight distance alone does not measure control behavior or certification."
+}

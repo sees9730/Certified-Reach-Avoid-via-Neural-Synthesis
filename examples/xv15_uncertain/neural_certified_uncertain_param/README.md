@@ -153,8 +153,8 @@ necessary. There is no claim of a globally optimal upper bound or guaranteed SAT
 
 ```bash
 MPLBACKEND=Agg ./.venv/bin/python -m pytest \
-    examples/xv15_uncertain/test_uncertain_density.py \
-    examples/xv15_uncertain/test_uncertain_mass.py -q
+    examples/xv15_uncertain/_tests/test_uncertain_density.py \
+    examples/xv15_uncertain/_tests/test_uncertain_mass.py -q
 ```
 
 These checks compare support values with physical corner drifts and interior

@@ -1,0 +1,40 @@
+{
+  "certified": true,
+  "beta_ra": 5.0,
+  "source_controller": {
+    "checkpoint": "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/xv15_uncertain/rl_sb3_ppo/seed0/outputs/rl_controller.pth",
+    "sha256": "5755c861d9319c64fab6d8b6e5078d3825416c5685ebf3ee28160ac609fb57be"
+  },
+  "controller_training": "last-layer",
+  "trainable_controller_parameters": [
+    "fc2.weight"
+  ],
+  "controller_parameter_change_l2": {
+    "fc1.weight": 0.0,
+    "fc2.weight": 7.062521457672119
+  },
+  "pretrain_time_sec": 396.99564909935,
+  "bound_training_time_sec": 4104.807019948959,
+  "final_results": {
+    "goal_satisfied": true,
+    "unsafe_satisfied": true,
+    "init_satisfied": true,
+    "outside_satisfied": true,
+    "generator_satisfied": true,
+    "V_goal_min": 0.04102478176355362,
+    "V_goal_max": 1.390252709388733,
+    "V_unsafe_min": 5.058114528656006,
+    "V_unsafe_max": 102.4421157836914,
+    "V_init_min": 0.6513000726699829,
+    "V_init_max": 0.9985443353652954,
+    "V_outside_min": 0.01381836086511612,
+    "V_outside_max": 109.47710418701172,
+    "Phi_min": -21.486652374267578,
+    "Phi_max": -0.00010217838280368596,
+    "Phi_mean": -0.36882123351097107,
+    "num_failing_cells": 0,
+    "num_active_generator_cells": 8802,
+    "generator_margin": 0.0001
+  },
+  "checkpoint": "eval_bundle.pth"
+}

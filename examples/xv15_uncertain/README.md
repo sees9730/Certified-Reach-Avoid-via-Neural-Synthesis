@@ -156,10 +156,19 @@ Outputs go to `run_mc_results/`, or `--output-dir PATH`:
   and (in JSON) evaluation metadata.
 - `per_seed.csv`: all individual training-seed/scenario/attack statistics.
 - `success_rate_summary.pdf`: density × mass success-rate heatmaps.
-- `time_and_effort.pdf`: successful hitting times and normalized effort.
-- `density_<mode>__mass_<mode>/`: `trajectories.pdf`, `controls.pdf`, and
-  `parameters.pdf` for a limited set of cached paths; these traces are
-  illustrative and can include different attack methods than a summary row.
+- `time_summary.pdf`: box plots of hitting times for successful trajectories.
+- `energy_summary.pdf`: box plots of finite normalized control effort across
+  all outcomes (not physical energy).
+
+The time and energy figures group each controller's individual trajectory
+samples into `zero-zero`, `uniform-uniform`, and `adversarial`. The last group
+pools **all remaining density/mass pairs**, including `zero-uniform` and
+`uniform-zero`. For each controller, training seed, and pair, the same worst
+tested attack used in the success heatmap supplies the samples. Samples are
+pooled across seeds and scenarios; each trajectory has equal weight. Empty
+boxes are marked `n/a`. Boxes show quartiles and medians, with 1.5-IQR whiskers
+and outlier points. Only these three summary figures are generated; stored
+sample paths remain available in the cache.
 
 `--n-paths` controls saved paths per training seed/scenario/attack (default 5),
 and `--trace-dt` controls their recording cadence (default 0.1 s).
@@ -174,13 +183,12 @@ Regenerate tables and plots without rerunning simulations or loading controllers
     --cache examples/xv15_uncertain/run_mc_results/mc_cache.pth
 ```
 
-Optional postprocessing flags: `--output-dir PATH`, `--max-paths N` (plotted
-paths per controller/scenario), and `--no-plots`.
+Optional postprocessing flags: `--output-dir PATH` and `--no-plots`.
 
 Implementation checks:
 
 ```bash
-MPLBACKEND=Agg ./.venv/bin/python -m pytest examples/xv15_uncertain/test_run_mc.py -q
+MPLBACKEND=Agg ./.venv/bin/python -m pytest examples/xv15_uncertain/_tests/test_run_mc.py -q
 ```
 
 ## Run
@@ -419,9 +427,46 @@ For seed 0, outputs are under `neural_certified_nominal_drift/seed0/`:
 Implementation checks (no training):
 
 ```bash
-MPLBACKEND=Agg ./.venv/bin/python -m pytest examples/xv15_uncertain/test_nominal_drift.py -q
+MPLBACKEND=Agg ./.venv/bin/python -m pytest examples/xv15_uncertain/_tests/test_nominal_drift.py -q
 ```
 
 They compare the drift with the original aircraft implementation, check
 units and control limits, compare the generator with autograd, and exercise
 bound enclosures and gradients through both neural networks.
+
+## Compare controller parameters
+
+Plot the saved seed0 controller weights for the uncertain-parameter certified
+controller, distilled PPO controller, and certified fine-tuned PPO controller:
+
+```bash
+./.venv/bin/python examples/xv15_uncertain/plot_controller_parameters.py
+```
+
+The script prefers `eval_bundle.pth` for final certified weights and
+`rl_controller.pth` for PPO. It saves two square-cell heatmap figures under
+`examples/xv15_uncertain/controller_parameter_comparison/`:
+
+- `controller_input_weights.{png,pdf}`: three controller columns and three
+  input-state rows (airspeed, flight-path angle, rotor tilt).
+- `controller_output_weights.{png,pdf}`: three controller columns and three
+  control-output rows (thrust, angle of attack, tilt rate).
+
+Each panel arranges the 64 hidden-neuron weights in an 8×8 grid; each square
+is one weight. The hidden-neuron index is the labeled row start plus the
+column offset (0-based), preserving saved order. The input-layer figure uses
+one shared color scale. The output-layer figure uses a separate scale and
+colorbar for each control output, shared across the three controllers in that
+row. Blue is negative and red is positive. The script generates only weight
+heatmaps.
+
+`parameter_differences.csv` reports per-layer and total weight
+metrics; `summary.json` also records checkpoint paths and comparisons of fixed
+trim, normalization, and limit buffers. These controllers have no biases.
+
+Override inputs with `--certified PATH`, `--ppo PATH`, and `--finetuned PATH`
+(checkpoint files or output directories), and the destination with
+`--output-dir PATH`. Relative L2 divides by the first controller's weight norm.
+Hidden neurons retain their saved order; independently trained networks can
+have different neuron ordering. Weight differences alone do not measure
+controller behavior or certification status.

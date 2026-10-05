@@ -1,0 +1,43 @@
+{
+  "energy_definition": "integral(1 dt) = elapsed time in seconds",
+  "clock_rate": 1.0,
+  "energy_max": 100.0,
+  "energy_margin": 5.0,
+  "energy_budget": 95.0,
+  "energy_ceiling": 95.0,
+  "goal_energy_max": 94.94999694824219,
+  "energy_domain": [
+    0.0,
+    100.0
+  ],
+  "unsafe_energy_band": [
+    95.0,
+    100.0
+  ],
+  "alpha": 1.0,
+  "beta": 5.0,
+  "eta": 0.0001,
+  "satisfied": true,
+  "probability_lower_bound": 0.8,
+  "results": {
+    "goal_satisfied": true,
+    "unsafe_satisfied": true,
+    "init_satisfied": true,
+    "outside_satisfied": true,
+    "generator_satisfied": true,
+    "V_goal_min": 0.02604065090417862,
+    "V_goal_max": 7.006585597991943,
+    "V_unsafe_min": 5.054086208343506,
+    "V_unsafe_max": 66.69019317626953,
+    "V_init_min": 0.8014312982559204,
+    "V_init_max": 0.9954925775527954,
+    "V_outside_min": 0.05404052883386612,
+    "V_outside_max": 64.73416137695312,
+    "Phi_min": -31.74075698852539,
+    "Phi_max": -0.00018669664859771729,
+    "Phi_mean": -0.4916932284832001,
+    "num_failing_cells": 0,
+    "num_active_generator_cells": 25748,
+    "generator_margin": 0.0001
+  }
+}

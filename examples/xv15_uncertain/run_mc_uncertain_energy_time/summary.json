@@ -1,0 +1,716 @@
+{
+  "metadata": {
+    "config": {
+      "controller_hidden_dim": 64,
+      "beta_ra": 5.0,
+      "uncertainty": {
+        "air_density_kg_m3": [
+          1.16375,
+          1.28625
+        ],
+        "mass_kg": [
+          5850.0,
+          5950.0
+        ]
+      },
+      "dynamics": {
+        "mass": 5900.0,
+        "gravity": 9.81,
+        "density": 1.225,
+        "wing_area": 15.7,
+        "lift_cruise": [
+          0.0849,
+          0.3482
+        ],
+        "lift_hover": [
+          0.0646,
+          0.2709
+        ],
+        "drag_cruise": [
+          0.00042143,
+          0.003,
+          0.0218
+        ],
+        "drag_hover": [
+          0.000473216,
+          0.00343,
+          0.2165
+        ],
+        "diffusion_mps_deg_deg": [
+          0.5,
+          0.1,
+          0.1
+        ]
+      },
+      "control": {
+        "thrust_over_weight": [
+          0.1,
+          1.8
+        ],
+        "alpha_max_deg": 16.0,
+        "delta_max_deg_per_second": 5.0
+      },
+      "regions_mps_deg_deg": {
+        "full_range": [
+          [
+            0.5,
+            100.0
+          ],
+          [
+            -20.0,
+            20.0
+          ],
+          [
+            0.0,
+            90.0
+          ]
+        ],
+        "init_range": [
+          [
+            28.0,
+            32.0
+          ],
+          [
+            8.5,
+            10.5
+          ],
+          [
+            58.0,
+            62.0
+          ]
+        ],
+        "goal_range": [
+          [
+            65.0,
+            85.0
+          ],
+          [
+            -2.0,
+            10.0
+          ],
+          [
+            25.0,
+            35.0
+          ]
+        ],
+        "unsafe_up": [
+          [
+            0.5,
+            100.0
+          ],
+          [
+            19.0,
+            20.0
+          ],
+          [
+            0.0,
+            90.0
+          ]
+        ],
+        "unsafe_dn": [
+          [
+            0.5,
+            100.0
+          ],
+          [
+            -20.0,
+            -19.0
+          ],
+          [
+            0.0,
+            90.0
+          ]
+        ],
+        "unsafe_min_beta": [
+          [
+            0.5,
+            100.0
+          ],
+          [
+            -20.0,
+            20.0
+          ],
+          [
+            0.0,
+            1.0
+          ]
+        ],
+        "unsafe_max_beta": [
+          [
+            0.5,
+            100.0
+          ],
+          [
+            -20.0,
+            20.0
+          ],
+          [
+            89.0,
+            90.0
+          ]
+        ],
+        "unsafe_min_vel": [
+          [
+            0.5,
+            1.0
+          ],
+          [
+            -20.0,
+            20.0
+          ],
+          [
+            0.0,
+            90.0
+          ]
+        ],
+        "unsafe_max_vel": [
+          [
+            99.5,
+            100.0
+          ],
+          [
+            -20.0,
+            20.0
+          ],
+          [
+            0.0,
+            90.0
+          ]
+        ]
+      }
+    },
+    "n_mc": 200,
+    "t_max": 30.0,
+    "dt": 0.01,
+    "mc_seed": 42,
+    "density_modes": [
+      "zero",
+      "uniform",
+      "adversarial"
+    ],
+    "mass_modes": [
+      "zero",
+      "uniform",
+      "adversarial"
+    ],
+    "uniform_refresh": "step",
+    "adversarial_methods": [
+      "lookahead",
+      "nearest_unsafe"
+    ],
+    "stochastic": true,
+    "n_paths": 5,
+    "trace_dt": 0.1,
+    "method": "Euler-Maruyama; events checked at step boundaries; empirical, not a certification proof",
+    "effort": "Integral of (T/(m0*g))^2 + (alpha/alpha_max)^2 + (delta/delta_max)^2 up to stopping; not physical energy",
+    "adversarial_summary": "Lowest success rate among tested attacks per training seed, then mean across seeds",
+    "controllers": [
+      {
+        "label": "Uncertain",
+        "training_seed": "seed0",
+        "checkpoint": "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/xv15_uncertain/neural_certified_uncertain_param/seed0/outputs/eval_bundle.pth",
+        "kind": "neural_certificate"
+      },
+      {
+        "label": "Energy",
+        "training_seed": "20260924_152906_397866",
+        "checkpoint": "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/xv15_uncertain/neural_certified_uncertain_param/seed0/energy/20260924_152906_397866/outputs/eval_bundle.pth",
+        "kind": "neural_certificate"
+      },
+      {
+        "label": "Time",
+        "training_seed": "20261003_151500_611395",
+        "checkpoint": "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/xv15_uncertain/neural_certified_uncertain_param/seed0/time/20261003_151500_611395/outputs/eval_bundle.pth",
+        "kind": "neural_certificate"
+      }
+    ]
+  },
+  "summary": [
+    {
+      "controller": "Uncertain",
+      "density_mode": "zero",
+      "mass_mode": "zero",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "seed0": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 12.932350000000001,
+      "normalized_effort_mean": 12.566982693266455,
+      "normalized_effort_success_mean": 12.566982693266455,
+      "normalized_effort_max": 14.295143657492604,
+      "normalized_effort_success_max": 14.295143657492604
+    },
+    {
+      "controller": "Uncertain",
+      "density_mode": "zero",
+      "mass_mode": "uniform",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "seed0": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 12.9322,
+      "normalized_effort_mean": 12.566236783243214,
+      "normalized_effort_success_mean": 12.566236783243214,
+      "normalized_effort_max": 14.29389197464634,
+      "normalized_effort_success_max": 14.29389197464634
+    },
+    {
+      "controller": "Uncertain",
+      "density_mode": "zero",
+      "mass_mode": "adversarial",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "seed0": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 13.028400000000001,
+      "normalized_effort_mean": 12.8044804422382,
+      "normalized_effort_success_mean": 12.8044804422382,
+      "normalized_effort_max": 14.576223056528628,
+      "normalized_effort_success_max": 14.576223056528628
+    },
+    {
+      "controller": "Uncertain",
+      "density_mode": "uniform",
+      "mass_mode": "zero",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "seed0": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 12.93235,
+      "normalized_effort_mean": 12.566887718685688,
+      "normalized_effort_success_mean": 12.566887718685688,
+      "normalized_effort_max": 14.302270774269601,
+      "normalized_effort_success_max": 14.302270774269601
+    },
+    {
+      "controller": "Uncertain",
+      "density_mode": "uniform",
+      "mass_mode": "uniform",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "seed0": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 12.931999999999999,
+      "normalized_effort_mean": 12.56604943694062,
+      "normalized_effort_success_mean": 12.56604943694062,
+      "normalized_effort_max": 14.301009502141044,
+      "normalized_effort_success_max": 14.301009502141044
+    },
+    {
+      "controller": "Uncertain",
+      "density_mode": "uniform",
+      "mass_mode": "adversarial",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "seed0": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 13.02815,
+      "normalized_effort_mean": 12.804225974249643,
+      "normalized_effort_success_mean": 12.804225974249643,
+      "normalized_effort_max": 14.583256751802937,
+      "normalized_effort_success_max": 14.583256751802937
+    },
+    {
+      "controller": "Uncertain",
+      "density_mode": "adversarial",
+      "mass_mode": "zero",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "seed0": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 13.017550000000002,
+      "normalized_effort_mean": 12.267292959401685,
+      "normalized_effort_success_mean": 12.267292959401685,
+      "normalized_effort_max": 13.972725416395347,
+      "normalized_effort_success_max": 13.972725416395347
+    },
+    {
+      "controller": "Uncertain",
+      "density_mode": "adversarial",
+      "mass_mode": "uniform",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "seed0": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 13.01705,
+      "normalized_effort_mean": 12.266409186111922,
+      "normalized_effort_success_mean": 12.266409186111922,
+      "normalized_effort_max": 13.971426084185461,
+      "normalized_effort_success_max": 13.971426084185461
+    },
+    {
+      "controller": "Uncertain",
+      "density_mode": "adversarial",
+      "mass_mode": "adversarial",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "seed0": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 13.113900000000001,
+      "normalized_effort_mean": 12.4933935352495,
+      "normalized_effort_success_mean": 12.4933935352495,
+      "normalized_effort_max": 14.197858321011083,
+      "normalized_effort_success_max": 14.197858321011083
+    },
+    {
+      "controller": "Energy",
+      "density_mode": "zero",
+      "mass_mode": "zero",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20260924_152906_397866": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 7.9472499999999995,
+      "normalized_effort_mean": 11.544170810673686,
+      "normalized_effort_success_mean": 11.544170810673686,
+      "normalized_effort_max": 12.812907883536765,
+      "normalized_effort_success_max": 12.812907883536765
+    },
+    {
+      "controller": "Energy",
+      "density_mode": "zero",
+      "mass_mode": "uniform",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20260924_152906_397866": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 7.9472499999999995,
+      "normalized_effort_mean": 11.543772042926989,
+      "normalized_effort_success_mean": 11.543772042926989,
+      "normalized_effort_max": 12.81221415375679,
+      "normalized_effort_success_max": 12.81221415375679
+    },
+    {
+      "controller": "Energy",
+      "density_mode": "zero",
+      "mass_mode": "adversarial",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20260924_152906_397866": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 7.958450000000002,
+      "normalized_effort_mean": 11.6303464998549,
+      "normalized_effort_success_mean": 11.6303464998549,
+      "normalized_effort_max": 12.939431084577912,
+      "normalized_effort_success_max": 12.939431084577912
+    },
+    {
+      "controller": "Energy",
+      "density_mode": "uniform",
+      "mass_mode": "zero",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20260924_152906_397866": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 7.946949999999999,
+      "normalized_effort_mean": 11.543800007640366,
+      "normalized_effort_success_mean": 11.543800007640366,
+      "normalized_effort_max": 12.81827073203779,
+      "normalized_effort_success_max": 12.81827073203779
+    },
+    {
+      "controller": "Energy",
+      "density_mode": "uniform",
+      "mass_mode": "uniform",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20260924_152906_397866": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 7.947,
+      "normalized_effort_mean": 11.54345545901917,
+      "normalized_effort_success_mean": 11.54345545901917,
+      "normalized_effort_max": 12.817575277718442,
+      "normalized_effort_success_max": 12.817575277718442
+    },
+    {
+      "controller": "Energy",
+      "density_mode": "uniform",
+      "mass_mode": "adversarial",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20260924_152906_397866": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 7.958400000000001,
+      "normalized_effort_mean": 11.630198975055734,
+      "normalized_effort_success_mean": 11.630198975055734,
+      "normalized_effort_max": 12.92596342885996,
+      "normalized_effort_success_max": 12.92596342885996
+    },
+    {
+      "controller": "Energy",
+      "density_mode": "adversarial",
+      "mass_mode": "zero",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20260924_152906_397866": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 7.99085,
+      "normalized_effort_mean": 11.499545667461454,
+      "normalized_effort_success_mean": 11.499545667461454,
+      "normalized_effort_max": 12.80676366816156,
+      "normalized_effort_success_max": 12.80676366816156
+    },
+    {
+      "controller": "Energy",
+      "density_mode": "adversarial",
+      "mass_mode": "uniform",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20260924_152906_397866": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 7.9906500000000005,
+      "normalized_effort_mean": 11.498968802516277,
+      "normalized_effort_success_mean": 11.498968802516277,
+      "normalized_effort_max": 12.806132989916899,
+      "normalized_effort_success_max": 12.806132989916899
+    },
+    {
+      "controller": "Energy",
+      "density_mode": "adversarial",
+      "mass_mode": "adversarial",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20260924_152906_397866": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 8.0012,
+      "normalized_effort_mean": 11.579508236716524,
+      "normalized_effort_success_mean": 11.579508236716524,
+      "normalized_effort_max": 12.878750623131706,
+      "normalized_effort_success_max": 12.878750623131706
+    },
+    {
+      "controller": "Time",
+      "density_mode": "zero",
+      "mass_mode": "zero",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20261003_151500_611395": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 5.0256,
+      "normalized_effort_mean": 15.878414085427325,
+      "normalized_effort_success_mean": 15.878414085427325,
+      "normalized_effort_max": 17.52282454247971,
+      "normalized_effort_success_max": 17.52282454247971
+    },
+    {
+      "controller": "Time",
+      "density_mode": "zero",
+      "mass_mode": "uniform",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20261003_151500_611395": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 5.0256,
+      "normalized_effort_mean": 15.877916413733793,
+      "normalized_effort_success_mean": 15.877916413733793,
+      "normalized_effort_max": 17.522554869887188,
+      "normalized_effort_success_max": 17.522554869887188
+    },
+    {
+      "controller": "Time",
+      "density_mode": "zero",
+      "mass_mode": "adversarial",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20261003_151500_611395": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 5.0261000000000005,
+      "normalized_effort_mean": 15.96281473957149,
+      "normalized_effort_success_mean": 15.96281473957149,
+      "normalized_effort_max": 17.618827460929516,
+      "normalized_effort_success_max": 17.618827460929516
+    },
+    {
+      "controller": "Time",
+      "density_mode": "uniform",
+      "mass_mode": "zero",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20261003_151500_611395": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 5.0256,
+      "normalized_effort_mean": 15.878475054754608,
+      "normalized_effort_success_mean": 15.878475054754608,
+      "normalized_effort_max": 17.522838169802426,
+      "normalized_effort_success_max": 17.522838169802426
+    },
+    {
+      "controller": "Time",
+      "density_mode": "uniform",
+      "mass_mode": "uniform",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20261003_151500_611395": "none"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 5.0256,
+      "normalized_effort_mean": 15.877977329229232,
+      "normalized_effort_success_mean": 15.877977329229232,
+      "normalized_effort_max": 17.52257104424602,
+      "normalized_effort_success_max": 17.52257104424602
+    },
+    {
+      "controller": "Time",
+      "density_mode": "uniform",
+      "mass_mode": "adversarial",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20261003_151500_611395": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 5.0261000000000005,
+      "normalized_effort_mean": 15.962881015899384,
+      "normalized_effort_success_mean": 15.962881015899384,
+      "normalized_effort_max": 17.61884597392074,
+      "normalized_effort_success_max": 17.61884597392074
+    },
+    {
+      "controller": "Time",
+      "density_mode": "adversarial",
+      "mass_mode": "zero",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20261003_151500_611395": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 5.02595,
+      "normalized_effort_mean": 15.87475198710878,
+      "normalized_effort_success_mean": 15.87475198710878,
+      "normalized_effort_max": 17.519216461087456,
+      "normalized_effort_success_max": 17.519216461087456
+    },
+    {
+      "controller": "Time",
+      "density_mode": "adversarial",
+      "mass_mode": "uniform",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20261003_151500_611395": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 5.0259,
+      "normalized_effort_mean": 15.87417878898026,
+      "normalized_effort_success_mean": 15.87417878898026,
+      "normalized_effort_max": 17.518927017950084,
+      "normalized_effort_success_max": 17.518927017950084
+    },
+    {
+      "controller": "Time",
+      "density_mode": "adversarial",
+      "mass_mode": "adversarial",
+      "n_seeds": 1,
+      "p_success": 1.0,
+      "p_success_seed_std": 0.0,
+      "selected_attacks": {
+        "20261003_151500_611395": "lookahead"
+      },
+      "p_fail": 0.0,
+      "p_timeout": 0.0,
+      "hit_time_s_mean": 5.0263,
+      "normalized_effort_mean": 15.959024837430208,
+      "normalized_effort_success_mean": 15.959024837430208,
+      "normalized_effort_max": 17.615276924596184,
+      "normalized_effort_success_max": 17.615276924596184
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "mode": "rl_sb3_ppo",
+  "mode": "sb3_ppo_then_distillation",
   "example": {
     "controller_hidden_dim": 64,
     "beta_ra": 5.0,
@@ -7,6 +7,10 @@
       "air_density_kg_m3": [
         1.16375,
         1.28625
+      ],
+      "mass_kg": [
+        5850.0,
+        5950.0
       ]
     },
     "dynamics": {
@@ -175,48 +179,49 @@
       ]
     }
   },
-  "training": {
+  "settings": {
     "seed": 0,
     "config": "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/xv15_uncertain/config.json",
-    "output_dir": null,
+    "device": "auto",
     "total_timesteps": 1000000,
     "n_envs": 8,
     "n_steps": 1024,
     "batch_size": 256,
     "n_epochs": 10,
-    "learning_rate": 0.0003,
-    "gamma": 0.999,
+    "lr": 0.0003,
+    "gamma": 0.99,
     "dt": 0.01,
-    "seconds": 20.0,
-    "density_mode": "uniform_step",
-    "density_min": null,
-    "density_max": null,
+    "t_max": 30.0,
+    "parameter_mode": "uniform",
+    "uniform_refresh": "step",
     "eval_every_steps": 20000,
     "eval_episodes": 64,
     "final_eval_episodes": 300,
-    "device": "cpu",
-    "deterministic": false,
-    "no_plots": false,
+    "early_stopping_patience": 20,
+    "distill_random": 20000,
+    "distill_traj_episodes": 200,
+    "distill_epochs": 300,
+    "distill_lr": 0.001,
+    "distill_batch_size": 512,
+    "output_dir": "/Users/chko1829/src/Projects/ML/Certified-Reach-Avoid-via-Neural-Synthesis/examples/xv15_uncertain/rl_sb3_ppo/seed0/outputs",
+    "no_plots": false
+  },
+  "ppo": {
     "gae_lambda": 0.95,
     "clip_range": 0.2,
     "ent_coef": 0.005,
     "vf_coef": 0.5,
     "max_grad_norm": 0.5,
-    "hidden_dims": [
+    "net_arch": [
       64,
       64
     ],
-    "activation": "tanh",
-    "reward": {
-      "success": 10.0,
-      "fail": -10.0,
-      "time_cost": 0.01,
-      "potential_weight": 5.0
-    }
+    "activation": "Tanh"
   },
-  "versions": {
-    "torch": "2.3.1",
-    "stable_baselines3": "2.7.1",
-    "gymnasium": "1.2.3"
+  "reward": {
+    "success": 1.0,
+    "fail": -1.0,
+    "step": -0.002,
+    "potential_weight": 0.2
   }
 }
