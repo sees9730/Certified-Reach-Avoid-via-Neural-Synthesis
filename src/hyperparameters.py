@@ -117,6 +117,8 @@ class TrainingConfig:
     loss_reduction: str = 'sum'
     loss_weights: dict = None
     max_grad_norm: float = None
+    # None inherits loss_reduction, preserving existing examples' behavior.
+    generator_loss_reduction: str = None
 
 @dataclass
 class Hyperparameters:
@@ -186,7 +188,7 @@ class Hyperparameters:
 
     def to_dict(self):
         """Convert hyperparameters to dictionary."""
-        return {
+        result = {
             'network': {
                 'n_inputs': self.network.n_inputs,
                 'n_hidden_1': self.network.n_hidden_1,
@@ -300,3 +302,6 @@ class Hyperparameters:
             'compute_GV': self.compute_GV,
             'include_time': self.include_time
         }
+        if self.training.generator_loss_reduction is not None:
+            result['training']['generator_loss_reduction'] = self.training.generator_loss_reduction
+        return result

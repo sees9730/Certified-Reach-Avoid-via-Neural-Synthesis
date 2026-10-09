@@ -98,10 +98,14 @@ Bound training prioritizes safety:
 - When a value constraint regresses beyond that tolerance, generator weight
   is halved each epoch; recovery resumes a gradual ramp. This is an optimization
   schedule: final certification still requires the original exact checks.
-- Bound losses are per-cell means, so adding cells does not mechanically
-  multiply a uniform violation. Unsafe loss has weight 5; other value losses
-  have weight 1. The bound learning rate is 0.001, with gradient norm capped
-  at 1. Logged component losses are means; `Total` includes their weights.
+- Value bound losses are per-cell means. Unsafe loss has weight 5; other
+  value losses have weight 1. The generator loss is the maximum active-cell
+  violation: `max(relu(GV_upper + 1e-4))`, with zero loss if no cells are active.
+  Active cells have `V_lower <= beta_ra` (nonfinite bounds also remain active).
+  Passing or inactive cells do not dilute a remaining generator violation.
+  The bound learning rate is 0.001, with gradient norm capped at 1.
+  Logged value losses are means; logged generator loss is the maximum
+  violation before weighting; `Total` includes their weights.
 
 The schedule addresses the original seed0 run's collapse toward `V=0.1`,
 where coarse generator bounds dominated the initial updates and repeated
@@ -111,6 +115,9 @@ value function with small generator loss as a useful safety certificate.
 generator loss during warmup means it was not optimized, not that it passed.
 The shared trainer retains summed losses and constant generator weight for
 other examples unless these options are explicitly enabled.
+The generator reduction override is saved as `generator_loss_reduction="max"`
+for Kepler. Its shared default is `None`, which preserves the existing
+sum/mean reduction for other examples and older saved configurations.
 
 ## Run
 

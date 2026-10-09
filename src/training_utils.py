@@ -107,10 +107,14 @@ def compute_loss_generator_bounds(
     Phi_upper: torch.Tensor,
     beta_ra,
     V_generator_lower: torch.Tensor = None,
+    loss_reduction: str = 'sum',
 ) -> torch.Tensor:
+    if loss_reduction not in {'sum', 'max'}:
+        raise ValueError("Generator bound loss reduction must be 'sum' or 'max'")
     active, failing = generator_bound_masks(Phi_upper, beta_ra, V_generator_lower)
     # An empty selection still retains its autograd connection.
-    loss = F.relu(Phi_upper[active] + GENERATOR_MARGIN).sum()
+    violations = F.relu(Phi_upper[active] + GENERATOR_MARGIN)
+    loss = violations.amax() if loss_reduction == 'max' and violations.numel() else violations.sum()
     sat = not bool(failing.any().item())
     return loss, sat
 
@@ -128,6 +132,7 @@ def compute_total_loss_bounds(
     compute_V: bool = True,
     compute_GV: bool = True,
     loss_reduction: str = 'sum',
+    generator_loss_reduction: str = None,
 ) -> Tuple[torch.Tensor, dict]:
     """
     Compute total training loss from CROWN bounds.
@@ -146,6 +151,8 @@ def compute_total_loss_bounds(
         loss_weights: Optional dictionary of weights for each loss component
         loss_reduction: 'sum' (default) or per-region/per-generator-cell 'mean';
             affects optimization and logging, but never SAT thresholds.
+        generator_loss_reduction: Optional 'sum', 'mean', or 'max' override
+            for the generator only; None preserves loss_reduction behavior.
         device: Device
 
     Returns:
@@ -153,6 +160,9 @@ def compute_total_loss_bounds(
     """
     if loss_reduction not in {'sum', 'mean'}:
         raise ValueError("loss_reduction must be 'sum' or 'mean'")
+    if generator_loss_reduction is not None and generator_loss_reduction not in {'sum', 'mean', 'max'}:
+        raise ValueError("generator_loss_reduction must be None, 'sum', 'mean', or 'max'")
+    effective_generator_reduction = loss_reduction if generator_loss_reduction is None else generator_loss_reduction
     if loss_weights is None:
         loss_weights = {
             'goal': 1.0,
@@ -168,7 +178,9 @@ def compute_total_loss_bounds(
         loss_init, sat_init = compute_loss_init_bounds(V_init_upper)
         loss_outside, sat_outside = compute_loss_outside_bounds(V_outside_lower)
     if compute_GV:
-        loss_generator, sat_generator = compute_loss_generator_bounds(Phi_upper, beta_ra, V_generator_lower=V_generator_lower)
+        loss_generator, sat_generator = compute_loss_generator_bounds(
+            Phi_upper, beta_ra, V_generator_lower=V_generator_lower,
+            loss_reduction='max' if effective_generator_reduction == 'max' else 'sum')
 
     # Normalize optimization losses only; SAT still checks every original bound.
     if loss_reduction == 'mean':
@@ -177,8 +189,8 @@ def compute_total_loss_bounds(
             loss_unsafe = loss_unsafe / max(1, V_unsafe_lower.numel())
             loss_init = loss_init / max(1, V_init_upper.numel())
             loss_outside = loss_outside / max(1, V_outside_lower.numel())
-        if compute_GV:
-            loss_generator = loss_generator / max(1, Phi_upper.numel())
+    if compute_GV and effective_generator_reduction == 'mean':
+        loss_generator = loss_generator / max(1, Phi_upper.numel())
 
     # Combine losses
     total_loss = torch.tensor(0.0, device=device)

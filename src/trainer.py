@@ -168,6 +168,7 @@ def train_network_bounds(
         'compute_GV': params.compute_GV,
         'loss_weights': getattr(params.training, 'loss_weights', None),
         'loss_reduction': getattr(params.training, 'loss_reduction', 'sum'),
+        'generator_loss_reduction': getattr(params.training, 'generator_loss_reduction', None),
     }
 
     # Training loop

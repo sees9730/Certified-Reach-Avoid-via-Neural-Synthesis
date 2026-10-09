@@ -61,9 +61,82 @@ def test_training_controls_survive_hyperparameter_round_trip(tmp_path):
     params = make_hyperparameters(load_config(), 0, tmp_path)
     saved = Hyperparameters.from_dict(params.to_dict())
     assert saved.training.loss_reduction == 'mean'
+    assert saved.training.generator_loss_reduction == 'max'
     assert saved.training.loss_weights['unsafe'] == 5.
     assert saved.training.max_grad_norm == 1.
     assert Hyperparameters.default().training.loss_reduction == 'sum'
+    assert Hyperparameters.default().training.generator_loss_reduction is None
+    assert 'generator_loss_reduction' not in Hyperparameters.default().to_dict()['training']
+    legacy = params.to_dict()
+    del legacy['training']['generator_loss_reduction']
+    assert Hyperparameters.from_dict(legacy).training.generator_loss_reduction is None
+
+
+def test_max_generator_loss_is_not_diluted_by_passing_or_inactive_cells():
+    phi = torch.tensor([.2, .7, -.3, 100.], dtype=torch.float64)
+    v_lower = torch.tensor([.1, 5., .1, 6.], dtype=torch.float64)
+    kwargs = dict(beta_ra=5., compute_V=False, generator_weight=.5,
+                  loss_reduction='mean', generator_loss_reduction='max')
+    loss, parts, sat = compute_total_loss_bounds(
+        Phi_upper=phi, V_generator_lower=v_lower, **kwargs)
+    extended_phi = torch.cat([phi.repeat(2), torch.full((1000,), -.2), torch.full((1000,), 200.)])
+    extended_v = torch.cat([v_lower.repeat(2), torch.zeros(1000), torch.full((1000,), 6.)])
+    loss2, parts2, sat2 = compute_total_loss_bounds(
+        Phi_upper=extended_phi, V_generator_lower=extended_v, **kwargs)
+    assert parts['generator'] == pytest.approx(.7001)
+    assert loss.item() == pytest.approx(.5 * .7001)
+    torch.testing.assert_close(loss, loss2)
+    assert parts == parts2 and sat == sat2
+    assert sat['generator'] is False
+
+
+def test_max_generator_gradient_targets_worst_active_cell():
+    phi = torch.tensor([.2, .7, -.3, 100.], requires_grad=True)
+    loss, _, _ = compute_total_loss_bounds(
+        beta_ra=5., Phi_upper=phi, V_generator_lower=torch.tensor([.1, 5., .1, 6.]),
+        compute_V=False, generator_weight=.5,
+        loss_reduction='mean', generator_loss_reduction='max')
+    loss.backward()
+    torch.testing.assert_close(phi.grad, torch.tensor([0., .5, 0., 0.]))
+
+
+@pytest.mark.parametrize('phi_values, v_values', [([], []), ([10.], [6.]), ([-.2], [.1])])
+def test_max_generator_handles_empty_inactive_and_passing_cells(phi_values, v_values):
+    phi = torch.tensor(phi_values, requires_grad=True)
+    loss, parts, sat = compute_total_loss_bounds(
+        beta_ra=5., Phi_upper=phi, V_generator_lower=torch.tensor(v_values),
+        compute_V=False, generator_weight=1., generator_loss_reduction='max')
+    assert loss.item() == 0. and parts['generator'] == 0. and sat['generator'] is True
+    loss.backward()
+    torch.testing.assert_close(phi.grad, torch.zeros_like(phi))
+
+
+def test_max_generator_override_keeps_value_losses_and_sat_checks_unchanged():
+    kwargs = dict(beta_ra=5., V_goal_lower=torch.tensor([-.1, .2]),
+                  V_unsafe_lower=torch.tensor([4., 5.2]), V_init_upper=torch.tensor([1.2, .3]),
+                  V_outside_lower=torch.tensor([-.5, .3]), Phi_upper=torch.tensor([.2, .7]),
+                  V_generator_lower=torch.tensor([.1, .1]), generator_weight=.5,
+                  loss_reduction='mean', loss_weights=dict(goal=1., unsafe=5., init=1., outside=1.))
+    _, baseline, baseline_sat = compute_total_loss_bounds(**kwargs)
+    _, changed, changed_sat = compute_total_loss_bounds(**kwargs, generator_loss_reduction='max')
+    for name in ('goal', 'unsafe', 'init', 'outside'):
+        assert changed[name] == baseline[name]
+    assert baseline['generator'] == pytest.approx((.2001 + .7001) / 2)
+    assert changed['generator'] == pytest.approx(.7001)
+    assert changed_sat == baseline_sat
+
+
+@pytest.mark.parametrize('reduction, divisor', [('sum', 1), ('mean', 4)])
+def test_default_generator_reduction_preserves_legacy_loss_and_gradients(reduction, divisor):
+    phi = torch.tensor([.2, .7, -.3, 100.], dtype=torch.float64, requires_grad=True)
+    loss, parts, sat = compute_total_loss_bounds(
+        beta_ra=5., Phi_upper=phi, V_generator_lower=torch.tensor([.1, 5., .1, 6.]),
+        compute_V=False, generator_weight=.5, loss_reduction=reduction)
+    assert parts['generator'] == pytest.approx((.2001 + .7001) / divisor)
+    assert loss.item() == pytest.approx(.5 * (.2001 + .7001) / divisor)
+    assert sat['generator'] is False
+    loss.backward()
+    torch.testing.assert_close(phi.grad, torch.tensor([.5, .5, 0., 0.], dtype=torch.float64) / divisor)
 
 
 def test_initial_certificate_separates_unsafe_faces_from_initial_set(tmp_path):

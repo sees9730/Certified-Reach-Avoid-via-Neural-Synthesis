@@ -75,6 +75,7 @@ def make_hyperparameters(config, seed, seed_dir,
     params.training.generator_weight = 1.0
     params.training.generator_start_epoch = 0
     params.training.loss_reduction = 'mean'
+    params.training.generator_loss_reduction = 'max'
     params.training.loss_weights = dict(goal=1.0, unsafe=5.0, init=1.0, outside=1.0)
     params.training.max_grad_norm = 1.0
     params.training.random_seed = seed
@@ -244,7 +245,8 @@ def main(argv=None):
         (output_dir / "run_config.json").write_text(json.dumps(
             dict(mode="nominal_drift", example=config, hyperparameters=params.to_dict(),
                  generator_curriculum=schedule.to_dict()), indent=2) + "\n")
-        print("Bound losses are per-cell means; unsafe weight=5; gradient norm capped at 1.")
+        print("Value bound losses are per-cell means; generator loss is the maximum active-cell violation.")
+        print("Unsafe weight=5; gradient norm capped at 1.")
         print(f"Generator warmup: {args.generator_warmup} epochs; safety-gated ramp: {args.generator_ramp} epochs.")
         print(f"Merging margins: outside={params.refinement.v_outside.merge_relax_margin}; "
               f"generator={params.refinement.gv_generator.merge_relax_margin}.")
